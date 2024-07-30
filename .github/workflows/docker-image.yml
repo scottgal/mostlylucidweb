@@ -21,7 +21,7 @@ jobs:
       run: docker build . --file Mostlylucid/Dockerfile --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest
 
     - name: Tag the Docker image with a timestamp
-      run: docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/mostlylucid:latest ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$(date +%s)
+      run: docker tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$(date +%s)
 
     - name: Push the Docker image to Docker Hub
       run: |
