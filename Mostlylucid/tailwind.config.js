@@ -164,5 +164,7 @@
                 modifiers: [],
             }),
             require("@tailwindcss/forms"),
+            require("@tailwindcss/aspect-ratio"),
+            require('daisyui'),
         ],
     };

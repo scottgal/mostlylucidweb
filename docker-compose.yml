@@ -1,0 +1,6 @@
+﻿services:
+  mostlylucid:
+    image: mostlylucid
+    build:
+      context: .
+      dockerfile: Mostlylucid/Dockerfile

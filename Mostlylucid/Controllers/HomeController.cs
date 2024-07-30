@@ -18,7 +18,7 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         List<IndexPageViewModel> pageModels = new();
-        var pages = Directory.GetFiles("~/Markdown" , "*.md");
+        var pages = Directory.GetFiles("Markdown" , "*.md");
         foreach (var page in pages)
         {
             var fileInfo = new FileInfo(page);

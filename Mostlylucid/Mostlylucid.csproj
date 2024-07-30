@@ -12,7 +12,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Markdown\" />
+      <Folder Include="Markdown\CloudFree\" />
+      <Folder Include="Markdown\Coding\" />
       <Folder Include="wwwroot\lib\" />
     </ItemGroup>
 
@@ -72,6 +73,25 @@
     <ItemGroup>
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
+      </Content>
+      <None Remove="Markdown\AboutMe.md" />
+      <Content Include="Markdown\AboutMe.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\img.png" />
+      <Content Include="Markdown\img.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\intro.md" />
+      <Content Include="Markdown\intro.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\oldisnew.md" />
+      <Content Include="Markdown\oldisnew.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\css\dist\main.css">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
 
