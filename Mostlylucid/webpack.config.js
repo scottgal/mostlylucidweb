@@ -23,7 +23,7 @@ var buildConfig = function (env) {
         output: {
             filename: '[name].js',
             path: outputPath,
-            library: 'JaneSeller'
+            library: 'Mostlylucid'
         },
         mode: isProd ? 'production' : 'development',
         watch: false,
