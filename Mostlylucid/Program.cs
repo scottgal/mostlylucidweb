@@ -1,4 +1,5 @@
 using Mostlylucid.Services;
+using SixLabors.ImageSharp.Web.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -6,6 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<BlogService>();
+
+builder.Services.AddImageSharp();
 
 var app = builder.Build();
 
@@ -18,7 +21,9 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseImageSharp();
 app.UseStaticFiles();
+
 
 app.UseRouting();
 

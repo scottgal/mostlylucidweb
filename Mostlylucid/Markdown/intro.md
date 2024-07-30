@@ -1,6 +1,8 @@
 # Clearing the smoke
 ## Cloud free systems for startups.
 
+<!--category-- Clearing the smoke, introduction -->
+
 First I am NOT saying that the cloud is somehow evil or unnecessary just that for many startups it can be unnecessary / expensice for 
 either your main or dev / test systems.
 
