@@ -1,0 +1,6 @@
+﻿@model List<Mostlylucid.Models.Blog.PostListModel>
+
+@foreach (var post in Model)
+{
+    <partial name="_ListPost" model="post"/>
+}

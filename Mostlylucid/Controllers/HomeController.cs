@@ -1,33 +1,19 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Models;
-using System.IO;
+using Mostlylucid.Models;
+using Mostlylucid.Services;
 using Mostlylucidblog.Models;
 
-namespace Mostlylucidblog.Controllers;
+namespace Mostlylucid.Controllers;
 
-public class HomeController : Controller
-{
-    private readonly ILogger<HomeController> _logger;
 
-    public HomeController(ILogger<HomeController> logger)
+    public class HomeController(BlogService blogService, ILogger<HomeController> logger) : Controller
     {
-        _logger = logger;
-    }
-
     public IActionResult Index()
     {
-        List<IndexPageViewModel> pageModels = new();
-        var pages = Directory.GetFiles("Markdown" , "*.md");
-        foreach (var page in pages)
-        {
-            var fileInfo = new FileInfo(page);
-            var lines = System.IO.File.ReadAllLines(page);
-            var title = lines[0];
-          
-            pageModels.Add(new IndexPageViewModel { Title = title, Path = page, DateModified =fileInfo.LastWriteTime });
-        }
-        return View();
+        var posts = blogService.GetPosts();
+      var indexPageViewModel = new IndexPageViewModel { Posts = posts };
+        return View(indexPageViewModel);
     }
 
     public IActionResult Privacy()

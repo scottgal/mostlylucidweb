@@ -1,10 +1,8 @@
-﻿namespace WebApplication1.Models;
+﻿using Mostlylucid.Models.Blog;
+
+namespace Mostlylucid.Models;
 
 public class IndexPageViewModel
 {
-    public string  Title { get; set; }
-    
-    public string Path { get; set; }
-    
-    public DateTime DateModified { get; set; }
+   public List<PostListModel> Posts { get; set; }
 }

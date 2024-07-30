@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.svg-container
+{
+    width:20rem;
+    img {
+    filter: none;
+ 
+}
+}
+
+/* Dark mode styles */
+@media (prefers-color-scheme: dark) {
+    .svg-container  img {
+            filter: invert(1) hue-rotate(180deg);
+        }
+    
+}
