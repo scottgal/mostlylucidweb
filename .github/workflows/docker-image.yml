@@ -7,12 +7,25 @@ on:
     branches: [ "main" ]
 
 jobs:
-
-  build:
-
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Check out the repository
+      uses: actions/checkout@v4
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
+
     - name: Build the Docker image
-      run: docker build . --file Mostlylucid/Dockerfile --tag mostlylucid:$(date +%s)
+      run: docker build . --file Mostlylucid/Dockerfile --tag ${{ secrets.DOCKER_HUB_USERNAME }}/mostlylucid:latest
+
+    - name: Tag the Docker image with a timestamp
+      run: docker tag ${{ secrets.DOCKER_HUB_USERNAME }}/mostlylucid:latest ${{ secrets.DOCKER_HUB_USERNAME }}/mostlylucid:$(date +%s)
+
+    - name: Push the Docker image to Docker Hub
+      run: |
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mostlylucid:latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mostlylucid:$(date +%s)
+
+
