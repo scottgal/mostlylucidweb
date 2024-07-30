@@ -29,10 +29,11 @@ RUN npm install
 # Ensure npm-run-all is available and install npm dependencies
 RUN npm --version
 RUN npx tailwindcss -i ./src/css/main.css -o ./wwwroot/css/dist/main.css
+
 RUN dotnet build "Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final

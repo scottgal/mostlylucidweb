@@ -5,7 +5,7 @@ interface GlobalState {
     themeSwitch(): void;
 }
 
-function global(): GlobalState {
+function main(): GlobalState {
     return {
         isMobileMenuOpen: false,
         isDarkMode: false,

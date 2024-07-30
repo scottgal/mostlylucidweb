@@ -4,4 +4,4 @@ interface GlobalState {
     themeInit(): void;
     themeSwitch(): void;
 }
-declare function global(): GlobalState;
+declare function main(): GlobalState;
