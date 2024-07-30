@@ -15,17 +15,27 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Log in to Docker Hub
-      run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USER_NAME }}" --password-stdin
+      run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USERNAME }}" --password-stdin
 
-    - name: Build the Docker image
-      run: docker build . --file Mostlylucid/Dockerfile --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
 
-    - name: Tag the Docker image with a timestamp
-      run: docker tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$(date +%s)
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
+    - name: Build and tag the Docker image
+      id: build
+      run: |
+        TIMESTAMP=$(date +%s)
+        echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+        docker build . --file Mostlylucid/Dockerfile --tag ${{ secrets.DOCKER_HUB_USERNAME }}/mostlylucid:latest --tag ${{ secrets.DOCKER_HUB_USERNAME }}/mostlylucid:$TIMESTAMP
 
     - name: Push the Docker image to Docker Hub
       run: |
-        docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest
-        docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$(date +%s)
-
-
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mostlylucid:latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/mostlylucid:${{ env.TIMESTAMP }}
