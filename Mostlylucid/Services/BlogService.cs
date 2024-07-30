@@ -70,7 +70,7 @@ public class BlogService(ILogger<BlogService> logger)
            
             var pageInfo = GetPage(page, false);
             
-            var summary = Markdown.ToPlainText( pageInfo.restOfTheLines).Substring(0,50) + "...";
+            var summary = Markdown.ToPlainText( pageInfo.restOfTheLines).Substring(0,100) + "...";
             pageModels.Add(new PostListModel {Categories = pageInfo.categories, Title = pageInfo.title,
                 Slug = pageInfo.slug, WordCount = WordCount(pageInfo.restOfTheLines),Date = pageInfo.lastWrite, Summary = summary });
         }

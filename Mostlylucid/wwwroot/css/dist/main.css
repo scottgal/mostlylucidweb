@@ -1236,10 +1236,6 @@ html {
   margin-bottom: 1rem;
 }
 
-.mb-6 {
-  margin-bottom: 1.5rem;
-}
-
 .ml-3 {
   margin-left: 0.75rem;
 }
@@ -1348,10 +1344,6 @@ html {
   border-radius: 9999px;
 }
 
-.border {
-  border-width: 1px;
-}
-
 .border-b {
   border-bottom-width: 1px;
 }
@@ -1407,11 +1399,6 @@ html {
   padding-right: 0.5rem;
 }
 
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-
 .py-1 {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
@@ -1437,10 +1424,6 @@ html {
   padding-bottom: 1.5rem;
 }
 
-.pb-16 {
-  padding-bottom: 4rem;
-}
-
 .pb-6 {
   padding-bottom: 1.5rem;
 }
@@ -1463,10 +1446,6 @@ html {
 
 .pr-2 {
   padding-right: 0.5rem;
-}
-
-.pr-8 {
-  padding-right: 2rem;
 }
 
 .pt-3 {
@@ -1676,11 +1655,6 @@ html {
     flex-direction: row;
   }
 
-  .sm\:px-6 {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-
   .sm\:py-12 {
     padding-top: 3rem;
     padding-bottom: 3rem;
@@ -1727,10 +1701,6 @@ html {
 
   .lg\:py-20 {
     padding-top: 5rem;
-    padding-bottom: 5rem;
-  }
-
-  .lg\:pb-20 {
     padding-bottom: 5rem;
   }
 

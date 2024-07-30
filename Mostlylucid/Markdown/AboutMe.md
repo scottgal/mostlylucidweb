@@ -1,9 +1,11 @@
 # About Me
 
+## Scott Galloway | Lead .NET Developer & CTO  
+
+<!--category-- resume , introduction -->
 
 
-## Summary
-Versatile and accomplished Senior .NET Developer with over 25 years of expertise in software development, technical leadership, and team management. Proficient in C#, ASP.NET, and modern web frameworks, with extensive experience in cloud computing, DevOps, and database management. Proven track record of leading successful development projects across diverse industries, from technology giants to innovative startups.
+Versatile and accomplished Lead .NET Developer with over 25 years of expertise in software development, technical leadership, and team management. Proficient in C#, ASP.NET, and modern web frameworks, with extensive experience in cloud computing, DevOps, and database management. Proven track record of leading successful development projects across diverse industries, from technology giants to innovative startups.
 
 ## Employment History
 ### Consulting | Lead Developer / Architect / Managing Director | Remote

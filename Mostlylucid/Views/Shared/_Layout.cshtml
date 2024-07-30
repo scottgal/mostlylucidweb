@@ -93,7 +93,7 @@
           <div class="svg-container">
               <img src="img/logo.svg" alt="logo"/>
           </div>
-          
+                <partial name="_Socials"/>
       </span>
             </a>
             <div class="flex items-center lg:hidden">
@@ -285,97 +285,7 @@
                     @RenderBody()
                 </div>
             </div>
-
-            <div class="pb-16 lg:pb-20">
-                <div class="flex items-center pb-6">
-                    <img src="/assets/img/icon-project.png" alt="icon story" />
-                    <h3
-                        class="ml-3 font-body text-2xl font-semibold text-primary dark:text-white"
-                    >
-                        My Projects
-                    </h3>
-                </div>
-                <div>
-
-                    <a
-                        href=" / "
-                        class="mb-6 flex items-center justify-between border border-grey-lighter px-4 py-4 sm:px-6"
-                    >
-        <span class="w-9/10 pr-8">
-          <h4
-              class="font-body text-lg font-semibold text-primary dark:text-white"
-          >
-            TailwindCSS
-          </h4>
-          <p class="font-body font-light text-primary dark:text-white">
-            Rapidly build modern websites without ever leaving your HTML.
-          </p>
-        </span>
-                        <span class="w-1/10">
-          <img src="/assets/img/chevron-right.png" class="mx-auto" alt="chevron right" />
-        </span>
-                    </a>
-
-                    <a
-                        href=" / "
-                        class="mb-6 flex items-center justify-between border border-grey-lighter px-4 py-4 sm:px-6"
-                    >
-        <span class="w-9/10 pr-8">
-          <h4
-              class="font-body text-lg font-semibold text-primary dark:text-white"
-          >
-            Maizzle
-          </h4>
-          <p class="font-body font-light text-primary dark:text-white">
-            Framework for Rapid Email Prototyping
-          </p>
-        </span>
-                        <span class="w-1/10">
-          <img src="/assets/img/chevron-right.png" class="mx-auto" alt="chevron right" />
-        </span>
-                    </a>
-
-                    <a
-                        href=" / "
-                        class="mb-6 flex items-center justify-between border border-grey-lighter px-4 py-4 sm:px-6"
-                    >
-        <span class="w-9/10 pr-8">
-          <h4
-              class="font-body text-lg font-semibold text-primary dark:text-white"
-          >
-            Alpine.js
-          </h4>
-          <p class="font-body font-light text-primary dark:text-white">
-            Think of it like Tailwind for JavaScript.
-          </p>
-        </span>
-                        <span class="w-1/10">
-          <img src="/assets/img/chevron-right.png" class="mx-auto" alt="chevron right" />
-        </span>
-                    </a>
-
-                    <a
-                        href=" / "
-                        class="mb-6 flex items-center justify-between border border-grey-lighter px-4 py-4 sm:px-6"
-                    >
-        <span class="w-9/10 pr-8">
-          <h4
-              class="font-body text-lg font-semibold text-primary dark:text-white"
-          >
-            PostCSS
-          </h4>
-          <p class="font-body font-light text-primary dark:text-white">
-            A tool for transforming CSS with JavaScript
-          </p>
-        </span>
-                        <span class="w-1/10">
-          <img src="/assets/img/chevron-right.png" class="mx-auto" alt="chevron right" />
-        </span>
-                    </a>
-
-                </div>
-            </div>
-        </div>
+ 
     </div>
 
     <div class="container mx-auto">
@@ -384,38 +294,23 @@
         >
             <div class="mr-auto flex flex-col items-center sm:flex-row">
                 <a href="/" class="mr-auto sm:mr-6">
-                    <img src="/assets/img/logo.svg" alt="logo" />
+                    <div class="svg-container">
+                        
+                    
+                    <img src="img/logo.svg" alt="logo"/>
+                    </div>
                 </a>
                 <p class="pt-5 font-body font-light text-primary dark:text-white sm:pt-0">
                     ©2024 Scott Galloway
                 </p>
             </div>
-            <div class="mr-auto flex items-center pt-5 sm:mr-0 sm:pt-0">
-
-                <a href="https://github.com/ " target="_blank">
-                    <i
-                        class="text-4xl text-primary dark:text-white pl-5 hover:text-secondary dark:hover:text-secondary transition-colors bx bxl-github"
-                    ></i>
-                </a>
-
-                <a href="https://codepen.io/ " target="_blank">
-                    <i
-                        class="text-4xl text-primary dark:text-white pl-5 hover:text-secondary dark:hover:text-secondary transition-colors bx bxl-codepen"
-                    ></i>
-                </a>
-
-                <a href="https://www.linkedin.com/ " target="_blank">
-                    <i
-                        class="text-4xl text-primary dark:text-white pl-5 hover:text-secondary dark:hover:text-secondary transition-colors bx bxl-linkedin"
-                    ></i>
-                </a>
-
-            </div>
+      <partial name="_Socials"/>
         </div>
     </div>
 
 </div>
 
+</div>
 <script src="/assets/js/main.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
