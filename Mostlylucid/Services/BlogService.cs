@@ -12,7 +12,8 @@ public class BlogService(ILogger<BlogService> logger)
     public BlogPostViewModel GetPost(string postName)
     {
     
-        var (title, slug, lastWrite, plainText, categories, restOfTheLines) = GetPage(postName, true);
+        var path = System.IO.Path.Combine(Path, postName + ".md");
+        var (title, slug, lastWrite, plainText, categories, restOfTheLines) = GetPage(path, true);
         return new BlogPostViewModel {Categories = categories, Content = plainText, Date = lastWrite, Slug = slug, Title = title};
     }
     
