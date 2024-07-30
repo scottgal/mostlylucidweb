@@ -1,0 +1,34 @@
+
+{
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:*",
+    "dev:js": "webpack",
+    "dev:tw": "npx tailwindcss -i ./src/css/main.css -o ./wwwroot/css/dist/main.css",
+    "watch": "npm-run-all --parallel watch:*",
+    "watch:js": "webpack --watch --env development",
+    "watch:tw": "npx tailwindcss -i ./src/css/main.css -o ./wwwroot/css/dist/main.css --watch",
+    "build": "npm-run-all --parallel build:*",
+    "build:js": "webpack --env production",
+    "build:tw": "npx tailwindcss -i ./src/css/main.css -o ./wwwroot/css/dist/main.css --minify"
+  },
+  "devDependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.12",
+    "@types/alpinejs": "^3.13.10",
+    "daisyui": "^4.10.2",
+    "npm-run-all": "^4.1.5",
+    "tailwindcss": "^3.4.3",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/typography": "^0.5.13",
+    "daisyui": "^4.12.10",
+    "tailwindcss": "^3.4.7"
+  }
+}
