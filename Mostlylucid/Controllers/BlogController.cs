@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Services;
 
 namespace Mostlylucidblog.Controllers;
@@ -15,6 +16,7 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
     }
 
     [Route("show/{slug}")]
+    [OutputCache(Duration = 3600)]
     public IActionResult Show(string slug)
     {
        var post =  blogService.GetPost(slug);
