@@ -79,7 +79,58 @@ COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Mostlylucid.dll"]
 ```
 
-### Full DockerFile
+### GitHub Actions
+
+The GitHub Action for this site is a simple build and push action that is triggered on a push to the main branch.
+https://github.com/scottgal/mostlylucidweb/blob/main/.github/workflows/docker-image.yml
+
+This action checks out the repository, logs into Docker Hub, sets up Docker Buildx, caches the Docker layers, builds and tags the Docker image, and then pushes the image to Docker Hub.
+
+In the docker compose file 
+
+```yaml
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v4
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USER_NAME }}" --password-stdin
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
+    - name: Build and tag the Docker image
+      id: build
+      run: |
+        TIMESTAMP=$(date +%s)
+        echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+        docker build . --file Mostlylucid/Dockerfile --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP
+
+    - name: Push the Docker image to Docker Hub
+      run: |
+        docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest
+        docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:${{ env.TIMESTAMP }}
+```
 
 
 
