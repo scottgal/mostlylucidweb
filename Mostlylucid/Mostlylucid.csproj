@@ -75,7 +75,7 @@
         <Link>.dockerignore</Link>
       </Content>
       <None Remove="Markdown\AboutMe.md" />
-      <Content Include="Markdown\AboutMe.md">
+      <Content Include="Markdown\aboutme.md">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <None Remove="Markdown\img.png" />
