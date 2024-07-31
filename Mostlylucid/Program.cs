@@ -1,14 +1,19 @@
+
 using Mostlylucid.Services;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var env = builder.Environment;
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+var directoryPath = Path.Combine(env.ContentRootPath, "Markdown");
+builder.Services.AddResponseCaching();
+builder.Services.AddResponseCompression();
 builder.Services.AddScoped<BlogService>();
 
 builder.Services.AddImageSharp();
+
 
 var app = builder.Build();
 
@@ -29,6 +34,9 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+
+app.UseResponseCaching();
+app.UseResponseCompression();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

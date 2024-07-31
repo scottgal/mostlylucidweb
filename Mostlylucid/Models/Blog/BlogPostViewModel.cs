@@ -10,5 +10,7 @@ public class BlogPostViewModel
     
     public string Slug { get; set; }= string.Empty;
     
-    public DateTimeOffset Date { get; set; }
+    public DateTime UpdatedDate { get; set; }
+    
+    public DateTime CreatedDate { get; set; }
 }

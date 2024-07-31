@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Models;
 using Mostlylucid.Services;
 using Mostlylucidblog.Models;
@@ -9,6 +10,7 @@ namespace Mostlylucid.Controllers;
 
     public class HomeController(BlogService blogService, ILogger<HomeController> logger) : Controller
     {
+    [OutputCache(Duration = 60*60*60)]
     public IActionResult Index()
     {
         var posts = blogService.GetPosts();
@@ -17,6 +19,7 @@ namespace Mostlylucid.Controllers;
     }
 
     public IActionResult Privacy()
+    
     {
         return View();
     }

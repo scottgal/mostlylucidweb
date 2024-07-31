@@ -224,87 +224,29 @@
     </div>
 
 
-    <div><div class="container mx-auto">
-            <div class="border-b border-grey-lighter ">
-                <div>
-                    <img src="img/author.png?width=64&height=64&format=webp" asp-append-version="true" class="h-16 w-16 mask mask-circle" alt="author"  />
-                </div>
-                <h1
-                    class="pt-3 font-body text-4xl font-semibold text-primary dark:text-white md:text-5xl lg:text-6xl"
-                >
-                    Hi, I’m Scott Galloway
-                </h1>
-                <p class="pt-3 font-body text-xl font-light text-primary dark:text-white">
-                    A lead developer, ertswhile CTO, senior web developer etc...based in Scotland in the UK
-                </p>
-                <a
-                    href="/"
-                    class="mt-12 block bg-secondary px-10 py-4 text-center font-body text-xl font-semibold text-white transition-colors hover:bg-green sm:inline-block sm:text-left sm:text-2xl"
-                >
-                    Say Hello!
-                </a>
-            </div>
+<div>
+    
+    <div class="container mx-auto" id="contentcontainer">
+   @RenderBody()
 
-            <div class="border-b border-grey-lighter py-16 lg:py-20">
-                <div class="flex items-center pb-6">
-                    <img src="img/icon-story.png" alt="icon story" />
-                    <h3
-                        class="ml-3 font-body text-2xl font-semibold text-primary dark:text-white"
-                    >
-                        My Story
-                    </h3>
-                </div>
-                <div>
-                    <p class="font-body font-light text-primary dark:text-white">
-                        This site is a collection of my thoughts, ideas, and projects. I'm always building SOMETHING so decided too share both how I build these somethings and what I build.
-                    </p>
-                </div>
-            </div>
-
-            <div class="py-16 lg:py-20">
-                <div class="flex items-center pb-6">
-                    <img src="img/icon-blog.png" class="w-8" alt="icon story" />
-                    <h3
-                        class="ml-3 font-body text-2xl font-semibold text-primary dark:text-white"
-                    >
-                       Blog Posts
-                    </h3>
-                    <a
-                        href="/blog"
-                        class="flex items-center pl-10 font-body italic text-green transition-colors hover:text-secondary dark:text-green-light dark:hover:text-secondary"
-                    >
-                        All posts
-                        <img
-                            src="img/long-arrow-right.png"
-                            class="ml-3"
-                            alt="arrow right"
-                        />
-                    </a>
-                </div>
-                <div class="pt-8" id="content">
-                    @RenderBody()
-                </div>
-            </div>
- 
     </div>
 
     <div class="container mx-auto">
         <div
-            class="flex flex-col items-center justify-between border-t border-grey-lighter py-10 sm:flex-row sm:py-12"
-        >
+            class="flex flex-col items-center justify-between border-t border-grey-lighter py-10 sm:flex-row sm:py-12">
             <div class="mr-auto flex flex-col items-center sm:flex-row">
                 <a href="/" class="mr-auto sm:mr-6">
                     <div class="svg-container">
-                        
-                    
-                    <img src="img/logo.svg" alt="logo"/>
+
+
+                        <img src="img/logo.svg" alt="logo"/>
                     </div>
                 </a>
                 <p class="pt-5 font-body font-light text-primary dark:text-white sm:pt-0">
                     ©2024 Scott Galloway
                 </p>
             </div>
-      <partial name="_Socials"/>
+            <partial name="_Socials"/>
         </div>
     </div>
 
