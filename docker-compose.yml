@@ -1,9 +1,6 @@
 ﻿services:
   mostlylucid:
-    image: mostlylucid
-    build:
-      context: .
-      dockerfile: Mostlylucid/Dockerfile
+    image: scottgal/mostlylucid:latest
   cloudflared:
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}

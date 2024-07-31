@@ -8,8 +8,7 @@
         <span
             class="mb-4 inline-block rounded-full bg-green-light px-2 py-1 font-body text-sm text-green">@category</span>
     }
-    <a
-        asp-action="Show" asp-route-slug="@Model.Slug" asp-controller="Blog"
+    <a asp-action="Show" asp-route-slug="@Model.Slug" asp-controller="Blog"
         class="block font-body text-lg font-semibold text-primary transition-colors hover:text-green dark:text-white dark:hover:text-secondary">@Model.Title</a>
     <div class="block font-body">@Model.Summary</div>
     <div class="flex items-center pt-4">

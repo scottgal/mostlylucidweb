@@ -10,6 +10,6 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
     public IActionResult Show(string slug)
     {
        var post =  blogService.GetPost(slug);
-       return View();
+       return View("Post", post);
     }
 }

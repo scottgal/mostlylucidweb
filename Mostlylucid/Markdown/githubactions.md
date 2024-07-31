@@ -1,9 +1,8 @@
 # Using GitHub Actions to build and push a docker image
 
-<!--category-- Docker, GitHub Actions -->
-
 
 This is a simple example of how to use GitHub Actions to build and push a docker image to a container registry.
+
 
 ## Prerequisites
 
@@ -14,7 +13,9 @@ This is a simple example of how to use GitHub Actions to build and push a docker
 
 For this project I started with the basic .NET Core ASP.NET project and the default Dockerfile created by Rider.
 
+
 ### Dockerfile
+
 This Dockerfile is a multi-stage build that builds the project and then copies the output to a runtime image.
 
 For this proect, as I use TailwindCSS, I also need to install Node.js and run the TailwindCSS build command.
@@ -32,7 +33,6 @@ This downloads the latest (at the time of writing) version of Node.js and instal
 
 Later in the file
 
-<details>
 
 ```dockerfile
 
@@ -81,4 +81,6 @@ ENTRYPOINT ["dotnet", "Mostlylucid.dll"]
 
 ### Full DockerFile
 
-</details>
+
+
+<!--category-- Docker, GitHub Actions -->

@@ -6,6 +6,7 @@ namespace Mostlylucid.Services;
 
 public class BlogService(ILogger<BlogService> logger)
 {
+    private MarkdownPipeline  pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
     private const string Path = "Markdown";
 
     public BlogPostViewModel? GetPost(string postName)
@@ -16,8 +17,8 @@ public class BlogService(ILogger<BlogService> logger)
             var page = GetPage(path, true);
             return new BlogPostViewModel
             {
-                Categories = page.categories, Content = page.text, UpdatedDate = page.lastWrite,
-                CreatedDate = page.created, Slug = page.slug, Title = page.title
+                Categories = page.categories,WordCount = WordCount(page.restOfTheLines) , Content = page.processed, UpdatedDate = page.lastWriteTime,
+                CreatedDate = page.creationTime, Slug = page.slug, Title = page.title
             };
         }
         catch (Exception e)
@@ -54,21 +55,39 @@ public class BlogService(ILogger<BlogService> logger)
             .ToArray();
         return categories;
     }
-
-    public (string title, string slug, DateTime created, DateTime lastWrite, string text, string[] categories, string
-        restOfTheLines) GetPage(string page, bool html)
+    
+    public (string title, string slug, DateTime creationTime, DateTime lastWriteTime, string processed, string[] categories, string restOfTheLines) GetPage(string page, bool html)
     {
         var fileInfo = new FileInfo(page);
+    
+        // Ensure the file exists
+        if (!fileInfo.Exists)
+        {
+            throw new FileNotFoundException("The specified file does not exist.", page);
+        }
+
+        // Read all lines from the file
         var lines = System.IO.File.ReadAllLines(page);
-        var title = Markdown.ToPlainText(lines[0].Trim());
+    
+        // Get the title from the first line
+        var title = lines.Length > 0 ? Markdown.ToPlainText(lines[0].Trim()) : string.Empty;
 
-        var restOfTheLines = string.Concat(lines.Skip(1));
+        // Concatenate the rest of the lines with newline characters
+        var restOfTheLines = string.Join(Environment.NewLine, lines.Skip(1));
+    
+        // Extract categories from the text
         var categories = GetCategories(restOfTheLines);
+    
+        // Remove category tags from the text
         restOfTheLines = CategoryRegex.Replace(restOfTheLines, "");
-        var processed = html ? Markdown.ToHtml(restOfTheLines) : Markdown.ToPlainText(restOfTheLines);
-
-
+    
+        // Process the rest of the lines as either HTML or plain text
+        var processed = html ? Markdown.ToHtml(restOfTheLines, pipeline) : Markdown.ToPlainText(restOfTheLines, pipeline);
+    
+        // Generate the slug from the page filename
         var slug = GetSlug(page);
+
+        // Return the parsed and processed content
         return (title, slug, fileInfo.CreationTime, fileInfo.LastWriteTime, processed, categories, restOfTheLines);
     }
 
@@ -84,8 +103,8 @@ public class BlogService(ILogger<BlogService> logger)
             pageModels.Add(new PostListModel
             {
                 Categories = pageInfo.categories, Title = pageInfo.title,
-                Slug = pageInfo.slug, WordCount = WordCount(pageInfo.restOfTheLines), UpdatedDate = pageInfo.lastWrite,
-                CreatedDate = pageInfo.created, Summary = summary
+                Slug = pageInfo.slug, WordCount = WordCount(pageInfo.restOfTheLines), UpdatedDate = pageInfo.lastWriteTime,
+                CreatedDate = pageInfo.creationTime, Summary = summary
             });
         }
 
