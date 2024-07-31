@@ -1834,10 +1834,6 @@ html {
   margin-right: 1.5rem;
 }
 
-.mr-8 {
-  margin-right: 2rem;
-}
-
 .mr-auto {
   margin-right: auto;
 }
@@ -1878,10 +1874,6 @@ html {
   height: 4rem;
 }
 
-.max-h-screen {
-  max-height: 100vh;
-}
-
 .w-16 {
   width: 4rem;
 }
@@ -1902,10 +1894,6 @@ html {
   max-width: none;
 }
 
-.cursor-pointer {
-  cursor: pointer;
-}
-
 .flex-col {
   flex-direction: column;
 }
@@ -1916,10 +1904,6 @@ html {
 
 .justify-between {
   justify-content: space-between;
-}
-
-.overflow-hidden {
-  overflow: hidden;
 }
 
 .rounded-full {
@@ -1961,10 +1945,6 @@ html {
 
 .bg-opacity-80 {
   --tw-bg-opacity: 0.8;
-}
-
-.fill-current {
-  fill: currentColor;
 }
 
 .p-4 {

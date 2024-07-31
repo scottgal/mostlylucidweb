@@ -27,7 +27,7 @@
 
     <meta property="og:site_name" content="mostlylucid" />
 
-    <meta property="og:image" content="/img/social.jpg" />
+    <meta property="og:image" content="/img/social.jpg"/>
 
     <meta name="twitter:card" content="summary_large_image" />
  
@@ -79,44 +79,21 @@
 
 
 <body
-    x-data="global()"
-    x-init="themeInit()"
-    :class="isMobileMenuOpen ? 'max-h-screen overflow-hidden relative' : ''"
+
     class="dark:bg-primary"
 >
 
 <div id="main">
-    <div class="container mx-auto">
+    <div class="container mx-auto" >
         <div class="flex items-center justify-between py-6 lg:py-10">
             <a href="/" class="flex items-center">
-      <span href="/" class="mr-2">
-          <div class="svg-container">
-              <img src="/img/logo.svg" alt="logo"/>
-          </div>
-                <partial name="_Socials"/>
-      </span>
+                <span class="mr-2">
+                    <div class="svg-container">
+                        <img src="/img/logo.svg" alt="logo"/>
+                    </div>
+                    <partial name="_Socials"/>
+                </span>
             </a>
-            <div class="flex items-center lg:hidden">
-                <i
-                    class="bx mr-8 cursor-pointer text-3xl text-primary dark:text-white"
-                    click="themeSwitch()"
-                    :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"
-                ></i>
-
-                <svg
-                    width="24"
-                    height="15"
-                    xmlns="http://www.w3.org/2000/svg"
-                    click="isMobileMenuOpen = true"
-                    class="fill-current text-primary dark:text-white"
-                >
-                    <g fill-rule="evenodd">
-                        <rect width="24" height="3" rx="1.5" />
-                        <rect x="8" y="6" width="16" height="3" rx="1.5" />
-                        <rect x="4" y="12" width="20" height="3" rx="1.5" />
-                    </g>
-                </svg>
-            </div>
             <div class="hidden lg:block">
                 <ul class="flex items-center">
 
@@ -127,8 +104,7 @@
                         <a
                             href="/"
                             class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary"
-                        >Intro</a
-                        >
+                        >Intro</a>
                     </li>
 
                     <li class="group relative mr-6 mb-1">
@@ -138,11 +114,8 @@
                         <a
                             href="/blog"
                             class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary"
-                        >Blog</a
-                        >
+                        >Blog</a>
                     </li>
-
-        
 
                     <li class="group relative mr-6 mb-1">
                         <div
@@ -151,17 +124,10 @@
                         <a
                             href="https://hachyderm.io/@("@")scottgal@("@")hachyderm.io"
                             class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary"
-                        >Contact</a
-                        >
+                        >Contact</a>
                     </li>
 
-                    <li>
-                        <i
-                            class="bx cursor-pointer text-3xl text-primary dark:text-white"
-                            click="themeSwitch()"
-                            :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"
-                        ></i>
-                    </li>
+                  
                 </ul>
             </div>
         </div>
@@ -230,7 +196,7 @@
                     <div class="svg-container">
 
 
-                        <img src="img/logo.svg" alt="logo"/>
+                        <img src="/img/logo.svg" alt="logo"/>
                     </div>
                 </a>
                 <p class="pt-5 font-body font-light text-primary dark:text-white sm:pt-0">
@@ -244,7 +210,6 @@
 </div>
 
 </div>
-<script src="/assets/js/main.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 

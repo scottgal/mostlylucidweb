@@ -155,7 +155,7 @@
                                 backgroundColor: theme("colors.secondary"),
                             },
                         },
-                    },
+                    },  
                 }),
             },
         },
