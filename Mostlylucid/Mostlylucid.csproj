@@ -93,6 +93,14 @@
       <Content Update="wwwroot\css\dist\main.css">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="Markdown\githubactions.md" />
+      <Content Include="Markdown\githubactions.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\tailwind.md" />
+      <Content Include="Markdown\tailwind.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <Target Name="BuildCss" BeforeTargets="Compile">

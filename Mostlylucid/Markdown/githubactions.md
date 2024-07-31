@@ -1,6 +1,7 @@
 # Using GitHub Actions to build and push a docker image
 
-<!--category-- Docker, GitHub Actions, devops -->
+<!--category-- Docker, GitHub Actions -->
+
 
 This is a simple example of how to use GitHub Actions to build and push a docker image to a container registry.
 
