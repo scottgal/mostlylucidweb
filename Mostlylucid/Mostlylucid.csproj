@@ -79,9 +79,6 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <None Remove="Markdown\img.png" />
-      <Content Include="Markdown\img.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
       <None Remove="Markdown\intro.md" />
       <Content Include="Markdown\intro.md">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -99,6 +96,9 @@
       </Content>
       <None Remove="Markdown\tailwind.md" />
       <Content Include="Markdown\tailwind.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\articleimages\img.png">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>

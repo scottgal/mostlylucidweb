@@ -1,12 +1,21 @@
 ﻿using Mostlylucid.Models.Blog;
 using System.Text.RegularExpressions;
 using Markdig;
+using Mostlylucid.MarkDigExtensions;
 
 namespace Mostlylucid.Services;
 
-public class BlogService(ILogger<BlogService> logger)
+public class BlogService
 {
-    private MarkdownPipeline  pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+    private ILogger<BlogService> _logger;
+    public BlogService(ILogger<BlogService> logger)
+    {
+        _logger = logger;
+          pipeline  =  new MarkdownPipelineBuilder().UseAdvancedExtensions().Use<ImgExtension>().Build();
+        
+    }
+
+    private MarkdownPipeline pipeline;
     private const string Path = "Markdown";
 
     public BlogPostViewModel? GetPost(string postName)
@@ -23,7 +32,7 @@ public class BlogService(ILogger<BlogService> logger)
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error getting post {PostName}", postName);
+            _logger.LogError(e, "Error getting post {PostName}", postName);
             return null;
         }
     }

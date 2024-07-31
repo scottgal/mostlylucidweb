@@ -17,7 +17,7 @@ either your main or dev / test systems.
 1. Cost - once your system reaches ny sort of complexity your costs can start to skyrocket. Even for simple services what you pay verus what you get in terms of performance is wildly overpriced in the cloud for example 
 if you want to run an ASP.NET system in the cloud with 4 cores, 7GB RAM & 10GB(!) storage (see later, for this price you can purchase a FULL Hetzner server for 5 months!)
 
-![img.png](img.png)
+![img.png](img.png?width=500&format=webp)
 
 2. Portability - once you build a complex system (say, using Azure Tables, Storage Queues, SQL Server etc) you can essentially be stuck using these systems & paying whatever Microsoft dictates.
 
