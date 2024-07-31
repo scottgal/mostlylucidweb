@@ -164,6 +164,6 @@
             require("@iconify/tailwind"),
             require("@tailwindcss/aspect-ratio"),
             require("@tailwindcss/typography"),
-            require('daisyui'),
+            require('daisyui')
         ],
     };
