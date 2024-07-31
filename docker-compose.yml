@@ -1,8 +1,20 @@
 ﻿services:
   mostlylucid:
     image: scottgal/mostlylucid:latest
+    labels:
+        - "com.centurylinklabs.watchtower.enable=true"
   cloudflared:
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
     env_file:
       - .env
+        
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_LABEL_ENABLE=true
+    command: --interval 300 # Check for updates every 300 seconds (5 minutes)
