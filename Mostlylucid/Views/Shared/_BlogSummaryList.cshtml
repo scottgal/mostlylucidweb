@@ -1,5 +1,14 @@
 ﻿@model List<Mostlylucid.Models.Blog.PostListModel>
 
+@if(ViewBag.Category != null)
+{
+    <h3
+        class="ml-3 font-body text-2xl font-semibold text-primary dark:text-white mb-10">
+        Posts in @ViewBag.Category
+    </h3>
+}
+
+
 @foreach (var post in Model)
 {
     <partial name="_ListPost" model="post"/>

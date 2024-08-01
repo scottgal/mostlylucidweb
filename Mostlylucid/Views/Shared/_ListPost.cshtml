@@ -4,9 +4,10 @@
     @foreach (var category in Model.Categories)
     {
         
-  
+        <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
         <span
             class="mb-4 inline-block rounded-full bg-green-light px-2 py-1 font-body text-sm text-green">@category</span>
+        </a>
     }
     <a hx-controller="Blog" hx-action="Show" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-slug="@Model.Slug"
         class="block font-body text-lg font-semibold text-primary transition-colors hover:text-green dark:text-white dark:hover:text-secondary">@Model.Title</a>

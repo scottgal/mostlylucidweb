@@ -12,7 +12,7 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
     
     public IActionResult Index()
     {
-        var posts = blogService.GetPosts();
+        var posts = blogService.GetPostsForFiles();
         return View("Index", posts);
     }
 
@@ -26,5 +26,17 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
               return PartialView("_PostPartial", post);
        }
        return View("Post", post);
+    }
+
+    [Route("category/{category}")]
+    public IActionResult Category(string category)
+    {
+        ViewBag.Category = category;
+        var posts = blogService.GetPostsByCategory(category);
+        if(Request.IsHtmx())
+        {
+            return PartialView("_BlogSummaryList", posts);
+        }
+        return View("Index", posts);
     }
 }

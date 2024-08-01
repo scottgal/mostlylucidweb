@@ -13,7 +13,7 @@ namespace Mostlylucid.Controllers;
     [OutputCache(Duration = 60*60*60)]
     public IActionResult Index()
     {
-        var posts = blogService.GetPosts();
+        var posts = blogService.GetPostsForFiles();
       var indexPageViewModel = new IndexPageViewModel { Posts = posts };
         return View(indexPageViewModel);
     }
