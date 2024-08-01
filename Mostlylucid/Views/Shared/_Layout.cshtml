@@ -216,15 +216,15 @@
 <script src="~/js/dist/htmx.min.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
+<script type="text/javascript" src="https://unpkg.com/highlightjs-cshtml-razor/dist/cshtml-razor.min.js"></script>
 <script>
  
 </script>
 @await RenderSectionAsync("Scripts", required: false)
 <script>
-    document.onload = function () {
+    document.addEventListener('DOMContentLoaded', function () {
         hljs.highlightAll();
-    }
+    });
     document.body.addEventListener('htmx:afterSwap', function(evt) {
             // Call your JavaScript function here
             hljs.highlightAll();

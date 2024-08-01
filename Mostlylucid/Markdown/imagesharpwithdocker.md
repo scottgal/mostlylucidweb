@@ -29,7 +29,7 @@ Here you see I map the /app/wwwroot/cache file to a local directory on my host m
 
 On my Ubuntu machine I created a directory /mnt/imagecache and then ran the folowing command to make it writeable (by anyone, I know this is not secure but I'm no Linux guru :))
 
-```bash
+```shell
 chmod  777 -p /mnt/imagecache
 ```
 

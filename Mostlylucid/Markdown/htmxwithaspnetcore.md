@@ -22,36 +22,39 @@ HTMX - Htmx is a JavaScript package the easist way to include it in your project
 
 You can of course also download a copy and include it 'manually' (or use LibMan or npm).
 
-I also recommend installing the Htmx Tag Helper from [here](https://github.com/khalidabuhakmeh/Htmx.Net) 
 
 ## ASP.NET Bits
 
+I also recommend installing the Htmx Tag Helper from [here](https://github.com/khalidabuhakmeh/Htmx.Net)
+
+
 These are both from the wonderful [Khalid Abuhakmeh
 ](https://mastodon.social/@khalidabuhakmeh@mastodon.social)
-```bash 
+
+``` shell 
 dotnet add package Htmx.TagHelpers
 ```
 
 And the Htmx Nuget package from [here](https://www.nuget.org/packages/Htmx/)
 
-``` bash
+
+``` shell
  dotnet add package Htmx
  ```
 
 The tag helper lets you do this:
 
-``` html
+``` razor
     <a hx-controller="Blog" hx-action="Show" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-slug="@Model.Slug"
         class="block font-body text-lg font-semibold text-primary transition-colors hover:text-green dark:text-white dark:hover:text-secondary">@Model.Title</a>
 ```
 
 Where instead of using 
-
-```html
+```razor
 <a asp-controller="Blog" asp-action="Show" asp-route-slug="@Model.Slug" >@Model.Title</a>
 ```
 
-These new tag helper tags will instead fill in the route values for you. We also have ```hx-push-url="true"``` this updates the url shown in the browser keeping the back button working as expected.
+These new tag helper tags will instead fill in the route values for you.
 
 ### Partials
 
@@ -59,7 +62,7 @@ HTMX works well with partial views. You can use HTMX to load a partial view into
 
 In this app we have a container in the Layout.cshtml file that we want to load a partial view into.
 
-```html
+```razor
     <div class="container mx-auto" id="contentcontainer">
    @RenderBody()
 
@@ -93,7 +96,7 @@ Using this we can ensure that we also support direct querying with little real e
 
 In this case our full view refers to this partial:
     
-``` html
+```razor
 @model Mostlylucid.Models.Blog.BlogPostViewModel
 
 @{
