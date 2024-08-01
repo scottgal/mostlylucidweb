@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Htmx;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Services;
 
@@ -15,11 +16,15 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
         return View("Index", posts);
     }
 
-    [Route("show/{slug}")]
+    [Route("{slug}")]
     [OutputCache(Duration = 3600)]
     public IActionResult Show(string slug)
     {
        var post =  blogService.GetPost(slug);
+       if(Request.IsHtmx())
+       {
+              return PartialView("_PostPartial", post);
+       }
        return View("Post", post);
     }
 }
