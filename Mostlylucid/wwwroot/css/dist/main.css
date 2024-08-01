@@ -1818,6 +1818,10 @@ html {
   margin-bottom: 1.25rem;
 }
 
+.mb-8 {
+  margin-bottom: 2rem;
+}
+
 .ml-3 {
   margin-left: 0.75rem;
 }
