@@ -1,5 +1,6 @@
 # Using GitHub Actions to build and push a docker image
 
+<datetime class="hidden">2024-07-30T13:30</datetime>
 
 This is a simple example of how to use GitHub Actions to build and push a docker image to a container registry.
 

@@ -1,5 +1,7 @@
 # About Me
 
+<datetime class="hidden">2024-07-30T13:30</datetime>
+
 ## Scott Galloway | Lead .NET Developer & CTO  
 
 <!--category-- resume , introduction -->

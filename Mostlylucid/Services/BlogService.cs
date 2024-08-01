@@ -1,4 +1,5 @@
-﻿using Mostlylucid.Models.Blog;
+﻿using System.Globalization;
+using Mostlylucid.Models.Blog;
 using System.Text.RegularExpressions;
 using Markdig;
 using Mostlylucid.MarkDigExtensions;
@@ -26,8 +27,8 @@ public class BlogService
             var page = GetPage(path, true);
             return new BlogPostViewModel
             {
-                Categories = page.categories,WordCount = WordCount(page.restOfTheLines) , Content = page.processed, UpdatedDate = page.lastWriteTime,
-                CreatedDate = page.creationTime, Slug = page.slug, Title = page.title
+                Categories = page.categories,WordCount = WordCount(page.restOfTheLines) , Content = page.processed,
+                PublishedDate = page.publishDate, Slug = page.slug, Title = page.title
             };
         }
         catch (Exception e)
@@ -37,6 +38,8 @@ public class BlogService
         }
     }
 
+    private static Regex DateRegex = new Regex( @"<datetime class=""hidden"">(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})</datetime>",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
 
     private static Regex WordCoountRegex = new Regex(@"\b\w+\b",
         RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
@@ -65,7 +68,7 @@ public class BlogService
         return categories;
     }
     
-    public (string title, string slug, DateTime creationTime, DateTime lastWriteTime, string processed, string[] categories, string restOfTheLines) GetPage(string page, bool html)
+    public (string title, string slug, DateTime publishDate, string processed, string[] categories, string restOfTheLines) GetPage(string page, bool html)
     {
         var fileInfo = new FileInfo(page);
     
@@ -87,17 +90,25 @@ public class BlogService
         // Extract categories from the text
         var categories = GetCategories(restOfTheLines);
     
+        DateTime publishedDate = fileInfo.CreationTime;
+        var publishDate = DateRegex.Match(restOfTheLines).Groups[1].Value;
+        if (!string.IsNullOrWhiteSpace(publishDate))
+        {
+            publishedDate = DateTime.ParseExact(publishDate, "yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture);
+        }
         // Remove category tags from the text
         restOfTheLines = CategoryRegex.Replace(restOfTheLines, "");
-    
+        restOfTheLines = DateRegex.Replace(restOfTheLines, "");
         // Process the rest of the lines as either HTML or plain text
         var processed = html ? Markdown.ToHtml(restOfTheLines, pipeline) : Markdown.ToPlainText(restOfTheLines, pipeline);
     
         // Generate the slug from the page filename
         var slug = GetSlug(page);
+ 
+
 
         // Return the parsed and processed content
-        return (title, slug, fileInfo.CreationTime, fileInfo.LastWriteTime, processed, categories, restOfTheLines);
+        return (title, slug,publishedDate , processed, categories, restOfTheLines);
     }
 
     public List<PostListModel> GetPosts()
@@ -112,12 +123,12 @@ public class BlogService
             pageModels.Add(new PostListModel
             {
                 Categories = pageInfo.categories, Title = pageInfo.title,
-                Slug = pageInfo.slug, WordCount = WordCount(pageInfo.restOfTheLines), UpdatedDate = pageInfo.lastWriteTime,
-                CreatedDate = pageInfo.creationTime, Summary = summary
+                Slug = pageInfo.slug, WordCount = WordCount(pageInfo.restOfTheLines), 
+                PublishedDate = pageInfo.publishDate, Summary = summary
             });
         }
 
-        pageModels = pageModels.OrderByDescending(x => x.CreatedDate).ToList();
+        pageModels = pageModels.OrderByDescending(x => x.PublishedDate).ToList();
         return pageModels;
     }
 }

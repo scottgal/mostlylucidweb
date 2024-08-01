@@ -2,6 +2,8 @@
 
 ## Dev models for Web Applications
 
+<datetime class="hidden">2024-07-30T13:30</datetime>
+
 In my LONG (30 year) history of building web applications there have been many ways to build a web app.
 1. Pure HTML 1990-> - the very first (if you ignore BBS / text based systems) mechanism for building web apps was Plain Old HTML. Building a web page, list a bunch of products and provide a mail in address, phone number or even email to send orders to.
 This had a few advantages and (many) disadvantages. 

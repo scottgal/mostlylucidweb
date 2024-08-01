@@ -23,5 +23,5 @@ public class BlogPostViewModel
     
     public DateTime UpdatedDate { get; set; }
     
-    public DateTime CreatedDate { get; set; }
+    public DateTime PublishedDate { get; set; }
 }
