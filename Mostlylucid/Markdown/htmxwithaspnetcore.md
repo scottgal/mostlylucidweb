@@ -24,6 +24,10 @@ You can of course also download a copy and include it 'manually' (or use LibMan 
 
 I also recommend installing the Htmx Tag Helper from [here](https://github.com/khalidabuhakmeh/Htmx.Net) 
 
+## ASP.NET Bits
+
+These are both from the wonderful [Khalid Abuhakmeh
+](https://mastodon.social/@khalidabuhakmeh@mastodon.social)
 ```bash 
 dotnet add package Htmx.TagHelpers
 ```
