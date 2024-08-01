@@ -1,5 +1,7 @@
 # ImageSharp with Docker
 
+<!--category-- Docker, ImageSharp -->
+
 ImageSharp is a great library for working with images in .NET. It's fast, easy to use, and has a lot of features. In this post, I'll show you how to use ImageSharp with Docker to create a simple image processing service.
 
 ## What is ImageSharp?
