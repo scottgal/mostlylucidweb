@@ -29,7 +29,6 @@ RUN npm install
 # Ensure npm-run-all is available and install npm dependencies
 RUN npm --version
 RUN npx tailwindcss -i ./src/css/main.css -o ./wwwroot/css/dist/main.css
-
 RUN dotnet build "Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 
@@ -38,5 +37,11 @@ RUN dotnet publish "Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/publish 
 
 FROM base AS final
 WORKDIR /app
+
 COPY --from=publish /app/publish .
+
+# Switch to a non-root user
+USER $APP_UID
+
+
 ENTRYPOINT ["dotnet", "Mostlylucid.dll"]
