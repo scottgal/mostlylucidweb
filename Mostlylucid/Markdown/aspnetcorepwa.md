@@ -1,5 +1,8 @@
 ﻿# Making your ASP.NET Core Website a PWA
 
+<!--category-- ASP.NET -->
+<datetime class="hidden">2024-08-01T11:36</datetime>
+
 In this article, I'll show you how to make your ASP.NET Core website a PWA (Progressive Web App).
 
 ## Prerequisites
