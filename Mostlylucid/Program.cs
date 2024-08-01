@@ -10,7 +10,7 @@ var env = builder.Environment;
 builder.Services.AddControllersWithViews();
 builder.Services.AddResponseCaching();
 builder.Services.AddScoped<BlogService>();
-
+builder.Services.AddProgressiveWebApp();
 builder.Services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 
 
