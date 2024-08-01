@@ -34,7 +34,6 @@ dotnet add package Htmx.TagHelpers
 
 And the Htmx Nuget package from [here](https://www.nuget.org/packages/Htmx/)
 
-```bash
 ``` bash
  dotnet add package Htmx
  ```
