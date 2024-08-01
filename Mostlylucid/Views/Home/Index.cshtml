@@ -24,22 +24,30 @@
 </div>
 
 <div class="py-16 lg:py-20">
-    <div class="flex items-center pb-6">
+    <div class="flex items-center pb-2">
         <img src="img/icon-blog.png" class="w-8" alt="icon story"/>
-        <h3
-            class="ml-3 font-body text-2xl font-semibold text-primary dark:text-white">
+        <h3 class="ml-3 font-body text-2xl font-semibold text-primary dark:text-white">
             Blog Posts
         </h3>
-        <a
-            href="/blog"
-            class="flex items-center pl-10 font-body italic text-green transition-colors hover:text-secondary dark:text-green-light dark:hover:text-secondary">
+        <a href="/blog" class="flex items-center pl-10 font-body italic text-green transition-colors hover:text-secondary dark:text-green-light dark:hover:text-secondary">
             All posts
-            <img
-                src="img/long-arrow-right.png"
-                class="ml-3"
-                alt="arrow right"/>
+            <img src="img/long-arrow-right.png" class="ml-3" alt="arrow right"/>
         </a>
     </div>
+
+    <!-- Legend and Categories List -->
+    <div class="">
+        <h4 class="font-body text-lg text-primary dark:text-white">Categories</h4>
+        <div class="flex flex-wrap gap-2 pt-2">
+            @foreach (var category in Model.Categories)
+            {
+            <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
+                <span class="inline-block rounded-full bg-green-light px-2 py-1 font-body text-sm text-green">@category</span>
+            </a>
+            }
+        </div>
+    </div>
+
     <div class="pt-8" id="content">
         <partial name="_BlogSummaryList" model="Model.Posts"/>
     </div>

@@ -15,6 +15,7 @@ namespace Mostlylucid.Controllers;
     {
         var posts = blogService.GetPostsForFiles();
       var indexPageViewModel = new IndexPageViewModel { Posts = posts };
+      indexPageViewModel.Categories = blogService.GetCategories();
         return View(indexPageViewModel);
     }
 

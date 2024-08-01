@@ -75,7 +75,13 @@ public class BlogService
         if (count > 0) SetCache(cacheCats);
     }
 
-
+    public List<string> GetCategories()
+    {
+        var cacheCats = GetFromCache();
+        return cacheCats.Keys.ToList();
+    }
+    
+    
     public List<PostListModel> GetPostsByCategory(string category)
     {
         var pages = GetFromCache()[category];

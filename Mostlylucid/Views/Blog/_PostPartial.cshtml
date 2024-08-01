@@ -3,9 +3,13 @@
 <title>@Model.Title</title>
 <div class="pt-16 lg:pt-20">
     <div class="border-b border-grey-lighter pb-8 sm:pb-12">
-        @foreach(var category in Model.Categories)
+        @foreach (var category in Model.Categories)
         {
-            <span class="mb-5 inline-block rounded-full bg-green-light px-2 py-1 font-body text-sm text-green sm:mb-8">@category</span>
+
+        <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
+        <span
+            class="mb-4 inline-block rounded-full bg-green-light px-2 py-1 font-body text-sm text-green">@category</span>
+        </a>
         }
         <h2
             class="block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-4xl md:text-5xl">
