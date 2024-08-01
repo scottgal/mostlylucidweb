@@ -106,6 +106,12 @@
       <Content Update="wwwroot\img\social.jpg">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Update="Markdown\imagesharpwithdocker.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Markdown\dockercompose.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <Target Name="BuildCss" BeforeTargets="Compile">
