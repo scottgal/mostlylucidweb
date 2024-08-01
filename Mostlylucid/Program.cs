@@ -1,18 +1,17 @@
 
+using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.Services;
+using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 var env = builder.Environment;
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
-var directoryPath = Path.Combine(env.ContentRootPath, "Markdown");
 builder.Services.AddResponseCaching();
-builder.Services.AddResponseCompression();
 builder.Services.AddScoped<BlogService>();
 
-builder.Services.AddImageSharp();
+builder.Services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 
 
 var app = builder.Build();
@@ -36,7 +35,6 @@ app.UseAuthorization();
 
 
 app.UseResponseCaching();
-app.UseResponseCompression();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
