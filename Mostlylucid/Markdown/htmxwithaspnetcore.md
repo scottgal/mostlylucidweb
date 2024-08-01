@@ -46,11 +46,12 @@ The tag helper lets you do this:
 ```
 
 Where instead of using 
+
 ```html
 <a asp-controller="Blog" asp-action="Show" asp-route-slug="@Model.Slug" >@Model.Title</a>
 ```
 
-These new tag helper tags will instead fill in the route values for you.
+These new tag helper tags will instead fill in the route values for you. We also have ```hx-push-url="true"``` this updates the url shown in the browser keeping the back button working as expected.
 
 ### Partials
 
