@@ -124,6 +124,13 @@
       <Content Include="Markdown\aspnetcorepwa.md">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="Markdown\usingmarkdownforblogging.md" />
+      <Content Include="Markdown\usingmarkdownforblogging.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Update="wwwroot\articleimages\setascontent.png">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <Target Name="BuildCss" BeforeTargets="Compile">

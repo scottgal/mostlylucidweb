@@ -1,17 +1,32 @@
 ﻿using System.Globalization;
-using Mostlylucid.Models.Blog;
 using System.Text.RegularExpressions;
 using Markdig;
 using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.MarkDigExtensions;
+using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Services;
 
 public class BlogService
 {
-    private ILogger<BlogService> _logger;
-    
-    private IMemoryCache _memoryCache;
+    private const string Path = "Markdown";
+    private const string CacheKey = "Categories";
+
+    private static readonly Regex DateRegex = new(
+        @"<datetime class=""hidden"">(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})</datetime>",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
+
+    private static readonly Regex WordCoountRegex = new(@"\b\w+\b",
+        RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
+
+    private static readonly Regex CategoryRegex = new(@"<!--\s*category\s*--\s*([^,]+?)\s*(?:,\s*([^,]+?)\s*)?-->",
+        RegexOptions.Compiled | RegexOptions.Singleline);
+
+    private readonly ILogger<BlogService> _logger;
+
+    private readonly IMemoryCache _memoryCache;
+
+    private readonly MarkdownPipeline pipeline;
 
     public BlogService(IMemoryCache memoryCache, ILogger<BlogService> logger)
     {
@@ -20,10 +35,6 @@ public class BlogService
         pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Use<ImgExtension>().Build();
         ListCategories();
     }
-
-    private MarkdownPipeline pipeline;
-    private const string Path = "Markdown";
-    private const string CacheKey = "Categories";
 
 
     private Dictionary<string, List<string>> GetFromCache()
@@ -43,24 +54,23 @@ public class BlogService
     {
         var cacheCats = GetFromCache();
         var pages = Directory.GetFiles("Markdown", "*.md");
-        int count = 0;
+        var count = 0;
 
         foreach (var page in pages)
         {
-            bool pageAlreadyAdded = cacheCats.Values.Any(x => x.Contains(page));
-        
+            var pageAlreadyAdded = cacheCats.Values.Any(x => x.Contains(page));
+
             if (pageAlreadyAdded) continue;
 
-          
+
             var text = File.ReadAllText(page);
             var categories = GetCategories(text);
             if (!categories.Any()) continue;
             count++;
             foreach (var category in categories)
-            {
                 if (cacheCats.TryGetValue(category, out var pagesList))
                 {
-                   pagesList.Add(page);
+                    pagesList.Add(page);
                     cacheCats[category] = pagesList;
                     _logger.LogInformation("Added category {Category} for {Page}", category, page);
                 }
@@ -69,7 +79,6 @@ public class BlogService
                     cacheCats.Add(category, new List<string> { page });
                     _logger.LogInformation("Created category {Category} for {Page}", category, page);
                 }
-            }
         }
 
         if (count > 0) SetCache(cacheCats);
@@ -80,8 +89,8 @@ public class BlogService
         var cacheCats = GetFromCache();
         return cacheCats.Keys.ToList();
     }
-    
-    
+
+
     public List<PostListModel> GetPostsByCategory(string category)
     {
         var pages = GetFromCache()[category];
@@ -107,13 +116,10 @@ public class BlogService
         }
     }
 
-    private static Regex DateRegex = new Regex(@"<datetime class=""hidden"">(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})</datetime>",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
-
-    private static Regex WordCoountRegex = new Regex(@"\b\w+\b",
-        RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
-
-    private int WordCount(string text) => WordCoountRegex.Matches(text).Count;
+    private int WordCount(string text)
+    {
+        return WordCoountRegex.Matches(text).Count;
+    }
 
 
     private string GetSlug(string fileName)
@@ -121,9 +127,6 @@ public class BlogService
         var slug = System.IO.Path.GetFileNameWithoutExtension(fileName);
         return slug.ToLowerInvariant();
     }
-
-    private static Regex CategoryRegex = new Regex(@"<!--\s*category\s*--\s*([^,]+?)\s*(?:,\s*([^,]+?)\s*)?-->",
-        RegexOptions.Compiled | RegexOptions.Singleline);
 
     private static string[] GetCategories(string markdownText)
     {
@@ -143,13 +146,10 @@ public class BlogService
         var fileInfo = new FileInfo(page);
 
         // Ensure the file exists
-        if (!fileInfo.Exists)
-        {
-            throw new FileNotFoundException("The specified file does not exist.", page);
-        }
+        if (!fileInfo.Exists) throw new FileNotFoundException("The specified file does not exist.", page);
 
         // Read all lines from the file
-        var lines = System.IO.File.ReadAllLines(page);
+        var lines = File.ReadAllLines(page);
 
         // Get the title from the first line
         var title = lines.Length > 0 ? Markdown.ToPlainText(lines[0].Trim()) : string.Empty;
@@ -160,12 +160,10 @@ public class BlogService
         // Extract categories from the text
         var categories = GetCategories(restOfTheLines);
 
-        DateTime publishedDate = fileInfo.CreationTime;
+        var publishedDate = fileInfo.CreationTime;
         var publishDate = DateRegex.Match(restOfTheLines).Groups[1].Value;
         if (!string.IsNullOrWhiteSpace(publishDate))
-        {
             publishedDate = DateTime.ParseExact(publishDate, "yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture);
-        }
 
         // Remove category tags from the text
         restOfTheLines = CategoryRegex.Replace(restOfTheLines, "");
