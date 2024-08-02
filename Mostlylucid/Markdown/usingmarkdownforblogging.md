@@ -37,7 +37,7 @@ flowchart LR
 Since I just added the image here, I'll show you how I did it. I simply added the image to the wwwroot/articleimages folder and referenced it in the markdown file like this:
 
 ```markdown
-[setascontent.png](setascontent.png)
+![setascontent.png](setascontent.png)
 ```
 
 I then add an extension to my Markdig pipeline which rewrites these to the correct URL (all about simplicity). [See here for the source code for the extension.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
