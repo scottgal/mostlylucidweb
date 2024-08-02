@@ -10,6 +10,45 @@ Mermaid is a simple diagramming format that takes text-based input and generates
 The Mermaid site is [here](https://mermaid.js.org/) and has far more information than I can provide here.
 
 
+## Markdown and Mermaid
+Mermaid diagrams can be included in your markdown files by using the following syntax:
+
+<pre>
+# My Markdown Title
+```mermaid
+graph LR
+    A[Start] --> B[Look for movie]
+    B --> C{Found?}
+    C -->|Yes| D[Watch it]
+    C -->|No| E[Look for another movie]
+    D --> E
+```
+</pre>
+
+This allows you to include Mermaid diagrams directly in your markdown files, which will be rendered as SVG images when the file is converted to HTML.
+
+```mermaid
+graph LR
+    A[Start] --> B[Look for movie]
+    B --> C{Found?}
+    C -->|Yes| D[Watch it]
+    C -->|No| E[Look for another movie]
+    D --> E
+```
+
+
+You can also add mermaid diagrams to normal html files by using the following syntax:
+
+```html
+<pre class="mermaid">
+    graph TD
+    A[Start] --> B[Look for movie]
+    B --> C{Found?}
+    C -->|Yes| D[Watch it]
+    C -->|No| E[Look for another movie]
+    D --> E
+</pre>
+```
 
 ### Examples of Mermaid diagrams
 Mermaid is a powerful tool that lets you build a wide range of diagrams using simple text-based syntax.
@@ -23,8 +62,10 @@ pie title NETFLIX
 ```
 
 -Flowcharts:
+Flowcharts can specify direction, e.g. LR (left to right), RL (right to left), TB (top to bottom), BT (bottom to top).
+
 ```mermaid
-flowchart TD
+flowchart LR
     A[Start] --> B{Is it?}
     B -->|Yes| C[OK]
     C --> D[Rethink]
@@ -34,12 +75,45 @@ flowchart TD
 
 -Sequence diagrams:
 ```mermaid
-sequenceDiagram
+sequenceDiagram 
     participant A
     participant B
     A->>B: Hi B, how are you?
     B-->>A: Fine, thanks!
 ```
+
+-Gantt charts:
+```mermaid
+gantt
+    title A Gantt Diagram
+    dateFormat  YYYY-MM-DD
+    section Section
+    A task           :a1, 2024-08-01, 30d
+    Another task     :after a1  , 20d
+```
+
+-Entity relationship diagrams:
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    ORDER ||--|{ LINE-ITEM : contains
+    CUSTOMER }|..|{ DELIVERY-ADDRESS : uses
+```
+
+-User journey diagrams:
+```mermaid
+journey
+    title My working day
+    section Go to work
+        Make tea: 5: Me
+        Go upstairs: 15: Me
+        Do work: 60: Me
+    section Go home
+        Go downstairs: 15: Me
+        Sit down: 5: Me
+```
+
+etc...See this page for more of the MYRIAD of diagrams you can create with Mermaid [here](https://mermaid.js.org/syntax/examples.html)
 
 ## Getting started with Mermaid and htmx
 First you need to include the Mermaid library in your HTML file. You can do this by adding the following script tag to your document:
