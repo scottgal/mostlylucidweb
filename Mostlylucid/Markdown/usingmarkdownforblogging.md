@@ -353,9 +353,8 @@ The GetCategories method uses a regular expression to extract the categories fro
 I then extract the date from the post (I WAS using the created date but how I deploy this using a whole docker image means this isn't really useful anymore) so I'm not  using a regular expression.
 This parses a tag in the form which is in each .md file.
 
-
 ```razor
-<datetime class="hidden">2024-08-02T17:00</datetime>
+ <datetime class="hidden">2024-08-02T17:00</datetime>
 ```
 
 ```csharp
