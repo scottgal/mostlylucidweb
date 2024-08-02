@@ -6,7 +6,7 @@
         @foreach (var category in Model.Categories)
         {
 
-        <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
+        <a hx-boost="true"   hx-target="#contentcontainer"  asp-action="Category" asp-controller="Blog" asp-route-category="@category">
         <span
             class="mb-4 inline-block rounded-full bg-green-light px-2 py-1 font-body text-sm text-green">@category</span>
         </a>

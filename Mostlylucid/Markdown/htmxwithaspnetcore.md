@@ -49,12 +49,21 @@ The tag helper lets you do this:
         class="block font-body text-lg font-semibold text-primary transition-colors hover:text-green dark:text-white dark:hover:text-secondary">@Model.Title</a>
 ```
 
-Where instead of using 
+**NOTE: This approach has one major drawback; it doesn't produce an href for the post link. This is a problem for SEO and accessibility. It also means these links will fail if HTMX for some reason doesn't load (CDNs DO go down).**
+
+An alternative approach is to use the ``` hx-boost="true"``` attribute and normal asp.net core tag helpers. See  [here](https://htmx.org/docs/#hx-boost) for more info on hx-boost (though the docs are a bit sparse). 
+This will output a normal href but will be intercepted by HTMX and the content loaded dynamically.
+
+So as follows:
+
 ```razor
-<a asp-controller="Blog" asp-action="Show" asp-route-slug="@Model.Slug" >@Model.Title</a>
+ <a asp-controller="Blog" asp-action="Show" hx-boost="true"  hx-target="#contentcontainer" asp-route-slug="@Model.Slug"
+       class="block font-body text-lg font-semibold text-primary transition-colors hover:text-green dark:text-white dark:hover:text-secondary">@Model.Title</a>
 ```
 
-These new tag helper tags will instead fill in the route values for you.
+
+
+
 
 ### Partials
 
