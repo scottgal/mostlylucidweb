@@ -22,6 +22,15 @@ To clarify; static site generators like [Hugo](https://gohugo.io/) / [Jekyll](ht
 ## How do you write your posts?
 I simply drop a new .md file into the Markdown folder and the site picks it up and renders it (when I remember to aet it as content, this ensures it's avaiable in the output files! )
 
+Then when I checkin the site to GitHub the Action runs and the site is updated. Simple!
+
+```mermaid
+flowchart LR
+    A[Write New Markdown File] -->|Checkin To Github| B(Github Action Triggers) -->  C(Builds Docker Image) --> D(Watchtower Pulls new Image) --> E(Site Updated)
+   
+  
+```
+
 ![setascontent.png](setascontent.png)
 
 ## How do you add images?

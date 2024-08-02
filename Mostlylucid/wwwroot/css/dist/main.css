@@ -2030,10 +2030,6 @@ html {
   padding-right: 1.25rem;
 }
 
-.pt-16 {
-  padding-top: 4rem;
-}
-
 .pt-2 {
   padding-top: 0.5rem;
 }
@@ -2331,8 +2327,8 @@ html {
     padding-bottom: 1rem;
   }
 
-  .lg\:pt-20 {
-    padding-top: 5rem;
+  .lg\:pt-2 {
+    padding-top: 0.5rem;
   }
 
   .lg\:text-6xl {
