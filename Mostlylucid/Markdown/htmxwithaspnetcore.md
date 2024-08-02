@@ -12,6 +12,9 @@ It's what I used to call 'hybrid' web design where you render the page fully usi
 
 In this article, I'll show you how to get started with HTMX in an ASP.NET Core application.
 
+
+[TOC]
+
 ## Prerequisites
 
 HTMX - Htmx is a JavaScript package the easist way to include it in your project is to use a CDN. (See [here](https://htmx.org/docs/#installing) )
@@ -48,6 +51,7 @@ The tag helper lets you do this:
     <a hx-controller="Blog" hx-action="Show" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-slug="@Model.Slug"
         class="block font-body text-lg font-semibold text-primary transition-colors hover:text-green dark:text-white dark:hover:text-secondary">@Model.Title</a>
 ```
+### Alternative approach.
 
 **NOTE: This approach has one major drawback; it doesn't produce an href for the post link. This is a problem for SEO and accessibility. It also means these links will fail if HTMX for some reason doesn't load (CDNs DO go down).**
 
