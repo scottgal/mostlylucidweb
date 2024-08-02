@@ -5,10 +5,12 @@
 <datetime class="hidden">2024-08-02T20:00</datetime>
 
 
+
 ## Introduction
 Mermaid is a simple diagramming format that takes text-based input and generates diagrams in SVG format. It is a great tool for creating flowcharts, sequence diagrams, Gantt charts, and more. In this tutorial, we will explore how to use Mermaid with htmx to create interactive diagrams that update dynamically without page reloads.
 The Mermaid site is [here](https://mermaid.js.org/) and has far more information than I can provide here.
 
+[TOC]
 
 ## Markdown and Mermaid
 Mermaid diagrams can be included in your markdown files by using the following syntax:

@@ -32,7 +32,7 @@ public class BlogService
     {
         _logger = logger;
         _memoryCache = memoryCache;
-        pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Use<ImgExtension>().Build();
+        pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseTableOfContent().Use<ImgExtension>().Build();
         ListCategories();
     }
 

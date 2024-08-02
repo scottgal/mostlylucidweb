@@ -2,10 +2,13 @@
 
 <!--category-- ASP.NET, Markdown -->
 <datetime class="hidden">2024-08-02T17:00</datetime>
+## Introduction
 
 Markdown is a lightweight markup language that you can use to add formatting elements to plaintext text documents. Created by John Gruber in 2004, Markdown is now one of the world’s most popular markup languages.
 
 On this site I use a super simple approach to blogging, having tried and failed to maintain a blog in the past I wanted to make it as easy as possible to write and publish posts. I use markdown to write my posts and this site has a single service using [Markdig](https://github.com/xoofx/markdig) to convert the markdown to HTML.
+
+[TOC]
 
 ## Why not a Static Site generator?
 In a word simplicity. This isn't going to be a super high traffic site, I use ASP.NET OutPutCache to cache the pages and I'm not going to be updating it that often. I wanted to keep the site as simple as possible and not have to worry about the overhead of a static site generator both in terms of the build process and the complexity of the site.
