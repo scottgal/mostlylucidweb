@@ -3,12 +3,12 @@
 <div class="border-b border-grey-lighter pb-8 mb-8">
  
     <a asp-controller="Blog" asp-action="Show" hx-boost="true"  hx-target="#contentcontainer" asp-route-slug="@Model.Slug"
-       class="block font-body text-lg font-semibold text-primary transition-colors hover:text-green dark:text-white dark:hover:text-secondary">@Model.Title</a>
+       class="block font-body text-lg font-semibold text-primary transition-colors hover:text-green dark:text-white  dark:hover:text-secondary">@Model.Title</a>
     @foreach (var category in Model.Categories)
     {
     <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
         <span
-            class="mb-2 mt-4 inline-block rounded-full bg-green-light px-2 py-1 font-body text-sm text-green">@category</span>
+            class="mb-2 mt-4 inline-block rounded-full bg-blue-dark px-2 py-1 font-body text-sm text-white">@category</span>
     </a>
     }
     <div class="block font-body">@Model.Summary</div>

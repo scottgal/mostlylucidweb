@@ -1918,6 +1918,12 @@ html {
   gap: 0.5rem;
 }
 
+.space-x-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-x-reverse: 0;
+  margin-right: calc(1rem * var(--tw-space-x-reverse));
+  margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
 .rounded-btn {
   border-radius: var(--rounded-btn, 0.5rem);
 }
@@ -1952,11 +1958,6 @@ html {
 .bg-green {
   --tw-bg-opacity: 1;
   background-color: rgb(0 124 133 / var(--tw-bg-opacity));
-}
-
-.bg-green-light {
-  --tw-bg-opacity: 1;
-  background-color: rgb(204 238 236 / var(--tw-bg-opacity));
 }
 
 .bg-opacity-80 {
@@ -2016,6 +2017,10 @@ html {
 
 .pl-2 {
   padding-left: 0.5rem;
+}
+
+.pl-4 {
+  padding-left: 1rem;
 }
 
 .pl-5 {
@@ -2306,6 +2311,11 @@ html {
     font-size: 3rem;
     line-height: 1;
   }
+
+  .md\:text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -2331,8 +2341,8 @@ html {
     padding-top: 0.5rem;
   }
 
-  .lg\:text-6xl {
-    font-size: 3.75rem;
-    line-height: 1;
+  .lg\:text-xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
   }
 }

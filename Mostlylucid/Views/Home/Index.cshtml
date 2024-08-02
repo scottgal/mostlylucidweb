@@ -5,14 +5,15 @@
 }
 
 <div class="border-b border-grey-lighter ">
-    <div>
+    <div class="flex items-center space-x-4">
         <img src="img/author.png" asp-append-version="true" class="h-16 w-16 mask mask-circle" alt="author"/>
+        <h1 class="font-body text-xl font-semibold text-primary dark:text-white md:text-xl lg:text-xl pl-4">
+            Hi, I’m Scott Galloway
+        </h1>
     </div>
-    <h1
-        class="pt-3 font-body text-2xl font-semibold text-primary dark:text-white md:text-5xl lg:text-6xl">
-        Hi, I’m Scott Galloway
-    </h1>
-    <p class="pt-3 font-body text-xl font-light text-primary dark:text-white">
+
+
+    <p class="pt-3 font-body text-lg font-light text-primary dark:text-white">
         This is a *work in process* site where I share my thoughts, ideas, and projects. I'm always building SOMETHING so decided too share both how I build these somethings and what I build.
         Note this site is currently being developed you can see the code <a href="https://github.com/scottgal/mostlylucidwebsite" class="text-green">here</a>. Bits will be broken or missing, but that's the fun of it. If you have any comments / suggestions / feedback please let me know on <a href="https://hachyderm.io/@("@")scottgal@("@")hachyderm.io" class="text-green">Mastodon </a>
     </p>
@@ -49,7 +50,7 @@
             @foreach (var category in Model.Categories)
             {
             <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
-                <span class="inline-block rounded-full bg-green-light px-2 py-1 font-body text-sm text-green">@category</span>
+                <span class="inline-block rounded-full bg-blue-dark px-2 py-1 font-body text-sm text-white">@category</span>
             </a>
             }
         </div>
