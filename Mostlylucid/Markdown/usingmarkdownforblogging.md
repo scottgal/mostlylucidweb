@@ -13,7 +13,7 @@ In a word simplicity. This isn't going to be a super high traffic site, I use AS
 ## How do you write your posts?
 I simply drop a new .md file into the Markdown folder and the site picks it up and renders it (when I remember to aet it as content, this ensures it's avaiable in the output files! )
 
-[setascontent.png](setascontent.png)
+![setascontent.png](setascontent.png)
 
 ## How do you add images?
 Since I just added the image here, I'll show you how I did it. I simply added the image to the wwwroot/articleimages folder and referenced it in the markdown file like this:
