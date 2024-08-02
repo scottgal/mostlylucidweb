@@ -10,6 +10,8 @@ On this site I use a super simple approach to blogging, having tried and failed 
 ## Why not a Static Site generator?
 In a word simplicity. This isn't going to be a super high traffic site, I use ASP.NET OutPutCache to cache the pages and I'm not going to be updating it that often. I wanted to keep the site as simple as possible and not have to worry about the overhead of a static site generator both in terms of the build process and the complexity of the site.
 
+To clarify; static site generators like [Hugo](https://gohugo.io/) / [Jekyll](https://jekyllrb.com/) etc...can be a good solution for many sites but for this one I wanted to keep it as simple *for me* as possible. I'm a 25 year ASP.NET veteran so understand it inside and out. This site design does add complexity; I have views, services, controllers and a LOT of manual HTML & CSS but I'm comfortable with that.
+
 ## How do you write your posts?
 I simply drop a new .md file into the Markdown folder and the site picks it up and renders it (when I remember to aet it as content, this ensures it's avaiable in the output files! )
 
