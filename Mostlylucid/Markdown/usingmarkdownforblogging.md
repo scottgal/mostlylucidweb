@@ -12,6 +12,13 @@ In a word simplicity. This isn't going to be a super high traffic site, I use AS
 
 To clarify; static site generators like [Hugo](https://gohugo.io/) / [Jekyll](https://jekyllrb.com/) etc...can be a good solution for many sites but for this one I wanted to keep it as simple *for me* as possible. I'm a 25 year ASP.NET veteran so understand it inside and out. This site design does add complexity; I have views, services, controllers and a LOT of manual HTML & CSS but I'm comfortable with that.
 
+## Why not a database?
+
+1. Simplicty of design; Databases are powerful systems for storing data (and I'll add one for comments shortly) however they also add complexity. To *correctly* use databases especially in an ASP.NET application you add a LOT of code, no matter if you're using [EF Core](https://learn.microsoft.com/en-us/ef/core/), [Dapper](https://github.com/DapperLib/Dapper) or raw SQL with ADO.NET. I wanted to keep the site as simple as possible *to start with*. 
+2. Ease of update and deployment. This site is meant to demonstrate how simple Docker & Docker Compose can be to run a site. I can update the site by checking in new code (including content) to GitHub, the Action runs, builds the image then the Watchtower method in my docker compose file updates the site image automatically. This is a very simple way to update a site and I wanted to keep it that way.
+3. Running duplicates; as I have ZERO data which isn't within the docker image it means I can EASILY run exact duplicates locally (on my little Ubuntu cluster here at home). This is a great way to test changes with docker (e.g, [when I made the ImageSharp changes](/blog/imagesharpwithdocker) ) before deploying them to the live site.
+4. Because I didn't want to! I wanted to see how far I could get with a simple site design and so far I'm pretty happy with it.
+
 ## How do you write your posts?
 I simply drop a new .md file into the Markdown folder and the site picks it up and renders it (when I remember to aet it as content, this ensures it's avaiable in the output files! )
 
