@@ -357,6 +357,110 @@
       <Content Include="Markdown\autotranslatingmarkdownfiles.md">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="Markdown\translated\mermaidandhtmx.de.md" />
+      <Content Include="Markdown\translated\mermaidandhtmx.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\mermaidandhtmx.es.md" />
+      <Content Include="Markdown\translated\mermaidandhtmx.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\mermaidandhtmx.fr.md" />
+      <Content Include="Markdown\translated\mermaidandhtmx.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\mermaidandhtmx.it.md" />
+      <Content Include="Markdown\translated\mermaidandhtmx.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\mermaidandhtmx.jap.md" />
+      <Content Include="Markdown\translated\mermaidandhtmx.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\mermaidandhtmx.zh.md" />
+      <Content Include="Markdown\translated\mermaidandhtmx.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\oldisnew.hash" />
+      <Content Include="Markdown\translated\oldisnew.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\oldisnew.de.md" />
+      <Content Include="Markdown\translated\oldisnew.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\oldisnew.es.md" />
+      <Content Include="Markdown\translated\oldisnew.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\oldisnew.fr.md" />
+      <Content Include="Markdown\translated\oldisnew.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\oldisnew.it.md" />
+      <Content Include="Markdown\translated\oldisnew.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\oldisnew.jap.md" />
+      <Content Include="Markdown\translated\oldisnew.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\oldisnew.zh.md" />
+      <Content Include="Markdown\translated\oldisnew.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\tailwind.hash" />
+      <Content Include="Markdown\translated\tailwind.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\tailwind.de.md" />
+      <Content Include="Markdown\translated\tailwind.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\tailwind.es.md" />
+      <Content Include="Markdown\translated\tailwind.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\tailwind.fr.md" />
+      <Content Include="Markdown\translated\tailwind.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\tailwind.it.md" />
+      <Content Include="Markdown\translated\tailwind.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\tailwind.jap.md" />
+      <Content Include="Markdown\translated\tailwind.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\tailwind.zh.md" />
+      <Content Include="Markdown\translated\tailwind.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\usingmarkdownforblogging.hash" />
+      <Content Include="Markdown\translated\usingmarkdownforblogging.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\usingmarkdownforblogging.es.md" />
+      <Content Include="Markdown\translated\usingmarkdownforblogging.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\usingmarkdownforblogging.fr.md" />
+      <Content Include="Markdown\translated\usingmarkdownforblogging.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\usingmarkdownforblogging.it.md" />
+      <Content Include="Markdown\translated\usingmarkdownforblogging.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\usingmarkdownforblogging.jap.md" />
+      <Content Include="Markdown\translated\usingmarkdownforblogging.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\usingmarkdownforblogging.zh.md" />
+      <Content Include="Markdown\translated\usingmarkdownforblogging.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <Target Name="BuildCss" BeforeTargets="Compile">
