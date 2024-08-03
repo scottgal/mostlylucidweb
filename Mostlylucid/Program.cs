@@ -15,15 +15,14 @@ services.AddControllersWithViews();
 services.AddResponseCaching();
 services.AddScoped<BlogService>();
 
-//Uncomment to enable markdown translation
-    // services.AddScoped<MarkdownTranslatorService>();
-    //
-    // services.AddHttpClient<MarkdownTranslatorService>(options =>
-    // {
-    //     options.Timeout = TimeSpan.FromMinutes(15);
-    //     options.BaseAddress = new Uri("http://localhost:24080");
-    // });
-    // services.AddHostedService<BackgroundTranslateService>();
+    services.AddScoped<MarkdownTranslatorService>();
+ 
+    services.AddHttpClient<MarkdownTranslatorService>(options =>
+    {
+        options.Timeout = TimeSpan.FromSeconds(120);
+        //options.BaseAddress = new Uri("http://localhost:24080");
+    });
+    services.AddHostedService<BackgroundTranslateService>();
 
 
 services.AddProgressiveWebApp();

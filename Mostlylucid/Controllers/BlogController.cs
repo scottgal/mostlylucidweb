@@ -40,7 +40,7 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
         return View("Index", posts);
     }
     
-    [Route("language/{slug}/{language}")]
+    [Route("/{language}/{slug}")]
     public IActionResult Language(string slug, string language)
     {
         var post = blogService.GetPost(slug, language);

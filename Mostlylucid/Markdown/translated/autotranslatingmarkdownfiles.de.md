@@ -6,6 +6,8 @@ EasyNMT ist ein lokal installierbarer Service, der eine einfache Schnittstelle z
 
 Sie finden alle Dateien für dieses Tutorial in der [GitHub-Repository](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/MarkdownTranslator) für dieses Projekt.
 
+HINWEIS: Das ist immer noch ziemlich rau, ich werde es weiter verfeinern, während ich gehe.
+
 [TOC]
 
 ## Voraussetzungen

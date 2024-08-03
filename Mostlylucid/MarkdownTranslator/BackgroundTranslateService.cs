@@ -21,12 +21,17 @@ public class BackgroundTranslateService(
 
     public async Task StartedAsync(CancellationToken cancellationToken)
     {
-        ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = 2, CancellationToken = cancellationToken};
+        if(!await blogService.IsServiceUp(cancellationToken))
+        {
+            logger.LogError("Translation service is not available");
+            return;
+        }
+        ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = 8, CancellationToken = cancellationToken};
         var files = Directory.GetFiles("Markdown", "*.md");
 
         var outDir = "Markdown/translated";
 
-        var languages = new[] { "es", "fr", "de", "it", "gr", "jap", "zh" };
+        var languages = new[] { "es", "fr", "de", "it",  "jap", "zh", "nl", "hi", "ar" };
         foreach(var language in languages)
         {
             await Parallel.ForEachAsync(files, parallelOptions, async (file,ct) =>

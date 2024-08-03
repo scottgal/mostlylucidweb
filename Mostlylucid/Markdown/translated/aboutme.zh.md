@@ -5,7 +5,7 @@
 ## Scott Galloway 领航.NET 开发者和 CTO
 
 <!--category-- resume , introduction -->
-在软件开发、技术领导和团队管理方面拥有25年以上专门知识的Versatile and complained Lead.NET开发者。 精通C#、ASP.NET和现代网络框架,在云计算、DevOps和数据库管理方面具有丰富经验。 从技术巨头到创新初创企业等不同行业成功发展项目的领先记录已经得到证明。
+在软件开发、技术领导和团队管理方面拥有25年以上专门知识的超常和成就领先的.NET开发者。精通C#、ASP.NET和现代网络框架,在云计算、DevOps和数据库管理方面具有丰富经验。
 
 [技选委
 

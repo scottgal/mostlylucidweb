@@ -5,18 +5,39 @@ namespace Mostlylucid.MarkdownTranslator;
 
 public class MarkdownTranslatorService(ILogger<MarkdownTranslatorService> logger, HttpClient client)
 {
-    private record PostRecord(string target_lang, string[] text, string source_lang = "en");
+    private record PostRecord(string target_lang, string[] text, string source_lang = "en",bool perform_sentence_splitting = false);
 
-
-    private record PostResponse(string target_lang, string[] translated, string source_lang, float translation_time);
+private Random random = Random.Shared;
     
+    private record PostResponse(string target_lang, string[] translated, string source_lang, float translation_time);
+
+
+    private string[] IPs = new[] { "http://192.168.0.30:24080", "http://localhost:24080", "http://192.168.0.74:24080" };
+    public async ValueTask<bool> IsServiceUp(CancellationToken cancellationToken)
+    {
+        try
+        {
+            var ip = IPs[random.Next(IPs.Length)];
+            logger.LogInformation("Checking service status at {IP}", ip);
+            var response = await client.GetAsync($"{ip}/model_name", cancellationToken);
+            return response.IsSuccessStatusCode;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error checking service status");
+            return false;
+        }
+    }
+  
     
     private async Task<string[]> Post(string[] elements, string targetLang, CancellationToken cancellationToken)
     {
         try
         {
+            var ip = IPs[random.Next(IPs.Length)];
+            logger.LogInformation("Sendign request to {IP}", ip);
             var postObject = new PostRecord(targetLang, elements);
-            var response = await client.PostAsJsonAsync("/translate", postObject, cancellationToken);
+            var response = await client.PostAsJsonAsync($"{ip}/translate", postObject, cancellationToken);
 
             var phrase = response.ReasonPhrase;
             response.EnsureSuccessStatusCode();
@@ -36,7 +57,7 @@ public class MarkdownTranslatorService(ILogger<MarkdownTranslatorService> logger
     {
         var document = Markdig.Markdown.Parse(markdown);
         var textStrings = ExtractTextStrings(document);
-        var batchSize = 50;
+        var batchSize = 20;
         var stringLength = textStrings.Count;
         List<string> translatedStrings = new();
         for (int i = 0; i < stringLength; i += batchSize)
