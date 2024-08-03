@@ -1,35 +1,35 @@
-﻿# Making your ASP.NET Core Website a PWA
+# Rendere il vostro ASP.NET Core Website un PWA
 
 <!--category-- ASP.NET -->
 <datetime class="hidden">2024-08-01T11:36</datetime>
 
-In this article, I'll show you how to make your ASP.NET Core website a PWA (Progressive Web App).
+In questo articolo vi mostrerò come rendere il vostro sito web ASP.NET Core una PWA (Progressive Web App).
 
-## Prerequisites
+## Prerequisiti
 
-It's really pretty simple see https://github.com/madskristensen/WebEssentials.AspNetCore.ServiceWorker/tree/master
+È molto semplice vedere https://github.com/madskristensen/WebEssentials.AspNetCore.ServiceWorker/tree/master
 
 ## ASP.NET Bits
 
-Install the Nuget package
+Installa il pacchetto Nuget
 
 ```bash
 dotnet add package WebEssentials.AspNetCore.PWA
 ```
-In your program.cs add:
 
-``` csharp
+Nel vostro programma.cs aggiungere:
+
+```csharp
 builder.Services.AddProgressiveWebApp();
 ```
 
-
-Then create some favicons which match the sizes below [here](https://realfavicongenerator.net/) is a tool you can use to create them. These can really be any icon (I used an emoji 😉) 
+Poi creare alcuni favicon che corrispondono alle dimensioni qui sotto [qui](https://realfavicongenerator.net/) è uno strumento che puoi usare per crearli. Questi possono davvero essere qualsiasi icona (Ho usato un emoji)
 
 Save these in your wwrroot folder as android-chrome-192x192.png and android-chrome-512x512.png (in the example below)
 
-Then you need a manifest.json
+Allora hai bisogno di un manifesto.Json
 
-``` json
+```json
 {
   "name": "mostlylucid",
   "short_name": "mostlylucid",

@@ -1,17 +1,30 @@
 
+using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using Microsoft.Extensions.Caching.Memory;
+using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.Services;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+var services = builder.Services;
 var env = builder.Environment;
+
 // Add services to the container.
-builder.Services.AddControllersWithViews();
-builder.Services.AddResponseCaching();
-builder.Services.AddScoped<BlogService>();
-builder.Services.AddProgressiveWebApp();
-builder.Services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
+services.AddControllersWithViews();
+services.AddResponseCaching();
+services.AddScoped<BlogService>();
+services.AddScoped<MarkdownTranslatorService>();
+//services.AddHostedService<BackgroundTranslateService>();
+services.AddHttpClient<MarkdownTranslatorService>(options =>
+{
+    options.Timeout = TimeSpan.FromMinutes(15);
+    options.BaseAddress = new Uri("http://192.168.0.30:24080");
+});
+
+services.AddProgressiveWebApp();
+services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 
 
 var app = builder.Build();
@@ -23,6 +36,11 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+
+
+
+
 
 app.UseHttpsRedirection();
 app.UseImageSharp();
