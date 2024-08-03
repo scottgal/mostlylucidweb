@@ -345,6 +345,14 @@
       <Content Include="Markdown\translated\intro.jap.md">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="Markdown\translated\intro.zh.md" />
+      <Content Include="Markdown\translated\intro.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\mermaidandhtmx.hash" />
+      <Content Include="Markdown\translated\mermaidandhtmx.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <Target Name="BuildCss" BeforeTargets="Compile">
