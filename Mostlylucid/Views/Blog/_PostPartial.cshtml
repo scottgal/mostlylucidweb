@@ -11,6 +11,14 @@
             class="mb-4 inline-block rounded-full bg-blue-dark px-2 py-1 font-body text-sm text-white">@category</span>
         </a>
         }
+        @foreach (var language in Model.Languages)
+        {
+
+            <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="@language">
+                <span
+                    class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">@language</span>
+            </a>
+        }
         <h2
             class="block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-4xl md:text-5xl">
             @Model.Title

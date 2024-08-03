@@ -6,6 +6,8 @@ public class BlogPostViewModel
     
     public string Title { get; set; }= string.Empty;
     
+    public string[] Languages { get; set; } = Array.Empty<string>();
+    
     public string Content { get; set; }= string.Empty;
     
     public string Slug { get; set; }= string.Empty;

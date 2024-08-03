@@ -39,4 +39,15 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
         }
         return View("Index", posts);
     }
+    
+    [Route("language/{slug}/{language}")]
+    public IActionResult Language(string slug, string language)
+    {
+        var post = blogService.GetPost(slug, language);
+        if(Request.IsHtmx())
+        {
+            return PartialView("_PostPartial", post);
+        }
+        return View("Post", post);
+    }
 }

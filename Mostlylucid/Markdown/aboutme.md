@@ -9,6 +9,8 @@
 
 Versatile and accomplished Lead .NET Developer with over 25 years of expertise in software development, technical leadership, and team management. Proficient in C#, ASP.NET, and modern web frameworks, with extensive experience in cloud computing, DevOps, and database management. Proven track record of leading successful development projects across diverse industries, from technology giants to innovative startups.
 
+[TOC]
+
 ## Employment History
 ### Consulting | Lead Developer / Architect / Managing Director | Remote
 Jan 2012 – Present
@@ -17,7 +19,7 @@ Directed multiple client projects as Lead Developer, Architect, and interim CTO,
 Developed a comprehensive training program for over 200 novice developers, achieving a 90% employment success rate.
 Modernized legacy systems, enhancing operational efficiency and user experience through advanced technological solutions.
 Overhauled an e-commerce platform, improving performance, scalability, and maintainability.
-Very Jane Ltd | Senior Contract Developer | Remote
+### Very Jane Ltd | Senior Contract Developer | Remote
 Apr 2024 – Aug 2024
 
 Architected backend systems for a large e-commerce application, integrating payment systems like Stripe Connect and Hyperwallet.

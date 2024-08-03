@@ -1,34 +1,34 @@
-# Traduzione automatica dei file Markdown con EasyNMT
+# 用 EasyNMT 自动翻译标记下调文件
 
-## Introduzione
+## 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
-EasyNMT è un servizio localmente installabile che fornisce una semplice interfaccia a un certo numero di servizi di traduzione automatica. In questo tutorial, useremo EasyNMT per tradurre automaticamente un file Markdown dall'inglese in più lingue.
+EasyNMT是一种可在当地安装的服务,为一些机器翻译服务提供一个简单的接口。 在此教程中, 我们将使用 EasyNMT 自动将标记文件从英文翻译成多种语言 。
 
-È possibile trovare tutti i file per questo tutorial nel [Repository GitHub](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/MarkdownTranslator) per questo progetto.
+您可以在 [GitHub 库](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/MarkdownTranslator) 这个项目。
 
-[TOC]
+[技选委
 
-## Prerequisiti
+## 先决条件
 
-Per seguire questo tutorial è necessaria un'installazione di EasyNMT. Di solito lo gestisco come servizio Docker. Puoi trovare le istruzioni di installazione [qui](https://github.com/UKPLab/EasyNMT/blob/main/docker/README.md) che copre come farlo funzionare come un servizio docker.
+需要安装简易NMT, 才能跟随此教程 。 我通常用杜克服务来经营 您可以找到安装指令 [在这里](https://github.com/UKPLab/EasyNMT/blob/main/docker/README.md) 它覆盖了如何运行它作为一个 docker 服务。
 
 ```shell
 docker run -d -p 24080:80 --env MAX_WORKERS_BACKEND=6 --env MAX_WORKERS_FRONTEND=6 easynmt/api:2.0-cpu
 ```
 
-O se dispone di una GPU NVIDIA:
+或者,如果您有 NVIDIA GPU 可用的话:
 
 ```shell
 docker run -d -p 24080:80 --env MAX_WORKERS_BACKEND=6 --env MAX_WORKERS_FRONTEND=6 easynmt/api:2.0.2-cuda11.3
 ```
 
-Le variabili d'ambiente MAX_WORKERS_BACKEND e MAX_WORKERS_FRONTEND impostano il numero di lavoratori che EasyNMT utilizzerà. Puoi adattarli alla tua macchina.
+MAX_WORKERS_BACKEND 和 MAX_WORKERS_FRUNTEND 环境变量设定了 EasyNMT 将使用的工人数量 。 你可以调整这些 适合你的机器。
 
-NOTA: EasyNMT non è il servizio SMOOTHEST da eseguire, ma è il meglio che ho trovato per questo scopo. È un po 'persnickety circa la stringa di ingresso è passato, quindi potrebbe essere necessario fare un po 'pre-elaborazione del testo di ingresso prima di passarlo a EasyNMT.
+注意: EasyNMT不是SMOOTHEST服务运行, 但它是我为这个目的找到的最好的。 它对于它通过的输入字符串有点粗略, 所以你可能需要先对输入文本进行一些预处理, 然后再把它传递给 EasyNMT 。
 
-## Traduzione di un file Markdown
+## 正在翻译标记下翻译文件
 
-Questo è il codice che ho nel file MarkdownTranslatorService.cs. È un servizio semplice che prende una stringa di markdown e una lingua di destinazione e restituisce la stringa di markdown tradotta.
+这是我在Markdown翻译服务公司文件中的代码 这是一个简单的服务, 使用一个标记字符串和一个目标语言 并返回翻译的标记字符串。
 
 ```csharp
     public async Task<string> TranslateMarkdown(string markdown, string targetLang, CancellationToken cancellationToken)
@@ -50,13 +50,13 @@ Questo è il codice che ho nel file MarkdownTranslatorService.cs. È un servizio
     }
 ```
 
-Come potete vedere ha una serie di passaggi:
+正如你所看到的,它有许多步骤:
 
-1. `  var document = Markdig.Markdown.Parse(markdown);` - Questo analizza la stringa di markdown in un documento.
-2. `  var textStrings = ExtractTextStrings(document);` - Questo estrae le stringhe di testo dal documento.
-3. `  var batchSize = 50;` - Questo imposta la dimensione del lotto per il servizio di traduzione. EasyNMT ha un limite al numero di caratteri che può tradurre in una sola volta.
+1. `  var document = Markdig.Markdown.Parse(markdown);` - 将标记字符串切入文档中。
+2. `  var textStrings = ExtractTextStrings(document);` - 这从文档中提取文本字符串 。
+3. `  var batchSize = 50;` - 这确定了翻译服务的批量大小。 EasyNMT对可以一次性翻译的字符数有限制。
 4. `csharp await Post(batch, targetLang, cancellationToken)`
-   Questo richiede il metodo che poi posta il batch al servizio EasyNMT.
+   这就要求采用一种方法,然后将批量投放到 " 方便NMT " 服务上。
 
 ```csharp
     private async Task<string[]> Post(string[] elements, string targetLang, CancellationToken cancellationToken)
@@ -80,11 +80,11 @@ Come potete vedere ha una serie di passaggi:
     }
 ```
 
-5. `  ReinsertTranslatedStrings(document, translatedStrings.ToArray());` - Questo reinserisce le stringhe tradotte nel documento. Utilizzando la capacità di MarkDig di percorrere il documento e sostituire le stringhe di testo.
+5. `  ReinsertTranslatedStrings(document, translatedStrings.ToArray());` - 将翻译的字符串重新插入到文档中。 使用 MarkDig 的能力行走文档并替换文本字符串 。
 
-## Servizio ospitato
+## 东道服务处
 
-Per eseguire tutto questo uso un IHostedLifetimeService che viene avviato nel file Program.cs. Questo servizio legge in un file markdown, lo traduce in un certo numero di lingue e scrive i file tradotti su disco.
+要运行所有这一切,我使用一个 IHOSTED Lifetime Service, 它在程序. cs 文件中启动 。 此服务读取标记文件, 翻译为多种语言, 并将译出的文件写成磁盘 。
 
 ```csharp
     public async Task StartedAsync(CancellationToken cancellationToken)
@@ -125,9 +125,9 @@ Per eseguire tutto questo uso un IHostedLifetimeService che viene avviato nel fi
     }
 ```
 
-Come potete vedere controlla anche l'hash del file per vedere se è cambiato prima di tradurlo. Questo è per evitare di tradurre i file che non sono cambiati.
+正如你所看到的,它也检查了文件的散列, 看文件翻译前是否有更改 。 这是为了避免翻译尚未更改的文件 。
 
-Questo viene fatto calcolando un hash veloce del file markdown originale quindi testando per vedere se quel file è cambiato prima di tentare di tradurlo.
+这样做的方法是计算原始标记文件的快速散列, 然后测试该文件在试图翻译之前是否已经更改 。
 
 ```csharp
     private static async Task<string> ComputeHash(string filePath)
@@ -144,7 +144,7 @@ Questo viene fatto calcolando un hash veloce del file markdown originale quindi 
     }
 ```
 
-La configurazione in Program.cs è abbastanza semplice:
+程序. cs的设置很简单:
 
 ```csharp
 
@@ -156,9 +156,9 @@ services.AddHttpClient<MarkdownTranslatorService>(options =>
 });
 ```
 
-Ho creato l'HostedService (BackgroundTranslateService) e l'HttpClient per il MarkdownTranslatorService.
-Un Servizio Hosted è un servizio di lunga durata che funziona in background. E 'un buon posto per mettere i servizi che hanno bisogno di funzionare continuamente in background o solo prendere un po 'di tempo per completare. La nuova interfaccia IHostedLifetimeService è un po 'più flessibile rispetto alla vecchia interfaccia IHostedService e ci permette di eseguire le attività completamente in background più facilmente rispetto al vecchio IHostedService.
+我设置了托管服务(地下翻译服务)和马克唐翻译服务 HttpClient。
+托管服务是一种长期服务,在背景中运行。 这是一个很好的地方 将服务 需要持续运行 在背景 或只是花一段时间完成。 新的IHED 终身服务界面比旧的IHED Services界面灵活一些,让我们比旧的IHED Services更容易在背景中完全执行任务。
 
-Qui potete vedere che sto impostando il timeout per l'HttpClient a 15 minuti. Questo perché EasyNMT può essere un po 'lento a rispondere (soprattutto la prima volta utilizzando un modello di lingua). Sto anche impostando l'indirizzo base all'indirizzo IP della macchina che esegue il servizio EasyNMT.
+这里你可以看到 我把HttpClient的超时时间设定为15分钟 这是因为容易NMT可能反应缓慢(特别是首次使用语言模式)。 我还在设定运行 EasyNMT 服务的机器的IP IP IP 的基址 。
 
-I
+一一

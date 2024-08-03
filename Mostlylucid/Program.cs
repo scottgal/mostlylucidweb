@@ -1,4 +1,3 @@
-
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using Microsoft.Extensions.Caching.Memory;
@@ -15,13 +14,17 @@ var env = builder.Environment;
 services.AddControllersWithViews();
 services.AddResponseCaching();
 services.AddScoped<BlogService>();
-services.AddScoped<MarkdownTranslatorService>();
-//services.AddHostedService<BackgroundTranslateService>();
-services.AddHttpClient<MarkdownTranslatorService>(options =>
-{
-    options.Timeout = TimeSpan.FromMinutes(15);
-    options.BaseAddress = new Uri("http://192.168.0.30:24080");
-});
+
+//Uncomment to enable markdown translation
+    // services.AddScoped<MarkdownTranslatorService>();
+    //
+    // services.AddHttpClient<MarkdownTranslatorService>(options =>
+    // {
+    //     options.Timeout = TimeSpan.FromMinutes(15);
+    //     options.BaseAddress = new Uri("http://localhost:24080");
+    // });
+    // services.AddHostedService<BackgroundTranslateService>();
+
 
 services.AddProgressiveWebApp();
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
@@ -36,10 +39,6 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-
-
-
-
 
 
 app.UseHttpsRedirection();

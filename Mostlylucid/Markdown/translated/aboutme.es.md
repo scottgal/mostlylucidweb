@@ -7,6 +7,8 @@
 <!--category-- resume , introduction -->
 Desarrollador de Lead.NET versátil y consumado con más de 25 años de experiencia en desarrollo de software, liderazgo técnico y gestión de equipo. Tiene experiencia en C#, ASP.NET y marcos web modernos, con amplia experiencia en computación en la nube, DevOps y administración de bases de datos. Un historial comprobado de proyectos de desarrollo exitosos líderes en diversas industrias, desde gigantes tecnológicos hasta startups innovadoras.
 
+[TOC]
+
 ## Historial del empleo
 
 ### Consultoría  Desarrollador principal / Arquitecto / Director Gerente  Remoto
@@ -17,7 +19,9 @@ Dirigió varios proyectos de clientes como Lead Developer, Architect y CTO inter
 Desarrolló un programa de capacitación integral para más de 200 desarrolladores novatos, logrando una tasa de éxito laboral del 90%.
 Modernizar los sistemas heredados, mejorando la eficiencia operacional y la experiencia de los usuarios mediante soluciones tecnológicas avanzadas.
 Rebasó una plataforma de comercio electrónico, mejorando el rendimiento, la escalabilidad y la mantenibilidad.
-Muy Jane Ltd  Senior Contract Developer  Remote
+
+### Muy Jane Ltd  Senior Contract Developer  Remote
+
 Abr 2024 – Ago 2024
 
 Sistemas de backend archivados para una gran aplicación de comercio electrónico, integrando sistemas de pago como Stripe Connect e Hyperwallet.

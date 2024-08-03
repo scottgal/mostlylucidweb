@@ -4,13 +4,14 @@ using Markdig;
 using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.MarkDigExtensions;
 using Mostlylucid.Models.Blog;
-
+using Path = System.IO.Path;
 namespace Mostlylucid.Services;
 
 public class BlogService
 {
-    private const string Path = "Markdown";
+    private const string DirectoryPath = "Markdown";
     private const string CacheKey = "Categories";
+    private const string LanguageCacheKey = "Languages";
 
     private static readonly Regex DateRegex = new(
         @"<datetime class=""hidden"">(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})</datetime>",
@@ -34,15 +35,31 @@ public class BlogService
         _memoryCache = memoryCache;
         pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseTableOfContent().Use<ImgExtension>().Build();
         ListCategories();
+        ListLanguages();
     }
 
+    
+    
 
-    private Dictionary<string, List<string>> GetFromCache()
+    public Dictionary<string, List<string>> GetLanguageCache()
+    {
+        return _memoryCache.Get<Dictionary<string, List<string>>>(LanguageCacheKey) ?? new Dictionary<string, List<string>>();
+    }
+    
+    public void SetLanguageCache(Dictionary<string, List<string>> languages)
+    {
+        _memoryCache.Set(LanguageCacheKey, languages, new MemoryCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(12)
+        });
+    }
+    
+    private Dictionary<string, List<string>> GetCategoryCache()
     {
         return _memoryCache.Get<Dictionary<string, List<string>>>(CacheKey) ?? new Dictionary<string, List<string>>();
     }
 
-    private void SetCache(Dictionary<string, List<string>> categories)
+    private void SetCategoryCache(Dictionary<string, List<string>> categories)
     {
         _memoryCache.Set(CacheKey, categories, new MemoryCacheEntryOptions
         {
@@ -50,9 +67,42 @@ public class BlogService
         });
     }
 
+    public List<string> GetLanguages(string page)
+    {
+        var cacheLangs = GetLanguageCache();
+        return cacheLangs.TryGetValue(page, out var languages) ? languages : new List<string>();
+    }
+    
+    private void ListLanguages()
+    {
+        var cacheLangs = GetLanguageCache();
+        var pages = Directory.GetFiles("Markdown/translated", "*.md");
+        var count = 0;
+        
+        foreach (var page in pages)
+        {
+            var pageName = Path.GetFileNameWithoutExtension(page);
+            var languageCode = pageName.LastIndexOf(".", StringComparison.Ordinal) + 1;
+            var language = pageName.Substring(languageCode);
+            var originPage = pageName.Substring(0, languageCode - 1) +".md";
+            
+            var pageEntry = cacheLangs.TryGetValue(originPage, out var languagesList) ? languagesList : new List<string>();
+            var languageAlreadyAdded = pageEntry.Any(x=> x.Contains(language));
+
+            if (languageAlreadyAdded) continue;
+            count++;
+            pageEntry.Add(language);
+            
+            cacheLangs[originPage] = pageEntry;
+        }
+        if(count > 0) SetLanguageCache(cacheLangs);
+        
+
+    }
+
     private void ListCategories()
     {
-        var cacheCats = GetFromCache();
+        var cacheCats = GetCategoryCache();
         var pages = Directory.GetFiles("Markdown", "*.md");
         var count = 0;
 
@@ -81,32 +131,36 @@ public class BlogService
                 }
         }
 
-        if (count > 0) SetCache(cacheCats);
+        if (count > 0) SetCategoryCache(cacheCats);
     }
 
     public List<string> GetCategories()
     {
-        var cacheCats = GetFromCache();
+        var cacheCats = GetCategoryCache();
         return cacheCats.Keys.ToList();
     }
 
 
     public List<PostListModel> GetPostsByCategory(string category)
     {
-        var pages = GetFromCache()[category];
+        var pages = GetCategoryCache()[category];
         return GetPosts(pages.ToArray());
     }
 
-    public BlogPostViewModel? GetPost(string postName)
+    public BlogPostViewModel? GetPost(string postName, string language="")
     {
         try
         {
-            var path = System.IO.Path.Combine(Path, postName + ".md");
+            var path = Path.Combine(DirectoryPath, postName + ".md");
+            if (!string.IsNullOrEmpty(language))
+            {
+                path = System.IO.Path.Combine("Markdown/translated", postName + "." + language + ".md");
+            }
             var page = GetPage(path, true);
             return new BlogPostViewModel
             {
                 Categories = page.categories, WordCount = WordCount(page.restOfTheLines), Content = page.processed,
-                PublishedDate = page.publishDate, Slug = page.slug, Title = page.title
+                PublishedDate = page.publishDate, Slug = page.slug, Title = page.title,Languages = GetLanguages(postName + ".md").ToArray()
             };
         }
         catch (Exception e)
@@ -193,7 +247,7 @@ public class BlogService
             {
                 Categories = pageInfo.categories, Title = pageInfo.title,
                 Slug = pageInfo.slug, WordCount = WordCount(pageInfo.restOfTheLines),
-                PublishedDate = pageInfo.publishDate, Summary = summary
+                PublishedDate = pageInfo.publishDate, Summary = summary, Languages = GetLanguages(Path.GetFileName( page)).ToArray()
             });
         }
 

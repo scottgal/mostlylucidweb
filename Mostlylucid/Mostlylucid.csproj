@@ -137,6 +137,214 @@
       <Content Include="Markdown\mermaidandhtmx.md">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="Markdown\translated\aboutme.hash" />
+      <Content Include="Markdown\translated\aboutme.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aboutme.de.md" />
+      <Content Include="Markdown\translated\aboutme.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aboutme.es.md" />
+      <Content Include="Markdown\translated\aboutme.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aboutme.jap.md" />
+      <Content Include="Markdown\translated\aboutme.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aboutme.zh.md" />
+      <Content Include="Markdown\translated\aboutme.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aspnetcorepwa.hash" />
+      <Content Include="Markdown\translated\aspnetcorepwa.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aspnetcorepwa.de.md" />
+      <Content Include="Markdown\translated\aspnetcorepwa.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aspnetcorepwa.es.md" />
+      <Content Include="Markdown\translated\aspnetcorepwa.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aspnetcorepwa.fr.md" />
+      <Content Include="Markdown\translated\aspnetcorepwa.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aspnetcorepwa.it.md" />
+      <Content Include="Markdown\translated\aspnetcorepwa.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aspnetcorepwa.jap.md" />
+      <Content Include="Markdown\translated\aspnetcorepwa.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\aspnetcorepwa.zh.md" />
+      <Content Include="Markdown\translated\aspnetcorepwa.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\autotranslatingmarkdownfiles.hash" />
+      <Content Include="Markdown\translated\autotranslatingmarkdownfiles.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\autotranslatingmarkdownfiles.de.md" />
+      <Content Include="Markdown\translated\autotranslatingmarkdownfiles.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\autotranslatingmarkdownfiles.es.md" />
+      <Content Include="Markdown\translated\autotranslatingmarkdownfiles.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\autotranslatingmarkdownfiles.fr.md" />
+      <Content Include="Markdown\translated\autotranslatingmarkdownfiles.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\autotranslatingmarkdownfiles.it.md" />
+      <Content Include="Markdown\translated\autotranslatingmarkdownfiles.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\autotranslatingmarkdownfiles.jap.md" />
+      <Content Include="Markdown\translated\autotranslatingmarkdownfiles.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\autotranslatingmarkdownfiles.zh.md" />
+      <Content Include="Markdown\translated\autotranslatingmarkdownfiles.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\dockercompose.hash" />
+      <Content Include="Markdown\translated\dockercompose.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\dockercompose.de.md" />
+      <Content Include="Markdown\translated\dockercompose.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\dockercompose.es.md" />
+      <Content Include="Markdown\translated\dockercompose.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\dockercompose.fr.md" />
+      <Content Include="Markdown\translated\dockercompose.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\dockercompose.it.md" />
+      <Content Include="Markdown\translated\dockercompose.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\dockercompose.jap.md" />
+      <Content Include="Markdown\translated\dockercompose.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\dockercompose.zh.md" />
+      <Content Include="Markdown\translated\dockercompose.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\githubactions.hash" />
+      <Content Include="Markdown\translated\githubactions.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\githubactions.de.md" />
+      <Content Include="Markdown\translated\githubactions.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\githubactions.es.md" />
+      <Content Include="Markdown\translated\githubactions.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\githubactions.fr.md" />
+      <Content Include="Markdown\translated\githubactions.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\githubactions.it.md" />
+      <Content Include="Markdown\translated\githubactions.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\githubactions.jap.md" />
+      <Content Include="Markdown\translated\githubactions.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\htmxwithaspnetcore.hash" />
+      <Content Include="Markdown\translated\htmxwithaspnetcore.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\htmxwithaspnetcore.de.md" />
+      <Content Include="Markdown\translated\htmxwithaspnetcore.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\htmxwithaspnetcore.es.md" />
+      <Content Include="Markdown\translated\htmxwithaspnetcore.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\htmxwithaspnetcore.fr.md" />
+      <Content Include="Markdown\translated\htmxwithaspnetcore.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\htmxwithaspnetcore.it.md" />
+      <Content Include="Markdown\translated\htmxwithaspnetcore.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\htmxwithaspnetcore.jap.md" />
+      <Content Include="Markdown\translated\htmxwithaspnetcore.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\htmxwithaspnetcore.zh.md" />
+      <Content Include="Markdown\translated\htmxwithaspnetcore.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\imagesharpwithdocker.hash" />
+      <Content Include="Markdown\translated\imagesharpwithdocker.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\imagesharpwithdocker.de.md" />
+      <Content Include="Markdown\translated\imagesharpwithdocker.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\imagesharpwithdocker.es.md" />
+      <Content Include="Markdown\translated\imagesharpwithdocker.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\imagesharpwithdocker.fr.md" />
+      <Content Include="Markdown\translated\imagesharpwithdocker.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\imagesharpwithdocker.it.md" />
+      <Content Include="Markdown\translated\imagesharpwithdocker.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\imagesharpwithdocker.jap.md" />
+      <Content Include="Markdown\translated\imagesharpwithdocker.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\imagesharpwithdocker.zh.md" />
+      <Content Include="Markdown\translated\imagesharpwithdocker.zh.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\intro.hash" />
+      <Content Include="Markdown\translated\intro.hash">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\intro.de.md" />
+      <Content Include="Markdown\translated\intro.de.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\intro.es.md" />
+      <Content Include="Markdown\translated\intro.es.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\intro.fr.md" />
+      <Content Include="Markdown\translated\intro.fr.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\intro.it.md" />
+      <Content Include="Markdown\translated\intro.it.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <None Remove="Markdown\translated\intro.jap.md" />
+      <Content Include="Markdown\translated\intro.jap.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <Target Name="BuildCss" BeforeTargets="Compile">

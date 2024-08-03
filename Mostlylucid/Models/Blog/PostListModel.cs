@@ -8,6 +8,8 @@ public class PostListModel
     public DateTime PublishedDate { get; set; }
     
     public DateTime UpdatedDate { get; set; }
+    
+    public string[] Languages { get; set; } = Array.Empty<string>();
 
     public string[] Categories { get; set; } = Array.Empty<string>();
     

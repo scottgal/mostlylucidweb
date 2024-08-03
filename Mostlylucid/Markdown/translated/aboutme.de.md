@@ -7,6 +7,8 @@
 <!--category-- resume , introduction -->
 Vielseitiger und kompetenter Lead.NET Entwickler mit über 25 Jahren Erfahrung in der Softwareentwicklung, der technischen Führung und dem Teammanagement. Proficient in C#, ASP.NET und modernen Web-Frameworks, mit umfangreicher Erfahrung in Cloud Computing, DevOps und Datenbank-Management. Bewährte Erfolgsbilanz erfolgreicher Entwicklungsprojekte in verschiedenen Branchen, von Technologiegiganten bis hin zu innovativen Startups.
 
+[TOC]
+
 ## Geschichte der Beschäftigung
 
 ### Beratung • Lead Developer / Architekt / Managing Director • Remote
@@ -17,7 +19,9 @@ Leitung mehrerer Client-Projekte als Lead Developer, Architect und Interim CTO, 
 Entwickelt ein umfassendes Ausbildungsprogramm für über 200 Anfänger Entwickler, erreicht eine 90% Beschäftigung Erfolgsquote.
 Modernisierte Altsysteme, Verbesserung der operativen Effizienz und Benutzererfahrung durch fortschrittliche technologische Lösungen.
 Überholt eine E-Commerce-Plattform, Verbesserung der Leistung, Skalierbarkeit und Wartungsfähigkeit.
-Sehr Jane Ltd... Senior Contract Developer... entfernt.
+
+### Sehr Jane Ltd... Senior Contract Developer... entfernt.
+
 April 2024 – August 2024
 
 Designierte Backend-Systeme für eine große E-Commerce-Anwendung, die Zahlungssysteme wie Stripe Connect und Hyperwallet integrieren.
