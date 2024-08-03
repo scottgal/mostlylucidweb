@@ -353,6 +353,10 @@
       <Content Include="Markdown\translated\mermaidandhtmx.hash">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
+      <None Remove="Markdown\autotranslatingmarkdownfiles.md" />
+      <Content Include="Markdown\autotranslatingmarkdownfiles.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
     <Target Name="BuildCss" BeforeTargets="Compile">
