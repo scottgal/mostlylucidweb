@@ -40,12 +40,32 @@
         class="prose prose max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
         @Html.Raw(Model.Content)
     </div>
-
+@if (Model.Authenticated)
+    {
+        
+  
     <div class=" max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
-        <textarea id="Comments"></textarea>
-        <button class="btn btn-primary" hx-action="Comment" hx-controller="Blog" hx-post hx-swap="outerHTML" hx-target="#Comments">Comment</button>
+        <textarea id="comment"></textarea>
+        <button class="btn btn-primary" hx-action="Comment" hx-controller="Blog" hx-post hx-vals="js:{comment: simplemde.value()}"  hx-route-slug="@Model.Slug" hx-swap="outerHTML" hx-target="#comment"  onclick="prepareForSubmission()" >Comment</button>
     </div>
-      
+    }
+    else
+    {
+        <div class=" max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
+            <p class="font-body text-lg font-medium text-primary dark:text-white">Please login to comment</p>
+            <div class="w-[200px] h-[39px] overflow-hidden rounded">
+                <div class="g_id_signin"
+                     data-type="standard"
+                     data-size="large"
+                     data-width=200
+                     data-theme="filled_black"
+                     data-text="sign_in_with"
+                     data-shape="rectangular"
+                     data-logo_alignment="left">
+                </div>
+            </div>
+        </div>
+    }
 </div>
 <div class="flex items-center py-10">
     <span class="pr-5 font-body font-medium text-primary dark:text-white"

@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@model Mostlylucid.Models.BaseViewModel
+<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
     <meta charset="utf-8" />
@@ -73,21 +74,35 @@
                         <img src="/img/logo.svg" alt="logo"/>
                     </div>
                     <partial name="_Socials"/>
-                    <div id="g_id_onload"
-                         data-client_id="839055275161-u7dqn2oco2729n6i5mk0fe7gap0bmg6g.apps.googleusercontent.com"
-                         data-callback="handleCredentialResponse"
-                         data-auto_prompt="false">
-                        
-                    </div>
-                    <div class="g_id_signin"
-                          data-type="standard"
-                          data-size="large"
-                          data-width=200
-                          data-theme="filled_black"
-                          data-text="sign_in_with"
-                          data-shape="rectangular"
-                          data-logo_alignment="left">
-    </div>
+                     <div id="g_id_onload"
+                          data-client_id="839055275161-u7dqn2oco2729n6i5mk0fe7gap0bmg6g.apps.googleusercontent.com"
+                          data-login_uri="/login"
+                          data-auto_prompt="false">
+
+                        </div>
+                    @if (Model.Authenticated)
+                    {
+                        <a asp-action="Logout" asp-controller="Login" target="_blank">
+                           Logged in as @Model.Name
+                        </a>
+                    }
+                    else
+                    {
+
+
+                       
+                        <div class="w-[200px] h-[39px] overflow-hidden rounded">
+                            <div class="g_id_signin"
+                                 data-type="standard"
+                                 data-size="large"
+                                 data-width=200
+                                 data-theme="filled_black"
+                                 data-text="sign_in_with"
+                                 data-shape="rectangular"
+                                 data-logo_alignment="left">
+                            </div>
+                        </div>
+                    }
                 </span>
             </a>
             <div class="hidden lg:block">
@@ -176,20 +191,27 @@
 
 @await RenderSectionAsync("Scripts", required: false)
 <script>
+    var simplemde;
     document.addEventListener('DOMContentLoaded', function () {
         hljs.highlightAll();
         mermaid.initialize({ startOnLoad: true });
-        var simplemde = new SimpleMDE({ element: document.getElementById("Comments") });
+        if (document.getElementById("comment") != null)
+        {
+        
+       simplemde = new SimpleMDE({ element: document.getElementById("comment") });
+       }
+     
     });
     document.body.addEventListener('htmx:afterSwap', function(evt) {
             // Call your JavaScript function here
         
             hljs.highlightAll();
-        var simplemde = new SimpleMDE({ element: document.getElementById("Comments") });
+        if (document.getElementById("comment") != null)
+        {
+        simplemde = new SimpleMDE({ element: document.getElementById("comment") });
+        }
         mermaid.run();
-        
     });
-
 </script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-J9VJNKV3PV"></script>

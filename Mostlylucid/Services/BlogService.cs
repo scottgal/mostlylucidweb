@@ -108,12 +108,13 @@ public class BlogService
         if (count > 0) SetLanguageCache(cacheLangs);
     }
 
-    public async Task AddComment(string slug, string markdown)
+    public async Task AddComment(string slug, string markdown, string nameIdentifier)
     {
-        var path = Path.Combine("Markdown/comments", slug + ".md");
-        await File.AppendAllTextAsync(path, markdown);
+        var path = Path.Combine(_markdownConfig.MarkdownCommentsPath,$"{DateTime.Now.ToFileTimeUtc()}_{nameIdentifier}_{slug}.md");
+        var comment =markdown;
+        await File.WriteAllTextAsync(path, comment);
     }
-    
+
     private void ListCategories()
     {
         var cacheCats = GetCategoryCache();

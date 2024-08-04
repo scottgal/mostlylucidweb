@@ -2110,12 +2110,20 @@ html {
   height: 4rem;
 }
 
+.h-\[39px\] {
+  height: 39px;
+}
+
 .w-16 {
   width: 4rem;
 }
 
 .w-8 {
   width: 2rem;
+}
+
+.w-\[200px\] {
+  width: 200px;
 }
 
 .w-full {
@@ -2150,6 +2158,14 @@ html {
   --tw-space-x-reverse: 0;
   margin-right: calc(1rem * var(--tw-space-x-reverse));
   margin-left: calc(1rem * calc(1 - var(--tw-space-x-reverse)));
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.rounded {
+  border-radius: 0.25rem;
 }
 
 .rounded-btn {

@@ -1,8 +1,11 @@
-﻿using Mostlylucid.Services;
+﻿using Mostlylucid.Config;
+using Mostlylucid.Config.Markdown;
+using Mostlylucid.Services;
 
 namespace Mostlylucid.MarkdownTranslator;
 
-public class BackgroundTranslateService(
+public class BackgroundTranslateService(MarkdownConfig markdownConfig,
+    TranslateServiceConfig translateServiceConfig,
     MarkdownTranslatorService blogService,
     ILogger<BackgroundTranslateService> logger) : IHostedLifecycleService
 {
@@ -27,11 +30,11 @@ public class BackgroundTranslateService(
             return;
         }
         ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = 3, CancellationToken = cancellationToken};
-        var files = Directory.GetFiles("Markdown", ".md");
+        var files = Directory.GetFiles(markdownConfig.MarkdownPath, ".md");
 
-        var outDir = "Markdown/translated";
+        var outDir = markdownConfig.MarkdownTranslatedPath;
 
-        var languages = new[] { "es", "fr", "de", "it",  "jap", "zh", "nl", "hi", "ar" };
+        var languages = translateServiceConfig.Languages;
         foreach(var language in languages)
         {
             await Parallel.ForEachAsync(files, parallelOptions, async (file,ct) =>

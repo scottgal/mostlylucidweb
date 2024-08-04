@@ -1,4 +1,5 @@
-﻿using Htmx;
+﻿using System.Security.Claims;
+using Htmx;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
@@ -22,6 +23,7 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
     public IActionResult Show(string slug)
     {
        var post =  blogService.GetPost(slug);
+       post.Authenticated = User.Identity.IsAuthenticated;
        if(Request.IsHtmx())
        {
               return PartialView("_PostPartial", post);
@@ -52,7 +54,10 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
     [Authorize]
     public async Task<IActionResult> Comment(string slug, string comment)
     {
-        blogService.AddComment(slug, comment);
+        var principal = HttpContext.User;
+        principal.Claims.ToList().ForEach(c => logger.LogInformation($"{c.Type} : {c.Value}"));
+        var nameIdentifier = principal.FindFirst(ClaimTypes.NameIdentifier);
+       await blogService.AddComment(slug, comment, nameIdentifier.Value);
         return RedirectToAction(nameof(Show), new { slug });
     }
 
