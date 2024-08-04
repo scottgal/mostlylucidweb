@@ -1,4 +1,5 @@
 ﻿using Htmx;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Services;
@@ -44,6 +45,22 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
     public IActionResult Compat(string slug, string language)
     {
        return RedirectToAction(nameof(Language), new { slug, language });
+    }
+    
+    [HttpPost]
+    [Route("comment")]
+    [Authorize]
+    public async Task<IActionResult> Comment(string slug, string comment)
+    {
+        blogService.AddComment(slug, comment);
+        return RedirectToAction(nameof(Show), new { slug });
+    }
+
+    [HttpGet]
+    [Route("list=comments")]
+    public async Task<IActionResult> ListComments(string slug)
+    {
+        return View();
     }
     
     [Route("/{language}/{slug}")]

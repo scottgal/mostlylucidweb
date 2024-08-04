@@ -41,8 +41,12 @@
         @Html.Raw(Model.Content)
     </div>
 
-      
+    <div class=" max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
+        <textarea id="Comments"></textarea>
+        <button class="btn btn-primary" hx-action="Comment" hx-controller="Blog" hx-post hx-swap="outerHTML" hx-target="#Comments">Comment</button>
     </div>
+      
+</div>
 <div class="flex items-center py-10">
     <span class="pr-5 font-body font-medium text-primary dark:text-white"
     >Share</span

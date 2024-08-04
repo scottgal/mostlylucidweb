@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="utf-8" />
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
@@ -18,7 +18,8 @@
     <meta property="og:site_name" content="mostlylucid" />
     <meta property="og:image" content="/img/social.jpg"/>
     <meta name="twitter:card" content="summary_large_image" />
-    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
     <link
         crossorigin="crossorigin"
         href="https://fonts.gstatic.com"
@@ -50,6 +51,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdn.rawgit.com/xcatliu/simplemde-theme-dark/master/dist/simplemde-theme-dark.min.css">
 </head>
 <script>
     window.dataLayer = window.dataLayer || [];
@@ -59,9 +61,7 @@
     gtag('config', 'G-J9VJNKV3PV');
 </script>
 
-<body
-
-    class="dark:bg-primary"
+<body class="dark:black"
 >
 
 <div id="main">
@@ -73,6 +73,21 @@
                         <img src="/img/logo.svg" alt="logo"/>
                     </div>
                     <partial name="_Socials"/>
+                    <div id="g_id_onload"
+                         data-client_id="839055275161-u7dqn2oco2729n6i5mk0fe7gap0bmg6g.apps.googleusercontent.com"
+                         data-callback="handleCredentialResponse"
+                         data-auto_prompt="false">
+                        
+                    </div>
+                    <div class="g_id_signin"
+                          data-type="standard"
+                          data-size="large"
+                          data-width=200
+                          data-theme="filled_black"
+                          data-text="sign_in_with"
+                          data-shape="rectangular"
+                          data-logo_alignment="left">
+    </div>
                 </span>
             </a>
             <div class="hidden lg:block">
@@ -114,52 +129,7 @@
         </div>
     </div>
 
-    <div
-        class="pointer-events-none fixed inset-0 z-50 flex bg-black bg-opacity-80 opacity-0 transition-opacity lg:hidden"
-        :class="isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : ''"
-    >
-        <div class="ml-auto w-2/3 bg-green p-4 md:w-1/3">
-            <i
-                class="bx bx-x absolute top-0 right-0 mt-4 mr-4 text-4xl text-white"
-                click="isMobileMenuOpen = false"
-            ></i>
-            <ul class="mt-8 flex flex-col">
-
-                <li class="">
-                    <a
-                        href="/"
-                        class="mb-3 block px-2 font-body text-lg font-medium text-white"
-                    >Intro</a
-                    >
-                </li>
-
-                <li class="">
-                    <a
-                        href="/blog"
-                        class="mb-3 block px-2 font-body text-lg font-medium text-white"
-                    >Blog</a
-                    >
-                </li>
-
-                <li class="">
-                    <a
-                        href="/uses"
-                        class="mb-3 block px-2 font-body text-lg font-medium text-white"
-                    >Uses</a
-                    >
-                </li>
-
-                <li class="">
-                    <a
-                        href="/contact"
-                        class="mb-3 block px-2 font-body text-lg font-medium text-white"
-                    >Contact</a
-                    >
-                </li>
-
-            </ul>
-        </div>
-    </div>
+   
 
 
 <div>
@@ -185,7 +155,11 @@
                 </p>
             </div>
             <partial name="_Socials"/>
+            <div>
+                <div class="g-signin2" data-onsuccess="onSignIn"></div>
+            </div>
         </div>
+        
     </div>
 
 </div>
@@ -194,18 +168,24 @@
 <script src="~/js/dist/htmx.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script type="text/javascript" src="https://unpkg.com/highlightjs-cshtml-razor/dist/cshtml-razor.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js
-"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+
+
+
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+
 @await RenderSectionAsync("Scripts", required: false)
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         hljs.highlightAll();
         mermaid.initialize({ startOnLoad: true });
+        var simplemde = new SimpleMDE({ element: document.getElementById("Comments") });
     });
     document.body.addEventListener('htmx:afterSwap', function(evt) {
             // Call your JavaScript function here
         
             hljs.highlightAll();
+        var simplemde = new SimpleMDE({ element: document.getElementById("Comments") });
         mermaid.run();
         
     });
@@ -213,6 +193,5 @@
 </script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-J9VJNKV3PV"></script>
-<script id="dsq-count-scr" src="//mostlylucid.disqus.com/count.js" async></script>
 </body>
 </html>

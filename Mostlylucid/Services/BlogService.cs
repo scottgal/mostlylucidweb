@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Markdig;
 using Microsoft.Extensions.Caching.Memory;
+using Mostlylucid.Config.Markdown;
 using Mostlylucid.MarkDigExtensions;
 using Mostlylucid.Models.Blog;
 using Path = System.IO.Path;
@@ -10,7 +11,7 @@ namespace Mostlylucid.Services;
 
 public class BlogService
 {
-    private const string DirectoryPath = "Markdown";
+    private  string DirectoryPath => _markdownConfig.MarkdownPath;
     private const string CacheKey = "Categories";
     private const string LanguageCacheKey = "Languages";
 
@@ -28,13 +29,15 @@ public class BlogService
 
     private readonly IMemoryCache _memoryCache;
 
-    private readonly MarkdownPipeline pipeline;
+    private readonly MarkdownPipeline _pipeline;
+    private readonly MarkdownConfig _markdownConfig;
 
-    public BlogService(IMemoryCache memoryCache, ILogger<BlogService> logger)
+    public BlogService(MarkdownConfig markdownConfig, IMemoryCache memoryCache, ILogger<BlogService> logger)
     {
+        _markdownConfig = markdownConfig;
         _logger = logger;
         _memoryCache = memoryCache;
-        pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseTableOfContent().Use<ImgExtension>()
+        _pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseTableOfContent().Use<ImgExtension>()
             .Build();
         ListCategories();
         ListLanguages();
@@ -105,6 +108,12 @@ public class BlogService
         if (count > 0) SetLanguageCache(cacheLangs);
     }
 
+    public async Task AddComment(string slug, string markdown)
+    {
+        var path = Path.Combine("Markdown/comments", slug + ".md");
+        await File.AppendAllTextAsync(path, markdown);
+    }
+    
     private void ListCategories()
     {
         var cacheCats = GetCategoryCache();
@@ -161,7 +170,7 @@ public class BlogService
             var path = Path.Combine(DirectoryPath, postName + ".md");
             if (!string.IsNullOrEmpty(language))
             {
-                path = System.IO.Path.Combine("Markdown/translated", postName + "." + language + ".md");
+                path = System.IO.Path.Combine(_markdownConfig.MarkdownTranslatedPath, postName + "." + language + ".md");
             }
 
             var page = GetPage(path, true);
@@ -238,7 +247,7 @@ public class BlogService
         restOfTheLines = DateRegex.Replace(restOfTheLines, "");
         // Process the rest of the lines as either HTML or plain text
         var processed =
-            html ? Markdown.ToHtml(restOfTheLines, pipeline) : Markdown.ToPlainText(restOfTheLines, pipeline);
+            html ? Markdown.ToHtml(restOfTheLines, _pipeline) : Markdown.ToPlainText(restOfTheLines, _pipeline);
 
         // Generate the slug from the page filename
         var slug = GetSlug(page);
@@ -273,7 +282,7 @@ public class BlogService
 
     public List<PostListModel> GetPostsForFiles()
     {
-        var pages = Directory.GetFiles("Markdown", "*.md");
+        var pages = Directory.GetFiles(DirectoryPath, "*.md");
         return GetPosts(pages);
     }
 }
