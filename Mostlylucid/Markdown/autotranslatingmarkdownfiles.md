@@ -7,6 +7,8 @@ You can find all the files for this tutorial in the [GitHub repository](https://
 
 NOTE: This is still pretty rough, I'll continue refining it as I go.
 
+I've only translated this file at (well and [about me](/blog/aboutme) as I refine the method; there are a few issues with the translation that I need to work out.
+
 [TOC]
 
 ## Prerequisites
@@ -22,6 +24,19 @@ docker run -d -p 24080:80 --env MAX_WORKERS_BACKEND=6 --env MAX_WORKERS_FRONTEND
 The MAX_WORKERS_BACKEND and MAX_WORKERS_FRONTEND environment variables set the number of workers that EasyNMT will use. You can adjust these to suit your machine.
 
 NOTE: EasyNMT isn't the SMOOTHEST service to run, but it's the best I've found for this purpose. It is a bit persnickety about the input string it's passed, so you may need to do some pre-processing of your input text before passing it to EasyNMT.
+
+## Naive Approach to Load Balancing
+
+Easy NMT is a thirst beast when it comes to resources, so in my MarkdownTranslatorService I have a super simple random IP selector that just takes the a random IP from the list of machines I have . This is a bit naive and could be improved by using a more sophisticated load balancing algorithm.
+
+```csharp
+    private string[] IPs = new[] { "http://192.168.0.30:24080", "http://localhost:24080", "http://192.168.0.74:24080" };
+
+     var ip = IPs[random.Next(IPs.Length)];
+     logger.LogInformation("Sendign request to {IP}", ip);
+     var response = await client.PostAsJsonAsync($"{ip}/translate", postObject, cancellationToken);
+
+ ```
 
 ## Translating a Markdown File
 This is the code I have in the MarkdownTranslatorService.cs file. It's a simple service that takes a markdown string and a target language and returns the translated markdown string.

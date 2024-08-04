@@ -8,6 +8,8 @@ U kunt alle bestanden voor deze tutorial vinden in de[GitHub repository](https:/
 
 LET OP: Dit is nog steeds vrij ruw, Ik zal blijven verfijnen als ik ga.
 
+Ik heb dit bestand alleen vertaald op (goed en[over mij](/blog/aboutme)als ik verfijn de methode; er zijn een paar problemen met de vertaling die ik moet uitwerken.
+
 [TOC]
 
 ## Vereisten
@@ -27,6 +29,19 @@ docker run -d -p 24080:80 --env MAX_WORKERS_BACKEND=6 --env MAX_WORKERS_FRONTEND
 De MAX_WORKERS_BACKEND en MAX_WORKERS_FRONTEND omgevingsvariabelen stellen het aantal werknemers in dat EasyNMT zal gebruiken. U kunt deze aanpassen aan uw machine.
 
 OPMERKING: EasyNMT is niet de SMOOTHEST-service om uit te voeren, maar het is de beste die ik heb gevonden voor dit doel. Het is een beetje persnickety over de invoer string die het is doorgegeven, dus je kan nodig hebben om wat pre-processing van uw invoer tekst te doen voordat het door te geven aan EasyNMT.
+
+## Native Approach to Load Balancing
+
+Easy NMT is een dorst beest als het gaat om middelen, dus in mijn MarkdownVertalerService heb ik een super eenvoudige willekeurige IP-selector die gewoon de een willekeurige IP uit de lijst van machines die ik heb. Dit is een beetje naïef en kan worden verbeterd met behulp van een meer geavanceerde load balancing algoritme.
+
+```csharp
+    private string[] IPs = new[] { "http://192.168.0.30:24080", "http://localhost:24080", "http://192.168.0.74:24080" };
+
+     var ip = IPs[random.Next(IPs.Length)];
+     logger.LogInformation("Sendign request to {IP}", ip);
+     var response = await client.PostAsJsonAsync($"{ip}/translate", postObject, cancellationToken);
+
+```
 
 ## Een markdown-bestand vertalen
 

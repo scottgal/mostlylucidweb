@@ -2,17 +2,19 @@
 
 ## Einleitung
 
-EasyNMT ist ein lokal installierbarer Service, der eine einfache Schnittstelle zu einer Reihe von maschinellen Übersetzungsdiensten bietet. In diesem Tutorial werden wir EasyNMT verwenden, um eine Markdown-Datei automatisch von Englisch in mehrere Sprachen zu übersetzen.
+EasyNMT ist ein lokal installierbarer Dienst, der eine einfache Schnittstelle zu einer Reihe von maschinellen Übersetzungsdiensten bietet. In diesem Tutorial werden wir EasyNMT verwenden, um eine Markdown-Datei automatisch von Englisch in mehrere Sprachen zu übersetzen.
 
-Sie finden alle Dateien für dieses Tutorial in der [GitHub-Repository](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/MarkdownTranslator) für dieses Projekt.
+Sie finden alle Dateien für dieses Tutorial in der[GitHub-Repository](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/MarkdownTranslator)für dieses Projekt.
 
 HINWEIS: Das ist immer noch ziemlich rau, ich werde es weiter verfeinern, während ich gehe.
+
+Ich habe nur diese Datei übersetzt bei (und[über mich](/blog/aboutme)da ich die Methode verfeinere; es gibt ein paar Probleme mit der Übersetzung, die ich erarbeiten muss.
 
 [TOC]
 
 ## Voraussetzungen
 
-Um diesem Tutorial zu folgen, ist eine Installation von EasyNMT erforderlich. Normalerweise leite ich es als Docker-Service. Die Installationsanleitung finden Sie [Hierher](https://github.com/UKPLab/EasyNMT/blob/main/docker/README.md) die wie man es als Docker-Service laufen lässt.
+Eine Installation von EasyNMT ist erforderlich, um diesem Tutorial zu folgen. Ich laufe es in der Regel als Docker-Service. Sie können die Installationsanleitung finden[Hierher](https://github.com/UKPLab/EasyNMT/blob/main/docker/README.md)die wie man es als Docker-Service laufen lässt.
 
 ```shell
 docker run -d -p 24080:80 --env MAX_WORKERS_BACKEND=6 --env MAX_WORKERS_FRONTEND=6 easynmt/api:2.0-cpu
@@ -26,11 +28,24 @@ docker run -d -p 24080:80 --env MAX_WORKERS_BACKEND=6 --env MAX_WORKERS_FRONTEND
 
 Die Umgebungsvariablen MAX_WORKERS_BACKEND und MAX_WORKERS_FRONTEND setzen die Anzahl der Mitarbeiter, die EasyNMT verwenden wird. Sie können diese an Ihre Maschine anpassen.
 
-HINWEIS: EasyNMT ist nicht der SMOOTHEST Service, aber es ist das Beste, was ich für diesen Zweck gefunden habe. Es ist ein bisschen persnickety über die Eingabe Zeichenkette, die es übergeben wird, so dass Sie möglicherweise einige Vorverarbeitung Ihres Eingabetextes tun müssen, bevor Sie es an EasyNMT übergeben.
+HINWEIS: EasyNMT ist nicht der SMOOTHEST-Dienst, aber es ist das beste, was ich für diesen Zweck gefunden habe. Es ist ein bisschen persnickety über die Eingabe Zeichenkette, die es übergeben wird, so dass Sie möglicherweise einige Vorverarbeitung Ihres Eingabetextes tun müssen, bevor Sie es an EasyNMT übergeben.
+
+## Naive Ansatz zur Belastung Balancing
+
+Easy NMT ist ein Durst Tier, wenn es um Ressourcen geht, so in meinem MarkdownTranslatorService Ich habe eine super einfache zufällige IP-Selektor, die nur die zufällige IP aus der Liste der Maschinen, die ich habe. Dies ist ein bisschen naiv und könnte durch einen anspruchsvolleren Lastausgleich Algorithmus verbessert werden.
+
+```csharp
+    private string[] IPs = new[] { "http://192.168.0.30:24080", "http://localhost:24080", "http://192.168.0.74:24080" };
+
+     var ip = IPs[random.Next(IPs.Length)];
+     logger.LogInformation("Sendign request to {IP}", ip);
+     var response = await client.PostAsJsonAsync($"{ip}/translate", postObject, cancellationToken);
+
+```
 
 ## Übersetzen einer Markdown-Datei
 
-Das ist der Code, den ich in der Datei MarkdownTranslatorService.cs habe. Es ist ein einfacher Dienst, der einen Markdown-String und eine Zielsprache benötigt und den übersetzten Markdown-String zurückgibt.
+Dies ist der Code, den ich in der Datei MarkdownTranslatorService.cs habe. Es ist ein einfacher Dienst, der einen Markdown-String und eine Zielsprache nimmt und den übersetzten Markdown-String zurückgibt.
 
 ```csharp
     public async Task<string> TranslateMarkdown(string markdown, string targetLang, CancellationToken cancellationToken)
@@ -54,9 +69,9 @@ Das ist der Code, den ich in der Datei MarkdownTranslatorService.cs habe. Es ist
 
 Wie Sie sehen können, hat es eine Reihe von Schritten:
 
-1. `  var document = Markdig.Markdown.Parse(markdown);` - Hierdurch wird der Markdown-String in ein Dokument eingeblendet.
-2. `  var textStrings = ExtractTextStrings(document);` - Das extrahiert die Textstrings aus dem Dokument.
-3. `  var batchSize = 50;` - Hiermit wird die Batchgröße für den Übersetzungsdienst festgelegt. EasyNMT hat ein Limit für die Anzahl der Zeichen, die es in einem Zug übersetzen kann.
+1. `  var document = Markdig.Markdown.Parse(markdown);`- Hierdurch wird der Markdown-String in ein Dokument eingeblendet.
+2. `  var textStrings = ExtractTextStrings(document);`- Das extrahiert die Textstrings aus dem Dokument.
+3. `  var batchSize = 50;`- Dies setzt die Batchgröße für den Übersetzungsdienst. EasyNMT hat eine Grenze für die Anzahl der Zeichen, die es in einem Zug übersetzen kann.
 4. `csharp await Post(batch, targetLang, cancellationToken)`
    Dies ruft die Methode auf, die dann die Charge an den EasyNMT-Dienst postet.
 
@@ -82,11 +97,11 @@ Wie Sie sehen können, hat es eine Reihe von Schritten:
     }
 ```
 
-5. `  ReinsertTranslatedStrings(document, translatedStrings.ToArray());` - Damit werden die übersetzten Zeichenfolgen wieder in das Dokument eingefügt. Mit MarkDigs Fähigkeit, das Dokument zu gehen und Textstrings zu ersetzen.
+5. `  ReinsertTranslatedStrings(document, translatedStrings.ToArray());`- Damit werden die übersetzten Zeichenfolgen wieder in das Dokument eingefügt. Mit MarkDigs Fähigkeit, das Dokument zu gehen und Textstrings zu ersetzen.
 
 ## Gehosteter Dienst
 
-Um all dies auszuführen, benutze ich einen IHostedLifetimeService, der in der Datei Program.cs gestartet wird. Dieser Dienst liest sich in einer Markdown-Datei, übersetzt sie in eine Reihe von Sprachen und schreibt die übersetzten Dateien auf die Festplatte.
+Um all dies auszuführen, benutze ich einen IHostedLifetimeService, der in der Program.cs-Datei gestartet wird. Dieser Dienst liest sich in einer Markdown-Datei, übersetzt sie in eine Reihe von Sprachen und schreibt die übersetzten Dateien auf die Festplatte.
 
 ```csharp
     public async Task StartedAsync(CancellationToken cancellationToken)
@@ -127,7 +142,7 @@ Um all dies auszuführen, benutze ich einen IHostedLifetimeService, der in der D
     }
 ```
 
-Wie Sie sehen können, überprüft es auch den Hash der Datei, um zu sehen, ob er sich vor der Übersetzung geändert hat. Um zu vermeiden, dass Dateien übersetzt werden, die sich nicht geändert haben.
+Wie Sie sehen können, überprüft es auch den Hash der Datei, um zu sehen, ob er sich vor der Übersetzung geändert hat. Dies ist, um zu vermeiden, dass Dateien, die sich nicht geändert haben, übersetzt werden.
 
 Dies geschieht, indem man einen schnellen Hash der ursprünglichen Markdown-Datei berechnet, um dann zu prüfen, ob sich diese Datei geändert hat, bevor man versucht, sie zu übersetzen.
 
@@ -159,8 +174,8 @@ services.AddHttpClient<MarkdownTranslatorService>(options =>
 ```
 
 Ich habe den HostedService (BackgroundTranslateService) und den HttpClient für den MarkdownTranslatorService eingerichtet.
-Ein Hosted Service ist ein langfristiger Dienst, der im Hintergrund läuft. Es ist ein guter Ort, um Dienstleistungen, die kontinuierlich im Hintergrund laufen müssen oder nur eine Weile dauern, um abzuschließen. Die neue IHostedLifetimeService-Schnittstelle ist etwas flexibler als die alte IHostedService-Schnittstelle und lässt uns Aufgaben ganz im Hintergrund leichter ausführen als der ältere IHostedService.
+Ein Hosted Service ist ein langfristiger Dienst, der im Hintergrund läuft. Es ist ein guter Ort, um Dienste anzubieten, die kontinuierlich im Hintergrund laufen oder nur eine Weile dauern müssen. Die neue IHostedLifetimeService-Schnittstelle ist etwas flexibler als die alte IHostedService-Schnittstelle und lässt uns Aufgaben ganz im Hintergrund leichter ausführen als der ältere IHostedService.
 
-Hier sehen Sie, dass ich den Timeout für den HttpClient auf 15 Minuten feststelle. Dies liegt daran, dass EasyNMT ein wenig langsam reagieren kann (besonders das erste Mal mit einem Sprachmodell). Außerdem setze ich die Basisadresse auf die IP-Adresse der Maschine, die den EasyNMT-Service betreibt.
+Hier sehen Sie, dass ich den Timeout für den HttpClient auf 15 Minuten setze. Dies liegt daran, dass EasyNMT ein wenig langsam reagieren kann (vor allem beim ersten Sprachmodell). Außerdem setze ich die Basisadresse auf die IP-Adresse der Maschine, die den EasyNMT-Service betreibt.
 
 I. ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNG DER ENTWICKLUNGEN

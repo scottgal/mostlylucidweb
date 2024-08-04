@@ -2,17 +2,19 @@
 
 ## Introduzione
 
-EasyNMT è un servizio localmente installabile che fornisce una semplice interfaccia a un certo numero di servizi di traduzione automatica. In questo tutorial, useremo EasyNMT per tradurre automaticamente un file Markdown dall'inglese in più lingue.
+EasyNMT è un servizio localmente installabile che fornisce una semplice interfaccia a un certo numero di servizi di traduzione automatica. In questo tutorial, useremo EasyNMT per tradurre automaticamente un file Markdown dall'inglese a più lingue.
 
-È possibile trovare tutti i file per questo tutorial nel [Repository GitHub](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/MarkdownTranslator) per questo progetto.
+È possibile trovare tutti i file per questo tutorial nel[Repository GitHub](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/MarkdownTranslator)per questo progetto.
 
 NOTA: Questo è ancora abbastanza ruvido, continuerò a raffinarlo mentre vado.
+
+Ho tradotto questo file solo a (bene e[su di me](/blog/aboutme)come ho affinato il metodo; ci sono alcuni problemi con la traduzione che ho bisogno di lavorare fuori.
 
 [TOC]
 
 ## Prerequisiti
 
-Per seguire questo tutorial è necessaria un'installazione di EasyNMT. Di solito lo gestisco come servizio Docker. Puoi trovare le istruzioni di installazione [qui](https://github.com/UKPLab/EasyNMT/blob/main/docker/README.md) che copre come farlo funzionare come un servizio docker.
+Per seguire questo tutorial è necessaria un'installazione di EasyNMT. Di solito la eseguisco come servizio Docker. Puoi trovare le istruzioni per l'installazione[qui](https://github.com/UKPLab/EasyNMT/blob/main/docker/README.md)che copre come farlo funzionare come un servizio docker.
 
 ```shell
 docker run -d -p 24080:80 --env MAX_WORKERS_BACKEND=6 --env MAX_WORKERS_FRONTEND=6 easynmt/api:2.0-cpu
@@ -24,9 +26,22 @@ O se dispone di una GPU NVIDIA:
 docker run -d -p 24080:80 --env MAX_WORKERS_BACKEND=6 --env MAX_WORKERS_FRONTEND=6 easynmt/api:2.0.2-cuda11.3
 ```
 
-Le variabili d'ambiente MAX_WORKERS_BACKEND e MAX_WORKERS_FRONTEND impostano il numero di lavoratori che EasyNMT utilizzerà. Puoi adattarli alla tua macchina.
+Le variabili d'ambiente MAX_WORKERS_BACKEND e MAX_WORKERS_FRONTEND impostano il numero di lavoratori che EasyNMT utilizzerà. Puoi regolarli in base alla tua macchina.
 
-NOTA: EasyNMT non è il servizio SMOOTHEST da eseguire, ma è il meglio che ho trovato per questo scopo. È un po 'persnickety circa la stringa di ingresso è passato, quindi potrebbe essere necessario fare un po 'pre-elaborazione del testo di ingresso prima di passarlo a EasyNMT.
+NOTA: EasyNMT non è il servizio SMOOTHEST da eseguire, ma è il meglio che ho trovato per questo scopo. È un po' persnickety circa la stringa di ingresso che è passato, quindi potrebbe essere necessario fare qualche pre-elaborazione del testo di input prima di passarlo a EasyNMT.
+
+## Approccio naive al bilanciamento del carico
+
+Easy NMT è una bestia assetata quando si tratta di risorse, così nel mio MarkdownTranslatorService ho un super semplice selettore IP casuale che prende solo un IP casuale dalla lista delle macchine che ho. Questo è un po 'ingenuo e potrebbe essere migliorato utilizzando un algoritmo di bilanciamento del carico più sofisticato.
+
+```csharp
+    private string[] IPs = new[] { "http://192.168.0.30:24080", "http://localhost:24080", "http://192.168.0.74:24080" };
+
+     var ip = IPs[random.Next(IPs.Length)];
+     logger.LogInformation("Sendign request to {IP}", ip);
+     var response = await client.PostAsJsonAsync($"{ip}/translate", postObject, cancellationToken);
+
+```
 
 ## Traduzione di un file Markdown
 
@@ -54,9 +69,9 @@ Questo è il codice che ho nel file MarkdownTranslatorService.cs. È un servizio
 
 Come potete vedere ha una serie di passaggi:
 
-1. `  var document = Markdig.Markdown.Parse(markdown);` - Questo analizza la stringa di markdown in un documento.
-2. `  var textStrings = ExtractTextStrings(document);` - Questo estrae le stringhe di testo dal documento.
-3. `  var batchSize = 50;` - Questo imposta la dimensione del lotto per il servizio di traduzione. EasyNMT ha un limite al numero di caratteri che può tradurre in una sola volta.
+1. `  var document = Markdig.Markdown.Parse(markdown);`- Questo analizza la stringa di markdown in un documento.
+2. `  var textStrings = ExtractTextStrings(document);`- Questo estrae le stringhe di testo dal documento.
+3. `  var batchSize = 50;`- Questo imposta la dimensione del batch per il servizio di traduzione. EasyNMT ha un limite sul numero di caratteri che può tradurre in una sola volta.
 4. `csharp await Post(batch, targetLang, cancellationToken)`
    Questo richiede il metodo che poi posta il batch al servizio EasyNMT.
 
@@ -82,7 +97,7 @@ Come potete vedere ha una serie di passaggi:
     }
 ```
 
-5. `  ReinsertTranslatedStrings(document, translatedStrings.ToArray());` - Questo reinserisce le stringhe tradotte nel documento. Utilizzando la capacità di MarkDig di percorrere il documento e sostituire le stringhe di testo.
+5. `  ReinsertTranslatedStrings(document, translatedStrings.ToArray());`- Questo reinserisce le stringhe tradotte nel documento. Usando la capacità di MarkDig di percorrere il documento e sostituire le stringhe di testo.
 
 ## Servizio ospitato
 
@@ -159,8 +174,8 @@ services.AddHttpClient<MarkdownTranslatorService>(options =>
 ```
 
 Ho creato l'HostedService (BackgroundTranslateService) e l'HttpClient per il MarkdownTranslatorService.
-Un Servizio Hosted è un servizio di lunga durata che funziona in background. E 'un buon posto per mettere i servizi che hanno bisogno di funzionare continuamente in background o solo prendere un po 'di tempo per completare. La nuova interfaccia IHostedLifetimeService è un po 'più flessibile rispetto alla vecchia interfaccia IHostedService e ci permette di eseguire le attività completamente in background più facilmente rispetto al vecchio IHostedService.
+Un servizio Hosted è un servizio a lungo termine che funziona in background. E 'un buon posto per mettere i servizi che devono funzionare continuamente in background o solo prendere un po 'di tempo per completare. La nuova interfaccia IHostedLifetimeService è un po 'più flessibile rispetto alla vecchia interfaccia IHostedService e ci permette di eseguire attività completamente in background più facilmente rispetto al vecchio IHostedService.
 
-Qui potete vedere che sto impostando il timeout per l'HttpClient a 15 minuti. Questo perché EasyNMT può essere un po 'lento a rispondere (soprattutto la prima volta utilizzando un modello di lingua). Sto anche impostando l'indirizzo base all'indirizzo IP della macchina che esegue il servizio EasyNMT.
+Qui potete vedere che sto impostando il timeout per HttpClient a 15 minuti. Questo perché EasyNMT può essere un po 'lento a rispondere (soprattutto la prima volta utilizzando un modello di lingua). Sto anche impostando l'indirizzo di base per l'indirizzo IP della macchina che esegue il servizio EasyNMT.
 
 I

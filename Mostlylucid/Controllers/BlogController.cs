@@ -40,6 +40,12 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
         return View("Index", posts);
     }
     
+    [Route("language/{slug}/{language}")]
+    public IActionResult Compat(string slug, string language)
+    {
+       return RedirectToAction(nameof(Language), new { slug, language });
+    }
+    
     [Route("/{language}/{slug}")]
     public IActionResult Language(string slug, string language)
     {
