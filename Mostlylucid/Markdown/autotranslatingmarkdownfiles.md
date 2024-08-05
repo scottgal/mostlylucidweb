@@ -1,5 +1,7 @@
 ﻿# Automatically Translating Markdown Files with EasyNMT
 
+<datetime class="hidden">2024-08-03T13:30</datetime>
+<!--category-- ASP.NET, Markdown -->
 ## Introduction
 EasyNMT is a locally installable service that provides a simple interface to a number of machine translation services. In this tutorial, we will use EasyNMT to automatically translate a Markdown file from English to multiple languages.
 
