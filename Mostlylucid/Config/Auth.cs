@@ -6,4 +6,6 @@ public class Auth : IConfigSection
     public string GoogleClientId { get; set; }
     public string GoogleClientSecret { get; set; }
     
+    public string AdminUserGoogleId { get; set; }
+    
 }

@@ -1,15 +1,13 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
-using Markdig;
 using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.Config.Markdown;
-using Mostlylucid.MarkDigExtensions;
 using Mostlylucid.Models.Blog;
 using Path = System.IO.Path;
 
-namespace Mostlylucid.Services;
+namespace Mostlylucid.Services.Markdown;
 
-public class BlogService
+public class BlogService : BaseService
 {
     private  string DirectoryPath => _markdownConfig.MarkdownPath;
     private const string CacheKey = "Categories";
@@ -25,20 +23,21 @@ public class BlogService
     private static readonly Regex CategoryRegex = new(@"<!--\s*category\s*--\s*([^,]+?)\s*(?:,\s*([^,]+?)\s*)?-->",
         RegexOptions.Compiled | RegexOptions.Singleline);
 
+
+    
     private readonly ILogger<BlogService> _logger;
 
     private readonly IMemoryCache _memoryCache;
 
-    private readonly MarkdownPipeline _pipeline;
+
     private readonly MarkdownConfig _markdownConfig;
 
-    public BlogService(MarkdownConfig markdownConfig, IMemoryCache memoryCache, ILogger<BlogService> logger)
+    public BlogService(MarkdownConfig markdownConfig, IMemoryCache memoryCache, ILogger<BlogService> logger) : base()
     {
         _markdownConfig = markdownConfig;
         _logger = logger;
         _memoryCache = memoryCache;
-        _pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseTableOfContent().Use<ImgExtension>()
-            .Build();
+      
         ListCategories();
         ListLanguages();
     }
@@ -108,13 +107,8 @@ public class BlogService
         if (count > 0) SetLanguageCache(cacheLangs);
     }
 
-    public async Task AddComment(string slug, string markdown, string nameIdentifier)
-    {
-        var path = Path.Combine(_markdownConfig.MarkdownCommentsPath,$"{DateTime.Now.ToFileTimeUtc()}_{nameIdentifier}_{slug}.md");
-        var comment =markdown;
-        await File.WriteAllTextAsync(path, comment);
-    }
 
+    
     private void ListCategories()
     {
         var cacheCats = GetCategoryCache();
@@ -156,10 +150,12 @@ public class BlogService
     }
 
 
-    public List<PostListModel> GetPostsByCategory(string category)
+    public PostListViewModel GetPostsByCategory(string category)
     {
         var pages = GetCategoryCache()[category];
-        return GetPosts(pages.ToArray());
+        var model = new PostListViewModel();
+        model.Posts= GetPosts(pages.ToArray());
+        return model;
     }
 
     public BlogPostViewModel? GetPost(string postName, string language = "")
@@ -230,7 +226,7 @@ public class BlogService
         var lines = File.ReadAllLines(page);
 
         // Get the title from the first line
-        var title = lines.Length > 0 ? Markdown.ToPlainText(lines[0].Trim()) : string.Empty;
+        var title = lines.Length > 0 ? Markdig.Markdown.ToPlainText(lines[0].Trim()) : string.Empty;
 
         // Concatenate the rest of the lines with newline characters
         var restOfTheLines = string.Join(Environment.NewLine, lines.Skip(1));
@@ -248,7 +244,7 @@ public class BlogService
         restOfTheLines = DateRegex.Replace(restOfTheLines, "");
         // Process the rest of the lines as either HTML or plain text
         var processed =
-            html ? Markdown.ToHtml(restOfTheLines, _pipeline) : Markdown.ToPlainText(restOfTheLines, _pipeline);
+            html ? Markdig.Markdown.ToHtml(restOfTheLines, _pipeline) : Markdig.Markdown.ToPlainText(restOfTheLines, _pipeline);
 
         // Generate the slug from the page filename
         var slug = GetSlug(page);
@@ -266,7 +262,7 @@ public class BlogService
         {
             var pageInfo = GetPage(page, false);
 
-            var summary = Markdown.ToPlainText(pageInfo.restOfTheLines).Substring(0, 100) + "...";
+            var summary = Markdig.Markdown.ToPlainText(pageInfo.restOfTheLines).Substring(0, 100) + "...";
             pageModels.Add(new PostListModel
             {
                 Categories = pageInfo.categories, Title = pageInfo.title,
@@ -281,9 +277,11 @@ public class BlogService
     }
 
 
-    public List<PostListModel> GetPostsForFiles()
+    public PostListViewModel GetPostsForFiles()
     {
         var pages = Directory.GetFiles(DirectoryPath, "*.md");
-        return GetPosts(pages);
+        var model = new PostListViewModel();
+         model.Posts = GetPosts(pages);
+         return model;
     }
 }

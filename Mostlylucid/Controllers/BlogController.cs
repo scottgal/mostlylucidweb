@@ -3,12 +3,14 @@ using Htmx;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Mostlylucid.Controllers;
 using Mostlylucid.Services;
+using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucidblog.Controllers;
 
 [Route("blog")]
-public class BlogController(BlogService blogService, ILogger<BlogController> logger) : Controller
+public class BlogController(BlogService blogService, CommentService commentService, ILogger<BlogController> logger) : BaseController(logger)
 {
 
     
@@ -23,7 +25,10 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
     public IActionResult Show(string slug)
     {
        var post =  blogService.GetPost(slug);
-       post.Authenticated = User.Identity.IsAuthenticated;
+       var user = GetUserInfo();
+       post.Authenticated = user.loggedIn;
+       post.Name = user.name;
+       post.AvatarUrl = user.avatarUrl;
        if(Request.IsHtmx())
        {
               return PartialView("_PostPartial", post);
@@ -34,8 +39,13 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
     [Route("category/{category}")]
     public IActionResult Category(string category)
     {
+        
         ViewBag.Category = category;
         var posts = blogService.GetPostsByCategory(category);
+        var user = GetUserInfo();
+        posts.Authenticated = user.loggedIn;
+        posts.Name = user.name;
+        posts.AvatarUrl = user.avatarUrl;
         if(Request.IsHtmx())
         {
             return PartialView("_BlogSummaryList", posts);
@@ -56,8 +66,9 @@ public class BlogController(BlogService blogService, ILogger<BlogController> log
     {
         var principal = HttpContext.User;
         principal.Claims.ToList().ForEach(c => logger.LogInformation($"{c.Type} : {c.Value}"));
-        var nameIdentifier = principal.FindFirst(ClaimTypes.NameIdentifier);
-       await blogService.AddComment(slug, comment, nameIdentifier.Value);
+        var nameIdentifier = principal.FindFirst("sub");
+        var userInformation = GetUserInfo();
+       await commentService.AddComment(slug, userInformation, comment, nameIdentifier.Value);
         return RedirectToAction(nameof(Show), new { slug });
     }
 

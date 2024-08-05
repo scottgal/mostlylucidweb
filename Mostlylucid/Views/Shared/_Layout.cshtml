@@ -20,7 +20,60 @@
     <meta property="og:image" content="/img/social.jpg"/>
     <meta name="twitter:card" content="summary_large_image" />
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script>
+        
+        function renderButton(element)
+        {
+            google.accounts.id.renderButton(
+                element,
+                {
+                    type: "standard",
+                    size: "large",
+                    width: 200,
+                    theme: "filled_black",
+                    text: "sign_in_with",
+                    shape: "rectangular",
+                    logo_alignment: "left"
+                }
+            );
+        }
+        function initGoogleSignIn() {
+            google.accounts.id.initialize({
+                client_id: "839055275161-u7dqn2oco2729n6i5mk0fe7gap0bmg6g.apps.googleusercontent.com",
+                callback: handleCredentialResponse
+            });
+            const element = document.getElementById('google_button');
+            if (element) {
+                renderButton(element);
+            }
+            const secondElement = document.getElementById('google_button2');
+            if (secondElement) {
+                renderButton(secondElement);
+            }
+           
+        }
 
+        function handleCredentialResponse(response) {
+            if (response.credential) {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/login', true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = function () {
+                    if (xhr.status === 200) {
+                        window.location.reload();
+                    } else {
+                        console.error('Failed to log in.');
+                    }
+                };
+                xhr.send(JSON.stringify({ idToken: response.credential }));
+            } else {
+                console.error('No credential in response.');
+            }
+        }
+
+        window.onload = initGoogleSignIn;
+    
+    </script>
     <link
         crossorigin="crossorigin"
         href="https://fonts.gstatic.com"
@@ -58,7 +111,6 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
-
     gtag('config', 'G-J9VJNKV3PV');
 </script>
 
@@ -74,32 +126,24 @@
                         <img src="/img/logo.svg" alt="logo"/>
                     </div>
                     <partial name="_Socials"/>
-                     <div id="g_id_onload"
-                          data-client_id="839055275161-u7dqn2oco2729n6i5mk0fe7gap0bmg6g.apps.googleusercontent.com"
-                          data-login_uri="/login"
-                          data-auto_prompt="false">
+                 
 
-                        </div>
+                        
                     @if (Model.Authenticated)
                     {
-                        <a asp-action="Logout" asp-controller="Login" target="_blank">
-                           Logged in as @Model.Name
-                        </a>
+                        <p class="flex items-center space-x-4">
+                            <img src="@Model.AvatarUrl" class="h-10 w-10 rounded-full" alt="User Avatar"/>
+                            <span class="text-lg">Logged in as @Model.Name</span>
+                            <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank"  class="bg-yellow-500 text-white py-2 px-4 rounded">
+                                Logout
+                            </a>
+                        </p>
+
                     }
                     else
                     {
-
-
-                       
                         <div class="w-[200px] h-[39px] overflow-hidden rounded">
-                            <div class="g_id_signin"
-                                 data-type="standard"
-                                 data-size="large"
-                                 data-width=200
-                                 data-theme="filled_black"
-                                 data-text="sign_in_with"
-                                 data-shape="rectangular"
-                                 data-logo_alignment="left">
+                            <div id="google_button">
                             </div>
                         </div>
                     }
@@ -170,9 +214,6 @@
                 </p>
             </div>
             <partial name="_Socials"/>
-            <div>
-                <div class="g-signin2" data-onsuccess="onSignIn"></div>
-            </div>
         </div>
         
     </div>
@@ -191,6 +232,22 @@
 
 @await RenderSectionAsync("Scripts", required: false)
 <script>
+
+function setLogoutLink() {
+        // Get the logout link
+    var logoutLink = document.querySelector('a[data-logout-link]');
+
+    if (logoutLink) {
+        // Get the current URL
+        var currentUrl = window.location.href;
+
+        // Update the href attribute to include the return URL
+        var baseUrl = logoutLink.href.split('?')[0]; // Get the base URL without query parameters
+        logoutLink.href = baseUrl + '?returnUrl=' + encodeURIComponent(currentUrl);
+    }
+    }
+    
+    var currentUrl = window.location.href;
     var simplemde;
     document.addEventListener('DOMContentLoaded', function () {
         hljs.highlightAll();
@@ -200,7 +257,8 @@
         
        simplemde = new SimpleMDE({ element: document.getElementById("comment") });
        }
-     
+        setLogoutLink();
+        
     });
     document.body.addEventListener('htmx:afterSwap', function(evt) {
             // Call your JavaScript function here
@@ -209,9 +267,14 @@
         if (document.getElementById("comment") != null)
         {
         simplemde = new SimpleMDE({ element: document.getElementById("comment") });
+        
         }
+     initGoogleSignIn();
         mermaid.run();
+        setLogoutLink();
     });
+
+
 </script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-J9VJNKV3PV"></script>

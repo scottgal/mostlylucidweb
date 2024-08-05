@@ -1,9 +1,11 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.Services;
+using Mostlylucid.Services.Markdown;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 
@@ -13,7 +15,7 @@ var markdownConfig =builder.Configure<MarkdownConfig>();
 var auth = builder.Configure<Auth>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
-
+var env = builder.Environment;
 services.AddCors(options =>
 {
     options.AddPolicy("AllowMostlylucid",
@@ -26,12 +28,13 @@ services.AddCors(options =>
                 .AllowAnyMethod();
         });
 });
-var env = builder.Environment;
+
 builder.Services
     .AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+   
       
     })
     .AddCookie()
@@ -44,12 +47,12 @@ builder.Services
 services.AddControllersWithViews();
 services.AddResponseCaching();
 services.AddScoped<BlogService>();
+services.AddScoped<CommentService>();
 
 if (translateServiceConfig.Enabled)
 {
 services.SetupTranslateService();
 }
-//services.AddProgressiveWebApp();
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 
 

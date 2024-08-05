@@ -2,7 +2,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
-
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace Mostlylucid.Controllers
 {
@@ -10,36 +12,52 @@ namespace Mostlylucid.Controllers
     public class LoginController : Controller
     {
         [Route("challenge")]
-        public IActionResult Login()
+        public IActionResult Login(string returnUrl = "/")
         {
             // Challenge the user using Google authentication
-            var properties = new AuthenticationProperties { RedirectUri = "/" };
+            var properties = new AuthenticationProperties { RedirectUri = returnUrl };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
-        
+
         [Route("logout")]
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout(string returnUrl = "/")
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return Redirect("/");
+            return Redirect(returnUrl);
         }
-        
-        [Route("login")]
-        public async Task<IActionResult> HandleGoogleCallback()
-        {
-            var authenticateResult = await HttpContext.AuthenticateAsync(GoogleDefaults.AuthenticationScheme);
 
-            if (!authenticateResult.Succeeded)
+        [Route("login")]
+        [HttpPost]
+        public async Task<IActionResult> HandleGoogleCallback([FromBody] GoogleLoginRequest request)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(request.IdToken) as JwtSecurityToken;
+
+            if (jsonToken == null)
             {
-                // If authentication failed, redirect to the login page
-                return Redirect("/challenge");
+                return BadRequest("Invalid token");
             }
 
-            // If authentication was successful, sign in the user with the cookie authentication scheme
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, authenticateResult.Principal, authenticateResult.Properties);
+            var claimsIdentity = new ClaimsIdentity(
+                jsonToken.Claims,
+                GoogleDefaults.AuthenticationScheme);
 
-            // Redirect to the originally requested page or the home page
-            return Redirect(authenticateResult.Properties.RedirectUri ?? "/");
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true
+            };
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                new ClaimsPrincipal(claimsIdentity),
+                authProperties);
+
+            return Ok();
         }
+    }
+
+    public class GoogleLoginRequest
+    {
+        public string IdToken { get; set; }
     }
 }

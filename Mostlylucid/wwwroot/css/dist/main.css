@@ -2106,12 +2106,20 @@ html {
   height: 0px;
 }
 
+.h-10 {
+  height: 2.5rem;
+}
+
 .h-16 {
   height: 4rem;
 }
 
 .h-\[39px\] {
   height: 39px;
+}
+
+.w-10 {
+  width: 2.5rem;
 }
 
 .w-16 {
@@ -2202,6 +2210,11 @@ html {
 .px-2 {
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+}
+
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 .py-1 {
