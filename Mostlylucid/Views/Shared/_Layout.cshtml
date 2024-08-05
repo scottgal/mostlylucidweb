@@ -1,6 +1,6 @@
 ﻿@model Mostlylucid.Models.BaseViewModel
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" >
 <head>
     <meta charset="utf-8" />
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
@@ -21,6 +21,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <script src="https://accounts.google.com/gsi/client"  data-cfasync="false" async defer></script>
     <script>
+        
         
         function renderButton(element)
         {
@@ -73,6 +74,7 @@
 
         window.onload = initGoogleSignIn;
     
+    
     </script>
     <link
         crossorigin="crossorigin"
@@ -106,6 +108,10 @@
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <link rel="stylesheet" href="https://cdn.rawgit.com/xcatliu/simplemde-theme-dark/master/dist/simplemde-theme-dark.min.css">
+
+    <!--Alpine Js V3-->
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="/js/main.js"></script>
 </head>
 <script>
     window.dataLayer = window.dataLayer || [];
@@ -114,79 +120,80 @@
     gtag('config', 'G-J9VJNKV3PV');
 </script>
 
-<body class="dark:black"
+<body
+    x-data="global()"
+    x-init="themeInit()"
+    :class="isMobileMenuOpen ? 'max-h-screen overflow-hidden relative' : ''"
+    class="bg-custom-light-bg dark:bg-custom-dark-bg "
+    
 >
 
 <div id="main">
-    <div class="container mx-auto" >
-        <div class="flex items-center justify-between py-6 lg:py-10">
+    <div class="container mx-auto">
+        <div class="flex items-center justify-between py-6 lg:py-10 w-full">
             <a href="/" class="flex items-center">
-                <span class="mr-2">
+                <div class="mr-2">
                     <div class="svg-container">
-                        <img src="/img/logo.svg" alt="logo"/>
+                        <img src="/img/logo.svg" alt="logo" :class="{ 'img-filter-dark': isDarkMode }"/>
                     </div>
-                    <partial name="_Socials"/>
                  
-
-                        
-                    @if (Model.Authenticated)
-                    {
-                        <p class="flex items-center space-x-4">
-                            <img src="@Model.AvatarUrl" class="h-10 w-10 rounded-full" alt="User Avatar"/>
-                            <span class="text-lg">Logged in as @Model.Name</span>
-                            <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank"  class="bg-yellow-500 text-white py-2 px-4 rounded">
-                                Logout
-                            </a>
-                        </p>
-
-                    }
-                    else
-                    {
-                        <div class="w-[200px] h-[39px] overflow-hidden rounded">
-                            <div id="google_button">
-                            </div>
-                        </div>
-                    }
-                </span>
+                </div>
             </a>
-            <div class="hidden lg:block">
-                <ul class="flex items-center">
-
-                    <li class="group relative mr-6 mb-1">
-                        <div
-                            class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"
-                        ></div>
-                        <a
-                            href="/"
-                            class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary"
-                        >Intro</a>
+         
+            <div class="block">
+                <ul class="flex items-center space-x-4">
+                    <li class="group relative mb-1">
+                        <div class="flex items-center space-x-4 flex-grow">
+                            @if (Model.Authenticated)
+                            {
+                            <div class="flex items-center space-x-4">
+                                <img src="@Model.AvatarUrl" class="h-10 w-10 rounded-full" alt="User Avatar"/>
+                                <span class="text-lg">Logged in as @Model.Name</span>
+                                <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="bg-yellow-500 text-white py-2 px-4 rounded">
+                                    Logout
+                                </a>
+                            </div>
+                            }
+                            else
+                            {
+                            <div class="w-[200px] h-[39px] overflow-hidden rounded">
+                                <div id="google_button"></div>
+                            </div>
+                            }
+                        </div>
                     </li>
+                    <li class="group relative mb-1">
 
-                    <li class="group relative mr-6 mb-1">
-                        <div
-                            class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"
-                        ></div>
-                        <a
-                            href="/blog"
-                            class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary"
-                        >Blog</a>
+
+                        <partial name="_Socials"/>
                     </li>
-
-                    <li class="group relative mr-6 mb-1">
-                        <div
-                            class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"
-                        ></div>
-                        <a
-                            href="https://hachyderm.io/@("@")scottgal@("@")hachyderm.io"
-                            class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary"
-                        >Contact</a>
+                    <li class="group relative mb-1">
+                        <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
+                        <a href="/" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Intro</a>
                     </li>
-
-                  
+                    <li class="group relative mb-1">
+                        <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
+                        <a href="/blog" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Blog</a>
+                    </li>
+                    <li class="group relative mb-1">
+                        <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
+                        <a href="https://hachyderm.io/@("@")scottgal@("@")hachyderm.io" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Contact</a>
+                    </li>
+                    <li class="group relative mb-1">
+                        <div class="flex items-center lg:visible">
+                            <i
+                                class="bx mr-8 cursor-pointer text-3xl text-primary dark:text-white"
+                                x-on:click="themeSwitch()"
+                                :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"
+                            ></i>
+                        </div>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
+
+</div>
 
    
 
@@ -204,9 +211,7 @@
             <div class="mr-auto flex flex-col items-center sm:flex-row">
                 <a href="/" class="mr-auto sm:mr-6">
                     <div class="svg-container">
-
-
-                        <img src="/img/logo.svg" alt="logo"/>
+                        <img src="/img/logo.svg" alt="logo" :class="{ 'img-filter-dark': isDarkMode }"/>
                     </div>
                 </a>
                 <p class="pt-5 font-body font-light text-primary dark:text-white sm:pt-0">
@@ -220,7 +225,6 @@
 
 </div>
 
-</div>
 <script src="~/js/dist/htmx.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script type="text/javascript" src="https://unpkg.com/highlightjs-cshtml-razor/dist/cshtml-razor.min.js"></script>

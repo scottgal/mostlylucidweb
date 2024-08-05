@@ -19,13 +19,13 @@
                     class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">@language</span>
     </a>
     }
-    <div class="block font-body">@Model.Summary</div>
+    <div class="block font-body light:text-black dark:text-white">@Model.Summary</div>
     <div class="flex items-center pt-4">
-        <p class="pr-2 font-body font-light text-primary dark:text-white">
+        <p class="pr-2 font-body font-light text-primary light:text-black dark:text-white">
             @Model.PublishedDate.ToString("f")
         </p>
         <span class="font-body text-grey dark:text-white">//</span>
-        <p class="pl-2 font-body font-light text-primary dark:text-white">
+        <p class="pl-2 font-body font-light text-primary light:text-black dark:text-white">
             @Model.ReadingTime
         </p>
     </div>

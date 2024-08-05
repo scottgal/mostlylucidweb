@@ -1,11 +1,4 @@
-interface GlobalState {
-    isMobileMenuOpen: boolean;
-    isDarkMode: boolean;
-    themeInit(): void;
-    themeSwitch(): void;
-}
-
-function main(): GlobalState {
+﻿function global() {
     return {
         isMobileMenuOpen: false,
         isDarkMode: false,
@@ -17,10 +10,12 @@ function main(): GlobalState {
             ) {
                 localStorage.theme = "dark";
                 document.documentElement.classList.add("dark");
+                document.documentElement.classList.remove("light");
                 this.isDarkMode = true;
             } else {
                 localStorage.theme = "light";
                 document.documentElement.classList.remove("dark");
+                document.documentElement.classList.add("light");
                 this.isDarkMode = false;
             }
         },
@@ -28,10 +23,12 @@ function main(): GlobalState {
             if (localStorage.theme === "dark") {
                 localStorage.theme = "light";
                 document.documentElement.classList.remove("dark");
+                document.documentElement.classList.add("light");
                 this.isDarkMode = false;
             } else {
                 localStorage.theme = "dark";
                 document.documentElement.classList.add("dark");
+                document.documentElement.classList.remove("light");
                 this.isDarkMode = true;
             }
         },

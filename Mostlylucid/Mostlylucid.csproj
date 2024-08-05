@@ -25,6 +25,7 @@
     <ItemGroup>
       <Folder Include="Markdown\comments\" />
       <Folder Include="Markdown\translated\" />
+      <Folder Include="src\js\" />
       <Folder Include="wwwroot\lib\" />
     </ItemGroup>
 

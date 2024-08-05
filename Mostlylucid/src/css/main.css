@@ -6,16 +6,33 @@
 .svg-container
 {
     width:20rem;
-    img {
-    filter: none;
- 
-}
 }
 
-/* Dark mode styles */
-@media (prefers-color-scheme: dark) {
-    .svg-container  img {
-            filter: invert(1) hue-rotate(180deg);
-        }
-    
+.img-filter-dark {
+    filter: invert(1) hue-rotate(180deg);
+}
+
+
+
+html {
+    @apply font-body antialiased;
+}
+
+
+
+
+.twitter-card {
+    @apply mt-8 mb-8 rounded bg-yellow-lighter px-6 py-8 sm:mt-10 sm:mb-10 md:px-10;
+
+    & &-title {
+        @apply mt-0 font-body text-lg font-normal text-blue-dark dark:text-blue-dark sm:text-xl;
+    }
+
+    & &-source {
+        @apply block pt-2 font-body text-sm font-light text-blue-dark underline;
+    }
+
+    & &-btn {
+        @apply mt-8 mb-0 inline-block border border-blue-dark px-5 py-2 font-body font-semibold text-blue-dark no-underline transition-colors hover:bg-primary hover:text-white sm:mb-4;
+    }
 }
