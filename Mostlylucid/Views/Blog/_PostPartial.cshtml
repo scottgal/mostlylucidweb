@@ -5,7 +5,13 @@
 
 <title>@Model.Title</title>
 <div class="pt-2 lg:pt-2">
-    <div class="border-b border-grey-lighter pb-8 sm:pb-12">
+    <div class="border-b border-grey-lighter pb-2 sm:pb-2">
+
+        <h2
+            class="pb-2 block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-4xl md:text-5xl">
+            @Model.Title
+        </h2>
+        <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2">
         @foreach (var category in Model.Categories)
         {
 
@@ -14,19 +20,15 @@
             class="mb-4 inline-block rounded-full bg-blue-dark px-2 py-1 font-body text-sm text-white">@category</span>
         </a>
         }
+        </div>
         @foreach (var language in Model.Languages)
         {
-
-            <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="@language">
+        <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="@language">
                 <span
                     class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">@language</span>
-            </a>
+        </a>
         }
-        <h2
-            class="block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-4xl md:text-5xl">
-            @Model.Title
-        </h2>
-        <div class="flex items-center pt-5 sm:pt-8">
+        <div class="flex items-center pt-1 sm:pt-1">
             <p class="pr-2 font-body font-light text-primary dark:text-white">
                 @Model.PublishedDate.ToString("D")
             </p>
@@ -37,7 +39,7 @@
         </div>
     </div>
     <div
-        class="prose prose max-w-none border-b py-8 text-black dark:prose-dark sm:py-12">
+        class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2">
         @Html.Raw(Model.Content)
     </div>
 @if (Model.Authenticated)

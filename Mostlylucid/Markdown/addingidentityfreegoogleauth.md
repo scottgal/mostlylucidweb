@@ -1,5 +1,4 @@
 ﻿# Adding Google Auth without ASP.NET Identity Database
-
 <!--category-- ASP.NET, Google Auth -->
 <datetime class="hidden">2024-08-05T08:06</datetime>
 
