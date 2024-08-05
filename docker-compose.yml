@@ -1,6 +1,13 @@
 ﻿services:
   mostlylucid:
     image: scottgal/mostlylucid:latest
+    container_name: mostlylucid
+    env_file:
+      - .env
+    environment:
+      - Auth__GoogleClientId=${AUTH_GOOGLECLIENTID}   
+      - Auth__GoogleClientSecret=${AUTH_GOOGLECLIENTSECRET}
+      - Auth__AdminUserGoogleId = ${AUTH_ADMINUSERGOOGLEID}
     labels:
         - "com.centurylinklabs.watchtower.enable=true"
   cloudflared:

@@ -43,7 +43,6 @@ This is to avoid the IOptions stuff which I find a bit clunky (and rarely need a
 
 In mine I do this which allows me to get the section name from the class itself:
 
-```csharp
 
 <details>
 <summary>Click to expand</summary>
@@ -107,6 +106,7 @@ public interface IConfigSection {
     public static abstract string Section { get; }
 }
 ```
+</details>
 
 So my Auth looks like
 
