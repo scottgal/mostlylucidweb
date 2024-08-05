@@ -3,7 +3,7 @@
 <div class="border-b border-grey-lighter pb-8 mb-8">
  
     <a asp-controller="Blog" asp-action="Show" hx-boost="true"  hx-target="#contentcontainer" asp-route-slug="@Model.Slug"
-       class="block font-body text-lg font-semibold text-primary transition-colors hover:text-green dark:text-white  dark:hover:text-secondary">@Model.Title</a>
+       class="block font-body text-lg font-semibold transition-colors hover:text-green text-blue-dark dark:text-white  dark:hover:text-secondary">@Model.Title</a>
     @foreach (var category in Model.Categories)
     {
     <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
@@ -19,7 +19,7 @@
                     class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">@language</span>
     </a>
     }
-    <div class="block font-body light:text-black dark:text-white">@Model.Summary</div>
+    <div class="block font-body text-black dark:text-white">@Model.Summary</div>
     <div class="flex items-center pt-4">
         <p class="pr-2 font-body font-light text-primary light:text-black dark:text-white">
             @Model.PublishedDate.ToString("f")
