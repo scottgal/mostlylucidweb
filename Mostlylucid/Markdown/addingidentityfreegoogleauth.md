@@ -44,6 +44,7 @@ This is to avoid the IOptions stuff which I find a bit clunky (and rarely need a
 In mine I do this which allows me to get the section name from the class itself:
 
 
+
 <details>
 <summary>Click to expand</summary>
 
@@ -180,6 +181,10 @@ In my _Layout.cshtml I have this Javascript, this is where I set up my Google Bu
 ```html
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 ```
+
+This is the dlow for the code below
+
+
 
 ```javascript
 
