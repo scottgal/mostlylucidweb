@@ -17,7 +17,8 @@ module.exports = {
 
         colors: {
             'custom-light-bg': '#ffffff',  // Example custom light mode background color
-            'custom-dark-bg': '#1d232a',  // Example custom dark mode background color
+            'custom-dark-bg': '#1d232a',
+           // Example custom dark mode background color
             transparent: "transparent",
             primary: "#072344",
             secondary: "#00aaa1",
