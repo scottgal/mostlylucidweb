@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <UserSecretsId>c720973b-30fe-465d-a96f-6c9923332a29</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -13,12 +14,16 @@
       <PackageReference Include="Htmx.TagHelpers" Version="1.8.0" />
       <PackageReference Include="Leisn.MarkdigToc" Version="0.1.3" />
       <PackageReference Include="Markdig" Version="0.37.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.7" />
+      <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.0.1" />
       <PackageReference Include="SixLabors.ImageSharp.Web" Version="3.1.3" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.1" />
       <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
       <PackageReference Include="WebEssentials.AspNetCore.PWA" Version="1.0.85" />
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Markdown\comments\" />
       <Folder Include="Markdown\translated\" />
       <Folder Include="wwwroot\lib\" />
     </ItemGroup>
@@ -85,6 +90,7 @@
       <Content Include="Markdown\aboutme.md" />
       <None Remove="Markdown\img.png" />
       <None Remove="Markdown\intro.md" />
+      <Content Include="Markdown\img.png" />
       <Content Include="Markdown\intro.md" />
       <None Remove="Markdown\oldisnew.md" />
       <Content Include="Markdown\oldisnew.md" />

@@ -1,31 +1,58 @@
-using System.Runtime.InteropServices;
-using System.Security.AccessControl;
-using Microsoft.Extensions.Caching.Memory;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.Google;
+using Mostlylucid.Config;
+using Mostlylucid.Config.Markdown;
 using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.Services;
+using Mostlylucid.Services.Markdown;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var markdownConfig =builder.Configure<MarkdownConfig>();
+var auth = builder.Configure<Auth>();
+var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
 var env = builder.Environment;
+services.AddCors(options =>
+{
+    options.AddPolicy("AllowMostlylucid",
+        builder =>
+        {
+            builder.WithOrigins("https://www.mostlylucid.net")
+                .WithOrigins("https://mostlylucid.net")
+                .WithOrigins("https://localhost:7240")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
+builder.Services
+    .AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
+   
+      
+    })
+    .AddCookie()
+    .AddGoogle(options =>
+    {
+        options.ClientId = auth.GoogleClientId;
+        options.ClientSecret = auth.GoogleClientSecret;
+    });
 // Add services to the container.
 services.AddControllersWithViews();
 services.AddResponseCaching();
 services.AddScoped<BlogService>();
+services.AddScoped<CommentService>();
 
-    // services.AddScoped<MarkdownTranslatorService>();
-    //
-    // services.AddHttpClient<MarkdownTranslatorService>(options =>
-    // {
-    //     options.Timeout = TimeSpan.FromSeconds(120);
-    //     //options.BaseAddress = new Uri("http://localhost:24080");
-    // });
-    // services.AddHostedService<BackgroundTranslateService>();
-
-
-services.AddProgressiveWebApp();
+if (translateServiceConfig.Enabled)
+{
+services.SetupTranslateService();
+}
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 
 
@@ -39,7 +66,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
+app.UseCors("AllowMostlylucid");
 app.UseHttpsRedirection();
 app.UseImageSharp();
 app.UseStaticFiles();
@@ -47,6 +74,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 

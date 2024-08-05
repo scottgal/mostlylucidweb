@@ -1,9 +1,10 @@
 ﻿using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using Mostlylucid.Config;
 
 namespace Mostlylucid.MarkdownTranslator;
 
-public class MarkdownTranslatorService(ILogger<MarkdownTranslatorService> logger, HttpClient client)
+public class MarkdownTranslatorService(TranslateServiceConfig translateServiceConfig, ILogger<MarkdownTranslatorService> logger, HttpClient client)
 {
     private record PostRecord(string target_lang, string[] text, string source_lang = "en",bool perform_sentence_splitting = false);
 
@@ -12,7 +13,7 @@ private Random random = Random.Shared;
     private record PostResponse(string target_lang, string[] translated, string source_lang, float translation_time);
 
 
-    private string[] IPs = new[] { "http://192.168.0.30:24080", "http://localhost:24080", "http://192.168.0.74:24080" };
+    private string[] IPs = translateServiceConfig.IPs;
     public async ValueTask<bool> IsServiceUp(CancellationToken cancellationToken)
     {
         try

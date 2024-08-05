@@ -1,4 +1,4 @@
-﻿@model List<Mostlylucid.Models.Blog.PostListModel>
+﻿@model Mostlylucid.Models.Blog.PostListViewModel
 
 @if(ViewBag.Category != null)
 {
@@ -9,7 +9,7 @@
 }
 
 
-@foreach (var post in Model)
+@foreach (var post in Model.Posts)
 {
     <partial name="_ListPost" model="post"/>
 }

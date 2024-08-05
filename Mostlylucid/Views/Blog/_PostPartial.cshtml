@@ -40,9 +40,28 @@
         class="prose prose max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
         @Html.Raw(Model.Content)
     </div>
-
-      
-    </div>
+@if (Model.Authenticated)
+    {
+        
+  
+        <div class=" max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
+            <p class="font-body text-lg font-medium text-primary dark:text-white">Welcome @Model.Name please comment below.</p>
+            <textarea id="comment"></textarea>
+         <!--   <button class="btn btn-primary" hx-action="Comment" hx-controller="Blog" hx-post hx-vals="js:{comment: simplemde.value()}" hx-route-slug="@Model.Slug" hx-swap="outerHTML" hx-target="#comment" onclick="prepareForSubmission()">Comment</button> -->
+           COMING SOON!
+        </div>
+    }
+    else
+    {
+        <div class=" max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
+            <p class="font-body text-lg font-medium text-primary dark:text-white">Please login to comment</p>
+            <div class="w-[200px] h-[39px] overflow-hidden rounded">
+                <div id="google_button2">
+                </div>
+            </div>
+        </div>
+    }
+</div>
 <div class="flex items-center py-10">
     <span class="pr-5 font-body font-medium text-primary dark:text-white"
     >Share</span
