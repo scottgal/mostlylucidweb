@@ -12,16 +12,28 @@ private Random random = Random.Shared;
     
     private record PostResponse(string target_lang, string[] translated, string source_lang, float translation_time);
 
+    public int IPCount => IPs.Length;
 
     private string[] IPs = translateServiceConfig.IPs;
     public async ValueTask<bool> IsServiceUp(CancellationToken cancellationToken)
     {
+        var workingIPs = new List<string>();
+
         try
         {
-            var ip = IPs[random.Next(IPs.Length)];
-            logger.LogInformation("Checking service status at {IP}", ip);
-            var response = await client.GetAsync($"{ip}/model_name", cancellationToken);
-            return response.IsSuccessStatusCode;
+            foreach (var ip in IPs)
+            {
+                logger.LogInformation("Checking service status at {IP}", ip);
+                var response = await client.GetAsync($"{ip}/model_name", cancellationToken);
+                if (response.IsSuccessStatusCode)
+                {
+                    workingIPs.Add(ip);
+                }
+            }
+
+            IPs = workingIPs.ToArray();
+            if (!IPs.Any()) return false;
+            return true;
         }
         catch (Exception e)
         {
@@ -29,14 +41,23 @@ private Random random = Random.Shared;
             return false;
         }
     }
-  
-    
+
+    private int currentIPIndex = 0;
     private async Task<string[]> Post(string[] elements, string targetLang, CancellationToken cancellationToken)
     {
         try
         {
-            var ip = IPs[random.Next(IPs.Length)];
-            logger.LogInformation("Sendign request to {IP}", ip);
+            if(!IPs.Any())
+            {
+                logger.LogError("No IPs available for translation");
+                throw new Exception("No IPs available for translation");
+            }
+            var ip = IPs[currentIPIndex];
+            
+            logger.LogInformation("Sending request to {IP}", ip);
+        
+            // Update the index for the next request
+            currentIPIndex = (currentIPIndex + 1) % IPs.Length;
             var postObject = new PostRecord(targetLang, elements);
             var response = await client.PostAsJsonAsync($"{ip}/translate", postObject, cancellationToken);
 

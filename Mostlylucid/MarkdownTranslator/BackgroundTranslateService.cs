@@ -29,8 +29,8 @@ public class BackgroundTranslateService(MarkdownConfig markdownConfig,
             logger.LogError("Translation service is not available");
             return;
         }
-        ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = 3, CancellationToken = cancellationToken};
-        var files = Directory.GetFiles(markdownConfig.MarkdownPath, ".md");
+        ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = blogService.IPCount, CancellationToken = cancellationToken};
+        var files = Directory.GetFiles(markdownConfig.MarkdownPath, "*.md");
 
         var outDir = markdownConfig.MarkdownTranslatedPath;
 
