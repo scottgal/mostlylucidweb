@@ -9,7 +9,6 @@ using Mostlylucid.Services.Markdown;
 namespace Mostlylucid.Controllers;
 
 [Route("contact")]
-[Authorize]
 public class ContactController(AuthSettings authSettingsSettings,CommentService commentService, EmailService emailService, ILogger<BaseController> logger) : BaseController(authSettingsSettings, logger)
 {
    [Route("")]
@@ -22,6 +21,7 @@ public class ContactController(AuthSettings authSettingsSettings,CommentService 
     
     [HttpPost]
     [Route("submit")]
+    [Authorize]
     public async Task<IActionResult> Submit(string comment)
     {
         var user = GetUserInfo();
