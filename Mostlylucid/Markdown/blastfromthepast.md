@@ -8,6 +8,8 @@ This just popped up on Facebook, an old image of me in my office at Microsoft.
 
 A long long time ago in a country far, far away I was a lowly PMII at Microsoft. I was working on the ASP.NET team and was responsible for the release lifecycle of ASP.NET. I was also responsible for the integration of ASP.NET with the broader .NET community. 
 
+My passion was web optimization and making things better for developers, I joined  just as ASP.NET MVC was being born (and even shared an office with Phil Haack in the months leading up the the beta release). It was an exciting time, I was able to present at a bunch of conferences around Europ and met a ton of passionate people. The old axion of 'never be the smartest person in the room' was never as true as it was at Microsoft.
+
 Unfortunately I was also deeply unhappy at this point; I'd yet to find the right treatment for depression. I was working 60-70 hours a week and was under a lot of pressure to deliver. I was also in a very toxic relationship at the time and was struggling with my mental health as a result. It wasn't long after this that I left Microsoft and moved to the UK to start a new life.
 
 It was a huge wrench, this was my dream job and I had worked so hard to get there. But I knew that if I stayed I would end up in a very bad place. I had to make a choice between my career and my health and I chose my health. It was the best decision I ever made.
