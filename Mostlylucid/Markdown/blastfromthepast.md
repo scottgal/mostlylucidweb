@@ -4,7 +4,7 @@ This just popped up on Facebook, an old image of me in my office at Microsoft.
 <!--category-- Microsoft -->
 <datetime class="hidden">2024-08-06T21:30</datetime>
 
-![Office at Microsoft](microsoft_office.jpg)
+![Office at Microsoft](microsoft_office.jpg?width=500&format=webp&quality=80)
 
 A long long time ago in a country far, far away I was a lowly PMII at Microsoft. I was working on the ASP.NET team and was responsible for the release lifecycle of ASP.NET. I was also responsible for the integration of ASP.NET with the broader .NET community. 
 
