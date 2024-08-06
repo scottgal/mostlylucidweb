@@ -25,6 +25,7 @@ services.AddCors(options =>
             builder.WithOrigins("https://www.mostlylucid.net")
                 .WithOrigins("https://mostlylucid.net")
                 .WithOrigins("https://localhost:7240")
+                .WithOrigins("https://local.mostlylucid.net")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
