@@ -1,16 +1,13 @@
 ﻿using FluentEmail.Core;
-using FluentEmail.Smtp;
 using Mostlylucid.Email.Models;
-using RazorLight;
 
 namespace Mostlylucid.Email;
 
 public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 {
-    
     public async Task SendCommentEmail(string commenterEmail, string commenterName, string comment, string postSlug)
     {
-        var commentModel = new CommentEmailModel()
+        var commentModel = new CommentEmailModel
         {
             PostSlug = postSlug,
             SenderEmail = commenterEmail,
@@ -22,15 +19,11 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 
     public async Task SendCommentEmail(CommentEmailModel commentModel)
     {
-   
-
         // Load the template
         var templatePath = "Email/Templates/MailTemplate.template";
         await SendMail(commentModel, templatePath);
-
-
     }
-    
+
     public async Task SendContactEmail(ContactEmailModel contactModel)
     {
         var templatePath = "Email/Templates/ContactEmailModel.template";
@@ -47,6 +40,6 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
         await email.To(smtpSettings.ToMail)
             .SetFrom(smtpSettings.SenderEmail, smtpSettings.SenderName)
             .Subject("New Comment")
-            .SendAsync(); 
+            .SendAsync();
     }
 }

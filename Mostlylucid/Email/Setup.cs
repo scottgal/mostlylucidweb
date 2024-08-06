@@ -10,8 +10,7 @@ public static class Setup
 {
     public static void SetupEmail(this IServiceCollection services, IConfiguration config)
     {
-        var smtpSettings = config.GetSection(SmtpSettings.Section).Get<SmtpSettings>();
-        services.AddSingleton<SmtpSettings>(smtpSettings);
+        var smtpSettings = services.ConfigurePOCO<SmtpSettings>(config.GetSection(SmtpSettings.Section));
 
         services.AddFluentEmail(smtpSettings.SenderEmail, smtpSettings.SenderName)
             .AddRazorRenderer();
