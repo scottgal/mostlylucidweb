@@ -207,17 +207,10 @@
         </div>
     </div>
 </div>
-
-   
-
-
 <div>
-    
-    <div class="container mx-auto" id="contentcontainer">
+  <div class="container mx-auto" id="contentcontainer">
    @RenderBody()
-
     </div>
-
     <div class="container mx-auto">
         <div
             class="flex flex-col items-center justify-between border-t border-grey-lighter py-10 sm:flex-row sm:py-12">
@@ -242,14 +235,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script type="text/javascript" src="https://unpkg.com/highlightjs-cshtml-razor/dist/cshtml-razor.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
-
-
-
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-
 @await RenderSectionAsync("Scripts", required: false)
 <script>
-
 function setLogoutLink() {
         // Get the logout link
     var logoutLink = document.querySelector('a[data-logout-link]');
@@ -271,15 +259,11 @@ function setLogoutLink() {
         mermaid.initialize({ startOnLoad: true });
         if (document.getElementById("comment") != null)
         {
-        
-       simplemde = new SimpleMDE({ element: document.getElementById("comment") });
+              simplemde = new SimpleMDE({ element: document.getElementById("comment") });
        }
         setLogoutLink();
-        
-    });
+            });
     document.body.addEventListener('htmx:afterSwap', function(evt) {
-            // Call your JavaScript function here
-        
             hljs.highlightAll();
         if (document.getElementById("comment") != null)
         {
@@ -290,8 +274,6 @@ function setLogoutLink() {
         mermaid.run();
         setLogoutLink();
     });
-
-
 </script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-J9VJNKV3PV"></script>
