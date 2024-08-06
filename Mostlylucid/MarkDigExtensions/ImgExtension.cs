@@ -20,6 +20,6 @@ public class ImgExtension : IMarkdownExtension
     {
         foreach (var link in document.Descendants<LinkInline>())
             if (link.IsImage)
-                link.Url = "/articleimages/" + link.Url;
+                link.Url = "/articleimages/" + link.Url + "?format=webp&quality=25";
     }
 }
