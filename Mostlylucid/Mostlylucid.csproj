@@ -113,7 +113,7 @@
       <Content Update="wwwroot\articleimages\img.png">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <Content Update="wwwroot\img\social.jpg">
+      <Content Update="wwwroot\img\social2.jpg">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
       <Content Update="wwwroot\articleimages\project.png">
