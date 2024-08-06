@@ -41,6 +41,7 @@ WORKDIR /app
 COPY --from=publish /app/publish .
 # Copy the Markdown directory
 COPY ./Mostlylucid/Markdown /app/Markdown
+COPY ./Mostlylucid/Email/Templates /app/Email/Templates
 # Switch to a non-root user
 USER $APP_UID
 

@@ -1,0 +1,20 @@
+﻿@model Mostlylucid.Email.Models.ContactEmailModel
+
+<!DOCTYPE html>
+<html class="dark">
+<head>
+    <title>Comment Email</title>
+</head>
+<body>
+<h1>Comment Email</h1>
+<p>New comment from email @Model.SenderEmail name @Model.SenderName</p>
+
+<p>Thank you for your comment on our blog post. We appreciate your feedback.</p>
+<p>Here is your comment:</p>
+<div>
+    @Raw( @Model.Comment)</div>
+<p>Thanks,</p>
+<p>The Blog Team</p>
+
+</body>
+</html>

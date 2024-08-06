@@ -146,13 +146,16 @@
                         <div class="flex items-center space-x-4 flex-grow">
                             @if (Model.Authenticated)
                             {
-                            <div class="flex items-center space-x-4">
-                                <img src="@Model.AvatarUrl" class="h-10 w-10 rounded-full" alt="User Avatar"/>
-                                <span class="text-blue-dark dark:text-white ">Logged in as @Model.Name</span>
-                                <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-primary text-white rounded">
-                                    Logout
-                                </a>
-                            </div>
+                                <div class="flex items-center space-x-4">
+                                    @if (Model.AvatarUrl != null)
+                                    {
+                                        <img src="@Model.AvatarUrl" class="h-10 w-10 rounded-full" alt="User Avatar"/>
+                                    }
+                                    <span class="text-blue-dark dark:text-white ">Logged in as @Model.Name</span>
+                                    <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-primary text-white rounded">
+                                        Logout
+                                    </a>
+                                </div>
                             }
                             else
                             {
@@ -177,7 +180,7 @@
                     </li>
                     <li class="group relative mb-1">
                         <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
-                        <a href="https://hachyderm.io/@("@")scottgal@("@")hachyderm.io" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Contact</a>
+                        <a asp-action="Index" asp-controller="Contact" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Contact</a>
                     </li>
                     <li class="group relative mb-1">
                         <div class="flex items-center lg:visible">

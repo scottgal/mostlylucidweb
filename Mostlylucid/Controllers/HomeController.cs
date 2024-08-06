@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Mostlylucid.Config;
 using Mostlylucid.Models;
 using Mostlylucid.Services;
 using Mostlylucid.Services.Markdown;
@@ -13,7 +14,7 @@ using Mostlylucidblog.Models;
 namespace Mostlylucid.Controllers;
 
 
-    public class HomeController(BlogService blogService, ILogger<HomeController> logger) : BaseController(logger)
+    public class HomeController(AuthSettings authSettings, BlogService blogService, ILogger<HomeController> logger) : BaseController(authSettings, logger)
     {
     [OutputCache(Duration = 60*60*60)]
     public async Task<IActionResult> Index()

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
+using Mostlylucid.Email;
 using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.Services;
 using Mostlylucid.Services.Markdown;
@@ -12,7 +13,7 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 var markdownConfig =builder.Configure<MarkdownConfig>();
-var auth = builder.Configure<Auth>();
+var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
 var env = builder.Environment;
@@ -54,7 +55,7 @@ if (translateServiceConfig.Enabled)
 services.SetupTranslateService();
 }
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
-
+services.SetupEmail(builder.Configuration);
 
 var app = builder.Build();
 
@@ -71,11 +72,16 @@ app.UseHttpsRedirection();
 app.UseImageSharp();
 app.UseStaticFiles();
 
+//T0 test email service
+// await using  var scope = app.Services.CreateAsyncScope();
+// var emailService = scope.ServiceProvider.GetRequiredService<EmailService>();
+// await emailService.SendCommentEmail("test@test.com", "Test", "Test", "test");
 
 app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 
 app.UseResponseCaching();

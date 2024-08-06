@@ -1,0 +1,31 @@
+﻿@model Mostlylucid.Models.Contact.ContactViewModel
+
+@{
+    ViewBag.Title = "Contact";
+    Layout = "_Layout";
+}
+
+<h2>Contact</h2>
+<div id="Comment">
+@if (Model.Authenticated)
+{
+        
+  
+    <div class=" max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
+        <p class="font-body text-lg font-medium text-primary dark:text-white">Welcome @Model.Name please comment below.</p>
+        <textarea id="comment"></textarea>
+       <button class="btn btn-primary" hx-action="Submit" hx-controller="Contact" hx-post hx-vals="js:{comment: simplemde.value()}"  hx-swap="outerHTML" hx-target="#Comment" onclick="prepareForSubmission()">Comment</button>
+    
+    </div>
+}
+else
+{
+    <div class=" max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
+        <p class="font-body text-lg font-medium text-primary dark:text-white">Please login to send a message to me!</p>
+        <div class="w-[200px] h-[39px] overflow-hidden rounded">
+            <div id="google_button2">
+            </div>
+        </div>
+    </div>
+}
+</div>

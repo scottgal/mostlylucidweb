@@ -3,6 +3,7 @@ using Htmx;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Mostlylucid.Config;
 using Mostlylucid.Controllers;
 using Mostlylucid.Services;
 using Mostlylucid.Services.Markdown;
@@ -10,7 +11,8 @@ using Mostlylucid.Services.Markdown;
 namespace Mostlylucidblog.Controllers;
 
 [Route("blog")]
-public class BlogController(BlogService blogService, CommentService commentService, ILogger<BlogController> logger) : BaseController(logger)
+public class BlogController(AuthSettings authSettings, BlogService blogService, CommentService commentService,
+    ILogger<BlogController> logger) : BaseController(authSettings, logger)
 {
 
     

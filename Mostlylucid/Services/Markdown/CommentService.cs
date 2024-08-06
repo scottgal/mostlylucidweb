@@ -21,6 +21,13 @@ public class CommentService(MarkdownConfig markdownConfig) : BaseService
         await File.WriteAllTextAsync(path, comment);
     }
 
+    public string ProcessComment(string commentMarkdown)
+    {
+        var html = Markdig.Markdown.ToHtml(commentMarkdown);
+        return html;
+    }
+ 
+    
     public  record Comment(DateTime Date, string Name, string Avatar, string Content);
     
     public List<Comment> GetComments(string slug)
