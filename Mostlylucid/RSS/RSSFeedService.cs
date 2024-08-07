@@ -38,14 +38,19 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
     }
     public string GenerateFeed(IEnumerable<RssFeedItem> items, string categoryName = "")
     {
+        XNamespace atom = "http://www.w3.org/2005/Atom";
         var feed = new XDocument(
             new XDeclaration("1.0", "utf-8", null),
-            new XElement("rss",  new XAttribute(XNamespace.Xmlns + "atom", "http://www.w3.org/2005/Atom"), new XAttribute("version", "2.0"),
+            new XElement("rss",    new XAttribute(XNamespace.Xmlns + "atom", atom.NamespaceName), new XAttribute("version", "2.0"),
                 new XElement("channel",
                     new XElement("title", !string.IsNullOrEmpty(categoryName) ? $"mostlylucid.net for {categoryName}" : $"mostlylucid.net"),
                     new XElement("link", $"{GetSiteUrl()}/rss"),
                     new XElement("description", "The latest posts from mostlylucid.net"),
                     new XElement("pubDate", DateTime.UtcNow.ToString("R")),
+                    new XElement(atom + "link", 
+                        new XAttribute("href", $"{GetSiteUrl()}/rss"), 
+                        new XAttribute("rel", "self"), 
+                        new XAttribute("type", "application/rss+xml")),
                     from item in items
                     select new XElement("item",
                         new XElement("title", item.Title),
