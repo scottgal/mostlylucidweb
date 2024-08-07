@@ -13,7 +13,6 @@
     }
     @foreach (var language in Model.Languages)
     {
-
     <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="@language">
                 <span
                     class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">@language</span>
