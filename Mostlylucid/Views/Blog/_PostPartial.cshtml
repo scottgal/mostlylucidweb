@@ -24,9 +24,9 @@
         <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2">
             @if (Model.Languages.Length > 1)
             {
-                <p class="font-body text-lg font-bold text-primary dark:text-white">NOTE: Apart
+                <p class="font-body text-lg font-bold text-primary dark:text-white">NOTE: Apart from
                     <span
-                        class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">en</span> from These are machine translated in languages I don't read. If they're terrible please contact me.</p>
+                        class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">en</span> (and even then it's questionable, I'm Scottish).  These are machine translated in languages I don't read. If they're terrible please <a asp-controller="Contact" asp-action="Index">contact me. </a> </p>
             }
             @foreach (var language in Model.Languages)
             {

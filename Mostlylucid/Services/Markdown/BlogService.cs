@@ -12,7 +12,6 @@ public class BlogService : BaseService
 {
     private const string CacheKey = "Categories";
     private const string LanguageCacheKey = "Languages";
-
     private const string PageCacheKey = "Pages";
 
     private static readonly Regex DateRegex = new(
@@ -25,14 +24,9 @@ public class BlogService : BaseService
     private static readonly Regex CategoryRegex = new(@"<!--\s*category\s*--\s*([^,]+?)\s*(?:,\s*([^,]+?)\s*)?-->",
         RegexOptions.Compiled | RegexOptions.Singleline);
 
-
     private readonly ILogger<BlogService> _logger;
-
-
     private readonly MarkdownConfig _markdownConfig;
-
     private readonly IMemoryCache _memoryCache;
-
 
     public BlogService(MarkdownConfig markdownConfig, IMemoryCache memoryCache, ILogger<BlogService> logger)
     {
@@ -90,6 +84,7 @@ public class BlogService : BaseService
 
     public List<string> GetLanguages(string page)
     {
+        page = Path.GetFileName(page);
         var cacheLangs = GetLanguageCache();
         var outLangs = cacheLangs.TryGetValue(page, out var languages) ? languages : new List<string>();
         if (outLangs.Any() && !outLangs.Contains("en"))
@@ -100,7 +95,7 @@ public class BlogService : BaseService
     private void ListLanguages()
     {
         var cacheLangs = GetLanguageCache();
-        var pages = Directory.GetFiles("Markdown/translated", "*.md");
+        var pages = Directory.GetFiles(_markdownConfig.MarkdownTranslatedPath, "*.md");
         var count = 0;
 
         foreach (var page in pages)
@@ -108,7 +103,7 @@ public class BlogService : BaseService
             var pageName = Path.GetFileNameWithoutExtension(page);
             var languageCode = pageName.LastIndexOf(".", StringComparison.Ordinal) + 1;
             var language = pageName.Substring(languageCode);
-            var originPage = pageName.Substring(0, languageCode - 1) + ".md";
+            var originPage = pageName.Substring(0, languageCode - 1);
 
             var pageEntry = cacheLangs.TryGetValue(originPage, out var languagesList)
                 ? languagesList
@@ -155,7 +150,7 @@ public class BlogService : BaseService
         var posts = GetPageCache()
             .Where(x => x.Value.Categories.Contains(category))
             .Select(x => x.Value).Select(GetListModel);
-        model.Posts = posts.ToList();
+        model.Posts = posts.OrderByDescending(x => x.PublishedDate).ToList();
         return model;
     }
 
@@ -165,10 +160,14 @@ public class BlogService : BaseService
             language = "";
         try
         {
-            var pageCache = GetPageCache();
-            if (pageCache.TryGetValue(postName, out var pageModel)) return pageModel;
+            if (string.IsNullOrEmpty(language))
+            {
+                var pageCache = GetPageCache();
 
-            var page = Path.Combine(DirectoryPath, $"{postName}.{language}.md");
+                if (pageCache.TryGetValue(postName, out var pageModel)) return pageModel;
+            }
+
+            var page = Path.Combine(_markdownConfig.MarkdownTranslatedPath, $"{postName}.{language}.md");
             if (!File.Exists(page))
             {
                 _logger.LogWarning("Post {PostName} not found", postName);
@@ -176,6 +175,7 @@ public class BlogService : BaseService
             }
 
             var model = GetPage(page);
+            model.Languages = GetLanguages(postName).ToArray();
             return model;
         }
         catch (Exception e)
@@ -244,11 +244,12 @@ public class BlogService : BaseService
 
         // Generate the slug from the page filename
         var slug = GetSlug(page);
-
+        var languages = GetLanguages(Path.GetFileNameWithoutExtension(page)).ToArray();
 
         // Return the parsed and processed content
         return new BlogPostViewModel
         {
+            Languages = languages,
             Categories = categories,
             WordCount = WordCount(restOfTheLines),
             HtmlContent = processed,
@@ -267,16 +268,17 @@ public class BlogService : BaseService
             PublishedDate = model.PublishedDate,
             Slug = model.Slug,
             Categories = model.Categories,
-            Summary = model.PlainTextContent.TruncateAtWord(200)+ "..."
+            Summary = model.PlainTextContent.TruncateAtWord(200) + "...",
+            Languages = model.Languages
         };
     }
-    
+
 
     public PostListViewModel GetPostsForFiles()
     {
         var model = new PostListViewModel();
         var posts = GetPageCache().Values.Select(GetListModel);
-       model.Posts= posts.OrderByDescending(x => x.PublishedDate).ToList();
+        model.Posts = posts.OrderByDescending(x => x.PublishedDate).ToList();
         return model;
     }
 }
