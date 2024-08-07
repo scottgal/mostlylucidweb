@@ -267,29 +267,16 @@ public class BlogService : BaseService
             PublishedDate = model.PublishedDate,
             Slug = model.Slug,
             Categories = model.Categories,
-            Summary = model.PlainTextContent.TruncateAtWord(100)
+            Summary = model.PlainTextContent.TruncateAtWord(200)+ "..."
         };
     }
-
-    private List<PostListModel> GetPosts(string[] pages)
-    {
-        List<PostListModel> pageModels = new();
-
-        var pageCache = GetPageCache();
-
-        foreach (var page in pages)
-            if (pageCache.TryGetValue(page, out var pageModel))
-                pageModels.Add(GetListModel(pageModel));
-
-        pageModels = pageModels.OrderByDescending(x => x.PublishedDate).ToList();
-        return pageModels;
-    }
-
+    
 
     public PostListViewModel GetPostsForFiles()
     {
         var model = new PostListViewModel();
-        model.Posts = GetPageCache().Values.Select(GetListModel).ToList();
+        var posts = GetPageCache().Values.Select(GetListModel);
+       model.Posts= posts.OrderByDescending(x => x.PublishedDate).ToList();
         return model;
     }
 }
