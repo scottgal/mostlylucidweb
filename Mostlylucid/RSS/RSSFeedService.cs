@@ -16,7 +16,7 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
             logger.LogError("Request is null");
             return string.Empty;
         }
-        return $"{request.Scheme}://{request.Host}";
+        return $"{request.Scheme}s://{request.Host}";
     }
     
     public string GenerateFeed(DateTime? startDate=null, string? category = null)
