@@ -12,15 +12,19 @@
             @Model.Title
         </h2>
         <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2">
-        @foreach (var category in Model.Categories)
-        {
+            @foreach (var category in Model.Categories)
+            {
 
-        <a hx-boost="true"   hx-target="#contentcontainer"  asp-action="Category" asp-controller="Blog" asp-route-category="@category">
-        <span
-            class="mb-4 inline-block rounded-full bg-blue-dark px-2 py-1 font-body text-sm text-white">@category</span>
-        </a>
-        }
+                <a hx-boost="true"   hx-target="#contentcontainer"  asp-action="Category" asp-controller="Blog" asp-route-category="@category">
+                    <span
+                        class="mb-4 inline-block rounded-full bg-blue-dark px-2 py-1 font-body text-sm text-white">@category</span>
+                </a>
+            }
         </div>
+        <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2">
+            <p class="font-body text-lg font-bold text-primary dark:text-white">NOTE: Apart <span
+                    class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">en</span> from These are machine translated in languages I don't read. If they're terrible please contact me.</p>
+      
         @foreach (var language in Model.Languages)
         {
         <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="@language">
@@ -28,6 +32,7 @@
                     class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">@language</span>
         </a>
         }
+        </div>
         <div class="flex items-center pt-1 sm:pt-1">
             <p class="pr-2 font-body font-light text-primary dark:text-white">
                 @Model.PublishedDate.ToString("D")
