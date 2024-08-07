@@ -117,6 +117,31 @@ docker compose config
 ```
 To show you what the file looks like with these injected. 
 
+## FluentEmail Annoyances
+One issue with Fluent Email is you need to add this to your csproj
+```xml
+  <PropertyGroup>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
+```
+This is because FluentEmail uses RazorLight which needs this to work.
+
+For the template files, you can either include them in your project as Content files or as I do in the docker container, copy the files to the final image
+```yaml
+FROM build AS publish
+RUN dotnet publish "Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+
+COPY --from=publish /app/publish .
+# Copy the Markdown directory
+COPY ./Mostlylucid/Markdown /app/Markdown
+COPY ./Mostlylucid/Email/Templates /app/Email/Templates
+# Switch to a non-root user
+USER $APP_UID
+```
+
 ## Email Service
 Ok back to the code!
 
