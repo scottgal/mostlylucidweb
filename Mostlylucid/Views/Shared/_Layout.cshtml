@@ -9,6 +9,11 @@
         name="viewport"
     />
     <title>@ViewBag.Title</title>
+
+    <link rel="alternate" type="application/rss+xml"
+          title="RSS Feed for mostlylucid.net"
+          href="/rss" />
+    
     <!-- Facebook Meta Tags -->
     <meta property="og:url" content="https://www.mostlylucid.net">
     <meta property="og:type" content="website">
@@ -188,6 +193,13 @@
                     <li class="group relative mb-1">
                         <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
                         <a href="/blog" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Blog</a>
+                      
+                    </li>
+                    <li class="group relative mb-1">
+                        <a href="/rss" target="_blank" class="flex items-center">
+                            <i class="text-4xl text-primary dark:text-white hover:text-secondary dark:hover:text-secondary transition-colors bx bx-rss"></i>
+                            RSS
+                        </a>
                     </li>
                     <li class="group relative mb-1">
                         <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>

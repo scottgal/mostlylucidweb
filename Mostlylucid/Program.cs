@@ -4,6 +4,7 @@ using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Email;
 using Mostlylucid.MarkdownTranslator;
+using Mostlylucid.RSS;
 using Mostlylucid.Services.Markdown;
 using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
@@ -56,7 +57,7 @@ services.AddScoped<CommentService>();
 if (translateServiceConfig.Enabled) services.SetupTranslateService();
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 services.SetupEmail(builder.Configuration);
-
+services.SetupRSS();
 var app = builder.Build();
 app.UseSerilogRequestLogging();
 

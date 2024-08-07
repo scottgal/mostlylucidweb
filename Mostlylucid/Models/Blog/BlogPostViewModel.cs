@@ -8,7 +8,9 @@ public class BlogPostViewModel : BaseViewModel
     
     public string[] Languages { get; set; } = Array.Empty<string>();
     
-    public string Content { get; set; }= string.Empty;
+    public string HtmlContent { get; set; }= string.Empty;
+    
+    public string PlainTextContent { get; set; }= string.Empty;
     
     public string Slug { get; set; }= string.Empty;
     
