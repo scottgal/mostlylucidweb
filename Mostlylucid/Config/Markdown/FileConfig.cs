@@ -6,6 +6,8 @@ public class MarkdownConfig : IConfigSection
     public string MarkdownPath { get; set; }= "Markdown";
     public string MarkdownTranslatedPath { get; set; } = "Markdown/translated";
     public string MarkdownCommentsPath { get; set; }= "Markdown/comments";
+    
+    public string MarkdownNotModeratedCommentsPath { get; set; }= "Markdown/notmoderatedcomments";
 
     
 }

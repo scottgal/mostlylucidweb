@@ -13,10 +13,10 @@ public class CommentService(MarkdownConfig markdownConfig) : BaseService
     private static readonly Regex CommentAvaterRegex = new("<!--avatar\\s+(.*?)\\s+-->\n",
         RegexOptions.Compiled | RegexOptions.Singleline);
     
-    public async Task AddComment(string slug,BaseController.LoginData userInformation, string markdown, string nameIdentifier)
+    public async Task AddComment(string slug,BaseController.LoginData userInformation, string markdown)
     {
         markdown = $"<!--name {userInformation.name} --><!--avatar {userInformation.avatarUrl} -->{ markdown}";
-        var path = Path.Combine(markdownConfig.MarkdownCommentsPath,$"{DateTime.Now.ToFileTimeUtc()}_{nameIdentifier}_{slug}.md");
+        var path = Path.Combine(markdownConfig.MarkdownNotModeratedCommentsPath,$"{DateTime.Now.ToFileTimeUtc()}_{userInformation.identifier}_{slug}.md");
         var comment =markdown;
         await File.WriteAllTextAsync(path, comment);
     }

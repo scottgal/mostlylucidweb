@@ -1,22 +1,25 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Email;
 using Mostlylucid.MarkdownTranslator;
-using Mostlylucid.Services;
 using Mostlylucid.Services.Markdown;
+using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog((context, configuration) =>
+    configuration.ReadFrom.Configuration(context.Configuration));
+
 builder.Configuration.AddEnvironmentVariables();
-var markdownConfig =builder.Configure<MarkdownConfig>();
+builder.Configure<MarkdownConfig>();
 var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
-var env = builder.Environment;
+
+//Set up CORS for Google Auth Use.
 services.AddCors(options =>
 {
     options.AddPolicy("AllowMostlylucid",
@@ -31,13 +34,12 @@ services.AddCors(options =>
         });
 });
 
+//Set up our Authentication Options
 builder.Services
     .AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-   
-      
     })
     .AddCookie()
     .AddGoogle(options =>
@@ -51,14 +53,12 @@ services.AddResponseCaching();
 services.AddScoped<BlogService>();
 services.AddScoped<CommentService>();
 
-if (translateServiceConfig.Enabled)
-{
-services.SetupTranslateService();
-}
+if (translateServiceConfig.Enabled) services.SetupTranslateService();
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 services.SetupEmail(builder.Configuration);
 
 var app = builder.Build();
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -84,10 +84,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
-
 app.UseResponseCaching();
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    "default",
+    "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

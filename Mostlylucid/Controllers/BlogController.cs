@@ -61,25 +61,7 @@ public class BlogController(AuthSettings authSettings, BlogService blogService, 
        return RedirectToAction(nameof(Language), new { slug, language });
     }
     
-    [HttpPost]
-    [Route("comment")]
-    [Authorize]
-    public async Task<IActionResult> Comment(string slug, string comment)
-    {
-        var principal = HttpContext.User;
-        principal.Claims.ToList().ForEach(c => logger.LogInformation($"{c.Type} : {c.Value}"));
-        var nameIdentifier = principal.FindFirst("sub");
-        var userInformation = GetUserInfo();
-       await commentService.AddComment(slug, userInformation, comment, nameIdentifier.Value);
-        return RedirectToAction(nameof(Show), new { slug });
-    }
 
-    [HttpGet]
-    [Route("list=comments")]
-    public async Task<IActionResult> ListComments(string slug)
-    {
-        return View();
-    }
     
     [Route("/{language}/{slug}")]
     public IActionResult Language(string slug, string language)

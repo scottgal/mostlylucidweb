@@ -9,7 +9,7 @@ using Mostlylucid.Services.Markdown;
 namespace Mostlylucid.Controllers;
 
 [Route("contact")]
-public class ContactController(AuthSettings authSettingsSettings,CommentService commentService, EmailService emailService, ILogger<BaseController> logger) : BaseController(authSettingsSettings, logger)
+public class ContactController(AuthSettings authSettingsSettings,CommentService commentService, EmailSenderHostedService sender, ILogger<BaseController> logger) : BaseController(authSettingsSettings, logger)
 {
    [Route("")]
     public IActionResult Index()
@@ -32,7 +32,7 @@ public class ContactController(AuthSettings authSettingsSettings,CommentService 
                 SenderName =user.name,
                 Comment = commentHtml,
             };
-            await emailService.SendContactEmail(contactModel);
+            await sender.SendEmailAsync(contactModel);
             return PartialView("_Response", new ContactViewModel(){Email = user.email, Name = user.name, Comment = commentHtml, Authenticated = user.loggedIn});
 
         return RedirectToAction("Index", "Home");
