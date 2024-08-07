@@ -1,4 +1,4 @@
-﻿# Adding an RSS file with ASP.NET Core
+﻿# Adding a RSS feed with ASP.NET Core
 
 <!--category-- ASP.NET, RSS -->
 <datetime class="hidden">2024-08-07T13:53</datetime>

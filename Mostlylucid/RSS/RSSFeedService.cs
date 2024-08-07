@@ -16,7 +16,7 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
             logger.LogError("Request is null");
             return string.Empty;
         }
-        return $"{request.Scheme}s://{request.Host}";
+        return $"https://{request.Host}";
     }
     
     public string GenerateFeed(DateTime? startDate=null, string? category = null)
@@ -31,7 +31,8 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
                 Link = $"{GetSiteUrl()}/blog/{item.Slug}",
                 Description = item.Title,
                 PubDate = item.PublishedDate,
-                Categories = item.Categories
+                Categories = item.Categories,
+                Slug = item.Slug
             });
         }
         return GenerateFeed(rssFeedItems, category);
