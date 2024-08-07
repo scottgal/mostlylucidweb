@@ -22,6 +22,7 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
     public string GenerateFeed(DateTime? startDate=null, string? category = null)
     {
         var items = blogService.GetPosts(startDate, category);
+        items = items.OrderByDescending(x => x.PublishedDate).ToList();
         List<RssFeedItem> rssFeedItems = new();
         foreach (var item in items)
         {
