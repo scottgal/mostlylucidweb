@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using Mostlylucid.RSS.Models;
 using Mostlylucid.Services.Markdown;
@@ -38,6 +39,7 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
     public string GenerateFeed(IEnumerable<RssFeedItem> items, string categoryName = "")
     {
         var feed = new XDocument(
+            new XDeclaration("1.0", "utf-8", null),
             new XElement("rss", new XAttribute("version", "2.0"),
                 new XElement("channel",
                     new XElement("title", !string.IsNullOrEmpty(categoryName) ? $"mostlylucid.net for {categoryName}" : $"mostlylucid.net"),
@@ -58,11 +60,18 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
             )
         );
 
-        var sb = new StringBuilder();
-        using (var writer = new StringWriter(sb))
+        var settings = new XmlWriterSettings
+        {
+            Indent = true,
+            Encoding = new UTF8Encoding(false) // UTF-8 without BOM
+        };
+
+        using (var memoryStream = new MemoryStream())
+        using (var writer = XmlWriter.Create(memoryStream, settings))
         {
             feed.Save(writer);
+            writer.Flush();
+            return Encoding.UTF8.GetString(memoryStream.ToArray());
         }
-        return sb.ToString();
     }
 }

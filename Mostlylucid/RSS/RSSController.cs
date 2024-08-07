@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Mostlylucid.RSS;
@@ -17,6 +18,6 @@ public class RssController(RSSFeedService rssFeedService, ILogger<RssController>
         }
 
         var rssFeed = rssFeedService.GenerateFeed(startDateTime, category);
-        return Content(rssFeed, "application/rss+xml");
+        return Content(rssFeed, "application/rss+xml", Encoding.UTF8);
     }
 }
