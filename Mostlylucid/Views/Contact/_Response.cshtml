@@ -3,13 +3,12 @@
 @{
     ViewBag.Title = "Contact";
 }
-
-<h2>Contact</h2>
-<div>
-    <h3>Thanks @Model.Name</h3>
-    <p>Your message has been sent.</p>
-    <div class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2">
+<div class="p-6 bg-white rounded-lg shadow-lg dark:bg-gray-800">
+    <h3 class="text-xl font-semibold text-gray-800 dark:text-white">
+        Thanks @Model.Name
+    </h3>
+    <p class="mt-2 text-gray-600 dark:text-gray-300">Your message has been sent.</p>
+    <div class="prose max-w-none border-b border-gray-200 py-2 text-black dark:prose-dark dark:border-gray-700 sm:py-2">
         @Html.Raw(Model.Comment)
-        </div>
-    
+    </div>
 </div>

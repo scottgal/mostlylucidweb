@@ -16,6 +16,22 @@
     width:20rem;
 }
 
+
+@media print {
+    .svg-container {
+        width: 20rem;
+        height: auto;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    img, svg {
+        max-width: 100%;
+        height: auto;
+    }
+    /* Other print-specific styles */
+}
 .img-filter-dark {
     filter: invert(1) hue-rotate(180deg);
 }
