@@ -40,7 +40,7 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
     {
         var feed = new XDocument(
             new XDeclaration("1.0", "utf-8", null),
-            new XElement("rss", new XAttribute("version", "2.0"),
+            new XElement("rss",  new XAttribute(XNamespace.Xmlns + "atom", "http://www.w3.org/2005/Atom"), new XAttribute("version", "2.0"),
                 new XElement("channel",
                     new XElement("title", !string.IsNullOrEmpty(categoryName) ? $"mostlylucid.net for {categoryName}" : $"mostlylucid.net"),
                     new XElement("link", $"{GetSiteUrl()}/rss"),
