@@ -50,7 +50,7 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
                     select new XElement("item",
                         new XElement("title", item.Title),
                         new XElement("link", item.Link),
-                        new XElement("guid", item.Guid),
+                        new XElement("guid", item.Guid, new XAttribute("isPermaLink", "false")),
                         new XElement("description", item.Description),
                         new XElement("pubDate", item.PubDate.ToString("R")),
                         from category in item.Categories
