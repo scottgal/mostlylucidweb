@@ -235,7 +235,15 @@ function setLogoutLink() {
         if (document.getElementById("comment") != null)
         {
         simplemde = new SimpleMDE({ element: document.getElementById("comment") });
+          
         
+        }
+        const url = evt.detail.pathInfo.requestPath;
+
+        // Track the page view in Umami
+        if (typeof umami !== 'undefined' && url) {
+            umami.track(props => ({ ...props, url:url }));
+
         }
      initGoogleSignIn();
         mermaid.run();
