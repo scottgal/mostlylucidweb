@@ -18,7 +18,7 @@ namespace Mostlylucid.Controllers;
         var authenticateResult = GetUserInfo();
        
         var posts = blogService.GetPostsForFiles();
-      var indexPageViewModel = new IndexPageViewModel { Posts = posts, Authenticated =  authenticateResult.loggedIn, Name = authenticateResult.name, AvatarUrl = authenticateResult.avatarUrl };
+      var indexPageViewModel = new IndexPageViewModel { Posts = posts, Authenticated =  authenticateResult.LoggedIn, Name = authenticateResult.Name, AvatarUrl = authenticateResult.AvatarUrl };
  
       indexPageViewModel.Categories = blogService.GetCategories();
         return View(indexPageViewModel);

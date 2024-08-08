@@ -28,9 +28,9 @@ public class BlogController(AuthSettings authSettings, BlogService blogService, 
     {
        var post =  blogService.GetPost(slug);
        var user = GetUserInfo();
-       post.Authenticated = user.loggedIn;
-       post.Name = user.name;
-       post.AvatarUrl = user.avatarUrl;
+       post.Authenticated = user.LoggedIn;
+       post.Name = user.Name;
+       post.AvatarUrl = user.AvatarUrl;
        if(Request.IsHtmx())
        {
               return PartialView("_PostPartial", post);
@@ -45,9 +45,9 @@ public class BlogController(AuthSettings authSettings, BlogService blogService, 
         ViewBag.Category = category;
         var posts = blogService.GetPostsByCategory(category);
         var user = GetUserInfo();
-        posts.Authenticated = user.loggedIn;
-        posts.Name = user.name;
-        posts.AvatarUrl = user.avatarUrl;
+        posts.Authenticated = user.LoggedIn;
+        posts.Name = user.Name;
+        posts.AvatarUrl = user.AvatarUrl;
         if(Request.IsHtmx())
         {
             return PartialView("_BlogSummaryList", posts);

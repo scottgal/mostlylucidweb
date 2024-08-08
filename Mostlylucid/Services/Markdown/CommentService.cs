@@ -15,8 +15,8 @@ public class CommentService(MarkdownConfig markdownConfig) : BaseService
     
     public async Task AddComment(string slug,BaseController.LoginData userInformation, string markdown)
     {
-        markdown = $"<!--name {userInformation.name} --><!--avatar {userInformation.avatarUrl} -->{ markdown}";
-        var path = Path.Combine(markdownConfig.MarkdownNotModeratedCommentsPath,$"{DateTime.Now.ToFileTimeUtc()}_{userInformation.identifier}_{slug}.md");
+        markdown = $"<!--name {userInformation.Name} --><!--avatar {userInformation.AvatarUrl} -->{ markdown}";
+        var path = Path.Combine(markdownConfig.MarkdownNotModeratedCommentsPath,$"{DateTime.Now.ToFileTimeUtc()}_{userInformation.Identifier}_{slug}.md");
         var comment =markdown;
         await File.WriteAllTextAsync(path, comment);
     }

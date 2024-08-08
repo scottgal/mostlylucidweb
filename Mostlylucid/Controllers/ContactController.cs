@@ -16,7 +16,7 @@ public class ContactController(AuthSettings authSettingsSettings,BlogService blo
     public IActionResult Index()
     {
         var user = GetUserInfo();
-        var model = new ContactViewModel(){Email = user.email, Name = user.name, Authenticated = user.loggedIn};
+        var model = new ContactViewModel(){Email = user.Email, Name = user.Name, Authenticated = user.LoggedIn};
         return View("Contact", model);
     }
     
@@ -29,12 +29,12 @@ public class ContactController(AuthSettings authSettingsSettings,BlogService blo
             var commentHtml = commentService.ProcessComment(comment);
             var contactModel = new ContactEmailModel()
             {
-                SenderEmail = user.email,
-                SenderName =user.name,
+                SenderEmail = user.Email,
+                SenderName =user.Name,
                 Comment = commentHtml,
             };
             await sender.SendEmailAsync(contactModel);
-            return PartialView("_Response", new ContactViewModel(){Email = user.email, Name = user.name, Comment = commentHtml, Authenticated = user.loggedIn});
+            return PartialView("_Response", new ContactViewModel(){Email = user.Email, Name = user.Name, Comment = commentHtml, Authenticated = user.LoggedIn});
 
         return RedirectToAction("Index", "Home");
     }
