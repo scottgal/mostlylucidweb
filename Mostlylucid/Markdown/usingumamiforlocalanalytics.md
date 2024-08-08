@@ -1,8 +1,10 @@
 ﻿# Using Umami for Local Analytics
-
+<!--category-- ASP.NET, Umami -->
+<datetime class="hidden">2024-08-08T15:53</datetime>
 ## Introduction
 One of the things that annoyed me about my current setup was having to use Google Analytics to get visitor data (what little there is of it ??). So I wanted to find something I could self-host that didn't pass data to Google or any other third party. I found [Umami](https://umami.is/) which is a simple, self-hosted web analytics solution. It's a great alternative to Google Analytics and is (relatively) easy to set up.
 
+[TOC]
 ## Installation
 Installation is PRETTY simple but took a fair bit of fiddling to really get going...
 
