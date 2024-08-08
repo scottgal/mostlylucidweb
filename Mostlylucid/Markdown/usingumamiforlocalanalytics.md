@@ -114,8 +114,8 @@ To enable the path for the script (called `getinfo` in my setup above) I've adde
 You can also add these to your .env file and pass them in as environment variables to the docker-compose file.
 
 ```dotenv
-ANALYTICS__UMAMIPATH:"https://umamilocal.mostlylucid.net/getinfo"
-ANALYTICS_WEBSITEID:"32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
+ANALYTICS__UMAMIPATH="https://umamilocal.mostlylucid.net/getinfo"
+ANALYTICS_WEBSITEID="32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
 ```
 
 ```yaml
