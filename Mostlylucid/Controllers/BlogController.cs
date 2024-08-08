@@ -12,7 +12,7 @@ namespace Mostlylucidblog.Controllers;
 
 [Route("blog")]
 public class BlogController(AuthSettings authSettings, BlogService blogService, CommentService commentService,
-    ILogger<BlogController> logger) : BaseController(authSettings, logger)
+    ILogger<BlogController> logger) : BaseController(authSettings,blogService, logger)
 {
 
     

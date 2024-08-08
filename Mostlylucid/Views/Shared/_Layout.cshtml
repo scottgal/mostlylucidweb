@@ -10,10 +10,19 @@
     />
     <title>@ViewBag.Title</title>
 
+    <!-- Static RSS Feed Link -->
     <link rel="alternate" type="application/atom+xml"
           title="RSS Feed for mostlylucid.net"
           href="https://@Context.Request.Host/rss" />
-    
+
+    <!-- Dynamic RSS Feed Links for each category -->
+    @foreach(var category in ViewBag.Categories)
+    {
+    <link rel="alternate" type="application/atom+xml"
+          title="RSS Feed for mostlylucid.net - @category"
+          href="https://@Context.Request.Host/rss?category=@category" />
+    }
+
     <!-- Facebook Meta Tags -->
     <meta property="og:url" content="https://www.mostlylucid.net">
     <meta property="og:type" content="website">
@@ -36,62 +45,7 @@
     />
     <link rel="icon" type="image/png" href="/img/favicon.png" />
     <script src="https://accounts.google.com/gsi/client"  data-cfasync="false" async defer></script>
-    <script>
-        
-        
-        function renderButton(element)
-        {
-            google.accounts.id.renderButton(
-                element,
-                {
-                    type: "standard",
-                    size: "large",
-                    width: 200,
-                    theme: "filled_black",
-                    text: "sign_in_with",
-                    shape: "rectangular",
-                    logo_alignment: "left"
-                }
-            );
-        }
-        function initGoogleSignIn() {
-            google.accounts.id.initialize({
-                client_id: "839055275161-u7dqn2oco2729n6i5mk0fe7gap0bmg6g.apps.googleusercontent.com",
-                callback: handleCredentialResponse
-            });
-            const element = document.getElementById('google_button');
-            if (element) {
-                renderButton(element);
-            }
-            const secondElement = document.getElementById('google_button2');
-            if (secondElement) {
-                renderButton(secondElement);
-            }
-           
-        }
 
-        function handleCredentialResponse(response) {
-            if (response.credential) {
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', '/login', true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.onload = function () {
-                    if (xhr.status === 200) {
-                        window.location.reload();
-                    } else {
-                        console.error('Failed to log in.');
-                    }
-                };
-                xhr.send(JSON.stringify({ idToken: response.credential }));
-            } else {
-                console.error('No credential in response.');
-            }
-        }
-
-        window.onload = initGoogleSignIn;
-    
-    
-    </script>
     <link
         crossorigin="crossorigin"
         href="https://fonts.gstatic.com"
@@ -286,6 +240,57 @@ function setLogoutLink() {
         mermaid.run();
         setLogoutLink();
     });
+
+function renderButton(element)
+{
+    google.accounts.id.renderButton(
+        element,
+        {
+            type: "standard",
+            size: "large",
+            width: 200,
+            theme: "filled_black",
+            text: "sign_in_with",
+            shape: "rectangular",
+            logo_alignment: "left"
+        }
+    );
+}
+function initGoogleSignIn() {
+    google.accounts.id.initialize({
+        client_id: "839055275161-u7dqn2oco2729n6i5mk0fe7gap0bmg6g.apps.googleusercontent.com",
+        callback: handleCredentialResponse
+    });
+    const element = document.getElementById('google_button');
+    if (element) {
+        renderButton(element);
+    }
+    const secondElement = document.getElementById('google_button2');
+    if (secondElement) {
+        renderButton(secondElement);
+    }
+
+}
+
+function handleCredentialResponse(response) {
+    if (response.credential) {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/login', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                window.location.reload();
+            } else {
+                console.error('Failed to log in.');
+            }
+        };
+        xhr.send(JSON.stringify({ idToken: response.credential }));
+    } else {
+        console.error('No credential in response.');
+    }
+}
+
+window.onload = initGoogleSignIn;
 </script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-J9VJNKV3PV"></script>

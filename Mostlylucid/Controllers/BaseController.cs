@@ -3,14 +3,33 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Mostlylucid.Config;
+using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucid.Controllers;
 
-public class BaseController(AuthSettings authSettingsSettings, ILogger<BaseController> logger) : Controller
+public class BaseController : Controller
 {
+    private readonly AuthSettings _authSettingsSettings;
+    private readonly BlogService _blogService;
+
+    public BaseController(AuthSettings authSettingsSettings, BlogService blogService, ILogger<BaseController> logger)
+    {
+        _authSettingsSettings = authSettingsSettings;
+        _blogService = blogService;
+       
+    }
+
+    public override void OnActionExecuting(ActionExecutingContext filterContext)
+    {
+     ViewBag.Categories = _blogService.GetCategories();
+        base.OnActionExecuting(filterContext);
+    }
+    
     public record LoginData(bool loggedIn, string? name, string? avatarUrl, string? email, string? identifier, bool isAdmin = false);
     
+
     protected LoginData GetUserInfo()
     {
         var authenticateResult = HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
@@ -51,7 +70,7 @@ public class BaseController(AuthSettings authSettingsSettings, ILogger<BaseContr
             var emailIdentifier = emailClaim?.Value;
             
             
-            if(sub == authSettingsSettings.AdminUserGoogleId)
+            if(sub == _authSettingsSettings.AdminUserGoogleId)
             {
                 return new LoginData(true, name, avatarUrl, emailIdentifier, name, true);
             }
