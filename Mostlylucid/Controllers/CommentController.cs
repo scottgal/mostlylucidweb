@@ -5,8 +5,8 @@ using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucid.Controllers;
 
-public class CommentController(AuthSettings authSettings,CommentService  commentService,BlogService blogService, ILogger<CommentController> logger)
-    : BaseController(authSettings, blogService, logger)
+public class CommentController(AuthSettings authSettings,CommentService  commentService,  AnalyticsSettings analyticsSettings,BlogService blogService, ILogger<CommentController> logger)
+    : BaseController(authSettings, analyticsSettings, blogService, logger)
 {
     // GET
     public IActionResult Index()

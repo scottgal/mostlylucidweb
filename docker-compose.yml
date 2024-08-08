@@ -1,32 +1,100 @@
 ﻿services:
   mostlylucid:
     image: scottgal/mostlylucid:latest
-    container_name: mostlylucid
-    env_file:
-      - .env
+    ports:
+      - 8080:8080
+    restart: always
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     environment:
       - Auth__GoogleClientId=${AUTH_GOOGLECLIENTID}
       - Auth__GoogleClientSecret=${AUTH_GOOGLECLIENTSECRET}
       - Auth__AdminUserGoogleId=${AUTH_ADMINUSERGOOGLEID}
-      - SmtpSettings__Username=${SMTPSETTINGS_USERNAME}
+      - SmtpSettings__UserName=${SMTPSETTINGS_USERNAME}
       - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
+      - Analytics__UmamiPath=${ANALYTICS_UMAMIPATH}
+      - Analytics__WebsiteId=${ANALYTICS_WEBSITEID}
     volumes:
       - /mnt/imagecache:/app/wwwroot/cache
       - /mnt/markdown/comments:/app/Markdown/comments
       - /mnt/logs:/app/logs
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-  cloudflared:
-    image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
-    env_file:
-      - .env
+    networks:
+      - app_network
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
+    restart: always
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_LABEL_ENABLE=true
-    command: --interval 300 # Check for updates every 300 seconds (5 minutes)
+    command: --interval 60 # Check for updates every 300 seconds (5 minutes)
+  db:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /mnt/umami/postgres:/var/lib/postgresql/data
+    restart: always
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - app_network
+  cloudflaredumami:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_UMAMI_TOKEN}
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - app_network
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    env_file: .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_TYPE: ${DATABASE_TYPE}
+      HASH_SALT: ${HASH_SALT}
+      APP_SECRET: ${APP_SECRET}
+      TRACKER_SCRIPT_NAME: getinfo
+      API_COLLECT_ENDPOINT: all
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - app_network
+    restart: always
+
+  caddy:
+    image: caddy:latest
+    ports:
+      - 80:80
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - app_network
+    restart: always
+networks:
+  app_network:
+    driver: bridge
+volumes:
+  caddy_data:
+  caddy_config:

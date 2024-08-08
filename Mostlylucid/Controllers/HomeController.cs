@@ -9,8 +9,8 @@ using Mostlylucidblog.Models;
 namespace Mostlylucid.Controllers;
 
 
-    public class HomeController(AuthSettings authSettings, BlogService blogService, ILogger<HomeController> logger) 
-        : BaseController(authSettings, blogService, logger)
+    public class HomeController(AuthSettings authSettings, BlogService blogService, AnalyticsSettings analyticsSettings, ILogger<HomeController> logger) 
+        : BaseController(authSettings,analyticsSettings, blogService, logger)
     {
     [OutputCache(Duration = 60*60*60)]
     public async Task<IActionResult> Index()

@@ -9,8 +9,8 @@ using Mostlylucid.Services.Markdown;
 namespace Mostlylucid.Controllers;
 
 [Route("contact")]
-public class ContactController(AuthSettings authSettingsSettings,BlogService blogService,
-    CommentService commentService, EmailSenderHostedService sender, ILogger<BaseController> logger) : BaseController(authSettingsSettings,blogService, logger)
+public class ContactController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings,BlogService blogService,
+    CommentService commentService, EmailSenderHostedService sender, ILogger<BaseController> logger) : BaseController(authSettingsSettings,analyticsSettings, blogService, logger)
 {
    [Route("")]
     public IActionResult Index()

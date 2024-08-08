@@ -15,12 +15,14 @@ public class BaseController : Controller
     private readonly AuthSettings _authSettingsSettings;
     private readonly BlogService _blogService;
     private readonly ILogger<BaseController> _logger;
+    private readonly AnalyticsSettings _analyticsSettings;
 
-    public BaseController(AuthSettings authSettingsSettings, BlogService blogService, ILogger<BaseController> logger)
+    public BaseController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings, BlogService blogService, ILogger<BaseController> logger)
     {
         _logger = logger;
         _authSettingsSettings = authSettingsSettings;
         _blogService = blogService;
+        _analyticsSettings = analyticsSettings;
        
     }
 
@@ -30,6 +32,8 @@ public class BaseController : Controller
         {
             _logger.LogInformation("Adding categories to viewbag");
             ViewBag.Categories = _blogService.GetCategories();
+            ViewBag.UmamiPath = _analyticsSettings.UmamiPath;
+            ViewBag.UmamiWebsiteId = _analyticsSettings.WebsiteId;
         }
         base.OnActionExecuting(filterContext);
     }

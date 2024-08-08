@@ -16,6 +16,7 @@ builder.Host.UseSerilog((context, configuration) =>
 
 builder.Configuration.AddEnvironmentVariables();
 builder.Configure<MarkdownConfig>();
+builder.Configure<AnalyticsSettings>();
 var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;

@@ -11,8 +11,9 @@ using Mostlylucid.Services.Markdown;
 namespace Mostlylucidblog.Controllers;
 
 [Route("blog")]
-public class BlogController(AuthSettings authSettings, BlogService blogService, CommentService commentService,
-    ILogger<BlogController> logger) : BaseController(authSettings,blogService, logger)
+public class BlogController(AuthSettings authSettings, AnalyticsSettings analyticsSettings,
+    BlogService blogService, CommentService commentService,
+    ILogger<BlogController> logger) : BaseController(authSettings,analyticsSettings, blogService, logger)
 {
 
     
