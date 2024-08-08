@@ -174,5 +174,13 @@ Finally, I've added the following to my layout file to include the analytics scr
 
 This includes the script in the page and sets the website id for the analytics service.
 
+## Excluding yourself from analytics
+In order to exclude your own visits from the analytics data you can add the following local storage in your browser:
+
+In Chrome dev tools (Ctrl+Shift+I on windows) you can add the following to the console:
+
+```javascript
+localStorage.setItem("umami.disabled", 1)
+```
 ## Conclusion
 This was a bit of a faff to set up but I'm happy with the result. I now have a self-hosted analytics service that doesn't pass data to Google or any other third party. It's a bit of a pain to set up but once it's done it's pretty easy to use. I'm happy with the result and would recommend it to anyone looking for a self-hosted analytics solution.
