@@ -31,8 +31,6 @@ As I wanted to add Umami to my current docker-compose setup I needed to add a ne
     restart: always
   db:
     image: postgres:16-alpine
-    ports:
-      - "5432:5432"
     env_file:
       - .env
     networks:

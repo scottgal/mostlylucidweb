@@ -32,8 +32,6 @@
     command: --interval 60 # Check for updates every 300 seconds (5 minutes)
   db:
     image: postgres:16-alpine
-    ports:
-      - "5432:5432"
     env_file:
       - .env
     networks:
