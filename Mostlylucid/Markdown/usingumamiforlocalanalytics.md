@@ -66,7 +66,8 @@ Note for this service I'm mapped it to a directory on my server so that the data
       - /mnt/umami/postgres:/var/lib/postgresql/data
 ```
 You'll need this director to exist and be writable by the docker user on your server (again not a Linux expert so 777 is likely overkill here!).
-```bash
+
+```shell
 chmod 777 /mnt/umami/postgres
 ```
 3. A new service called `cloudflaredumami` which uses the `cloudflare/cloudflared:latest` image. This service is used to tunnel the Umami service through Cloudflare to allow it to be accessed from the internet.
@@ -75,7 +76,7 @@ chmod 777 /mnt/umami/postgres
 
 To support this I also updated my `.env` file to include the following:
 
-```env
+```shell
 CLOUDFLARED_UMAMI_TOKEN=<cloudflaretoken>
 DATABASE_TYPE=postgresql
 HASH_SALT=<salt>
@@ -111,7 +112,7 @@ To enable the path for the script (called `getinfo` in my setup above) I've adde
 ```
 You can also add these to your .env file and pass them in as environment variables to the docker-compose file.
 
-```dotenv
+```shell
 ANALYTICS__UMAMIPATH="https://umamilocal.mostlylucid.net/getinfo"
 ANALYTICS_WEBSITEID="32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
 ```
