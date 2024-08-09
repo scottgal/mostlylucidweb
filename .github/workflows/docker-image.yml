@@ -19,8 +19,6 @@ jobs:
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
-      with:
-        install: true
 
     - name: Cache Docker layers
       uses: actions/cache@v3
@@ -30,12 +28,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildx-
 
-    - name: Build and push multi-platform Docker image
+    - name: Build and tag the Docker image
+      id: build
       run: |
         TIMESTAMP=$(date +%s)
         echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
-        docker buildx build --platform linux/amd64,linux/arm64 --push \
-          --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest \
-          --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP \
-          --file Mostlylucid/Dockerfile .
+        docker build . --file Mostlylucid/Dockerfile --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP
 
+    - name: Push the Docker image to Docker Hub
+      run: |
+        docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest
+        docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:${{ env.TIMESTAMP }}
