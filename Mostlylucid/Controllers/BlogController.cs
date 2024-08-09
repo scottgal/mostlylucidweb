@@ -20,6 +20,7 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     public IActionResult Index(int page = 1, int pageSize = 5)
     {
         var posts = blogService.GetPostsForFiles(page, pageSize);
+   
         if(Request.IsHtmx())
         {
             return PartialView("_BlogSummaryList", posts);

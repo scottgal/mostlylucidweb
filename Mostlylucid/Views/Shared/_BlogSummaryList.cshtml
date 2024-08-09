@@ -3,7 +3,9 @@
 
     @if (Model.TotalItems > Model.PageSize)
     {
-        <pager link-url="@Model.LinkUrl"
+        <pager
+            x-ref="pager"
+            link-url="@Model.LinkUrl"
                hx-boost="true"
                hx-push-url="true"
                hx-target="#content"
