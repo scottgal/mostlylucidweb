@@ -45,15 +45,16 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     }
 
     [Route("category/{category}")]
-    public IActionResult Category(string category)
+    public IActionResult Category(string category, int page = 1, int pageSize = 5)
     {
         
         ViewBag.Category = category;
-        var posts = blogService.GetPostsByCategory(category);
+        var posts = blogService.GetPostsByCategory(category, page, pageSize);
         var user = GetUserInfo();
         posts.Authenticated = user.LoggedIn;
         posts.Name = user.Name;
         posts.AvatarUrl = user.AvatarUrl;
+        posts.LinkUrl = Url.Action("Category", "Blog");
         if(Request.IsHtmx())
         {
             return PartialView("_BlogSummaryList", posts);

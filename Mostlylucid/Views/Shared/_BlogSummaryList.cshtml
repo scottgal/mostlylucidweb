@@ -1,15 +1,18 @@
 ﻿@model Mostlylucid.Models.Blog.PostListViewModel
 <div class="pt-2" id="content">
 
-<pager link-url="@Model.LinkUrl"
-       hx-boost="true"
-       hx-push-url="true"
-       hx-target="#content"
-       hx-swap="show:none"
-       page="@Model.Page"
-       page-size="@Model.PageSize"
-       total-items="@Model.TotalItems" ></pager>
-@if(ViewBag.Categories != null)
+    @if (Model.TotalItems > Model.PageSize)
+    {
+        <pager link-url="@Model.LinkUrl"
+               hx-boost="true"
+               hx-push-url="true"
+               hx-target="#content"
+               hx-swap="show:none"
+               page="@Model.Page"
+               page-size="@Model.PageSize"
+               total-items="@Model.TotalItems"></pager>
+    }
+    @if(ViewBag.Categories != null)
 {
     <div class="pb-3">
         <h4 class="font-body text-lg text-primary dark:text-white">Categories</h4>

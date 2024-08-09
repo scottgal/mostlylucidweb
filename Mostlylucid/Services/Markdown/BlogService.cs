@@ -144,13 +144,16 @@ public class BlogService : BaseService
     }
 
 
-    public PostListViewModel GetPostsByCategory(string category)
+    public PostListViewModel GetPostsByCategory(string category, int page = 1, int pageSize = 10)
     {
         var model = new PostListViewModel();
         var posts = GetPageCache()
             .Where(x => x.Value.Categories.Contains(category))
-            .Select(x => x.Value).Select(GetListModel);
-        model.Posts = posts.OrderByDescending(x => x.PublishedDate).ToList();
+            .Select(x => x.Value).Select(GetListModel).ToList();
+        model.Posts = posts.OrderByDescending(x => x.PublishedDate).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        model.TotalItems = posts.Count();
+        model.PageSize = pageSize;
+        model.Page = page;
         return model;
     }
 
