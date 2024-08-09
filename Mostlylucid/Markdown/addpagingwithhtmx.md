@@ -8,7 +8,7 @@ Now that I have a bunch of blog posts the home page was getting rather length so
 
 This goes along with adding full caching for blog posts to make this a quick and efficient site.
 
-See the [Blog Service source](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/Markdown/BlogService.cs) for how this is implemented; it's really pretty simple using the IMemeoryCache.
+See the [Blog Service source](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/Markdown/BlogService.cs) for how this is implemented; it's really pretty simple using the IMemoryCache.
 
 ### TagHelper
 I decided to use a TagHelper to implement the paging mechanism. This is a great way to encapsulate the paging logic and make it reusable.
