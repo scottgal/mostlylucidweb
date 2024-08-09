@@ -129,4 +129,3 @@ Here page and pageSize are passed in from the URL and the total items are calcul
 
 ### Conclusion
 This was a simple addition to the site but it makes it much more usable. The HTMX integration makes the site feel more responsive while not adding more JavaScript to the site.
-```
