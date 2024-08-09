@@ -30,11 +30,12 @@ public class BaseController : Controller
     {
         if (!Request.IsHtmx())
         {
-            _logger.LogInformation("Adding categories to viewbag");
-            ViewBag.Categories = _blogService.GetCategories();
+         
             ViewBag.UmamiPath = _analyticsSettings.UmamiPath;
             ViewBag.UmamiWebsiteId = _analyticsSettings.WebsiteId;
         }
+        _logger.LogInformation("Adding categories to viewbag");
+        ViewBag.Categories = _blogService.GetCategories();
         base.OnActionExecuting(filterContext);
     }
     

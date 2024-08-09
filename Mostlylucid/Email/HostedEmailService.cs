@@ -75,7 +75,6 @@ namespace Mostlylucid.Email
 
         public void Dispose()
         {
-            cancellationTokenSource.Cancel();
             cancellationTokenSource.Dispose();
         }
     }

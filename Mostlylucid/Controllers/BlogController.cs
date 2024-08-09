@@ -17,9 +17,14 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
 {
 
     
-    public IActionResult Index()
+    public IActionResult Index(int page = 1, int pageSize = 5)
     {
-        var posts = blogService.GetPostsForFiles();
+        var posts = blogService.GetPostsForFiles(page, pageSize);
+        if(Request.IsHtmx())
+        {
+            return PartialView("_BlogSummaryList", posts);
+        }
+        posts.LinkUrl = Url.Action("Index", "Blog");
         return View("Index", posts);
     }
 

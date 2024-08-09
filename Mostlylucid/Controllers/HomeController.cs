@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Htmx;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Config;
@@ -13,15 +14,25 @@ namespace Mostlylucid.Controllers;
         : BaseController(authSettings,analyticsSettings, blogService, logger)
     {
     [OutputCache(Duration = 60*60*60)]
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(int page = 1,int pageSize = 5)
     {
-        var authenticateResult = GetUserInfo();
-       
-        var posts = blogService.GetPostsForFiles();
-      var indexPageViewModel = new IndexPageViewModel { Posts = posts, Authenticated =  authenticateResult.LoggedIn, Name = authenticateResult.Name, AvatarUrl = authenticateResult.AvatarUrl };
- 
-      indexPageViewModel.Categories = blogService.GetCategories();
-        return View(indexPageViewModel);
+   
+            var authenticateResult = GetUserInfo();
+
+            var posts = blogService.GetPostsForFiles(page, pageSize);
+            posts.LinkUrl= Url.Action("Index", "Home");
+            if (Request.IsHtmx())
+            {
+                return PartialView("_BlogSummaryList", posts);
+            }
+            var indexPageViewModel = new IndexPageViewModel
+            {
+                Posts = posts, Authenticated = authenticateResult.LoggedIn, Name = authenticateResult.Name,
+                AvatarUrl = authenticateResult.AvatarUrl
+            };
+            
+            return View(indexPageViewModel);
+    
     }
 
     public IActionResult Privacy()

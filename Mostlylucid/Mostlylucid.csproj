@@ -23,6 +23,7 @@
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.7" />
       <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
       <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.0.1" />
+      <PackageReference Include="PaginationTagHelper.AspNetCore" Version="1.0.1" />
       <PackageReference Include="PreMailer.Net" Version="2.6.0" />
       <PackageReference Include="Serilog" Version="4.0.1" />
       <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
@@ -40,6 +41,7 @@
       <Folder Include="Markdown\notmoderatedcomments\" />
       <Folder Include="Markdown\translated\" />
       <Folder Include="src\js\" />
+      <Folder Include="wwwroot\css\dist\" />
       <Folder Include="wwwroot\lib\" />
     </ItemGroup>
 
@@ -110,9 +112,6 @@
       <Content Include="Markdown\intro.md" />
       <None Remove="Markdown\oldisnew.md" />
       <Content Include="Markdown\oldisnew.md" />
-      <Content Update="wwwroot\css\dist\main.css">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
       <None Remove="Markdown\githubactions.md" />
       <Content Include="Markdown\githubactions.md" />
       <None Remove="Markdown\tailwind.md" />

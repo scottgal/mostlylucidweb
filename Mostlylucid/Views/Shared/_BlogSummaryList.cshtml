@@ -1,13 +1,30 @@
 ﻿@model Mostlylucid.Models.Blog.PostListViewModel
+<div class="pt-2" id="content">
 
-@if(ViewBag.Category != null)
+<pager link-url="@Model.LinkUrl"
+       hx-boost="true"
+       hx-push-url="true"
+       hx-target="#content"
+       hx-swap="show:none"
+       page="@Model.Page"
+       page-size="@Model.PageSize"
+       total-items="@Model.TotalItems" ></pager>
+@if(ViewBag.Categories != null)
 {
-    <h3
-        class="ml-3 font-body text-2xl font-semibold text-primary dark:text-white mb-10">
-        Posts in @ViewBag.Category
-    </h3>
+    <div class="pb-3">
+        <h4 class="font-body text-lg text-primary dark:text-white">Categories</h4>
+        <div class="flex flex-wrap gap-2 pt-2">
+            @foreach (var category in ViewBag.Categories)
+            {
+                <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
+                    <span class="inline-block rounded-full bg-blue-dark px-2 py-1 font-body text-sm text-white">@category</span>
+                </a>
+            }
+        </div>
+    </div>
 }
 @foreach (var post in Model.Posts)
 {
     <partial name="_ListPost" model="post"/>
 }
+</div>

@@ -60,3 +60,41 @@ html {
         @apply mt-8 mb-0 inline-block border border-blue-dark px-5 py-2 font-body font-semibold text-blue-dark no-underline transition-colors hover:bg-primary hover:text-white sm:mb-4;
     }
 }
+
+
+.pagination {
+    @apply py-2 flex list-none p-0 m-0 justify-center items-center;
+}
+
+.page-item {
+    @apply mx-1 text-black  dark:text-white rounded;
+}
+
+.page-item a {
+    @apply block rounded-md transition duration-300 ease-in-out;
+}
+
+.page-item a:hover {
+    @apply bg-blue-dark text-white;
+}
+
+.page-item.disabled a {
+    @apply text-blue-dark pointer-events-none cursor-not-allowed;
+}
+
+.page-item.active {
+    @apply bg-blue-dark;
+}
+
+.page-item.active a {
+    @apply text-white border border-blue-dark;
+}
+.page-link
+{
+    @apply block px-4 py-2 text-blue-dark dark:text-blue-light;
+
+}
+.page-item:focus a,
+.page-item a:focus {
+    @apply outline-none; /* Tailwind's outline class could be used if custom color needed */
+}
