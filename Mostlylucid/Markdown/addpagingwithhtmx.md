@@ -10,6 +10,8 @@ This goes along with adding full caching for blog posts to make this a quick and
 
 See the [Blog Service source](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/Markdown/BlogService.cs) for how this is implemented; it's really pretty simple using the IMemoryCache.
 
+[TOC]
+
 ### TagHelper
 I decided to use a TagHelper to implement the paging mechanism. This is a great way to encapsulate the paging logic and make it reusable.
 This uses the [pagination taghelper from Darrel O'Neill ](https://github.com/darrel-oneil/PaginationTagHelper) this is included in the project as a nuget package.
@@ -33,6 +35,7 @@ In the _BlogSummaryList.cshtml partial view I added the following code to render
        page-size="@Model.PageSize"
        total-items="@Model.TotalItems" ></pager>
 ```
+
 A few notable things here:
 1. `link-url` this allows the taghelper to generate the correct url for the paging links. In the HomeController Index method this is set to that action.
 ```csharp
@@ -59,7 +62,8 @@ And in the Blog controller
 
 This is set to that URl. This ensures the pagination helper can work for either top level method. 
 
-2. HTMX Properties - `hx-boost`, `hx-push-url`, `hx-target`, `hx-swap` these are all HTMX properties that allow the paging to work with HTMX.
+### HTMX Properties
+`hx-boost`, `hx-push-url`, `hx-target`, `hx-swap` these are all HTMX properties that allow the paging to work with HTMX.
 ```razor
      hx-boost="true"
        hx-push-url="true"
@@ -74,11 +78,39 @@ Here we use `hx-boost="true"` this allows the pagination taghelper to not need a
 
 `hx-swap="show:none"` this is the swap effect that will be used when the content is replaced. In this case it prevents the normal 'jump' effect which HTMX uses on swapping content.
 
-3. `page`, `page-size`, `total-items` these are the properties that the pagination taghelper uses to generate the paging links.
+#### CSS
+I also added styles to the main.css in my /src directory allowing me to use the Tailwind CSS classes for the pagination links.
+```css
+.pagination {
+    @apply py-2 flex list-none p-0 m-0 justify-center items-center;
+}
+
+.page-item {
+    @apply mx-1 text-black  dark:text-white rounded;
+}
+
+.page-item a {
+    @apply block rounded-md transition duration-300 ease-in-out;
+}
+
+.page-item a:hover {
+    @apply bg-blue-dark text-white;
+}
+
+.page-item.disabled a {
+    @apply text-blue-dark pointer-events-none cursor-not-allowed;
+}
+
+```
+
+### Controller
+`page`, `page-size`, `total-items` are the properties that the pagination taghelper uses to generate the paging links.
 These are passed into the partial view from the controller.
 ```csharp
  public IActionResult Index(int page = 1, int pageSize = 5)
 ```
+
+### Blog Service
 Here page and pageSize are passed in from the URL and the total items are calculated from the blog service.
 
 ```csharp
