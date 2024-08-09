@@ -4,8 +4,7 @@ module.exports = {
     content: ["./**/*.html", "./**/*.cshtml"],
     safelist: ["dark"],
     darkMode: "class",
-    theme: {
-      
+    theme: {        
         fontFamily: {
             body: ["Poppins", "sans-serif"],
         },

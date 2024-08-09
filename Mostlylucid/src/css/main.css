@@ -16,6 +16,11 @@
     width:20rem;
 }
 
+.borderbutton {
+    @apply flex items-center ml-4 mb-2 bg-blue-dark outline outline-1 p-2 mt-4 text-center rounded-btn font-body text-xl font-semibold text-white transition-colors hover:bg-red sm:inline-block sm:text-left sm:text-xl;
+}
+
+
 
 @media print {
     .svg-container {
