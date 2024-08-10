@@ -34,13 +34,13 @@ public class BlogService : BaseService, IBlogService, IMarkdownBlogService
         _markdownConfig = markdownConfig;
         _logger = logger;
         _memoryCache = memoryCache;
-        ListLanguages();
-        
+      
         _initializationTask = new Lazy<Task>(async () => await InitializeAsync());
     }
 
     private async Task InitializeAsync()
     {
+        PopulateLanguages();
        await PopulatePages();
     }
     
@@ -215,9 +215,10 @@ public class BlogService : BaseService, IBlogService, IMarkdownBlogService
         return outLangs;
     }
 
-    private void ListLanguages()
+    private void PopulateLanguages()
     {
         var cacheLangs = GetLanguageCache();
+        if(cacheLangs is {Count: > 0}) return;
         var pages = Directory.GetFiles(_markdownConfig.MarkdownTranslatedPath, "*.md");
         var count = 0;
 
