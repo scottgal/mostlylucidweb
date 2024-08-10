@@ -13,7 +13,7 @@ First you'll need to install docker desktop on whatever platform you're using. Y
 **NOTE: I've found that on Windows you really need to run Docker Desktop installer as admin to ensure it installs correctly.**
 
 # Creating a Docker Compose file
-Docker Compose uses a YAML file to define the services you want to run. Here's an example of a simple `devdeps-docker-compose.yml.yml` file that defines a database service:
+Docker Compose uses a YAML file to define the services you want to run. Here's an example of a simple `devdeps-docker-compose.yml` file that defines a database service:
 
 ```yaml
 services: 
