@@ -12,14 +12,14 @@ namespace Mostlylucidblog.Controllers;
 
 [Route("blog")]
 public class BlogController(AuthSettings authSettings, AnalyticsSettings analyticsSettings,
-    BlogService blogService, CommentService commentService,
+    IBlogService blogService, CommentService commentService,
     ILogger<BlogController> logger) : BaseController(authSettings,analyticsSettings, blogService, logger)
 {
 
     
-    public IActionResult Index(int page = 1, int pageSize = 5)
+    public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
     {
-        var posts = blogService.GetPostsForFiles(page, pageSize);
+        var posts =await  blogService.GetPostsForFiles(page, pageSize);
    
         if(Request.IsHtmx())
         {
@@ -31,9 +31,9 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
 
     [Route("{slug}")]
     [OutputCache(Duration = 3600)]
-    public IActionResult Show(string slug)
+    public async Task<IActionResult> Show(string slug)
     {
-       var post =  blogService.GetPost(slug);
+       var post =await  blogService.GetPost(slug);
        var user = GetUserInfo();
        post.Authenticated = user.LoggedIn;
        post.Name = user.Name;
@@ -46,11 +46,11 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     }
 
     [Route("category/{category}")]
-    public IActionResult Category(string category, int page = 1, int pageSize = 5)
+    public async Task<IActionResult> Category(string category, int page = 1, int pageSize = 5)
     {
         
         ViewBag.Category = category;
-        var posts = blogService.GetPostsByCategory(category, page, pageSize);
+        var posts =await blogService.GetPostsByCategory(category, page, pageSize);
         var user = GetUserInfo();
         posts.Authenticated = user.LoggedIn;
         posts.Name = user.Name;
@@ -72,9 +72,9 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
 
     
     [Route("/{language}/{slug}")]
-    public IActionResult Language(string slug, string language)
+    public  async Task<IActionResult> Language(string slug, string language)
     {
-        var post = blogService.GetPost(slug, language);
+        var post =await blogService.GetPost(slug, language);
         if(Request.IsHtmx())
         {
             return PartialView("_PostPartial", post);

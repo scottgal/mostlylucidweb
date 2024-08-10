@@ -8,7 +8,7 @@ public class RssController(RSSFeedService rssFeedService, ILogger<RssController>
 {
 
     [HttpGet]
-    public IActionResult Index([FromQuery] string category = null, [FromQuery] string startDate = null)
+    public async Task< IActionResult> Index([FromQuery] string category = null, [FromQuery] string startDate = null)
     {
         DateTime? startDateTime = null;
         if (DateTime.TryParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None,
@@ -17,7 +17,7 @@ public class RssController(RSSFeedService rssFeedService, ILogger<RssController>
             logger.LogInformation("Start date is {startDate}", startDate);
         }
 
-        var rssFeed = rssFeedService.GenerateFeed(startDateTime, category);
+        var rssFeed =await  rssFeedService.GenerateFeed(startDateTime, category);
         return Content(rssFeed, "application/rss+xml", Encoding.UTF8);
     }
 }

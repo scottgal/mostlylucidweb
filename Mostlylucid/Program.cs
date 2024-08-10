@@ -5,6 +5,7 @@ using Mostlylucid.Config.Markdown;
 using Mostlylucid.Email;
 using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.RSS;
+using Mostlylucid.Services;
 using Mostlylucid.Services.Markdown;
 using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
@@ -14,12 +15,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
 
+var config = builder.Configuration;
 builder.Configuration.AddEnvironmentVariables();
 builder.Configure<MarkdownConfig>();
 builder.Configure<AnalyticsSettings>();
+
 var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
+
+//services.SetupEntityFramework(config.GetConnectionString("DefaultConnection") ?? throw new Exception("No Connection String"));
 
 //Set up CORS for Google Auth Use.
 services.AddCors(options =>
@@ -37,7 +42,7 @@ services.AddCors(options =>
 });
 
 //Set up our Authentication Options
-builder.Services
+services
     .AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -52,7 +57,9 @@ builder.Services
 // Add services to the container.
 services.AddControllersWithViews();
 services.AddResponseCaching();
-services.AddScoped<BlogService>();
+services.AddScoped<IBlogService, BlogService >();
+
+services.AddSingleton<IMarkdownBlogService, BlogService>();
 services.AddScoped<CommentService>();
 
 if (translateServiceConfig.Enabled) services.SetupTranslateService();
@@ -70,15 +77,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+//await app.InitializeDatabase();
+        
 app.UseCors("AllowMostlylucid");
 app.UseHttpsRedirection();
 app.UseImageSharp();
 app.UseStaticFiles();
 
-//T0 test email service
-// await using  var scope = app.Services.CreateAsyncScope();
-// var emailService = scope.ServiceProvider.GetRequiredService<EmailService>();
-// await emailService.SendCommentEmail("test@test.com", "Test", "Test", "test");
+
 
 app.UseRouting();
 

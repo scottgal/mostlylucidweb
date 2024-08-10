@@ -2,13 +2,14 @@
 using System.Xml;
 using System.Xml.Linq;
 using Mostlylucid.RSS.Models;
+using Mostlylucid.Services;
 using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucid.RSS;
 
-public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpContextAccessor, ILogger<RSSFeedService> logger)
+public class RSSFeedService(IBlogService blogService, IHttpContextAccessor httpContextAccessor, ILogger<RSSFeedService> logger)
 {
-    public string GetSiteUrl()
+    private string GetSiteUrl()
     {
         var request = httpContextAccessor.HttpContext?.Request;
         if (request == null)
@@ -19,9 +20,9 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
         return $"https://{request.Host}";
     }
     
-    public string GenerateFeed(DateTime? startDate=null, string? category = null)
+    public async Task<string> GenerateFeed(DateTime? startDate=null, string? category = null)
     {
-        var items = blogService.GetPosts(startDate, category);
+        var items =await  blogService.GetPosts(startDate, category);
         items = items.OrderByDescending(x => x.PublishedDate).ToList();
         List<RssFeedItem> rssFeedItems = new();
         foreach (var item in items)
@@ -38,7 +39,8 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
         }
         return GenerateFeed(rssFeedItems, category);
     }
-    public string GenerateFeed(IEnumerable<RssFeedItem> items, string categoryName = "")
+
+    private string GenerateFeed(IEnumerable<RssFeedItem> items, string categoryName = "")
     {
         XNamespace atom = "http://www.w3.org/2005/Atom";
         var feed = new XDocument(
@@ -73,12 +75,10 @@ public class RSSFeedService(BlogService blogService, IHttpContextAccessor httpCo
             Encoding = new UTF8Encoding(false) // UTF-8 without BOM
         };
 
-        using (var memoryStream = new MemoryStream())
-        using (var writer = XmlWriter.Create(memoryStream, settings))
-        {
-            feed.Save(writer);
-            writer.Flush();
-            return Encoding.UTF8.GetString(memoryStream.ToArray());
-        }
+        using var memoryStream = new MemoryStream();
+        using var writer = XmlWriter.Create(memoryStream, settings);
+        feed.Save(writer);
+        writer.Flush();
+        return Encoding.UTF8.GetString(memoryStream.ToArray());
     }
 }

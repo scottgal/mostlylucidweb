@@ -25,7 +25,5 @@ public class BlogPostViewModel : BaseViewModel
     
     public int WordCount { get; set; }
     
-    public DateTime UpdatedDate { get; set; }
-    
     public DateTime PublishedDate { get; set; }
 }

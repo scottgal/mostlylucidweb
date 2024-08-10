@@ -4,12 +4,13 @@ using Mostlylucid.Config;
 using Mostlylucid.Email;
 using Mostlylucid.Email.Models;
 using Mostlylucid.Models.Contact;
+using Mostlylucid.Services;
 using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucid.Controllers;
 
 [Route("contact")]
-public class ContactController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings,BlogService blogService,
+public class ContactController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings,IBlogService blogService,
     CommentService commentService, EmailSenderHostedService sender, ILogger<BaseController> logger) : BaseController(authSettingsSettings,analyticsSettings, blogService, logger)
 {
    [Route("")]

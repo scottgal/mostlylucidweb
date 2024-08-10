@@ -30,6 +30,10 @@ public static class Setup
         services.AddSingleton<EmailSenderHostedService>();
         services.AddHostedService(provider => provider.GetRequiredService<EmailSenderHostedService>());
 
+        //T0 test email service
+// await using  var scope = app.Services.CreateAsyncScope();
+// var emailService = scope.ServiceProvider.GetRequiredService<EmailService>();
+// await emailService.SendCommentEmail("test@test.com", "Test", "Test", "test");
     }
 
 }

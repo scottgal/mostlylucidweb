@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Concurrent;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.Config.Markdown;
@@ -8,9 +9,8 @@ using Path = System.IO.Path;
 
 namespace Mostlylucid.Services.Markdown;
 
-public class BlogService : BaseService
+public class BlogService : BaseService, IBlogService, IMarkdownBlogService
 {
-    private const string CacheKey = "Categories";
     private const string LanguageCacheKey = "Languages";
     private const string PageCacheKey = "Pages";
 
@@ -27,17 +27,138 @@ public class BlogService : BaseService
     private readonly ILogger<BlogService> _logger;
     private readonly MarkdownConfig _markdownConfig;
     private readonly IMemoryCache _memoryCache;
-
+    private readonly Lazy<Task> _initializationTask;
+    
     public BlogService(MarkdownConfig markdownConfig, IMemoryCache memoryCache, ILogger<BlogService> logger)
     {
         _markdownConfig = markdownConfig;
         _logger = logger;
         _memoryCache = memoryCache;
         ListLanguages();
-        PopulatePageCache();
+        
+        _initializationTask = new Lazy<Task>(async () => await InitializeAsync());
     }
 
+    private async Task InitializeAsync()
+    {
+       await PopulatePages();
+    }
+    
+
     private string DirectoryPath => _markdownConfig.MarkdownPath;
+
+
+    public async Task<List<string>> GetCategories()
+    {
+        await _initializationTask.Value;
+        var pages = GetPageCache();
+        var categories = pages.Values.SelectMany(x => x.Categories).Distinct().ToList();
+        return await Task.FromResult(categories);
+    }
+
+
+    public async Task<List<BlogPostViewModel>> GetPosts(DateTime? startDate = null, string category = "")
+    {
+        await _initializationTask.Value;
+        var pageCache = GetPageCache().Select(x => x.Value);
+
+        if (!string.IsNullOrEmpty(category))
+        {
+            pageCache = pageCache.Where(x => x.Categories.Contains(category));
+        }
+
+        if (startDate != null)
+        {
+            pageCache = pageCache.Where(x => x.PublishedDate >= startDate);
+        }
+
+        return await Task.FromResult(pageCache.ToList());
+    }
+
+
+
+    public async Task<PostListViewModel> GetPostsByCategory(string category, int page = 1, int pageSize = 10)
+    {
+        await _initializationTask.Value;
+        var postsQuery = GetPageCache()
+            .Where(x => x.Value.Categories.Contains(category))
+            .Select(x => GetListModel(x.Value))
+            .OrderByDescending(x => x.PublishedDate).ToList();
+
+        var totalItems = postsQuery.Count();
+
+        var posts = postsQuery
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        var model = new PostListViewModel
+        {
+            Posts = posts,
+            TotalItems = totalItems,
+            PageSize = pageSize,
+            Page = page
+        };
+
+        return await Task.FromResult(model);
+    }
+
+
+    public async Task<BlogPostViewModel?> GetPost(string postName, string language = "")
+    {
+        try
+        {
+            // Normalize language input for "en"
+            if (language == "en")
+            {
+                language = "";
+            }
+
+            await _initializationTask.Value;
+            // Attempt to retrieve from the cache first
+            var pageCache = GetPageCache();
+            if (string.IsNullOrEmpty(language) && pageCache.TryGetValue(postName, out var pageModel))
+            {
+                return await Task.FromResult(pageModel);
+            }
+
+            // Construct the file path for the specified language
+            var filePath = Path.Combine(_markdownConfig.MarkdownTranslatedPath, $"{postName}.{language}.md");
+
+            // Check if the file exists
+            if (!File.Exists(filePath))
+            {
+                _logger.LogWarning("Post {PostName} not found", postName);
+                return null;
+            }
+
+            // Retrieve and build the page model
+            var model =await GetPage(filePath);
+            model.Languages = GetLanguages(postName).ToArray();
+
+            return  model;
+        }
+        catch (Exception ex)
+        {
+            // Log the error and return null
+            _logger.LogError(ex, "Error getting post {PostName}", postName);
+            return null;
+        }
+    }
+
+
+
+    public async Task<PostListViewModel> GetPostsForFiles(int page = 1, int pageSize = 10)
+    {
+        var model = new PostListViewModel();
+        await _initializationTask.Value;
+        var posts = GetPageCache().Values.Select(GetListModel).ToList();
+        model.Posts = posts.OrderByDescending(x => x.PublishedDate).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+        model.TotalItems = posts.Count();
+        model.PageSize = pageSize;
+        model.Page = page;
+        return  await Task.FromResult( model);
+    }
 
 
     private Dictionary<string, List<string>> GetLanguageCache()
@@ -55,17 +176,19 @@ public class BlogService : BaseService
     }
 
 
-    private void PopulatePageCache()
+    private async Task PopulatePages()
     {
+        if(GetPageCache() is {Count: > 0}) return;
         Dictionary<string, BlogPostViewModel> pageCache = new();
         var pages = Directory.GetFiles(DirectoryPath, "*.md");
-        foreach (var page in pages)
+        foreach(var page in pages)
         {
-            var pageModel = GetPage(page);
-            pageCache.Add(pageModel.Slug, pageModel);
+            var pageModel =await GetPage(page);
+            pageCache.TryAdd(pageModel.Slug, pageModel);
         }
+     
 
-        SetPageCache(pageCache);
+        SetPageCache(pageCache.ToDictionary());
     }
 
     private Dictionary<string, BlogPostViewModel> GetPageCache()
@@ -82,7 +205,7 @@ public class BlogService : BaseService
         });
     }
 
-    public List<string> GetLanguages(string page)
+    private List<string> GetLanguages(string page)
     {
         page = Path.GetFileName(page);
         var cacheLangs = GetLanguageCache();
@@ -120,74 +243,6 @@ public class BlogService : BaseService
         if (count > 0) SetLanguageCache(cacheLangs);
     }
 
-
-    public List<string> GetCategories()
-    {
-        var pages = GetPageCache();
-        var categories = pages.Values.SelectMany(x => x.Categories).Distinct().ToList();
-        return categories;
-    }
-
-
-    public List<BlogPostViewModel> GetPosts(DateTime? startDate = null, string category = "")
-    {
-        List<BlogPostViewModel> pagesList = new();
-        if (!string.IsNullOrEmpty(category))
-            pagesList = GetPageCache().Where(x => x.Value.Categories
-                .Contains(category)).Select(x => x.Value).ToList();
-        else
-            pagesList = GetPageCache().Select(x => x.Value).ToList();
-        if (startDate != null) pagesList = pagesList.Where(x => x.PublishedDate >= startDate).ToList();
-
-
-        return pagesList;
-    }
-
-
-    public PostListViewModel GetPostsByCategory(string category, int page = 1, int pageSize = 10)
-    {
-        var model = new PostListViewModel();
-        var posts = GetPageCache()
-            .Where(x => x.Value.Categories.Contains(category))
-            .Select(x => x.Value).Select(GetListModel).ToList();
-        model.Posts = posts.OrderByDescending(x => x.PublishedDate).Skip((page - 1) * pageSize).Take(pageSize).ToList();
-        model.TotalItems = posts.Count();
-        model.PageSize = pageSize;
-        model.Page = page;
-        return model;
-    }
-
-    public BlogPostViewModel? GetPost(string postName, string language = "")
-    {
-        if (language == "en")
-            language = "";
-        try
-        {
-            if (string.IsNullOrEmpty(language))
-            {
-                var pageCache = GetPageCache();
-
-                if (pageCache.TryGetValue(postName, out var pageModel)) return pageModel;
-            }
-
-            var page = Path.Combine(_markdownConfig.MarkdownTranslatedPath, $"{postName}.{language}.md");
-            if (!File.Exists(page))
-            {
-                _logger.LogWarning("Post {PostName} not found", postName);
-                return null;
-            }
-
-            var model = GetPage(page);
-            model.Languages = GetLanguages(postName).ToArray();
-            return model;
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error getting post {PostName}", postName);
-            return null;
-        }
-    }
-
     private int WordCount(string text)
     {
         return WordCoountRegex.Matches(text).Count;
@@ -214,7 +269,7 @@ public class BlogService : BaseService
         return categories;
     }
 
-    public BlogPostViewModel GetPage(string page)
+    private async Task<BlogPostViewModel> GetPage(string page)
     {
         var fileInfo = new FileInfo(page);
 
@@ -222,7 +277,7 @@ public class BlogService : BaseService
         if (!fileInfo.Exists) throw new FileNotFoundException("The specified file does not exist.", page);
 
         // Read all lines from the file
-        var lines = File.ReadAllLines(page);
+        var lines = await File.ReadAllLinesAsync(page);
 
         // Get the title from the first line
         var title = lines.Length > 0 ? Markdig.Markdown.ToPlainText(lines[0].Trim()) : string.Empty;
@@ -275,17 +330,4 @@ public class BlogService : BaseService
             Languages = model.Languages
         };
     }
-
-
-    public PostListViewModel GetPostsForFiles(int page=1, int pageSize=10)
-    {
-        var model = new PostListViewModel();
-        var posts = GetPageCache().Values.Select(GetListModel).ToList();
-        model.Posts = posts.OrderByDescending(x => x.PublishedDate).Skip((page - 1) * pageSize).Take(pageSize).ToList();
-        model.TotalItems = posts.Count();
-        model.PageSize = pageSize;
-        model.Page = page;
-        return model;
-    }
-
 }

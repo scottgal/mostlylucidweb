@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Config;
 using Mostlylucid.Models;
+using Mostlylucid.Services;
 using Mostlylucid.Services.Markdown;
 using Mostlylucidblog.Models;
 
 namespace Mostlylucid.Controllers;
 
 
-    public class HomeController(AuthSettings authSettings, BlogService blogService, AnalyticsSettings analyticsSettings, ILogger<HomeController> logger) 
+    public class HomeController(AuthSettings authSettings, IBlogService blogService, AnalyticsSettings analyticsSettings, ILogger<HomeController> logger) 
         : BaseController(authSettings,analyticsSettings, blogService, logger)
     {
     [OutputCache(Duration = 60*60*60)]
@@ -19,7 +20,7 @@ namespace Mostlylucid.Controllers;
    
             var authenticateResult = GetUserInfo();
 
-            var posts = blogService.GetPostsForFiles(page, pageSize);
+            var posts =await blogService.GetPostsForFiles(page, pageSize);
             posts.LinkUrl= Url.Action("Index", "Home");
             if (Request.IsHtmx())
             {

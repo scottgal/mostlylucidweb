@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mostlylucid.Config;
+using Mostlylucid.Services;
 using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucid.Controllers;
@@ -13,11 +14,11 @@ namespace Mostlylucid.Controllers;
 public class BaseController : Controller
 {
     private readonly AuthSettings _authSettingsSettings;
-    private readonly BlogService _blogService;
+    private readonly IBlogService _blogService;
     private readonly ILogger<BaseController> _logger;
     private readonly AnalyticsSettings _analyticsSettings;
 
-    public BaseController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings, BlogService blogService, ILogger<BaseController> logger)
+    public BaseController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings, IBlogService blogService, ILogger<BaseController> logger)
     {
         _logger = logger;
         _authSettingsSettings = authSettingsSettings;
@@ -25,8 +26,9 @@ public class BaseController : Controller
         _analyticsSettings = analyticsSettings;
        
     }
+    
 
-    public override void OnActionExecuting(ActionExecutingContext filterContext)
+    public override async Task OnActionExecutionAsync(ActionExecutingContext filterContext, ActionExecutionDelegate next)
     {
         if (!Request.IsHtmx())
         {
@@ -35,8 +37,8 @@ public class BaseController : Controller
             ViewBag.UmamiWebsiteId = _analyticsSettings.WebsiteId;
         }
         _logger.LogInformation("Adding categories to viewbag");
-        ViewBag.Categories = _blogService.GetCategories();
-        base.OnActionExecuting(filterContext);
+        ViewBag.Categories =await  _blogService.GetCategories();
+       await base.OnActionExecutionAsync(filterContext, next);
     }
     
     public record LoginData(bool LoggedIn, string? Name, string? AvatarUrl, string? Email, string? Identifier, bool IsAdmin = false);
