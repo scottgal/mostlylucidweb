@@ -1,0 +1,23 @@
+services: 
+  smtp4dev:
+    image: rnwood/smtp4dev
+    ports:
+      - "3002:80"
+      - "2525:25"
+    volumes:
+      # This is where smtp4dev stores the database..
+      - e:/smtp4dev-data:/smtp4dev
+    restart: always
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    volumes:
+      - e:/data:/var/lib/postgresql/data  # Map e:\data to the PostgreSQL data folder
+    restart: always	
+networks:
+  mynetwork:
+        driver: bridge
