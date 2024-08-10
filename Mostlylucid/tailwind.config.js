@@ -15,9 +15,8 @@ module.exports = {
         },
 
         colors: {
-            'custom-light-bg': '#ffffff',  // Example custom light mode background color
+            'custom-light-bg': '#ffffff',
             'custom-dark-bg': '#1d232a',
-           // Example custom dark mode background color
             transparent: "transparent",
             primary: "#072344",
             secondary: "#00aaa1",
@@ -36,6 +35,9 @@ module.exports = {
             "grey-lightest": "#eff0f3",
             "grey-lighter": "#eceef1",
             "grey-light": "#ccd7e0",
+            "orange-light": "#f9e8e2",
+            orange: "#f9a825",
+            "orange-dark": "#f58f1e",
             grey: "#adb6c4",
         },
 
@@ -159,6 +161,6 @@ module.exports = {
         require("@tailwindcss/forms"),
         require("@tailwindcss/aspect-ratio"),
         require("@tailwindcss/typography"),
-        require('daisyui'),
+        require('daisyui')
     ],
 };
