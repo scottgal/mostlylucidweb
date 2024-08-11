@@ -4,11 +4,12 @@ namespace Mostlylucid.Services;
 
 public interface IBlogService
 {
+    
    Task<List<string>> GetCategories();
     Task<List<BlogPostViewModel>> GetPosts(DateTime? startDate = null, string category = "");
-    Task<PostListViewModel> GetPostsByCategory(string category, int page = 1, int pageSize = 10);
+    Task<PostListViewModel> GetPostsByCategory(string category, int page = 1, int pageSize = 10, string language = BaseService.EnglishLanguage);
     Task<BlogPostViewModel?> GetPost(string postName, string language = "");
-    Task<PostListViewModel> GetPosts(int page = 1, int pageSize = 10);
+    Task<PostListViewModel> GetPosts(int page = 1, int pageSize = 10, string language = BaseService.EnglishLanguage);
 
     Task Populate();
 }

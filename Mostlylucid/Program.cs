@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Email;
@@ -25,6 +26,9 @@ builder.Configure<AnalyticsSettings>();
 var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
+
+services.AddOutputCache();
+
 
 //services.SetupEntityFramework(config.GetConnectionString("DefaultConnection") ??
                             //  throw new Exception("No Connection String"));
@@ -58,6 +62,7 @@ services
         options.ClientSecret = auth.GoogleClientSecret;
     });
 // Add services to the container.
+services.AddOutputCache();
 services.AddControllersWithViews();
 services.AddResponseCaching();
 services.AddScoped<IBlogService, MarkdownBlogService>();
@@ -79,6 +84,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+app.UseOutputCache();
+
 
 //await app.InitializeDatabase();
 
@@ -90,7 +97,19 @@ app.UseCors("AllowMostlylucid");
 app.UseHttpsRedirection();
 app.UseImageSharp();
 app.UseStaticFiles();
+app.Use(async (context, next) =>
+{
+    context.Response.GetTypedHeaders().CacheControl =
+        new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
+        {
+            Public = true,
+            MaxAge = TimeSpan.FromMinutes(5)
+        };
+    context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
+        new string[] { "Accept-Encoding" };
 
+    await next();
+});
 
 app.UseRouting();
 

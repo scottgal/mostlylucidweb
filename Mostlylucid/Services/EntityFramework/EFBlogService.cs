@@ -37,104 +37,142 @@ public class EFBlogService : BaseService, IBlogService
         }).ToList();
     }
 
-    public async Task Populate()
+    public async Task<PostListViewModel> GetPostsByCategory(string category, int page = 1, int pageSize = 10,
+        string language = EnglishLanguage)
     {
-        var posts = await _markdownBlogService.GetPages();
-        var languages = _markdownBlogService.LanguageList();
-
-        var languageList = languages.SelectMany(x => x.Value).ToList();
-
-        var currentLanguages = await _context.Languages.Select(x => x.Name).ToListAsync();
-
-        var languageEntities = new List<Language>();
-        var enLang = new Language() { Name = "en" };
-
-        if (!currentLanguages.Contains("en")) _context.Languages.Add(enLang);
-        languageEntities.Add(enLang);
-
-        foreach (var language in languageList)
-        {
-            if (languageEntities.Any(x => x.Name == language)) continue;
-            var langItem = new Language() { Name = language };
-
-            if (!currentLanguages.Contains(language)) _context.Languages.Add(langItem);
-            _context.Languages.Add(langItem);
-            languageEntities.Add(langItem);
-        }
-
-        await _context.SaveChangesAsync(); // Save the languages first so we can reference them in the blog posts
-        var existingPosts = await _context.BlogPosts.Select(x => x.ContentHash).ToListAsync();
-        var existingCategories = await _context.Categories.Select(x => x.Name).ToListAsync();
-
-        var categories = new List<Category>();
-
-
-        foreach (var post in posts)
-        {
-            var postLanguage = languageEntities.FirstOrDefault(x => x.Name == "en");
-
-            var categoryList = post.Categories;
-
-            foreach (var category in categoryList)
-            {
-                if (categories.Any(x => x.Name == category)) continue;
-                var cat = new Category() { Name = category };
-                if (!existingCategories.Contains(category)) _context.Categories.Add(cat);
-                categories.Add(cat);
-            }
-
-            var hash = post.HtmlContent.ContentHash();
-            var postLanguageId = postLanguage.Id;
-            BlogPost blogPost;
-            if (!existingPosts.Contains(hash))
-            {
-                blogPost = new BlogPost
-                {
-                    Title = post.Title,
-                    Slug = post.Slug,
-                    HtmlContent = post.HtmlContent,
-                    PlainTextContent = post.PlainTextContent,
-                    ContentHash = hash,
-                    PublishedDate = post.PublishedDate,
-                    Language = postLanguage,
-                    LanguageId = postLanguageId,
-                    Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList()
-                };
-
-                await _context.BlogPosts.AddAsync(blogPost);
-            }
-
-            if (languages.TryGetValue(post.Slug, out var postlanguages))
-            {
-                foreach (var entryLanguage in postlanguages)
-                {
-                    postLanguage = languageEntities.FirstOrDefault(x => x.Name == entryLanguage);
-
-                    postLanguageId = postLanguage.Id;
-                    var languagePost = await _markdownBlogService.GetPost(post.Slug, entryLanguage);
-                    if (languagePost != null)
-                    {
-                        hash = languagePost.HtmlContent.ContentHash();
-                        if (existingPosts.Contains(hash)) continue;
-                        blogPost = new BlogPost
-                        {
-                            Title = languagePost.Title,
-                            Slug = languagePost.Slug,
-                            HtmlContent = languagePost.HtmlContent,
-                            PlainTextContent = languagePost.PlainTextContent,
-                            ContentHash = hash,
-                            PublishedDate = languagePost.PublishedDate,
-                            Language = postLanguage,
-                            LanguageId = postLanguageId
-                        };
-                        await _context.BlogPosts.AddAsync(blogPost);
-                    }
-                }
-            }
-        }
-
-        await _context.SaveChangesAsync();
+        var count = await _context.BlogPosts.Include(x=>x.Language)
+            .Include(x=>x.Categories).Where(x => x.Categories.Any(c => c.Name == category) && x.Language.Name==language).CountAsync();
+        var posts =await _context.BlogPosts
+            .Include(x => x.Categories)
+            .Include(x => x.Language)
+            .Where(x => x.Categories.Any(c => c.Name == category) && x.Language.Name == language)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        var postListViewModel = new PostListViewModel();
+        postListViewModel.Page = page;
+        postListViewModel.PageSize = pageSize;
+        postListViewModel.TotalItems = count;
+        postListViewModel.Posts = posts.Select(x => x.ToListModel(new[] {language})).ToList();
+        return postListViewModel;
     }
+
+    public async Task Populate()
+{
+    var posts = await _markdownBlogService.GetPages();
+    var languages = _markdownBlogService.LanguageList();
+
+    var languageEntities = await EnsureLanguages(languages);
+    await EnsureCategoriesAndPosts(posts, languageEntities);
+
+    await _context.SaveChangesAsync();
+}
+
+private async Task<List<Language>> EnsureLanguages(Dictionary<string, List<string>> languages)
+{
+    var languageList = languages.SelectMany(x => x.Value).ToList();
+    var currentLanguages = await _context.Languages.Select(x => x.Name).ToListAsync();
+
+    var languageEntities = new List<Language>();
+    var enLang = new Language { Name = "en" };
+
+    if (!currentLanguages.Contains("en"))
+    {
+        _context.Languages.Add(enLang);
+    }
+    languageEntities.Add(enLang);
+
+    foreach (var language in languageList)
+    {
+        if (languageEntities.Any(x => x.Name == language)) continue;
+
+        var langItem = new Language { Name = language };
+
+        if (!currentLanguages.Contains(language))
+        {
+            _context.Languages.Add(langItem);
+        }
+
+        languageEntities.Add(langItem);
+    }
+
+    await _context.SaveChangesAsync(); // Save the languages first so we can reference them in the blog posts
+    return languageEntities;
+}
+
+private async Task EnsureCategoriesAndPosts(
+    IEnumerable<BlogPostViewModel> posts,
+    List<Language> languageEntities)
+{
+    var existingPosts = await _context.BlogPosts.Select(x => x.ContentHash).ToListAsync();
+    var existingCategories = await _context.Categories.Select(x => x.Name).ToListAsync();
+
+    var languages = languageEntities.ToDictionary(x => x.Name, x => x);
+    var categories = new List<Category>();
+
+    foreach (var post in posts)
+    {
+        await AddCategoriesToContext(post.Categories, existingCategories, categories);
+        await AddBlogPostToContext(post,languages[post.Language], categories, existingPosts);
+
+        
+    }
+}
+
+private async Task AddCategoriesToContext(
+    IEnumerable<string> categoryList,
+    List<string> existingCategories,
+    List<Category> categories)
+{
+    foreach (var category in categoryList)
+    {
+        if (categories.Any(x => x.Name == category)) continue;
+
+        var cat = new Category { Name = category };
+
+        if (!existingCategories.Contains(category))
+        {
+            await _context.Categories.AddAsync(cat);
+        }
+
+        categories.Add(cat);
+    }
+}
+
+private async Task AddBlogPostToContext(
+    BlogPostViewModel post,
+    Language postLanguage,
+    List<Category> categories,
+    List<string> existingPosts)
+{
+    var hash = post.HtmlContent.ContentHash();
+    if (existingPosts.Contains(hash)) return;
+
+    var blogPost = new BlogPost
+    {
+        Title = post.Title,
+        Slug = post.Slug,
+        HtmlContent = post.HtmlContent,
+        PlainTextContent = post.PlainTextContent,
+        ContentHash = hash,
+        PublishedDate = post.PublishedDate,
+        Language = postLanguage,
+        LanguageId = postLanguage.Id,
+        Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList()
+    };
+
+    if (_context.BlogPosts.Any(x => x.Slug == post.Slug && x.Language.Name == post.Language))
+    { 
+        _context.BlogPosts.Update(blogPost);
+    }
+    else
+    {
+        await _context.BlogPosts.AddAsync(blogPost);
+    }
+    
+}
+
+
 
 
     public async Task<PostListViewModel> GetPostsByCategory(string category, int page = 1, int pageSize = 10)
@@ -184,12 +222,12 @@ public class EFBlogService : BaseService, IBlogService
         return BlogPostMapper.ToPostModel(post);
     }
 
-    public async Task<PostListViewModel> GetPosts(int page = 1, int pageSize = 10)
+    public async Task<PostListViewModel> GetPosts(int page = 1, int pageSize = 10, string language = EnglishLanguage)
     {
-        var count = await _context.BlogPosts.CountAsync();
-        var posts = await _context.BlogPosts.Include(x => x.Categories)
-            .Include(x => x.Language)
-            .Where(x => x.Language.Name == "en")
+        var query = _context.BlogPosts.Include(x => x.Categories)
+            .Include(x => x.Language).Where(x => x.Language.Name == language);
+        var count = await query.CountAsync();
+        var posts = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();

@@ -18,6 +18,8 @@ public class BaseController : Controller
     private readonly ILogger<BaseController> _logger;
     private readonly AnalyticsSettings _analyticsSettings;
 
+
+    
     public BaseController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings, IBlogService blogService, ILogger<BaseController> logger)
     {
         _logger = logger;
@@ -37,7 +39,7 @@ public class BaseController : Controller
             ViewBag.UmamiWebsiteId = _analyticsSettings.WebsiteId;
         }
         _logger.LogInformation("Adding categories to viewbag");
-        ViewBag.Categories =await  _blogService.GetCategories();
+        ViewBag.Categories =(await  _blogService.GetCategories()).OrderBy(x=>x).ToList();
        await base.OnActionExecutionAsync(filterContext, next);
     }
     

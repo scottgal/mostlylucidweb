@@ -16,11 +16,14 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     ILogger<BlogController> logger) : BaseController(authSettings,analyticsSettings, blogService, logger)
 {
 
+    [OutputCache(Duration = 3600, VaryByQueryKeys = new[] {"page", "pageSize"})]
+    [ResponseCache(Duration = 300, VaryByHeader = "Accept-Encoding", VaryByQueryKeys = new[] {"page", "pageSize"}, Location = ResponseCacheLocation.Any)]
     
     public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
     {
         var posts =await  blogService.GetPosts(page, pageSize);
    
+        
         if(Request.IsHtmx())
         {
             return PartialView("_BlogSummaryList", posts);
@@ -31,9 +34,13 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
 
     [Route("{slug}")]
     [OutputCache(Duration = 3600)]
-    public async Task<IActionResult> Show(string slug)
+    public async Task<IActionResult> Show(string slug, string language = BaseService.EnglishLanguage)
     {
-       var post =await  blogService.GetPost(slug);
+       var post =await  blogService.GetPost(slug, language);
+       if(post == null)
+       {
+           return NotFound();
+       }
        var user = GetUserInfo();
        post.Authenticated = user.LoggedIn;
        post.Name = user.Name;
@@ -46,6 +53,8 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     }
 
     [Route("category/{category}")]
+    [ResponseCache(Duration = 300, VaryByHeader = "Accept-Encoding", VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)}, Location = ResponseCacheLocation.Any)]
+    [OutputCache(Duration = 3600, VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)})]
     public async Task<IActionResult> Category(string category, int page = 1, int pageSize = 5)
     {
         
@@ -72,6 +81,8 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
 
     
     [Route("/{language}/{slug}")]
+    [ResponseCache(Duration = 300, VaryByHeader = "Accept-Encoding", VaryByQueryKeys = new[] {nameof(slug), nameof(language)}, Location = ResponseCacheLocation.Any)]
+    [OutputCache(Duration = 3600, VaryByQueryKeys = new[] {nameof(slug), nameof(language)})]
     public  async Task<IActionResult> Language(string slug, string language)
     {
         var post =await blogService.GetPost(slug, language);

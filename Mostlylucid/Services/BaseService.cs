@@ -7,12 +7,14 @@ namespace Mostlylucid.Services;
 
 public class BaseService
 {
-    protected  readonly MarkdownPipeline _pipeline;
-    protected  BaseService()
-    {   
-        _pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().UseTableOfContent().Use<ImgExtension>()
-            .Build();
-    }
+    public const string EnglishLanguage = "en";
+    protected   MarkdownPipeline Pipeline() =>  new MarkdownPipelineBuilder()
+        .UseAdvancedExtensions()
+        .UseTableOfContent()
+        .Use<ImgExtension>()
+        .Build();
+
+
     protected PostListModel GetListModel(BlogPostViewModel model)
     {
         return new PostListModel

@@ -32,6 +32,7 @@ public class CommentService(MarkdownConfig markdownConfig) : BaseService
     
     public List<Comment> GetComments(string slug)
     {
+        var pipeline = Pipeline();
         var comments = new List<Comment>();
         var path = Directory.GetFiles(markdownConfig.MarkdownCommentsPath, $"*{slug}.md");
         foreach (var file in path)
@@ -44,7 +45,7 @@ public class CommentService(MarkdownConfig markdownConfig) : BaseService
             var comment = File.ReadAllText(file);
             var name = CommentNameRegex.Match(comment).Groups[1].Value;
             var avatar = CommentAvaterRegex.Match(comment).Groups[1].Value;
-            var html = Markdig.Markdown.ToHtml(comment, _pipeline);
+            var html = Markdig.Markdown.ToHtml(comment, pipeline);
             var commentModel = new Comment(date, name, avatar, html);
             comments.Add(commentModel);
         }

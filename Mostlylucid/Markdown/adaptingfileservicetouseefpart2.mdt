@@ -1,0 +1,13 @@
+﻿# Adding Entity Framework for Blog Posts (Part 2, Adapting the File Service)
+<!--category-- ASP.NET, Entity Framework -->
+<datetime class="hidden">2024-08-11T15:53</datetime>
+
+In the [previous post](/blog/addingentityframeworkforblogpostspt1) I showed how to set up the database and create the models for the blog posts and comments. In this post I'll show how to adapt the file service to use EF Core to store and retrieve blog posts.
+
+## The File Service
+In preparation for this I changed how the File Service caches files. The previious approach using IMemoryCache was a great approach when I was using files, but now that I'm using a database I need to change how I cache the data. I've changed the File Service to use a simple dictionary to cache the data for pages and for languages. 
+This is a simple approach and works well for my needs.
+
+```csharp
+
+```

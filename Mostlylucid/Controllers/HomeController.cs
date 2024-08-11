@@ -14,7 +14,8 @@ namespace Mostlylucid.Controllers;
     public class HomeController(AuthSettings authSettings, IBlogService blogService, AnalyticsSettings analyticsSettings, ILogger<HomeController> logger) 
         : BaseController(authSettings,analyticsSettings, blogService, logger)
     {
-    [OutputCache(Duration = 60*60*60)]
+        [OutputCache(Duration = 3600, VaryByQueryKeys = new[] {"page", "pageSize"})]
+        [ResponseCache(Duration = 300, VaryByHeader = "Accept-Encoding", VaryByQueryKeys = new[] {"page", "pageSize"}, Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> Index(int page = 1,int pageSize = 5)
     {
    
@@ -35,13 +36,7 @@ namespace Mostlylucid.Controllers;
             return View(indexPageViewModel);
     
     }
-
-    public IActionResult Privacy()
     
-    {
-        return View();
-    }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
