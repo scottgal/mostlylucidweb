@@ -17,8 +17,8 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
 {
 
     
-    [ResponseCache(Duration = 300, VaryByHeader  = "HX_Request", VaryByQueryKeys = new[] {"page", "pageSize"}, Location = ResponseCacheLocation.Any)]
-    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"HX-Request"} ,VaryByQueryKeys = new[] { nameof(page), nameof(pageSize)})]
+    [ResponseCache(Duration = 300, VaryByHeader  = "hx-request", VaryByQueryKeys = new[] {"page", "pageSize"}, Location = ResponseCacheLocation.Any)]
+    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"hx-request"} ,VaryByQueryKeys = new[] { nameof(page), nameof(pageSize)})]
     [HttpGet]
     public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
     {
@@ -55,8 +55,8 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
 
     [Route("category/{category}")]
     [HttpGet]
-    [ResponseCache(Duration = 300, VaryByHeader  = "HX_Request",VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)}, Location = ResponseCacheLocation.Any)]
-    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"HX-Request"} ,VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)})]
+    [ResponseCache(Duration = 300, VaryByHeader  = "hx-request",VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)}, Location = ResponseCacheLocation.Any)]
+    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"hx-request"} ,VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)})]
     public async Task<IActionResult> Category(string category, int page = 1, int pageSize = 5)
     {
         
@@ -85,8 +85,8 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     
     [Route("/{language}/{slug}")]
     [HttpGet]
-    [ResponseCache(Duration = 300, VaryByHeader  = "HX_Request",VaryByQueryKeys = new[] {nameof(slug), nameof(language)}, Location = ResponseCacheLocation.Any)]
-    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"HX-Request"}, VaryByQueryKeys = new[] {nameof(slug), nameof(language)})]
+    [ResponseCache(Duration = 300, VaryByHeader  = "hx-request",VaryByQueryKeys = new[] {nameof(slug), nameof(language)}, Location = ResponseCacheLocation.Any)]
+    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"hx-request"}, VaryByQueryKeys = new[] {nameof(slug), nameof(language)})]
     public  async Task<IActionResult> Language(string slug, string language)
     {
         var post =await blogService.GetPost(slug, language);
