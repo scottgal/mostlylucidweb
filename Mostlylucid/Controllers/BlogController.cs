@@ -53,8 +53,8 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     }
 
     [Route("category/{category}")]
-    [ResponseCache(Duration = 300, VaryByHeader = "Accept-Encoding", VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)}, Location = ResponseCacheLocation.Any)]
-    [OutputCache(Duration = 3600, VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)})]
+    [ResponseCache(Duration = 300,VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)}, Location = ResponseCacheLocation.Any)]
+    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"hx-request"} ,VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)})]
     public async Task<IActionResult> Category(string category, int page = 1, int pageSize = 5)
     {
         
@@ -82,7 +82,7 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     
     [Route("/{language}/{slug}")]
     [ResponseCache(Duration = 300, VaryByHeader = "Accept-Encoding", VaryByQueryKeys = new[] {nameof(slug), nameof(language)}, Location = ResponseCacheLocation.Any)]
-    [OutputCache(Duration = 3600, VaryByQueryKeys = new[] {nameof(slug), nameof(language)})]
+    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"hx-request"}, VaryByQueryKeys = new[] {nameof(slug), nameof(language)})]
     public  async Task<IActionResult> Language(string slug, string language)
     {
         var post =await blogService.GetPost(slug, language);
