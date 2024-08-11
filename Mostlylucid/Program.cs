@@ -106,7 +106,7 @@ app.Use(async (context, next) =>
             MaxAge = TimeSpan.FromMinutes(5)
         };
     context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
-        new string[] { "Accept-Encoding", "HX-Request" };
+        new [] { "Accept-Encoding", "HX-Request" };
 
     await next();
 });
