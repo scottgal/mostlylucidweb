@@ -97,19 +97,19 @@ app.UseCors("AllowMostlylucid");
 app.UseHttpsRedirection();
 app.UseImageSharp();
 app.UseStaticFiles();
-app.Use(async (context, next) =>
-{
-    context.Response.GetTypedHeaders().CacheControl =
-        new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
-        {
-            Public = true,
-            MaxAge = TimeSpan.FromMinutes(5)
-        };
-    context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
-        new [] { "Accept-Encoding", "HX-Request" };
-
-    await next();
-});
+// app.Use(async (context, next) =>
+// {
+//     context.Response.GetTypedHeaders().CacheControl =
+//         new Microsoft.Net.Http.Headers.CacheControlHeaderValue()
+//         {
+//             Public = true,
+//             MaxAge = TimeSpan.FromMinutes(5)
+//         };
+//     context.Response.Headers[Microsoft.Net.Http.Headers.HeaderNames.Vary] =
+//         new [] { "Accept-Encoding", "HX-Request" };
+//
+//     await next();
+// });
 
 app.UseRouting();
 
