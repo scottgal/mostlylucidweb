@@ -2,9 +2,13 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: 
+      - "main"
+      - "local"
   pull_request:
-    branches: [ "main" ]
+    branches: 
+      - "main"
+      - "local"
 
 jobs:
   build-and-push:
@@ -33,9 +37,25 @@ jobs:
       run: |
         TIMESTAMP=$(date +%s)
         echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
-        docker build . --file Mostlylucid/Dockerfile --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP
+
+        # Define the default tags for the main branch
+        TAGS="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP"
+
+        # If the branch is 'local', modify the tags
+        if [ "${{ github.ref }}" == "refs/heads/local" ]; then
+          TAGS="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:local --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP-local"
+        fi
+
+        # Build the Docker image with the appropriate tags
+        docker build . --file Mostlylucid/Dockerfile --tag $TAGS
 
     - name: Push the Docker image to Docker Hub
       run: |
-        docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest
-        docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:${{ env.TIMESTAMP }}
+        # Push the appropriate tags based on the branch
+        if [ "${{ github.ref }}" == "refs/heads/local" ]; then
+          docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:local
+          docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:${{ env.TIMESTAMP }}-local
+        else
+          docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest
+          docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:${{ env.TIMESTAMP }}
+        fi
