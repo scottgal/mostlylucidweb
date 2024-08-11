@@ -59,7 +59,6 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"hx-request"} ,VaryByQueryKeys = new[] {nameof(category), nameof(page), nameof(pageSize)})]
     public async Task<IActionResult> Category(string category, int page = 1, int pageSize = 5)
     {
-        
         ViewBag.Category = category;
         var posts =await blogService.GetPostsByCategory(category, page, pageSize);
         var user = GetUserInfo();
