@@ -1,4 +1,7 @@
 ﻿# Using Docker Compose for Development Dependencies
+<!--category-- Docker -->
+<datetime class="hidden">2024-08-09T17:17</datetime>
+
 
 # Introduction
 When developing software traditionally we'd spin up a database, a message queue, a cache, and maybe a few other services. This can be a pain to manage, especially if you're working on multiple projects. Docker Compose is a tool that allows you to define and run multi-container Docker applications. It's a great way to manage your development dependencies.
