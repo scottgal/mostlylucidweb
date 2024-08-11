@@ -14,8 +14,8 @@ namespace Mostlylucid.Controllers;
     public class HomeController(AuthSettings authSettings, IBlogService blogService, AnalyticsSettings analyticsSettings, ILogger<HomeController> logger) 
         : BaseController(authSettings,analyticsSettings, blogService, logger)
     {
-        // [OutputCache(Duration = 3600,VaryByHeaderNames = new[] {"HX-Request"},VaryByQueryKeys = new[] {"page", "pageSize"})]
-        // [ResponseCache(Duration = 300, VaryByQueryKeys = new[] {"page", "pageSize"}, Location = ResponseCacheLocation.Any)]
+        [OutputCache(Duration = 3600,VaryByHeaderNames = new[] {"HX-Request"},VaryByQueryKeys = new[] {"page", "pageSize"})]
+        [ResponseCache(Duration = 300, VaryByHeader = "HX_Request", VaryByQueryKeys = new[] {"page", "pageSize"}, Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> Index(int page = 1,int pageSize = 5)
     {
    
