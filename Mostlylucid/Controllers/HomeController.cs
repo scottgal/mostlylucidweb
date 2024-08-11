@@ -18,9 +18,7 @@ namespace Mostlylucid.Controllers;
         [ResponseCache(Duration = 300, VaryByHeader = "hx-request", VaryByQueryKeys = new[] {"page", "pageSize"}, Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> Index(int page = 1,int pageSize = 5)
     {
-   
             var authenticateResult = GetUserInfo();
-
             var posts =await blogService.GetPosts(page, pageSize);
             posts.LinkUrl= Url.Action("Index", "Home");
             if (Request.IsHtmx())
@@ -34,7 +32,6 @@ namespace Mostlylucid.Controllers;
             };
             
             return View(indexPageViewModel);
-    
     }
     
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
