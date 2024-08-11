@@ -26,8 +26,8 @@ var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
 
-services.SetupEntityFramework(config.GetConnectionString("DefaultConnection") ??
-                              throw new Exception("No Connection String"));
+//services.SetupEntityFramework(config.GetConnectionString("DefaultConnection") ??
+                            //  throw new Exception("No Connection String"));
 
 //Set up CORS for Google Auth Use.
 services.AddCors(options =>
