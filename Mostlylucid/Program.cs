@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Email;
+using Mostlylucid.EntityFramework;
 using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.RSS;
 using Mostlylucid.Services;
+using Mostlylucid.Services.EntityFramework;
 using Mostlylucid.Services.Markdown;
 using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
@@ -24,7 +26,8 @@ var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
 
-//services.SetupEntityFramework(config.GetConnectionString("DefaultConnection") ?? throw new Exception("No Connection String"));
+services.SetupEntityFramework(config.GetConnectionString("DefaultConnection") ??
+                              throw new Exception("No Connection String"));
 
 //Set up CORS for Google Auth Use.
 services.AddCors(options =>
@@ -57,9 +60,8 @@ services
 // Add services to the container.
 services.AddControllersWithViews();
 services.AddResponseCaching();
-services.AddScoped<IBlogService, BlogService >();
-
-services.AddSingleton<IMarkdownBlogService, BlogService>();
+services.AddScoped<IBlogService, MarkdownBlogService>();
+    //services.AddSingleton<IMarkdownBlogService, MarkdownBlogService>();
 services.AddScoped<CommentService>();
 
 if (translateServiceConfig.Enabled) services.SetupTranslateService();
@@ -77,13 +79,17 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
 //await app.InitializeDatabase();
-        
+
+await using var scope = app.Services.CreateAsyncScope();
+var context = scope.ServiceProvider.GetRequiredService<IBlogService>();
+await context.Populate();
+
 app.UseCors("AllowMostlylucid");
 app.UseHttpsRedirection();
 app.UseImageSharp();
 app.UseStaticFiles();
-
 
 
 app.UseRouting();

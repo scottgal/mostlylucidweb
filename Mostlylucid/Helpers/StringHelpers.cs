@@ -1,5 +1,6 @@
 ﻿using System.IO.Hashing;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Mostlylucid.Helpers;
 
@@ -23,4 +24,15 @@ public static class StringHelpers
         return guidS.ToLowerInvariant();
     }
 
+     
+    public static string ContentHash(this string content)
+    {
+        var buf = Encoding.UTF8.GetBytes(content);
+        var hash = XxHash128.Hash(buf);
+        return BitConverter.ToString(hash).Replace("-", "");
+    }
+    
+    private static readonly Regex WordCountRegex = new(@"\b\w+\b",
+        RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
+    public  static int WordCount(this string text) => WordCountRegex.Matches(text).Count;
 }

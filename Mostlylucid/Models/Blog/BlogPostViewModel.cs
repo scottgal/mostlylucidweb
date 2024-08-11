@@ -1,4 +1,6 @@
-﻿namespace Mostlylucid.Models.Blog;
+﻿using Mostlylucid.EntityFramework.Models;
+
+namespace Mostlylucid.Models.Blog;
 
 public class BlogPostViewModel : BaseViewModel
 {
@@ -26,4 +28,7 @@ public class BlogPostViewModel : BaseViewModel
     public int WordCount { get; set; }
     
     public DateTime PublishedDate { get; set; }
+    
+    
+
 }

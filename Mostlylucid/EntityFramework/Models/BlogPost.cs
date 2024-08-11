@@ -15,8 +15,14 @@ public class BlogPost
     public string PlainTextContent { get; set; }
     public string ContentHash { get; set; }
 
+    
+    public int WordCount { get; set; }
+    
+    public int LanguageId { get; set; }
+    public Language Language { get; set; }
     public ICollection<Comments> Comments { get; set; }
     public ICollection<Category> Categories { get; set; }
     
     public DateTimeOffset PublishedDate { get; set; }
+    
 }

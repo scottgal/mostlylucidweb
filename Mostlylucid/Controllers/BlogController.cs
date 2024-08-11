@@ -19,7 +19,7 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     
     public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
     {
-        var posts =await  blogService.GetPostsForFiles(page, pageSize);
+        var posts =await  blogService.GetPosts(page, pageSize);
    
         if(Request.IsHtmx())
         {

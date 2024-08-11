@@ -9,36 +9,30 @@ using Path = System.IO.Path;
 
 namespace Mostlylucid.Services.Markdown;
 
-public class BlogService : BaseService, IBlogService, IMarkdownBlogService
+public class MarkdownBlogService : BaseService, IBlogService, IMarkdownBlogService
 {
-    private const string LanguageCacheKey = "Languages";
-    private const string PageCacheKey = "Pages";
-
     private static readonly Regex DateRegex = new(
         @"<datetime class=""hidden"">(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})</datetime>",
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
-
-    private static readonly Regex WordCoountRegex = new(@"\b\w+\b",
-        RegexOptions.Compiled | RegexOptions.Multiline | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
+    
 
     private static readonly Regex CategoryRegex = new(@"<!--\s*category\s*--\s*([^,]+?)\s*(?:,\s*([^,]+?)\s*)?-->",
         RegexOptions.Compiled | RegexOptions.Singleline);
 
-    private readonly ILogger<BlogService> _logger;
+    private readonly ILogger<MarkdownBlogService> _logger;
     private readonly MarkdownConfig _markdownConfig;
-    private readonly IMemoryCache _memoryCache;
-    private readonly Lazy<Task> _initializationTask;
     
-    public BlogService(MarkdownConfig markdownConfig, IMemoryCache memoryCache, ILogger<BlogService> logger)
+    private static readonly Dictionary<string, BlogPostViewModel> PageCache = new();
+    
+    private static readonly Dictionary<string, List<string>> LanguageCache = new();
+    
+    public MarkdownBlogService(MarkdownConfig markdownConfig, IMemoryCache memoryCache, ILogger<MarkdownBlogService> logger)
     {
         _markdownConfig = markdownConfig;
         _logger = logger;
-        _memoryCache = memoryCache;
-      
-        _initializationTask = new Lazy<Task>(async () => await InitializeAsync());
     }
 
-    private async Task InitializeAsync()
+    public async Task Populate()
     {
         PopulateLanguages();
        await PopulatePages();
@@ -50,7 +44,6 @@ public class BlogService : BaseService, IBlogService, IMarkdownBlogService
 
     public async Task<List<string>> GetCategories()
     {
-        await _initializationTask.Value;
         var pages = GetPageCache();
         var categories = pages.Values.SelectMany(x => x.Categories).Distinct().ToList();
         return await Task.FromResult(categories);
@@ -59,7 +52,6 @@ public class BlogService : BaseService, IBlogService, IMarkdownBlogService
 
     public async Task<List<BlogPostViewModel>> GetPosts(DateTime? startDate = null, string category = "")
     {
-        await _initializationTask.Value;
         var pageCache = GetPageCache().Select(x => x.Value);
 
         if (!string.IsNullOrEmpty(category))
@@ -79,7 +71,6 @@ public class BlogService : BaseService, IBlogService, IMarkdownBlogService
 
     public async Task<PostListViewModel> GetPostsByCategory(string category, int page = 1, int pageSize = 10)
     {
-        await _initializationTask.Value;
         var postsQuery = GetPageCache()
             .Where(x => x.Value.Categories.Contains(category))
             .Select(x => GetListModel(x.Value))
@@ -113,8 +104,6 @@ public class BlogService : BaseService, IBlogService, IMarkdownBlogService
             {
                 language = "";
             }
-
-            await _initializationTask.Value;
             // Attempt to retrieve from the cache first
             var pageCache = GetPageCache();
             if (string.IsNullOrEmpty(language) && pageCache.TryGetValue(postName, out var pageModel))
@@ -148,10 +137,9 @@ public class BlogService : BaseService, IBlogService, IMarkdownBlogService
 
 
 
-    public async Task<PostListViewModel> GetPostsForFiles(int page = 1, int pageSize = 10)
+    public async Task<PostListViewModel> GetPosts(int page = 1, int pageSize = 10)
     {
         var model = new PostListViewModel();
-        await _initializationTask.Value;
         var posts = GetPageCache().Values.Select(GetListModel).ToList();
         model.Posts = posts.OrderByDescending(x => x.PublishedDate).Skip((page - 1) * pageSize).Take(pageSize).ToList();
         model.TotalItems = posts.Count();
@@ -161,93 +149,99 @@ public class BlogService : BaseService, IBlogService, IMarkdownBlogService
     }
 
 
-    private Dictionary<string, List<string>> GetLanguageCache()
-    {
-        return _memoryCache.Get<Dictionary<string, List<string>>>(LanguageCacheKey) ??
-               new Dictionary<string, List<string>>();
-    }
+    private Dictionary<string, List<string>> GetLanguages() => LanguageCache;
+   
 
     private void SetLanguageCache(Dictionary<string, List<string>> languages)
     {
-        _memoryCache.Set(LanguageCacheKey, languages, new MemoryCacheEntryOptions
+        LanguageCache.Clear();
+        foreach (var (key, value) in languages)
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(12)
-        });
+            LanguageCache.TryAdd(key, value);
+        }
     }
+
 
 
     private async Task PopulatePages()
     {
         if(GetPageCache() is {Count: > 0}) return;
         Dictionary<string, BlogPostViewModel> pageCache = new();
-        var pages = Directory.GetFiles(DirectoryPath, "*.md");
-        foreach(var page in pages)
+        var pages = await GetPages();
+        foreach (var page in pages)
         {
-            var pageModel =await GetPage(page);
-            pageCache.TryAdd(pageModel.Slug, pageModel);
+            pageCache.TryAdd(page.Slug, page);
         }
-     
 
         SetPageCache(pageCache.ToDictionary());
     }
 
-    private Dictionary<string, BlogPostViewModel> GetPageCache()
+    public async Task<List< BlogPostViewModel>> GetPages()
     {
-        return _memoryCache.Get<Dictionary<string, BlogPostViewModel>>(PageCacheKey) ??
-               new Dictionary<string, BlogPostViewModel>();
+     
+        var pages = Directory.GetFiles(DirectoryPath, "*.md");
+        var pageModels = new List<BlogPostViewModel>();
+        foreach(var page in pages)
+        {
+            var pageModel =await GetPage(page);
+            pageModels.Add(pageModel);
+        }
+        return pageModels;
     }
+
+    private Dictionary<string, BlogPostViewModel> GetPageCache() => PageCache;
+
 
     private void SetPageCache(Dictionary<string, BlogPostViewModel> pages)
     {
-        _memoryCache.Set(PageCacheKey, pages, new MemoryCacheEntryOptions
+       PageCache.Clear();
+        foreach (var (key, value) in pages)
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(12)
-        });
+            PageCache.TryAdd(key, value);
+        }
     }
 
     private List<string> GetLanguages(string page)
     {
         page = Path.GetFileName(page);
-        var cacheLangs = GetLanguageCache();
+        var cacheLangs = GetLanguages();
         var outLangs = cacheLangs.TryGetValue(page, out var languages) ? languages : new List<string>();
         if (outLangs.Any() && !outLangs.Contains("en"))
             outLangs.Insert(0, "en");
         return outLangs;
     }
 
-    private void PopulateLanguages()
+    public Dictionary<string, List<string>> LanguageList()
     {
-        var cacheLangs = GetLanguageCache();
-        if(cacheLangs is {Count: > 0}) return;
         var pages = Directory.GetFiles(_markdownConfig.MarkdownTranslatedPath, "*.md");
-        var count = 0;
-
+       Dictionary<string, List<string>> languageList = new();
         foreach (var page in pages)
         {
             var pageName = Path.GetFileNameWithoutExtension(page);
             var languageCode = pageName.LastIndexOf(".", StringComparison.Ordinal) + 1;
             var language = pageName.Substring(languageCode);
             var originPage = pageName.Substring(0, languageCode - 1);
-
-            var pageEntry = cacheLangs.TryGetValue(originPage, out var languagesList)
-                ? languagesList
-                : new List<string>();
-            var languageAlreadyAdded = pageEntry.Any(x => x.Contains(language));
-
-            if (languageAlreadyAdded) continue;
-            count++;
-            pageEntry.Add(language);
-
-            cacheLangs[originPage] = pageEntry;
+            if(languageList.TryGetValue(originPage, out var languages))
+            {
+                languages.Add(language);
+                languageList[originPage] = languages;
+            }
+            else
+            {
+                languageList[originPage] = new List<string> {language};
+            }
         }
-
-        if (count > 0) SetLanguageCache(cacheLangs);
+        return languageList;
     }
-
-    private int WordCount(string text)
+    
+    private void PopulateLanguages()
     {
-        return WordCoountRegex.Matches(text).Count;
+        if(GetLanguages() is {Count: > 0}) return;
+        var languageList = LanguageList();
+         SetLanguageCache(languageList);
     }
+
+
 
 
     private string GetSlug(string fileName)
@@ -310,7 +304,7 @@ public class BlogService : BaseService, IBlogService, IMarkdownBlogService
         {
             Languages = languages,
             Categories = categories,
-            WordCount = WordCount(restOfTheLines),
+            WordCount = restOfTheLines.WordCount(),
             HtmlContent = processed,
             PlainTextContent = plainText,
             PublishedDate = publishedDate,
@@ -319,16 +313,5 @@ public class BlogService : BaseService, IBlogService, IMarkdownBlogService
         };
     }
 
-    private PostListModel GetListModel(BlogPostViewModel model)
-    {
-        return new PostListModel
-        {
-            Title = model.Title,
-            PublishedDate = model.PublishedDate,
-            Slug = model.Slug,
-            Categories = model.Categories,
-            Summary = model.PlainTextContent.TruncateAtWord(200) + "...",
-            Languages = model.Languages
-        };
-    }
+
 }

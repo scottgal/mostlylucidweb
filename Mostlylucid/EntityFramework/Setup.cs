@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Mostlylucid.Services;
 using Serilog;
 
 namespace Mostlylucid.EntityFramework;
@@ -7,7 +8,7 @@ public static class Setup
 {
     public static void SetupEntityFramework(this IServiceCollection services, string connectionString)
     {
-        services.AddDbContext<MostlylucidDBContext>(options =>
+        services.AddDbContext<MostlylucidDbContext>(options =>
             options.UseNpgsql(connectionString));
     }
 
@@ -17,8 +18,12 @@ public static class Setup
         {
             await using var scope = 
                 app.Services.CreateAsyncScope();
-            await using var context = scope.ServiceProvider.GetRequiredService<MostlylucidDBContext>();
+            
+            await using var context = scope.ServiceProvider.GetRequiredService<MostlylucidDbContext>();
             await context.Database.MigrateAsync();
+            
+            var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            await blogService.Populate();
         }
         catch (Exception e)
         {

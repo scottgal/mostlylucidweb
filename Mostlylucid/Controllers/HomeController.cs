@@ -20,7 +20,7 @@ namespace Mostlylucid.Controllers;
    
             var authenticateResult = GetUserInfo();
 
-            var posts =await blogService.GetPostsForFiles(page, pageSize);
+            var posts =await blogService.GetPosts(page, pageSize);
             posts.LinkUrl= Url.Action("Index", "Home");
             if (Request.IsHtmx())
             {
