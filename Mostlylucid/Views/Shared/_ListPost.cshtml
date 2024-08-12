@@ -11,7 +11,7 @@
     </a>
     }
 
-    @{ var languageModel = (Model.Slug, Model.Languages); }
+    @{ var languageModel = (Model.Slug, Model.Languages, Model.Language); }
         <partial name="_LanguageList" model="languageModel"/>
     </div>
     <div class="block font-body text-black dark:text-white">@Model.Summary</div>
