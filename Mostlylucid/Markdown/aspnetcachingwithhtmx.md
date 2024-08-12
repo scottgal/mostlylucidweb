@@ -6,6 +6,7 @@
 ## Introduction
 Caching is an important technique to both improve user experience by loading content faster and to reduce the load on your server. In this article I'll show you how to use the built-in caching features of ASP.NET Core with HTMX to cache content on the client side.
 
+[TOC]
 ## Setup
 In ASP.NET Core, there are two types of Caching offered 
 - Reponse Cache - This is data which is cached on the client or in intermediary procy servers (or both) and is used to cache the entire response for a request. 
