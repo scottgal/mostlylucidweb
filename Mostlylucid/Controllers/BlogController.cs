@@ -66,6 +66,7 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
         posts.Name = user.Name;
         posts.AvatarUrl = user.AvatarUrl;
         posts.LinkUrl = Url.Action("Category", "Blog");
+        ViewBag.Title = category + " - Blog";
         if(Request.IsHtmx())
         {
             return PartialView("_BlogSummaryList", posts);
@@ -89,6 +90,7 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     public  async Task<IActionResult> Language(string slug, string language)
     {
         var post =await blogService.GetPost(slug, language);
+        ViewBag.Title = post.Title + " - " + language;
         if(Request.IsHtmx())
         {
             return PartialView("_PostPartial", post);
