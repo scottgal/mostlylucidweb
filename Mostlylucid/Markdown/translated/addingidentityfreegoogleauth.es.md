@@ -1,21 +1,21 @@
-# Het toevoegen van Google Auth zonder ASP.NET Identity Database
+# Agregar Google Auth sin ASP.NET Identity Database
 
 <!--category-- ASP.NET, Google Auth -->
 <datetime class="hidden">2024-08-05T08:06</datetime>
 
-## Inleiding
+## Introducción
 
-In deze app wilde ik een simple mechanisme van het toestaan van login om opmerkingen (en sommige admin taken) toe te voegen aan de app. Ik wilde Google Auth gebruiken voor dit doel. Ik wilde de ASP.NET Identity database niet gebruiken voor dit doel. Ik wilde de app zo eenvoudig mogelijk houden voor zo lang mogelijk.
+En esta aplicación quería añadir un simple mecanismo de permitir que el inicio de sesión agregara comentarios (y algunas tareas de administración) a la aplicación. Quería usar Google Auth para este propósito. No quería usar la base de datos de identidad ASP.NET para este propósito. Quería mantener la aplicación lo más simple posible durante el mayor tiempo posible.
 
-Databanken zijn een krachtig onderdeel van elke toepassing, maar ze voegen ook complexiteit toe. Ik wilde die complexiteit vermijden totdat ik het echt nodig had.
+Las bases de datos son un componente poderoso de cualquier aplicación, pero también añaden complejidad. Quería evitar esa complejidad hasta que realmente lo necesitaba.
 
 [TOC]
 
-## Stappen
+## Pasos
 
-Eerst moet u Google Auth instellen in de Google Developer Console. U kunt de stappen volgen in deze[link](https://developers.google.com/identity/gsi/web/guides/overview)om uw gegevens voor u in te stellen Google Client ID en Secret.
+Primero tienes que configurar Google Auth en la Consola de Desarrolladores de Google. Puedes seguir los pasos en esta[enlace](https://developers.google.com/identity/gsi/web/guides/overview)para obtener sus datos configurados para usted Google Client ID y Secret.
 
-Zodra u uw Google Client ID en Secret, kunt u ze toevoegen aan uw appsettings.json bestand.
+Una vez que tengas tu Google Client ID y Secret, puedes añadirlos a tu archivo appsettings.json.
 
 ```json
     "Auth" :{
@@ -24,11 +24,11 @@ Zodra u uw Google Client ID en Secret, kunt u ze toevoegen aan uw appsettings.js
 }
 ```
 
-Hoe dan ook moet u deze niet in te checken om de bron te controleren. In plaats daarvan voor lokale ontwikkeling kunt u het Geheimenbestand gebruiken:
+Sin embargo, no debe registrarse para el control de origen. En lugar de ello, para el desarrollo local puede utilizar el archivo Secrets:
 
 ![secrets.png](secrets.png)
 
-Daarin kunt u uw Google Client ID en Secret toevoegen (let op dat uw client Id niet echt vertrouwelijk is, zoals u later zult zien is het opgenomen in de JS call aan de voorkant.
+Allí puedes agregar tu Google Client ID y Secret (nota que tu cliente Id no es en realidad confidencial, como verás más adelante se incluye en la llamada de JS en la parte delantera.
 
 ```json
     "Auth" :{
@@ -37,12 +37,12 @@ Daarin kunt u uw Google Client ID en Secret toevoegen (let op dat uw client Id n
 }
 ```
 
-## Google Auth configureren met POCO
+## Configuración de Google Auth con POCO
 
-Opmerking Ik gebruik een aangepaste versie van Steve Smith's IConfigSectie (recent beroemd gemaakt door Phil Haack).
-Dit is om te voorkomen dat de IOptions spullen die ik vind een beetje clunky (en zelden nodig als ik bijna nooit te veranderen config na implementatie in mijn scenario's).
+Nota Yo uso una versión modificada de la IConfigSection de Steve Smith (recientemente hecha famosa por Phil Haack).
+Esto es para evitar las cosas de IOptions que encuentro un poco torpe (y rara vez necesito ya que casi nunca cambio la configuración después de la implementación en mis escenarios).
 
-In de mijne doe ik dit waardoor ik de sectienaam van de klas zelf kan krijgen:
+En el mío hago esto que me permite obtener el nombre de la sección de la propia clase:
 
 <details>
 <summary>Click to expand</summary>
@@ -108,7 +108,7 @@ public interface IConfigSection {
 ```
 
 </details>
-Dus mijn Auth ziet eruit als
+Así que mi Auth parece
 
 ```csharp
 public class Auth : IConfigSection
@@ -122,19 +122,19 @@ public class Auth : IConfigSection
 }
 ```
 
-Waar ik een statische interface methode gebruik om de sectienaam te krijgen.
+Donde uso un método de interfaz estática para obtener el nombre de la sección.
 
-Dan in mijn startup kan ik dit doen:
+Entonces en mi startup puedo hacer esto:
 
 ```csharp
 var auth = builder.GetConfig<Auth>();
 ```
 
-Hoe dan ook terug naar het google gedoe!
+¡De todos modos de vuelta a las cosas de Google!
 
-## Programma.cs instellen
+## Program.cs Setup
 
-Om dit daadwerkelijk toe te voegen
+Para agregar esto realmente
 
 ```csharp
 services.AddCors(options =>
@@ -166,15 +166,15 @@ builder.Services
     });
 ```
 
-U zult merken dat er CORS ingangen hier, je moet deze ook instellen in de google identiteit console.
+Notarás que hay entradas de CORS aquí, también necesitas configurarlas en la consola de identidad de Google.
 
 ![googleidentity.png](googleidentity.png)
 
-Dit zorgt ervoor dat de Google Auth alleen kan worden gebruikt vanuit de domeinen die u opgeeft.
+Esto garantiza que la Auth de Google sólo se puede utilizar desde los dominios que especifique.
 
 ## Google Auth In Razor
 
-In mijn_Layout.cshtml Ik heb dit Javascript, dit is waar ik mijn Google Buttons heb ingesteld en een callback heb geactiveerd die de ASP.NET app logt.
+En mi_Layout.cshtml Tengo este Javascript, aquí es donde configuré mis botones de Google y desencadené un callback que registra la aplicación ASP.NET.
 
 # Google JS
 
@@ -182,7 +182,7 @@ In mijn_Layout.cshtml Ik heb dit Javascript, dit is waar ik mijn Google Buttons 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 ```
 
-Dit is de laag voor de code hieronder
+Este es el dlow para el código de abajo
 
 ```javascript
 
@@ -241,9 +241,9 @@ Dit is de laag voor de code hieronder
 
 ```
 
-Hier kunt u zien dat ik maximaal twee div-elementen in de pagina heb met de id google_knop en google_button2. Dit zijn de elementen waarin de Google JS de knoppen zal renderen.
+Aquí puedes ver que tengo hasta dos elementos div en la página con el botón id google_button y el botón google_button2. Estos son los elementos en los que la JS de Google mostrará los botones.
 
-TIP: Als u Tailwind gebruikt, kunt u de knop div shinken om correct te werken in de donkere modus (anders geeft het een witte achtergrond rond de knop)
+SUGERENCIA: Si está usando Tailwind, puede hacer brillar el botón div para que funcione correctamente en modo oscuro (de lo contrario, representa un fondo blanco alrededor del botón)
 
 ```html
 <div class="w-[200px] h-[39px] overflow-hidden rounded">
@@ -252,7 +252,7 @@ TIP: Als u Tailwind gebruikt, kunt u de knop div shinken om correct te werken in
 </div>
 ```
 
-In de JavaScript hierboven plaats ik dit terug naar een Controller actie genaamd Login. Hier pak ik de Google Auth aan.
+En el JavaScript de arriba lo devuelvo a una acción de Controlador llamada Login. Aquí es donde manejo la Auth de Google.
 
 ```javascript
       const xhr = new XMLHttpRequest();
@@ -268,9 +268,9 @@ In de JavaScript hierboven plaats ik dit terug naar een Controller actie genaamd
                 xhr.send(JSON.stringify({ idToken: response.credential }));
 ```
 
-## Google Auth in de controller
+## Google Auth en el controlador
 
-De Controller is hier' het is vrij eenvoudig het neemt gewoon de geposte JWT, decodeert het dan gebruikt dat om in te loggen op de app.
+El controlador está aquí' es bastante simple que sólo toma el JWT publicado, decodifica que luego utiliza para iniciar sesión en la aplicación.
 
 ```csharp
     [Route("login")]
@@ -304,11 +304,11 @@ De Controller is hier' het is vrij eenvoudig het neemt gewoon de geposte JWT, de
     }
 ```
 
-OPMERKING: Dit is niet prefect als het assess up van de claim namen (ze zijn allemaal klein geval) maar het werkt voor nu.
+NOTA: Esto no es prefecto ya que esse hasta los nombres de la reclamación (todos son minúsculas) pero funciona por ahora.
 
-### Basisklasse controller om de aanmeldeigenschappen uit te pakken
+### Controlador Clase Base para extraer las propiedades de inicio de sesión
 
-In mijn BaseController haal ik de eigenschappen die ik nodig heb;
+En mi BaseController extraigo las propiedades que necesito;
 
 ```csharp
       public record LoginData(bool loggedIn, string? name, string? avatarUrl, string? identifier);
@@ -332,4 +332,4 @@ In mijn BaseController haal ik de eigenschappen die ik nodig heb;
     }
 ```
 
-En dat is het! Hiermee kunt u Google Authentication gebruiken zonder gebruik te maken van de ASP.NET Identity database.
+¡Y eso es todo! Esto te permite usar la Autenticación de Gooogle sin usar la base de datos de identidad ASP.NET.

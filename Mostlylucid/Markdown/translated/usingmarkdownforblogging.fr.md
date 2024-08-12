@@ -404,6 +404,7 @@ La méthode GetCategories utilise une expression régulière pour extraire les c
 
 <details>
 <summary> The GetPage Method</summary>
+
 ```csharp
 public (string title, string slug, DateTime publishDate, string processed, string[] categories, string
         restOfTheLines) GetPage(string page, bool html)
@@ -447,6 +448,7 @@ public (string title, string slug, DateTime publishDate, string processed, strin
 ```
 
 </details>
+
 Le code ci-dessous montre comment je génère la liste des messages de blog, il utilise le`GetPage(page, false)`méthode pour extraire le titre, les catégories, la date de publication et le contenu traité.
 
 ```csharp

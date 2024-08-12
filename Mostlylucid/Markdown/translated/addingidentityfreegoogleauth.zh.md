@@ -1,21 +1,21 @@
-# Het toevoegen van Google Auth zonder ASP.NET Identity Database
+# 没有 ASP. NET 身份数据库添加 Google Auth 的 Google Auth
 
 <!--category-- ASP.NET, Google Auth -->
-<datetime class="hidden">2024-08-05T08:06</datetime>
+<datetime class="hidden">2024-08-005T08:06</datetime>
 
-## Inleiding
+## 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
-In deze app wilde ik een simple mechanisme van het toestaan van login om opmerkingen (en sommige admin taken) toe te voegen aan de app. Ik wilde Google Auth gebruiken voor dit doel. Ik wilde de ASP.NET Identity database niet gebruiken voor dit doel. Ik wilde de app zo eenvoudig mogelijk houden voor zo lang mogelijk.
+在此应用程序中,我想添加一个模拟机制, 允许登录在应用程序中添加评论( 和一些行政任务) 。 我想为此使用 Google Auth 。 我不想为此使用 ASP. NET 身份数据库 。 我想尽可能长地保持应用程序的简单 。
 
-Databanken zijn een krachtig onderdeel van elke toepassing, maar ze voegen ook complexiteit toe. Ik wilde die complexiteit vermijden totdat ik het echt nodig had.
+数据库是任何应用程序的强大组成部分,但它们也增加了复杂性。 我想避免这种复杂性,直到我真正需要它。
 
-[TOC]
+[技选委
 
-## Stappen
+## 步骤 步骤 步骤
 
-Eerst moet u Google Auth instellen in de Google Developer Console. U kunt de stappen volgen in deze[link](https://developers.google.com/identity/gsi/web/guides/overview)om uw gegevens voor u in te stellen Google Client ID en Secret.
+首先,您需要在 Google 开发者控制台设置 Google Auth 。 您可以跟随此步骤[链接链接](https://developers.google.com/identity/gsi/web/guides/overview)来为您设置您的详细信息 谷歌客户身份和秘密。
 
-Zodra u uw Google Client ID en Secret, kunt u ze toevoegen aan uw appsettings.json bestand.
+一旦您有您的 Google 客户端身份和秘密, 您可以将其添加到您的 apggings.json 文件 。
 
 ```json
     "Auth" :{
@@ -24,11 +24,11 @@ Zodra u uw Google Client ID en Secret, kunt u ze toevoegen aan uw appsettings.js
 }
 ```
 
-Hoe dan ook moet u deze niet in te checken om de bron te controleren. In plaats daarvan voor lokale ontwikkeling kunt u het Geheimenbestand gebruiken:
+您如何不要检查这些内容到源控制 。 相反, 本地开发您可以使用“ 秘密” 文件 :
 
 ![secrets.png](secrets.png)
 
-Daarin kunt u uw Google Client ID en Secret toevoegen (let op dat uw client Id niet echt vertrouwelijk is, zoals u later zult zien is het opgenomen in de JS call aan de voorkant.
+里面可以加上你的Google客户身份和秘密(请注意,你的客户Id实际上并不保密,因为你以后会看到它被列入联署材料前端的电话中。
 
 ```json
     "Auth" :{
@@ -37,19 +37,17 @@ Daarin kunt u uw Google Client ID en Secret toevoegen (let op dat uw client Id n
 }
 ```
 
-## Google Auth configureren met POCO
+## 使用 POCO 配置 Google Auth 的 Google Auth
 
-Opmerking Ik gebruik een aangepaste versie van Steve Smith's IConfigSectie (recent beroemd gemaakt door Phil Haack).
-Dit is om te voorkomen dat de IOptions spullen die ik vind een beetje clunky (en zelden nodig als ik bijna nooit te veranderen config na implementatie in mijn scenario's).
+Steve Smith的IConfig部分(最近由Phil Haack出名)的修改版本。
+这是为了避免我发现有点笨拙(而且很少需要, 因为在我的假想中部署后, 我几乎从未改变配置),
 
-In de mijne doe ik dit waardoor ik de sectienaam van de klas zelf kan krijgen:
+在我的课里,我这样做, 让我能从班上获得分节名称:
 
 <details>
 <summary>Click to expand</summary>
 
 ```csharp
-
-
 namespace Mostlylucid.Config;
 
 public static class ConfigExtensions {
@@ -108,7 +106,7 @@ public interface IConfigSection {
 ```
 
 </details>
-Dus mijn Auth ziet eruit als
+所以,我的Authe看起来像
 
 ```csharp
 public class Auth : IConfigSection
@@ -122,19 +120,19 @@ public class Auth : IConfigSection
 }
 ```
 
-Waar ik een statische interface methode gebruik om de sectienaam te krijgen.
+在那里我使用静态界面方法获得区域名称。
 
-Dan in mijn startup kan ik dit doen:
+然后在我的开办阶段,我可以做到这一点:
 
 ```csharp
 var auth = builder.GetConfig<Auth>();
 ```
 
-Hoe dan ook terug naar het google gedoe!
+任何回到谷歌的东西!
 
-## Programma.cs instellen
+## 方案.cs 设置
 
-Om dit daadwerkelijk toe te voegen
+以实际添加此内容
 
 ```csharp
 services.AddCors(options =>
@@ -166,23 +164,23 @@ builder.Services
     });
 ```
 
-U zult merken dat er CORS ingangen hier, je moet deze ook instellen in de google identiteit console.
+你会注意到这里有CORS的条目, 你也需要设置这些 在谷歌身份控制台。
 
 ![googleidentity.png](googleidentity.png)
 
-Dit zorgt ervoor dat de Google Auth alleen kan worden gebruikt vanuit de domeinen die u opgeeft.
+这将确保 Google Auth 只能从您指定的域中使用 。
 
-## Google Auth In Razor
+## Google Auth in Razor 谷歌在 Razor 中
 
-In mijn_Layout.cshtml Ik heb dit Javascript, dit is waar ik mijn Google Buttons heb ingesteld en een callback heb geactiveerd die de ASP.NET app logt.
+在我的_布局. cshtml 我有这个 Javascript, 这就是我设置 Google 按钮的地方, 并触发回调, 记录 ASP. NET 应用程序 。
 
-# Google JS
+# JS Google JS Google
 
 ```html
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 ```
 
-Dit is de laag voor de code hieronder
+这是下面代码的下方
 
 ```javascript
 
@@ -241,9 +239,9 @@ Dit is de laag voor de code hieronder
 
 ```
 
-Hier kunt u zien dat ik maximaal twee div-elementen in de pagina heb met de id google_knop en google_button2. Dit zijn de elementen waarin de Google JS de knoppen zal renderen.
+在这里,您可以看到我在页面中有多达两个 div 元素, 包括 id Google_ button 和 Google_ button 2 。 这些元素是谷歌联署材料将把按钮转换成的 。
 
-TIP: Als u Tailwind gebruikt, kunt u de knop div shinken om correct te werken in de donkere modus (anders geeft het een witte achtergrond rond de knop)
+TIP: 如果您正在使用尾风, 您可以按下按钮 div 来在暗模式下正确工作( 否则它会使按钮周围的白背景变为白背景) 。
 
 ```html
 <div class="w-[200px] h-[39px] overflow-hidden rounded">
@@ -252,7 +250,7 @@ TIP: Als u Tailwind gebruikt, kunt u de knop div shinken om correct te werken in
 </div>
 ```
 
-In de JavaScript hierboven plaats ik dit terug naar een Controller actie genaamd Login. Hier pak ik de Google Auth aan.
+在上方的 JavaScript 中,我把这个发回给一个叫做登录的主计长行动。这里是我处理Google Auth 的地方。
 
 ```javascript
       const xhr = new XMLHttpRequest();
@@ -268,9 +266,9 @@ In de JavaScript hierboven plaats ik dit terug naar een Controller actie genaamd
                 xhr.send(JSON.stringify({ idToken: response.credential }));
 ```
 
-## Google Auth in de controller
+## 主计长的Google Auths
 
-De Controller is hier' het is vrij eenvoudig het neemt gewoon de geposte JWT, decodeert het dan gebruikt dat om in te loggen op de app.
+主计长在这里,这很简单,它只需要 张贴的JWT, 解码它然后使用它 登录到应用程序。
 
 ```csharp
     [Route("login")]
@@ -304,11 +302,11 @@ De Controller is hier' het is vrij eenvoudig het neemt gewoon de geposte JWT, de
     }
 ```
 
-OPMERKING: Dit is niet prefect als het assess up van de claim namen (ze zijn allemaal klein geval) maar het werkt voor nu.
+注意:这不是省政府 因为它透露了索赔名称(他们都是低级案件) 但它目前有效。
 
-### Basisklasse controller om de aanmeldeigenschappen uit te pakken
+### 用于提取登录属性的 控制器基础类
 
-In mijn BaseController haal ik de eigenschappen die ik nodig heb;
+在我的基地主计长 我提取我所需要的财产
 
 ```csharp
       public record LoginData(bool loggedIn, string? name, string? avatarUrl, string? identifier);
@@ -332,4 +330,4 @@ In mijn BaseController haal ik de eigenschappen die ik nodig heb;
     }
 ```
 
-En dat is het! Hiermee kunt u Google Authentication gebruiken zonder gebruik te maken van de ASP.NET Identity database.
+这就允许您使用 Google 身份验证而不使用 ASP. NET 身份数据库 。

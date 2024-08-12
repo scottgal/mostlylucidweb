@@ -85,6 +85,7 @@ public class ImgExtension : IMarkdownExtension
 
 <details>
 <summary>Click to see the source code for the BlogService</summary>
+
 ```csharp
 
 using System.Globalization;
