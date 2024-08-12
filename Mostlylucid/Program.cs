@@ -106,6 +106,10 @@ app.UseAuthorization();
 
 app.UseResponseCaching();
 app.MapControllerRoute(
+    name: "sitemap",
+    pattern: "sitemap.xml",
+    defaults: new { controller = "Sitemap", action = "Index" });
+app.MapControllerRoute(
     "default",
     "{controller=Home}/{action=Index}/{id?}");
 

@@ -42,6 +42,17 @@ public class MarkdownBlogService(MarkdownConfig markdownConfig, ILogger<Markdown
         return await Task.FromResult(categories);
     }
 
+    public async Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "", string language = EnglishLanguage)
+    {
+        var pageCache = GetPageCache().Select(x => x.Value).Where(x => x.Language == language);
+
+        if (!string.IsNullOrEmpty(category)) pageCache = pageCache.Where(x => x.Categories.Contains(category));
+
+        if (startDate != null) pageCache = pageCache.Where(x => x.PublishedDate >= startDate);
+
+        return await Task.FromResult(pageCache.Select(x=> GetListModel(x)).ToList());
+    }
+    
 
     public async Task<List<BlogPostViewModel>> GetPosts(DateTime? startDate = null, string category = "")
     {
@@ -101,7 +112,7 @@ public class MarkdownBlogService(MarkdownConfig markdownConfig, ILogger<Markdown
     }
 
 
-    public async Task<PostListViewModel> GetPosts(int page = 1, int pageSize = 10, string language = EnglishLanguage)
+    public async Task<PostListViewModel> GetPagedPosts(int page = 1, int pageSize = 10, string language = EnglishLanguage)
     {
         var model = new PostListViewModel();
         var posts = GetPageCache().Where(x => x.Value.Language == language)

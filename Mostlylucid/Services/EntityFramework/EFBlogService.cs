@@ -57,6 +57,12 @@ public class EFBlogService : BaseService, IBlogService
         return postListViewModel;
     }
 
+    public Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "",
+        string language = BaseService.EnglishLanguage)
+    {
+        throw new NotImplementedException();
+    }
+
     public async Task Populate()
 {
     var posts = await _markdownBlogService.GetPages();
@@ -222,7 +228,7 @@ private async Task AddBlogPostToContext(
         return BlogPostMapper.ToPostModel(post);
     }
 
-    public async Task<PostListViewModel> GetPosts(int page = 1, int pageSize = 10, string language = EnglishLanguage)
+    public async Task<PostListViewModel> GetPagedPosts(int page = 1, int pageSize = 10, string language = EnglishLanguage)
     {
         var query = _context.BlogPosts.Include(x => x.Categories)
             .Include(x => x.Language).Where(x => x.Language.Name == language);

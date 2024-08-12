@@ -30,6 +30,7 @@ public static class BlogPostMapper
             Title = post.Title,
             Summary = post.PlainTextContent.TruncateAtWord(200) + "...",
             Slug = post.Slug,
+            Language = post.Language.Name,
             Languages = languages ?? [],
             WordCount = post.WordCount,
             PublishedDate = post.PublishedDate.DateTime

@@ -22,7 +22,7 @@ public class RSSFeedService(IBlogService blogService, IHttpContextAccessor httpC
     
     public async Task<string> GenerateFeed(DateTime? startDate=null, string? category = null)
     {
-        var items =await  blogService.GetPosts(startDate, category);
+        var items =await  blogService.GetPostsForLanguage(startDate, category, BaseService.EnglishLanguage);
         items = items.OrderByDescending(x => x.PublishedDate).ToList();
         List<RssFeedItem> rssFeedItems = new();
         foreach (var item in items)
