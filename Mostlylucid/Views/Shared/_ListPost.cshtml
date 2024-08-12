@@ -4,20 +4,16 @@
  
     <a asp-controller="Blog" asp-action="Show" hx-boost="true"  hx-swap="show:window:top"  hx-target="#contentcontainer" asp-route-slug="@Model.Slug"
        class="block font-body text-lg font-semibold transition-colors hover:text-green text-blue-dark dark:text-white  dark:hover:text-secondary">@Model.Title</a>
+    <div class="flex space-x-2 items-center py-4">
     @foreach (var category in Model.Categories)
     {
-    <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
-        <span
-            class="mb-2 mt-4 inline-block rounded-full bg-blue-dark px-2 py-1 font-body text-sm text-white">@category</span>
+    <a hx-controller="Blog" hx-action="Category" class="rounded-full bg-blue-dark font-body text-sm text-white px-2 py-1 outline outline-1 outline-white" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>@category
     </a>
     }
-    @foreach (var language in Model.Languages)
-    {
-    <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="@language">
-                <span
-                    class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">@language</span>
-    </a>
-    }
+
+    @{ var languageModel = (Model.Slug, Model.Languages); }
+        <partial name="_LanguageList" model="languageModel"/>
+    </div>
     <div class="block font-body text-black dark:text-white">@Model.Summary</div>
     <div class="flex items-center pt-4">
         <p class="pr-2 font-body font-light text-primary light:text-black dark:text-white">

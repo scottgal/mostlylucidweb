@@ -1,0 +1,10 @@
+﻿@model (string slug, string[] languuages)
+
+
+@foreach (var language in Model.languuages)
+{
+  
+        <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.slug" asp-route-language="@language" class="rounded-full outline outline-1 outline-white inline-block">
+            <img src="~/img/flags/@(language).svg" alt="@language" class="w-6 h-6 rounded-full" />
+        </a>
+}

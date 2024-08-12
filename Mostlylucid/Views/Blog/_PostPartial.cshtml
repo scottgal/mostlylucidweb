@@ -24,18 +24,16 @@
      
             @if (Model.Languages.Length > 1)
             {
+                var languageModel = (Model.Slug, Model.Languages);
                 <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2">
-                    <p class="font-body text-lg font-bold text-primary dark:text-white">NOTE: Apart from
-                        <span
-                            class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">en</span> (and even then it's questionable, I'm Scottish).  These are machine translated in languages I don't read. If they're terrible please <a asp-controller="Contact" asp-action="Index">contact me. </a> </p>
-           
-                    @foreach (var language in Model.Languages)
-                    {
-                        <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="@language">
-                            <span
-                                class="mb-4 inline-block rounded-full bg-neutral-700 px-2 py-1 font-body text-sm text-white">@language</span>
-                        </a>
-                    }
+                    <p class="font-body text-lg font-bold text-primary dark:text-white">NOTE: Apart from  
+                        <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="en" class="rounded-full outline outline-1 outline-white inline-block">
+                            <img src="~/img/flags/en.svg" alt="en" class="w-6 h-6 rounded-full" />
+                        </a>   (and even then it's questionable, I'm Scottish).  These are machine translated in languages I don't read. If they're terrible please <a asp-controller="Contact" asp-action="Index">contact me. </a> </p>
+                    <div class="flex space-x-2 items-center pb-4 pt-2">
+                   
+                        <partial name="_LanguageList" model="languageModel"/>
+                    </div>
                 </div>
             }
         <div class="flex items-center pt-1 sm:pt-1">
