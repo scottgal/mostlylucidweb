@@ -105,6 +105,18 @@ app.UseAuthorization();
 
 
 app.UseResponseCaching();
+app.MapGet("/robots.txt", async httpContext =>
+{
+    // Define the content of the robots.txt file
+    var robotsContent = $"User-agent: *\nDisallow: \nDisallow: /cgi-bin/\nSitemap: https://{httpContext.Request.Host}/sitemap.xml";
+
+    // Set the content type to text/plain
+    httpContext.Response.ContentType = "text/plain";
+
+    // Write the content to the response
+    await httpContext.Response.WriteAsync(robotsContent);
+});
+
 app.MapControllerRoute(
     name: "sitemap",
     pattern: "sitemap.xml",
