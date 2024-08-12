@@ -115,7 +115,7 @@ app.MapGet("/robots.txt", async httpContext =>
 
     // Write the content to the response
     await httpContext.Response.WriteAsync(robotsContent);
-});
+}).CacheOutput(policy: policyBuilder => policyBuilder.Expire(TimeSpan.FromDays(60)));
 
 app.MapControllerRoute(
     name: "sitemap",
