@@ -24,9 +24,15 @@ public class EFBlogService : BaseService, IBlogService
         return await _context.Categories.Select(x => x.Name).ToListAsync();
     }
 
+    private IQueryable<BlogPost> GetPostsQuery()
+    {
+        return _context.BlogPosts.Include(x => x.Categories)
+            .Include(x => x.Language);
+    }
+    
     public async Task<List<BlogPostViewModel>> GetPosts(DateTime? startDate = null, string category = "")
     {
-        var posts = await _context.BlogPosts.ToListAsync();
+        var posts = await GetPostsQuery().ToListAsync();
         return posts.Select(p => new BlogPostViewModel
         {
             Title = p.Title,
@@ -37,30 +43,67 @@ public class EFBlogService : BaseService, IBlogService
         }).ToList();
     }
 
+    private async Task<Dictionary<string, List<string>>> GetLanguagesForSlugs(List<string> slugs)
+    {
+        var langSlugs = await _context.BlogPosts.Include(x => x.Language)
+            .Where(x => slugs.Contains(x.Slug))
+            .Select(x => new { x.Slug, x.Language.Name }).ToListAsync();
+
+        var outDict = new Dictionary<string, List<string>>();
+        
+        foreach (var lang in langSlugs)
+        {
+            if (!outDict.TryGetValue(lang.Slug, out var langArr))
+            {
+                langArr = new List<string>();
+                outDict.Add(lang.Slug, langArr);
+            }
+            else
+            {
+                langArr.Add(lang.Name);
+            }
+        }
+
+        return outDict;
+    }
+    
     public async Task<PostListViewModel> GetPostsByCategory(string category, int page = 1, int pageSize = 10,
         string language = EnglishLanguage)
     {
-        var count = await _context.BlogPosts.Include(x=>x.Language)
-            .Include(x=>x.Categories).Where(x => x.Categories.Any(c => c.Name == category) && x.Language.Name==language).CountAsync();
-        var posts =await _context.BlogPosts
-            .Include(x => x.Categories)
-            .Include(x => x.Language)
+        var count = await GetPostsQuery()
+            .Where(x => x.Categories.Any(c => c.Name == category) && x.Language.Name==language).CountAsync();
+        var posts =await GetPostsQuery()
             .Where(x => x.Categories.Any(c => c.Name == category) && x.Language.Name == language)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+      
+        var languages = await GetLanguagesForSlugs(posts.Select(x => x.Slug).ToList());
         var postListViewModel = new PostListViewModel();
         postListViewModel.Page = page;
         postListViewModel.PageSize = pageSize;
         postListViewModel.TotalItems = count;
-        postListViewModel.Posts = posts.Select(x => x.ToListModel(new[] {language})).ToList();
+        postListViewModel.Posts = posts.Select(x => x.ToListModel(
+            languages.FirstOrDefault(entry=>entry.Key==x.Slug).Value.ToArray())).ToList();
         return postListViewModel;
     }
 
     public Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "",
         string language = BaseService.EnglishLanguage)
     {
-        throw new NotImplementedException();
+        var query = GetPostsQuery();
+            if(category != "")
+            {
+                query = query.Where(x => x.Categories.Any(c => c.Name == category));
+            }
+            if(startDate != null)
+            {
+                query = query.Where(x => x.PublishedDate >= startDate);
+            }
+            
+            return query.Where(x => x.Language.Name == language)
+                .Select(x => x.ToListModel(new[] {language}))
+            .ToListAsync();
     }
 
     public async Task Populate()

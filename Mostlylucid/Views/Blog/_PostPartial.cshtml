@@ -24,7 +24,7 @@
      
             @if (Model.Languages.Length > 1)
             {
-                var languageModel = (Model.Slug, Model.Languages);
+                var languageModel = (Model.Slug, Model.Languages, Model.Language);
                 <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2">
                     <p class="font-body text-lg font-bold text-primary dark:text-white">NOTE: Apart from  
                         <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="en" class="rounded-full outline outline-1 outline-white inline-block">
