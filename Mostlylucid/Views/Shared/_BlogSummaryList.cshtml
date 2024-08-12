@@ -22,7 +22,7 @@
             @foreach (var category in ViewBag.Categories)
             {
                 <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
-                    <span class="inline-block rounded-full bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-white">@category</span>
+                    <span class="inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">@category</span>
                 </a>
             }
         </div>
