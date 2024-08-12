@@ -79,7 +79,7 @@ private Random random = Random.Shared;
     {
         var document = Markdig.Markdown.Parse(markdown);
         var textStrings = ExtractTextStrings(document);
-        var batchSize = 20;
+        var batchSize = 10;
         var stringLength = textStrings.Count;
         List<string> translatedStrings = new();
         for (int i = 0; i < stringLength; i += batchSize)

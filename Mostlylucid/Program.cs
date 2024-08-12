@@ -1,14 +1,11 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Email;
-using Mostlylucid.EntityFramework;
 using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.RSS;
 using Mostlylucid.Services;
-using Mostlylucid.Services.EntityFramework;
 using Mostlylucid.Services.Markdown;
 using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
@@ -27,13 +24,18 @@ var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
 
-services.AddOutputCache();
+// Add services to the container.
+services.AddOutputCache(); // Remove duplicate call later in your code
+services.AddControllersWithViews();
+services.AddResponseCaching();
+services.AddScoped<IBlogService, MarkdownBlogService>();
+services.AddScoped<CommentService>();
+if (translateServiceConfig.Enabled) services.SetupTranslateService();
+services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
+services.SetupEmail(builder.Configuration);
+services.SetupRSS();
 
-
-//services.SetupEntityFramework(config.GetConnectionString("DefaultConnection") ??
-                            //  throw new Exception("No Connection String"));
-
-//Set up CORS for Google Auth Use.
+// Setup CORS for Google Auth Use.
 services.AddCors(options =>
 {
     options.AddPolicy("AllowMostlylucid",
@@ -48,7 +50,7 @@ services.AddCors(options =>
         });
 });
 
-//Set up our Authentication Options
+// Setup Authentication Options
 services
     .AddAuthentication(options =>
     {
@@ -61,18 +63,7 @@ services
         options.ClientId = auth.GoogleClientId;
         options.ClientSecret = auth.GoogleClientSecret;
     });
-// Add services to the container.
-services.AddOutputCache();
-services.AddControllersWithViews();
-services.AddResponseCaching();
-services.AddScoped<IBlogService, MarkdownBlogService>();
-    //services.AddSingleton<IMarkdownBlogService, MarkdownBlogService>();
-services.AddScoped<CommentService>();
 
-if (translateServiceConfig.Enabled) services.SetupTranslateService();
-services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
-services.SetupEmail(builder.Configuration);
-services.SetupRSS();
 var app = builder.Build();
 app.UseSerilogRequestLogging();
 
@@ -80,42 +71,41 @@ app.UseSerilogRequestLogging();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
+app.UseHttpsRedirection();
+var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append(
+            "Cache-Control", $"public, max-age={cacheMaxAgeOneWeek}");
+    }
+});
+app.UseRouting();
+app.UseCors("AllowMostlylucid");
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseOutputCache();
-
-
-//await app.InitializeDatabase();
+app.UseResponseCaching();
+app.UseImageSharp();
 
 await using var scope = app.Services.CreateAsyncScope();
 var context = scope.ServiceProvider.GetRequiredService<IBlogService>();
 await context.Populate();
 
-app.UseCors("AllowMostlylucid");
-app.UseHttpsRedirection();
-app.UseImageSharp();
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-
-app.UseResponseCaching();
 app.MapGet("/robots.txt", async httpContext =>
 {
-    // Define the content of the robots.txt file
     var robotsContent = $"User-agent: *\nDisallow: \nDisallow: /cgi-bin/\nSitemap: https://{httpContext.Request.Host}/sitemap.xml";
-
-    // Set the content type to text/plain
     httpContext.Response.ContentType = "text/plain";
-
-    // Write the content to the response
     await httpContext.Response.WriteAsync(robotsContent);
-}).CacheOutput(policy: policyBuilder => policyBuilder.Expire(TimeSpan.FromDays(60)));
+}).CacheOutput(policy: policyBuilder =>
+{
+    policyBuilder.Expire(TimeSpan.FromDays(60));
+    policyBuilder.Cache();
+});
 
 app.MapControllerRoute(
     name: "sitemap",

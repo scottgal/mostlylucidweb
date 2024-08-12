@@ -1,11 +1,9 @@
 # Sobre mí
 
-<datetime class="hidden">2024-07-30T13:30</datetime>
-
 ## Scott Galloway  Lead.NET Desarrollador & CTO
 
 <!--category-- resume , introduction -->
-Desarrollador de Lead.NET versátil y consumado con más de 25 años de experiencia en desarrollo de software, liderazgo técnico y gestión de equipo. Tiene experiencia en C#, ASP.NET y marcos web modernos, con amplia experiencia en computación en la nube, DevOps y administración de bases de datos. Un historial comprobado de proyectos de desarrollo exitosos líderes en diversas industrias, desde gigantes tecnológicos hasta startups innovadoras.
+Desarrollador de Lead.NET versátil y consumado con más de 25 años de experiencia en desarrollo de software, liderazgo técnico y gestión de equipo. Con experiencia en C#, ASP.NET y marcos web modernos, con amplia experiencia en computación en la nube, DevOps y administración de bases de datos.
 
 [TOC]
 

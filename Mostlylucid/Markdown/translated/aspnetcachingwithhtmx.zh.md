@@ -81,6 +81,28 @@ app.UseOutputCache();
 
 和"反应缓存"一样 我们用的是`hx-request`标题根据请求是否来自 HTMX 来更改缓存 。
 
+## 静静文件
+
+ASP.NET Core Core 也为缓存静态文件提供内部支持。`Cache-Control`响应中的头头标题。 您可以在您的`Program.cs`文件。
+请注意,这里的顺序非常重要。 如果您的静态文件需要授权支持, 您应该移动`UseAuthorization`之前的中继器件`UseStaticFiles`中件。 TH 使用Https redirection 中件也应在“ 使用静态文件” 中件之前, 如果您依赖此特性 。
+
+```csharp
+app.UseHttpsRedirection();
+var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append(
+            "Cache-Control", $"public, max-age={cacheMaxAgeOneWeek}");
+    }
+});
+app.UseRouting();
+app.UseCors("AllowMostlylucid");
+app.UseAuthentication();
+app.UseAuthorization();
+```
+
 ## 结论 结论 结论 结论 结论
 
 缓存是改进您应用程序性能的有力工具。 通过使用 ASP. NET Core 的内置缓存功能, 您可以很容易在客户端或服务器端缓存内容。 通过使用 HTMX, 您可以在客户端缓存内容, 并提供部分视图来改善用户体验 。

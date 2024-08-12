@@ -203,7 +203,7 @@
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script defer src="@ViewBag.UmamiPath" data-website-id="@ViewBag.UmamiWebsiteId"></script>
-<script src="~/js/dist/main.js"></script>
+<script src="~/js/dist/main.js" asp-append-version="true"> </script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

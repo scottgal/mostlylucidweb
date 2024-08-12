@@ -81,6 +81,28 @@ Poiché stiamo memorizzando il lato del server dati per un tempo significativo (
 
 Come con la cache di risposta stiamo usando il`hx-request`header per variare la cache in base al fatto che la richiesta è da HTMX o no.
 
+## File statici
+
+ASP.NET Core ha anche il supporto integrato per la cache dei file statici.`Cache-Control`header nella risposta. È possibile impostare questo nel vostro`Program.cs`Archivio.
+Si noti che l'ordine è importante qui, se i file statici hanno bisogno di supporto di autorizzazione si dovrebbe spostare il`UseAuthorization`middleware prima del`UseStaticFiles`middleware. THE UseHttpsRedirection middleware dovrebbe essere anche prima del middleware UseStaticFiles se ci si affida a questa funzione.
+
+```csharp
+app.UseHttpsRedirection();
+var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append(
+            "Cache-Control", $"public, max-age={cacheMaxAgeOneWeek}");
+    }
+});
+app.UseRouting();
+app.UseCors("AllowMostlylucid");
+app.UseAuthentication();
+app.UseAuthorization();
+```
+
 ## Conclusione
 
 La cache è uno strumento potente per migliorare le prestazioni dell'applicazione. Utilizzando le funzionalità di cache integrato di ASP.NET Core è possibile facilmente cache contenuto sul lato client o server. Utilizzando HTMX è possibile cache contenuto sul lato client e fornire viste parziali per migliorare l'esperienza utente.

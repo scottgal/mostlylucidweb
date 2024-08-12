@@ -81,6 +81,28 @@ Como estamos almacenando el lado del servidor de datos durante un tiempo signifi
 
 Al igual que con el Caché Respuesta que estamos utilizando el`hx-request`cabecera para variar la caché en función de si la solicitud es de HTMX o no.
 
+## Archivos estáticos
+
+ASP.NET Core también tiene soporte integrado para el almacenamiento en caché de archivos estáticos.`Cache-Control`cabeza en la respuesta. Puede configurar esto en su`Program.cs`archivo.
+Tenga en cuenta que el orden i es importante aquí, si sus archivos estáticos necesitan apoyo de autorización debe mover el`UseAuthorization`middleware antes de la`UseStaticFiles`middleware. THe UseHttpsRedirection middleware también debe estar antes de que useStaticFiles middleware si confía en esta función.
+
+```csharp
+app.UseHttpsRedirection();
+var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append(
+            "Cache-Control", $"public, max-age={cacheMaxAgeOneWeek}");
+    }
+});
+app.UseRouting();
+app.UseCors("AllowMostlylucid");
+app.UseAuthentication();
+app.UseAuthorization();
+```
+
 ## Conclusión
 
 Caching es una poderosa herramienta para mejorar el rendimiento de su aplicación. Al utilizar las funciones de caché integradas de ASP.NET Core, puede fácilmente cachear contenido en el lado del cliente o del servidor. Al utilizar HTMX puede cachear contenido en el lado del cliente y servir vistas parciales para mejorar la experiencia del usuario.
