@@ -11,10 +11,12 @@ public class EFBlogService : BaseService, IBlogService
 {
     private readonly MostlylucidDbContext _context;
     private readonly IMarkdownBlogService _markdownBlogService;
+    private readonly ILogger<EFBlogService> _logger;
 
     public EFBlogService(MostlylucidDbContext context, IMarkdownBlogService markdownBlogService,
         ILogger<EFBlogService> logger)
     {
+        _logger = logger;
         _context = context;
         _markdownBlogService = markdownBlogService;
     }
@@ -89,7 +91,7 @@ public class EFBlogService : BaseService, IBlogService
     }
 
     public Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "",
-        string language = BaseService.EnglishLanguage)
+        string language =EnglishLanguage)
     {
         var query = GetPostsQuery();
             if(category != "")
@@ -123,9 +125,9 @@ private async Task<List<Language>> EnsureLanguages(Dictionary<string, List<strin
     var currentLanguages = await _context.Languages.Select(x => x.Name).ToListAsync();
 
     var languageEntities = new List<Language>();
-    var enLang = new Language { Name = "en" };
+    var enLang = new Language { Name = EnglishLanguage};
 
-    if (!currentLanguages.Contains("en"))
+    if (!currentLanguages.Contains(BaseService.EnglishLanguage))
     {
         _context.Languages.Add(enLang);
     }
@@ -210,12 +212,14 @@ private async Task AddBlogPostToContext(
         Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList()
     };
 
-    if (_context.BlogPosts.Any(x => x.Slug == post.Slug && x.Language.Name == post.Language))
+    if (_context.BlogPosts.Any(x => x.Slug == post.Slug && x.Language.Name == post.Language && x.ContentHash != hash))
     { 
+        _logger.LogInformation("Updating post {Post}", post.Slug);
         _context.BlogPosts.Update(blogPost);
     }
     else
     {
+        _logger.LogInformation("Adding post {Post}", post.Slug);
         await _context.BlogPosts.AddAsync(blogPost);
     }
     
@@ -228,7 +232,7 @@ private async Task AddBlogPostToContext(
     {
         var count = await _context.BlogPosts.Where(x => x.Categories.Any(c => c.Name == category)).CountAsync();
         var posts = await _context.BlogPosts.Where(x => x.Categories.Any(c => c.Name == category))
-            .Where(x => x.Language.Name == "en")
+            .Where(x => x.Language.Name == EnglishLanguage)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -265,7 +269,7 @@ private async Task AddBlogPostToContext(
 
     public async Task<BlogPostViewModel?> GetPost(string postName, string language = "")
     {
-        if (string.IsNullOrEmpty(language)) language = "en";
+        if (string.IsNullOrEmpty(language)) language = EnglishLanguage;
         var post = await _context.BlogPosts.FirstOrDefaultAsync(x => x.Slug == postName && x.Language.Name == language);
         if (post == null) return null;
         return BlogPostMapper.ToPostModel(post);
