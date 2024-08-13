@@ -30,7 +30,7 @@ public class BackgroundTranslateService(MarkdownConfig markdownConfig,
             return;
         }
         ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = blogService.IPCount, CancellationToken = cancellationToken};
-        var files = Directory.GetFiles(markdownConfig.MarkdownPath, "usingimagesharpweb.md");
+        var files = Directory.GetFiles(markdownConfig.MarkdownPath, "*.md");
 
         var outDir = markdownConfig.MarkdownTranslatedPath;
 
