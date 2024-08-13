@@ -8,7 +8,7 @@ var active= "opacity-50 hover:opacity-100";
     {
         active = "opacity-100";
     }
-        <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.slug" asp-route-language="@language" class="rounded outline outline-1  outline-green-dark dark:outline-white inline-block w-6 h-4 @active">
+        <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.slug" asp-route-language="@language" class="rounded outline outline-1  outline-green-dark dark:outline-white inline-block w-6 h-4  @active">
             <img src="~/img/flags/@(language).svg" alt="@language" class="rounded" />
         </a>
 }

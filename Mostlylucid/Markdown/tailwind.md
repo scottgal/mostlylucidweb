@@ -1,6 +1,8 @@
 # Tailwind CSS & ASP.NET Core
 
 <datetime class="hidden">2024-07-30T13:30</datetime>
+<!--category-- ASP.NET, Tailwind -->
+
 Tailwind CSS is a utility-first CSS framework for rapidly building custom designs. It is a highly customizable, low-level CSS framework that gives you all of the building blocks you need to build bespoke designs without any annoying opinionated styles you have to fight to override.
 
 One of the big benefits of Tailwind over 'traditional' CSS frameworks like Bootstrap is that Tailwind includes a 'scanning' and building step so only includes the CSS you actually use in your project. This means that you can include the entire Tailwind CSS library in your project and not worry about the size of the CSS file.
