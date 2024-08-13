@@ -6,9 +6,8 @@ namespace Mostlylucid.MarkdownTranslator;
 
 public class MarkdownTranslatorService(TranslateServiceConfig translateServiceConfig, ILogger<MarkdownTranslatorService> logger, HttpClient client)
 {
-    private record PostRecord(string target_lang, string[] text, string source_lang = "en",bool perform_sentence_splitting = false);
-
-private Random random = Random.Shared;
+    private record PostRecord(string target_lang, string[] text, string source_lang = "en",bool perform_sentence_splitting = true);
+    
     
     private record PostResponse(string target_lang, string[] translated, string source_lang, float translation_time);
 
@@ -60,11 +59,10 @@ private Random random = Random.Shared;
             currentIPIndex = (currentIPIndex + 1) % IPs.Length;
             var postObject = new PostRecord(targetLang, elements);
             var response = await client.PostAsJsonAsync($"{ip}/translate", postObject, cancellationToken);
-
-            var phrase = response.ReasonPhrase;
             response.EnsureSuccessStatusCode();
             var result = await response.Content.ReadFromJsonAsync<PostResponse>(cancellationToken: cancellationToken);
 
+            logger.LogInformation("Translation took {Time} seconds", result.translation_time);
             return result.translated;
         }
         catch (Exception e)
@@ -79,7 +77,7 @@ private Random random = Random.Shared;
     {
         var document = Markdig.Markdown.Parse(markdown);
         var textStrings = ExtractTextStrings(document);
-        var batchSize = 10;
+        var batchSize = 5;
         var stringLength = textStrings.Count;
         List<string> translatedStrings = new();
         for (int i = 0; i < stringLength; i += batchSize)
