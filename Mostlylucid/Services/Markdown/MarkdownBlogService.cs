@@ -93,20 +93,20 @@ public class MarkdownBlogService(MarkdownConfig markdownConfig, ILogger<Markdown
     }
 
 
-    public async Task<BlogPostViewModel?> GetPost(string postName, string language = EnglishLanguage)
+    public async Task<BlogPostViewModel?> GetPost(string slug, string language = EnglishLanguage)
     {
         try
         {
             // Attempt to retrieve from the cache first
             var pageCache = GetPageCache();
-            if (pageCache.TryGetValue((postName, language), out var pageModel)) return await Task.FromResult(pageModel);
+            if (pageCache.TryGetValue((slug, language), out var pageModel)) return await Task.FromResult(pageModel);
 
             return null;
         }
         catch (Exception ex)
         {
             // Log the error and return null
-            logger.LogError(ex, "Error getting post {PostName}", postName);
+            logger.LogError(ex, "Error getting post {PostName}", slug);
             return null;
         }
     }

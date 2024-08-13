@@ -98,5 +98,9 @@ Where this image will come from `wwwroot/articleimages/image.jpg` and be resized
 
 Or we can just use the image as is and it will be resized and formatted as specified in the querystring.
 
+## Docker
+Note  the `cache` forlder I've used above needs to be writable by the application. If you're using Docker you'll need to make sure this is the case. 
+See [my earlier post](/blog/imagesharpwithdocker) for how I manage this using a mapped volume.
+
 ## Conclusion
 As you've seen ImageSharp.Web gives us a great capability to resize and format images in our ASP.NET Core applications. It's easy to set up and use and provides a lot of flexibility in how we can manipulate images in our applications.
