@@ -58,6 +58,53 @@
 
 Як ви можете бачити з документації, всі вони приймають ряд параметрів (і я позначив їх як параметри запиту у коді, наведеному нижче).
 
+## Перевірка на Їзді на httpCleient
+
+Я завжди починаю з тестування API в вбудованому HTTP-клієнті Їздця. Це дозволяє мені швидко перевірити API і побачити відповідь.
+
+```http
+### Login Request and Store Token
+POST https://{{umamiurl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+
+  "password": "{{password}}"
+}
+> {% client.global.set("auth_token", response.body.token);
+    client.global.set("endAt", Math.round(new Date().getTime()).toString() );
+    client.global.set("startAt", Math.round(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toString());
+%}
+
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/stats?endAt={{endAt}}&startAt={{startAt}}
+Authorization: Bearer {{auth_token}}
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/pageviews?endAt={{endAt}}&startAt={{startAt}}&unit=day
+Authorization: Bearer {{auth_token}}
+
+
+###
+GET https://{{umamiurl}}}}/api/websites/{{websiteid}}/metrics?endAt={{endAt}}&startAt={{startAt}}&type=url
+Authorization: Bearer {{auth_token}}
+```
+
+Хороша практика зберігати змінні імена тут `{{}}` файл env. json, який ви можете знайти нижче.
+
+```json
+{
+  "local": {
+    "umamiurl":"umamilocal.mostlylucid.net",
+    "username": "admin",
+    "password": "<password{>",
+    "websiteid" : "32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
+  }
+}
+```
+
 ## Налаштування
 
 Спочатку нам потрібно налаштувати HtpClient і служби, які ми використаємо для виконання запитів.

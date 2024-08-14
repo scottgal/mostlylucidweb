@@ -58,6 +58,53 @@
 
 从文件可以看出,这些都接受若干参数(我在下面的代码中将这些参数作为查询参数)。
 
+## 在 Rider httpClient 中测试
+
+我总是从在骑士的内置HTTP客户端测试API开始 这使我能够快速测试API 并看到反应。
+
+```http
+### Login Request and Store Token
+POST https://{{umamiurl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+
+  "password": "{{password}}"
+}
+> {% client.global.set("auth_token", response.body.token);
+    client.global.set("endAt", Math.round(new Date().getTime()).toString() );
+    client.global.set("startAt", Math.round(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toString());
+%}
+
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/stats?endAt={{endAt}}&startAt={{startAt}}
+Authorization: Bearer {{auth_token}}
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/pageviews?endAt={{endAt}}&startAt={{startAt}}&unit=day
+Authorization: Bearer {{auth_token}}
+
+
+###
+GET https://{{umamiurl}}}}/api/websites/{{websiteid}}/metrics?endAt={{endAt}}&startAt={{startAt}}&type=url
+Authorization: Bearer {{auth_token}}
+```
+
+将变量名称保留在这里是良好做法 `{{}}` 一个 env.json 文件, 您可以在下面引用。
+
+```json
+{
+  "local": {
+    "umamiurl":"umamilocal.mostlylucid.net",
+    "username": "admin",
+    "password": "<password{>",
+    "websiteid" : "32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
+  }
+}
+```
+
 ## 设置设置设置设置设置设置设置
 
 首先,我们需要配置 HttpClient 和我们用来提出请求的服务。

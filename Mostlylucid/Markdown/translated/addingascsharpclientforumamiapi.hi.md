@@ -58,6 +58,53 @@
 
 जैसा कि आप डॉट्स से देख सकते हैं, ये सभी पैरामीटरों की संख्या स्वीकार करते हैं (और मैंने इन्हें नीचे दिए गए कोड में क्वैरी पैरामीटर्स के रूप में प्रतिनिधित्व किया है).
 
+## सवार httpswidient में जाँच की जा रही है
+
+मैं हमेशा Enrol-in HTTP ग्राहक में बनाया गया एपीआई परीक्षण के द्वारा शुरू होता है. यह मुझे एपीआई की जाँच करने और प्रतिक्रिया देखने की अनुमति देता है ।
+
+```http
+### Login Request and Store Token
+POST https://{{umamiurl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+
+  "password": "{{password}}"
+}
+> {% client.global.set("auth_token", response.body.token);
+    client.global.set("endAt", Math.round(new Date().getTime()).toString() );
+    client.global.set("startAt", Math.round(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toString());
+%}
+
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/stats?endAt={{endAt}}&startAt={{startAt}}
+Authorization: Bearer {{auth_token}}
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/pageviews?endAt={{endAt}}&startAt={{startAt}}&unit=day
+Authorization: Bearer {{auth_token}}
+
+
+###
+GET https://{{umamiurl}}}}/api/websites/{{websiteid}}/metrics?endAt={{endAt}}&startAt={{startAt}}&type=url
+Authorization: Bearer {{auth_token}}
+```
+
+यह यहाँ वेरिएबल नामों को रखने के लिए अच्छा अभ्यास है `{{}}` एक प्रविष्टि.jann फ़ाइल जिसे आप निम्न की तरह उल्लेख कर सकते हैं.
+
+```json
+{
+  "local": {
+    "umamiurl":"umamilocal.mostlylucid.net",
+    "username": "admin",
+    "password": "<password{>",
+    "websiteid" : "32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
+  }
+}
+```
+
 ## सेटअप
 
 सबसे पहले हम बाहर विन्यस्त करने की आवश्यकता है और सेवाओं हम अनुरोध करने के लिए उपयोग करेंगे।

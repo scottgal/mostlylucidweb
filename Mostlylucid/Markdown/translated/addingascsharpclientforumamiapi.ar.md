@@ -58,6 +58,53 @@
 
 كما ترون من الدساتير، هذه كلها تقبل عدداً من البارامترات (وقد مثلت هذه كمعاملات استعلام في الرمز أدناه).
 
+## في الاختبار
+
+دائماً أبدأ بإختبار API في عميل رايدر الموجود في HTTP. هذا يسمح لي بإختبار الـ API بسرعة ورؤية الإستجابة.
+
+```http
+### Login Request and Store Token
+POST https://{{umamiurl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+
+  "password": "{{password}}"
+}
+> {% client.global.set("auth_token", response.body.token);
+    client.global.set("endAt", Math.round(new Date().getTime()).toString() );
+    client.global.set("startAt", Math.round(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toString());
+%}
+
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/stats?endAt={{endAt}}&startAt={{startAt}}
+Authorization: Bearer {{auth_token}}
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/pageviews?endAt={{endAt}}&startAt={{startAt}}&unit=day
+Authorization: Bearer {{auth_token}}
+
+
+###
+GET https://{{umamiurl}}}}/api/websites/{{websiteid}}/metrics?endAt={{endAt}}&startAt={{startAt}}&type=url
+Authorization: Bearer {{auth_token}}
+```
+
+من الممارسات الجيدة إبقاء الأسماء المتغيرة هنا في `{{}}` a ملفّ إلى أسفل.
+
+```json
+{
+  "local": {
+    "umamiurl":"umamilocal.mostlylucid.net",
+    "username": "admin",
+    "password": "<password{>",
+    "websiteid" : "32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
+  }
+}
+```
+
 ## إنشاء
 
 أولاً نحتاج إلى ضبط HttpClient والخدمات التي سنستخدمها لتقديم الطلبات.

@@ -58,6 +58,53 @@ Dans ce cas, j'ai choisi de mettre en œuvre les paramètres suivants:
 
 Comme vous pouvez le voir dans les documents, ils acceptent tous un certain nombre de paramètres (et j'ai représenté ceux-ci comme paramètres de requête dans le code ci-dessous).
 
+## Essais dans Rider httpClient
+
+Je commence toujours par tester l'API dans le client HTTP intégré de Rider. Cela me permet de tester rapidement l'API et de voir la réponse.
+
+```http
+### Login Request and Store Token
+POST https://{{umamiurl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+
+  "password": "{{password}}"
+}
+> {% client.global.set("auth_token", response.body.token);
+    client.global.set("endAt", Math.round(new Date().getTime()).toString() );
+    client.global.set("startAt", Math.round(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toString());
+%}
+
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/stats?endAt={{endAt}}&startAt={{startAt}}
+Authorization: Bearer {{auth_token}}
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/pageviews?endAt={{endAt}}&startAt={{startAt}}&unit=day
+Authorization: Bearer {{auth_token}}
+
+
+###
+GET https://{{umamiurl}}}}/api/websites/{{websiteid}}/metrics?endAt={{endAt}}&startAt={{startAt}}&type=url
+Authorization: Bearer {{auth_token}}
+```
+
+C'est une bonne pratique de garder les noms de variables ici dans `{{}}` un fichier env.json auquel vous pouvez vous référer comme ci-dessous.
+
+```json
+{
+  "local": {
+    "umamiurl":"umamilocal.mostlylucid.net",
+    "username": "admin",
+    "password": "<password{>",
+    "websiteid" : "32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
+  }
+}
+```
+
 ## Configuration
 
 Nous devons d'abord configurer HttpClient et les services que nous utiliserons pour faire les requêtes.
@@ -216,4 +263,5 @@ public class StatsRequest : BaseRequest
 Et construisez la chaîne de requête à partir des paramètres. Si la demande est acceptée, nous renvoyons le contenu en tant que `UmamiResult` objet. Si la requête échoue avec un code d'état 401, nous appelons le `LoginAsync` méthode et réessayer la demande. Cela garantit que nous nous occupons 'élégamment' de l'expiration du jeton.
 
 ## Conclusion
+
 C'est un exemple simple de la façon de créer un client C# pour l'API Umami. Vous pouvez l'utiliser comme point de départ pour construire des clients plus complexes ou intégrer l'API dans vos propres applications.

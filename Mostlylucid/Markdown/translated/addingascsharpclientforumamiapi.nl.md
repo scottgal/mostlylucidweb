@@ -58,6 +58,53 @@ Hierin heb ik ervoor gekozen om de volgende eindpunten te implementeren:
 
 Zoals je kunt zien uit de documenten, accepteren deze allemaal een aantal parameters (en ik heb deze weergegeven als query parameters in de onderstaande code).
 
+## Testen in Rider httpClient
+
+Ik begin altijd met het testen van de API in Rider's ingebouwde HTTP client. Dit stelt me in staat om snel de API te testen en de reactie te zien.
+
+```http
+### Login Request and Store Token
+POST https://{{umamiurl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "{{username}}",
+
+  "password": "{{password}}"
+}
+> {% client.global.set("auth_token", response.body.token);
+    client.global.set("endAt", Math.round(new Date().getTime()).toString() );
+    client.global.set("startAt", Math.round(new Date().getTime() - 7 * 24 * 60 * 60 * 1000).toString());
+%}
+
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/stats?endAt={{endAt}}&startAt={{startAt}}
+Authorization: Bearer {{auth_token}}
+
+### Use Token in Subsequent Request
+GET https://{{umamiurl}}/api/websites/{{websiteid}}/pageviews?endAt={{endAt}}&startAt={{startAt}}&unit=day
+Authorization: Bearer {{auth_token}}
+
+
+###
+GET https://{{umamiurl}}}}/api/websites/{{websiteid}}/metrics?endAt={{endAt}}&startAt={{startAt}}&type=url
+Authorization: Bearer {{auth_token}}
+```
+
+Het is een goede gewoonte om de variabele namen hier in te houden. `{{}}` een env.json-bestand waarnaar u zoals hieronder kunt verwijzen.
+
+```json
+{
+  "local": {
+    "umamiurl":"umamilocal.mostlylucid.net",
+    "username": "admin",
+    "password": "<password{>",
+    "websiteid" : "32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
+  }
+}
+```
+
 ## Instellen
 
 Eerst moeten we HttpClient configureren en de diensten die we zullen gebruiken om de verzoeken te doen.
