@@ -5,6 +5,8 @@
 ## Imtroduction
 In this post, I will show you how to create a C# client for the Umami reporting API. This is a simple example that demonstrates how to authenticate with the API and retrieve data from it.
 
+You can find all the source code for this [on my GitHub repo](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/Umami).
+
 [TOC]
 ## Prerequisites
 Install Umami. You can find the installation instructions [here](https://www.mostlylucid.net/blog/usingumamiforlocalanalytics) this details how I install and use Umami to provide analytics for this site.
