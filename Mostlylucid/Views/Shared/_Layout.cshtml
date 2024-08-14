@@ -66,7 +66,7 @@
         rel="stylesheet"
         href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
     />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/default.min.css"/>
  
     <link
         crossorigin="anonymous"
@@ -74,9 +74,9 @@
         media="screen"
         rel="stylesheet"
     />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/default.min.css">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/atom-one-dark.min.css">
     <link rel="stylesheet" href="https://cdn.rawgit.com/xcatliu/simplemde-theme-dark/master/dist/simplemde-theme-dark.min.css">
 
     <!--Alpine Js V3-->
@@ -100,32 +100,31 @@
 
 <div id="main">
     <div class="container mx-auto">
-        <div class="flex items-center justify-between py-4 lg:py-4 w-full">
-            <a href="/" class="flex items-center">
+        <div class="flex flex-wrap items-center justify-between py-4 lg:py-4 w-full">
+            <a href="/" class="flex items-center mb-4 lg:mb-0">
                 <div class="mr-2">
                     <div class="svg-container">
-                        <img src="/img/logo.svg" alt="logo"  :class="{ 'img-filter-dark': isDarkMode }"/>
+                        <img src="/img/logo.svg" alt="mostlylucid limited" :class="{ 'img-filter-dark': isDarkMode }" />
                     </div>
-                 
                 </div>
             </a>
-         
-            <div class="block">
-                <ul class="flex items-center space-x-4">
+
+            <div class="w-full lg:w-auto">
+                <ul class="flex flex-wrap items-center justify-end space-x-4">
                     <li class="group relative mb-1">
-                        <div class="flex items-center space-x-4 flex-grow">
+                        <div class="flex items-center space-x-4">
                             @if (Model.Authenticated)
                             {
-                                <div class="flex items-center space-x-4">
-                                    @if (Model.AvatarUrl != null)
-                                    {
-                                        <img src="@Model.AvatarUrl" class="h-10 w-10 rounded-full" alt="User Avatar"/>
-                                    }
-                                    <span class="text-blue-dark dark:text-white ">Logged in as @Model.Name</span>
-                                    <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-primary text-white rounded">
-                                        Logout
-                                    </a>
-                                </div>
+                            <div class="flex items-center space-x-4">
+                                @if (Model.AvatarUrl != null)
+                                {
+                                <img src="@Model.AvatarUrl" class="h-10 w-10 rounded-full" alt="User Avatar" />
+                                }
+                                <span class="text-blue-dark dark:text-white">Logged in as @Model.Name</span>
+                                <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-primary text-white rounded">
+                                    Logout
+                                </a>
+                            </div>
                             }
                             else
                             {
@@ -136,9 +135,7 @@
                         </div>
                     </li>
                     <li class="group relative mb-1">
-
-
-                        <partial name="_Socials"/>
+                        <partial name="_Socials" />
                     </li>
                     <li class="group relative mb-1">
                         <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
@@ -147,7 +144,6 @@
                     <li class="group relative mb-1">
                         <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
                         <a href="/blog" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Blog</a>
-                      
                     </li>
                     <li class="group relative mb-1">
                         <a href="/rss" target="_blank" class="flex items-center">
@@ -160,7 +156,7 @@
                         <a asp-action="Index" asp-controller="Contact" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Contact</a>
                     </li>
                     <li class="group relative mb-1">
-                        <div class="flex items-center lg:visible">
+                        <div class="flex items-center">
                             <i
                                 class="bx mr-8 cursor-pointer text-3xl text-primary dark:text-white"
                                 x-on:click="themeSwitch()"
@@ -171,6 +167,7 @@
                 </ul>
             </div>
         </div>
+
     </div>
 </div>
 <div>
@@ -198,7 +195,7 @@
 </div>
 
 <script src="~/js/dist/htmx.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
 <script type="text/javascript" src="https://unpkg.com/highlightjs-cshtml-razor/dist/cshtml-razor.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>

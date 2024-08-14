@@ -69,17 +69,16 @@ html {
     }
 }
 
-
 .pagination {
-    @apply py-2 flex list-none p-0 m-0 justify-center items-center;
+    @apply py-2 flex list-none p-0 m-0 justify-center items-center flex-wrap; /* Added flex-wrap */
 }
 
 .page-item {
-    @apply mx-1 text-black  dark:text-white rounded;
+    @apply mx-1 text-black dark:text-white rounded;
 }
 
 .page-item a {
-    @apply block rounded-md transition duration-300 ease-in-out;
+    @apply block rounded-md transition duration-300 ease-in-out text-sm sm:text-base px-2 sm:px-4; /* Responsive font size and padding */
 }
 
 .page-item a:hover {
@@ -97,11 +96,11 @@ html {
 .page-item.active a {
     @apply text-white border border-blue-dark;
 }
-.page-link
-{
-    @apply block px-4 py-2 text-blue-dark dark:text-blue-light;
 
+.page-link {
+    @apply block px-2 sm:px-4 py-2 text-blue-dark dark:text-blue-light text-sm sm:text-base; /* Responsive padding and font size */
 }
+
 .page-item:focus a,
 .page-item a:focus {
     @apply outline-none; /* Tailwind's outline class could be used if custom color needed */

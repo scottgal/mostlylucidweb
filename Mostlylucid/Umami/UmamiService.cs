@@ -32,7 +32,7 @@ public async Task<UmamiResult<StatsResponseModels>> GetStatsAsync(StatsRequest s
     if (!string.IsNullOrEmpty(statsRequest.Country)) queryParams.Add($"country={statsRequest.Country}");
     if (!string.IsNullOrEmpty(statsRequest.Region)) queryParams.Add($"region={statsRequest.Region}");
     if (!string.IsNullOrEmpty(statsRequest.City)) queryParams.Add($"city={statsRequest.City}");
-
+    ;
     // Combine the query parameters into a query string
     var queryString = string.Join("&", queryParams);
 
