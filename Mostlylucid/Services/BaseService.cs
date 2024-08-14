@@ -22,6 +22,7 @@ public class BaseService
             Title = model.Title,
             PublishedDate = model.PublishedDate,
             Slug = model.Slug,
+            WordCount = model.WordCount,
             Language = model.Language,
             Categories = model.Categories,
             Summary = model.PlainTextContent.TruncateAtWord(200) + "...",
