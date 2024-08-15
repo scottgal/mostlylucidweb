@@ -1,22 +1,24 @@
-﻿# Adding Entity Framework for Blog Posts Part 2
+# Añadiendo marco de entidad para entradas de blog Parte 2
+
 <!--category-- ASP.NET, Entity Framework -->
 <datetime class="hidden">2024-08-15T18:00</datetime>
 
-You can find all the source code for the blog posts on [GitHub](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
+Usted puede encontrar todo el código fuente para las entradas del blog en [GitHub](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
 
-**Part 2 of the series on adding Entity Framework to a .NET Core project.**
-Part 1 can be found [here](/addingentityframeworkforblogpostspt1).
+**Parte 2 de la serie sobre la adición de Entity Framework a un proyecto.NET Core.**
+Parte 1 se puede encontrar [aquí](/addingentityframeworkforblogpostspt1).
 
-# Introduction
-In the previous post, we set up the database and the context for our blog posts. In this post, we will add the services to interact with the database.
+# Introducción
 
-In the next post we will detail how these services now work with the existing controllers and views.
+En el post anterior, configuramos la base de datos y el contexto para nuestros posts de blog. En este post, añadiremos los servicios para interactuar con la base de datos.
+
+En el próximo post detallaremos cómo estos servicios ahora funcionan con los controladores y vistas existentes.
 
 [TOC]
 
-### Setup
-We now have a BlogSetup extension class which sets up these services.
+### Configuración
 
+Ahora tenemos una clase de extensión BlogSetup que establece estos servicios.
 
 ```csharp
   public static void SetupBlog(this IServiceCollection services, IConfiguration configuration)
@@ -41,12 +43,15 @@ We now have a BlogSetup extension class which sets up these services.
         }
     }
 ```
-This uses the simple `BlogConfig` class to define which mode we are in, either `File` or `Database`. Based on this, we register the services we need.
+
+Esto utiliza el simple `BlogConfig` clase para definir en qué modo estamos, o bien `File` o `Database`. Basándonos en esto, registramos los servicios que necesitamos.
+
 ```json
   "Blog": {
     "Mode": "File"
   }
 ```
+
 ```csharp
 public class BlogConfig : IConfigSection
 {
@@ -62,16 +67,15 @@ public enum BlogMode
 }
 ```
 
-
 ## Interfaces
-As I want to both support file and Database in this application (because why not! I've used an interface based approach allowing these to be swapped in based on config.
 
-We have three new interfaces, `IBlogService`, `IMarkdownBlogService` and `IBlogPopulator`.
+Como quiero apoyar tanto el archivo como la base de datos en esta aplicación (porque por qué no! He utilizado un enfoque basado en la interfaz permitiendo que estos sean intercambiados en base a la configuración.
 
+Tenemos tres nuevas interfaces, `IBlogService`, `IMarkdownBlogService` y `IBlogPopulator`.
 
 #### IBlogService
-This is the main interface for the blog service. It contains methods for getting posts, categories and individual posts.
 
+Esta es la interfaz principal para el servicio del blog. Contiene métodos para obtener puestos, categorías y puestos individuales.
 
 ```csharp
 public interface IBlogService
@@ -90,7 +94,8 @@ public interface IBlogService
 ```
 
 #### IMarkdownBlogService
-This service is used by the `EFlogPopulatorService` on first run to populate the database with posts from the markdown files.
+
+Este servicio es utilizado por el `EFlogPopulatorService` en la primera ejecución para poblar la base de datos con mensajes de los archivos Markdown.
 
 ```csharp
 public interface IMarkdownBlogService
@@ -100,9 +105,10 @@ public interface IMarkdownBlogService
     Dictionary<string, List<String>> LanguageList();
 }
 ```
-As you can see it's pretty simple and just has two methods, `GetPages` and `LanguageList`. These are used to process the Markdown files and get the list of languages.
 
-This is implemented in the `MarkdownBlogPopulator` class.
+Como puedes ver es bastante simple y sólo tiene dos métodos, `GetPages` y `LanguageList`. Estos se utilizan para procesar los archivos Markdown y obtener la lista de idiomas.
+
+Esto se aplica en el `MarkdownBlogPopulator` clase.
 
 ```csharp
 public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkdownBlogService
@@ -159,9 +165,9 @@ public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkd
 }
 ```
 
+#### IBlogPopulador
 
-#### IBlogPopulator
-The BlogPopulators are used in our setup method above to populate the database or static cache object (for the File based system) with posts.
+Los BlogPopulators se utilizan en nuestro método de configuración anterior para poblar la base de datos o el objeto de caché estático (para el sistema basado en archivos) con mensajes.
 
 ```csharp
   public static async Task PopulateBlog(this WebApplication app)
@@ -178,9 +184,10 @@ The BlogPopulators are used in our setup method above to populate the database o
         await context.Populate();
     }
 ```
-You can see that this is an extension to `WebApplication` with config allowing the Database Migration to be run if needed (which also creates the Database if it doesn't exist). It then calls the configured `IBlogPopulator` service to populate the database.
 
-This is the interface for that service. 
+Usted puede ver que esto es una extensión a `WebApplication` con configuración que permite ejecutar la migración de la base de datos si es necesario (que también crea la base de datos si no existe). A continuación, llama a la configuración `IBlogPopulator` servicio para poblar la base de datos.
+
+Esta es la interfaz para ese servicio.
 
 ```csharp
 public interface IBlogPopulator
@@ -189,9 +196,10 @@ public interface IBlogPopulator
 }
 ```
 
-Pretty simple right? This is implemented in both the `MarkdownBlogPopulator` and `EFBlogPopulator` classes.
+Bastante simple, ¿verdad? Esto se aplica tanto en el `MarkdownBlogPopulator` y `EFBlogPopulator` clases.
 
--   Markdown - here we call into the `GetPages` method and populate the cache.
+- Markdown - aquí llamamos a la `GetPages` método y poblar la caché.
+
 ```csharp
   /// <summary>
     ///     The method to preload the cache with pages and Languages.
@@ -210,7 +218,9 @@ Pretty simple right? This is implemented in both the `MarkdownBlogPopulator` and
         SetPageCache(pageCache);
     }
 ```
-- EF - here we call into the `IMarkdownBlogService` to get the pages and then populate the database.
+
+- EF - aquí llamamos a la `IMarkdownBlogService` para obtener las páginas y luego poblar la base de datos.
+
 ```csharp
     public async Task Populate()
     {
@@ -225,6 +235,6 @@ Pretty simple right? This is implemented in both the `MarkdownBlogPopulator` and
 
 ```
 
-We have segregated this functionality into interfaces to make the code more understandable and 'segregated' (as in the SOLID principles). This allows us to easily swap out the services based on the configuration.
+Hemos segregado esta funcionalidad en interfaces para hacer el código más comprensible y'segregado' (como en los principios SOLID). Esto nos permite intercambiar fácilmente los servicios basados en la configuración.
 
-In the next post, we will look in more detail at the implementation of the `EFBlogService` and `MarkdownBlogService` classes.
+En el próximo post, examinaremos con más detalle la aplicación de la `EFBlogService` y `MarkdownBlogService` clases.

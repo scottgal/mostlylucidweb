@@ -1,22 +1,24 @@
-﻿# Adding Entity Framework for Blog Posts Part 2
+# 添加实体博客文章框架第2部分
+
 <!--category-- ASP.NET, Entity Framework -->
 <datetime class="hidden">2024-08-15T18:00</datetime>
 
-You can find all the source code for the blog posts on [GitHub](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
+您可以在博客文章中找到所有源代码 [吉特胡布](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
 
-**Part 2 of the series on adding Entity Framework to a .NET Core project.**
-Part 1 can be found [here](/addingentityframeworkforblogpostspt1).
+**关于将实体框架加入.NET核心项目的系列第二部分。**
+第一部分可以找到 [在这里](/addingentityframeworkforblogpostspt1).
 
-# Introduction
-In the previous post, we set up the database and the context for our blog posts. In this post, we will add the services to interact with the database.
+# 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
-In the next post we will detail how these services now work with the existing controllers and views.
+在上篇文章中, 我们建立了数据库, 以及博客文章的背景。 在此员额中,我们将增加与数据库互动的服务。
 
-[TOC]
+在下一篇文章中,我们将详细说明这些服务目前如何与现有的控制者和观点合作。
 
-### Setup
-We now have a BlogSetup extension class which sets up these services.
+[技选委
 
+### 设置设置设置设置设置设置设置
+
+现在我们有一个BlogSetup推广班来提供这些服务。
 
 ```csharp
   public static void SetupBlog(this IServiceCollection services, IConfiguration configuration)
@@ -41,12 +43,15 @@ We now have a BlogSetup extension class which sets up these services.
         }
     }
 ```
-This uses the simple `BlogConfig` class to define which mode we are in, either `File` or `Database`. Based on this, we register the services we need.
+
+此选项使用简单 `BlogConfig` 类来定义我们处于哪种模式,或者 `File` 或 `Database`.. 基于这一点,我们登记我们需要的服务。
+
 ```json
   "Blog": {
     "Mode": "File"
   }
 ```
+
 ```csharp
 public class BlogConfig : IConfigSection
 {
@@ -62,16 +67,15 @@ public enum BlogMode
 }
 ```
 
+## 接口
 
-## Interfaces
-As I want to both support file and Database in this application (because why not! I've used an interface based approach allowing these to be swapped in based on config.
+我想在这个应用程序中同时支持文件和数据库( 因为为什么不! 我采用了基于界面的方法 允许根据配置来交换这些
 
-We have three new interfaces, `IBlogService`, `IMarkdownBlogService` and `IBlogPopulator`.
+我们有三个新界面 `IBlogService`, `IMarkdownBlogService` 和 `IBlogPopulator`.
 
+#### IB服务
 
-#### IBlogService
-This is the main interface for the blog service. It contains methods for getting posts, categories and individual posts.
-
+这是博客服务的主要界面 。 它载有获得员额、职类和个人员额的方法。
 
 ```csharp
 public interface IBlogService
@@ -89,8 +93,9 @@ public interface IBlogService
 }
 ```
 
-#### IMarkdownBlogService
-This service is used by the `EFlogPopulatorService` on first run to populate the database with posts from the markdown files.
+#### IMarkdown 服务( ImarkdownBlog service)
+
+此服务由以下用户使用: `EFlogPopulatorService` 首运行以从标记文件填充文章来填充数据库 。 @ info: whatsthis
 
 ```csharp
 public interface IMarkdownBlogService
@@ -100,9 +105,10 @@ public interface IMarkdownBlogService
     Dictionary<string, List<String>> LanguageList();
 }
 ```
-As you can see it's pretty simple and just has two methods, `GetPages` and `LanguageList`. These are used to process the Markdown files and get the list of languages.
 
-This is implemented in the `MarkdownBlogPopulator` class.
+正如你可以看到的,它非常简单 并且只是有两种方法, `GetPages` 和 `LanguageList`.. 这些用于处理 Markdown 文件并获取语言列表 。
+
+这项工作在以下项目中实施: `MarkdownBlogPopulator` 类。
 
 ```csharp
 public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkdownBlogService
@@ -159,9 +165,9 @@ public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkd
 }
 ```
 
+#### IBlogPoppuputor
 
-#### IBlogPopulator
-The BlogPopulators are used in our setup method above to populate the database or static cache object (for the File based system) with posts.
+BlogPopulators 用于上述设置方法, 以填充数据库或静态缓存对象( 以文件为基础的系统),
 
 ```csharp
   public static async Task PopulateBlog(this WebApplication app)
@@ -178,9 +184,10 @@ The BlogPopulators are used in our setup method above to populate the database o
         await context.Populate();
     }
 ```
-You can see that this is an extension to `WebApplication` with config allowing the Database Migration to be run if needed (which also creates the Database if it doesn't exist). It then calls the configured `IBlogPopulator` service to populate the database.
 
-This is the interface for that service. 
+您可以看到,这是 `WebApplication` 配置允许根据需要运行数据库迁移( 如果数据库不存在, 也会创建数据库 ) 。 然后它调用配置 `IBlogPopulator` 输入数据库的服务。
+
+这是该服务的界面 。
 
 ```csharp
 public interface IBlogPopulator
@@ -189,9 +196,10 @@ public interface IBlogPopulator
 }
 ```
 
-Pretty simple right? This is implemented in both the `MarkdownBlogPopulator` and `EFBlogPopulator` classes.
+很简单吧? 这在以下两个方面都得到了实施: `MarkdownBlogPopulator` 和 `EFBlogPopulator` 班级。
 
--   Markdown - here we call into the `GetPages` method and populate the cache.
+- Markdown - 在这里,我们呼叫 `GetPages` 方法并填充缓存 。
+
 ```csharp
   /// <summary>
     ///     The method to preload the cache with pages and Languages.
@@ -210,7 +218,9 @@ Pretty simple right? This is implemented in both the `MarkdownBlogPopulator` and
         SetPageCache(pageCache);
     }
 ```
-- EF - here we call into the `IMarkdownBlogService` to get the pages and then populate the database.
+
+- EF - 我们在这里呼叫 `IMarkdownBlogService` 以获取页面,然后填充数据库。
+
 ```csharp
     public async Task Populate()
     {
@@ -225,6 +235,6 @@ Pretty simple right? This is implemented in both the `MarkdownBlogPopulator` and
 
 ```
 
-We have segregated this functionality into interfaces to make the code more understandable and 'segregated' (as in the SOLID principles). This allows us to easily swap out the services based on the configuration.
+我们将这一功能分为接口,使代码更容易理解和“隔离”(如SOLID原则)。 这使得我们可以轻松地根据配置换掉服务。
 
-In the next post, we will look in more detail at the implementation of the `EFBlogService` and `MarkdownBlogService` classes.
+下一位,我们将更详细地研究执行《1990年代联合国 `EFBlogService` 和 `MarkdownBlogService` 班级。
