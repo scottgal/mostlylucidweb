@@ -1,6 +1,5 @@
 ﻿using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
-using Mostlylucid.Services;
 
 namespace Mostlylucid.MarkdownTranslator;
 

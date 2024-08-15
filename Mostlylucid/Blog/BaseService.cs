@@ -3,7 +3,7 @@ using Mostlylucid.Helpers;
 using Mostlylucid.MarkDigExtensions;
 using Mostlylucid.Models.Blog;
 
-namespace Mostlylucid.Services;
+namespace Mostlylucid.Blog;
 
 public class BaseService
 {
@@ -13,6 +13,7 @@ public class BaseService
         .UseTableOfContent()
         .Use<ImgExtension>()
         .Build();
+
 
 
     protected PostListModel GetListModel(BlogPostViewModel model)

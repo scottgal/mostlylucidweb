@@ -1,9 +1,9 @@
 ﻿using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.Identity;
+using Mostlylucid.Blog.Models;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Controllers;
 
-namespace Mostlylucid.Services.Markdown;
+namespace Mostlylucid.Blog.Markdown;
 
 public class CommentService(MarkdownConfig markdownConfig) : BaseService
 {
@@ -28,7 +28,7 @@ public class CommentService(MarkdownConfig markdownConfig) : BaseService
     }
  
     
-    public  record Comment(DateTime Date, string Name, string Avatar, string Content);
+
     
     public List<Comment> GetComments(string slug)
     {

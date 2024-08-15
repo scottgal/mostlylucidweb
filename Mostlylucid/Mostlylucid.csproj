@@ -46,7 +46,6 @@
     <ItemGroup>
       <Folder Include="Markdown\comments\" />
       <Folder Include="Markdown\notmoderatedcomments\" />
-      <Folder Include="Migrations\" />
       <Folder Include="wwwroot\css\dist\" />
       <Folder Include="wwwroot\lib\" />
     </ItemGroup>

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Mostlylucid.Blog;
+using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Config;
-using Mostlylucid.Services;
-using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucid.Controllers;
 

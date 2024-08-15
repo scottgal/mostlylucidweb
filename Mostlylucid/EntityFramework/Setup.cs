@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Mostlylucid.Services;
+using Mostlylucid.Blog;
 using Serilog;
 
 namespace Mostlylucid.EntityFramework;
@@ -22,8 +22,8 @@ public static class Setup
             await using var context = scope.ServiceProvider.GetRequiredService<MostlylucidDbContext>();
             await context.Database.MigrateAsync();
             
-            var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
-            await blogService.Populate();
+            var markdownBlogPopulator = scope.ServiceProvider.GetRequiredService<IBlogPopulator>();
+            await markdownBlogPopulator.Populate();
         }
         catch (Exception e)
         {

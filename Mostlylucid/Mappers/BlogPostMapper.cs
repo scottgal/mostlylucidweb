@@ -6,36 +6,36 @@ namespace Mostlylucid.Mappers;
 
 public static class BlogPostMapper
 {
-    public static  BlogPostViewModel ToPostModel(this BlogPost post, List<string> languages)
+    public static  BlogPostViewModel ToPostModel(this BlogPostEntity postEntity, List<string> languages)
     {
         return new BlogPostViewModel()
         {
 
 
-            Categories = post.Categories.Select(x => x.Name).ToArray(),
-            Title = post.Title,
-            HtmlContent = post.HtmlContent,
-            PlainTextContent = post.PlainTextContent,
-            Slug = post.Slug,
-            Language = post.Language.Name,
-            WordCount = post.WordCount,
+            Categories = postEntity.Categories.Select(x => x.Name).ToArray(),
+            Title = postEntity.Title,
+            HtmlContent = postEntity.HtmlContent,
+            PlainTextContent = postEntity.PlainTextContent,
+            Slug = postEntity.Slug,
+            Language = postEntity.LanguageEntity.Name,
+            WordCount = postEntity.WordCount,
             Languages = languages.ToArray(),
-            PublishedDate = post.PublishedDate.DateTime
+            PublishedDate = postEntity.PublishedDate.DateTime
         };
     }
     
-    public static  PostListModel ToListModel(this BlogPost post, string[]? languages )
+    public static  PostListModel ToListModel(this BlogPostEntity postEntity, string[]? languages )
     {
         return new PostListModel()
         {
-            Categories = post.Categories.Select(x => x.Name).ToArray(),
-            Title = post.Title,
-            Summary = post.PlainTextContent.TruncateAtWord(200) + "...",
-            Slug = post.Slug,
-            Language = post.Language.Name,
+            Categories = postEntity.Categories.Select(x => x.Name).ToArray(),
+            Title = postEntity.Title,
+            Summary = postEntity.PlainTextContent.TruncateAtWord(200) + "...",
+            Slug = postEntity.Slug,
+            Language = postEntity.LanguageEntity.Name,
             Languages = languages ?? [],
-            WordCount = post.WordCount,
-            PublishedDate = post.PublishedDate.DateTime
+            WordCount = postEntity.WordCount,
+            PublishedDate = postEntity.PublishedDate.DateTime
         };
     }
 }

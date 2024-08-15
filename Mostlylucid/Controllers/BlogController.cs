@@ -3,10 +3,10 @@ using Htmx;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Mostlylucid.Blog;
+using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Config;
 using Mostlylucid.Controllers;
-using Mostlylucid.Services;
-using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucidblog.Controllers;
 

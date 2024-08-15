@@ -1,12 +1,10 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Mostlylucid.Blog;
 using Mostlylucid.Config;
-using Mostlylucid.Config.Markdown;
 using Mostlylucid.Email;
 using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.RSS;
-using Mostlylucid.Services;
-using Mostlylucid.Services.Markdown;
 using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
@@ -17,23 +15,24 @@ builder.Host.UseSerilog((context, configuration) =>
 
 var config = builder.Configuration;
 builder.Configuration.AddEnvironmentVariables();
-builder.Configure<MarkdownConfig>();
 builder.Configure<AnalyticsSettings>();
 
 var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
 
-// Add services to the container.
+
+// Add services to
+// the container.
 services.AddOutputCache(); // Remove duplicate call later in your code
 services.AddControllersWithViews();
 services.AddResponseCaching();
-services.AddScoped<IBlogService, MarkdownBlogService>();
-services.AddScoped<CommentService>();
+
 if (translateServiceConfig.Enabled) services.SetupTranslateService();
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 services.SetupEmail(builder.Configuration);
 services.SetupRSS();
+services.SetupBlog(config);
 
 // Setup CORS for Google Auth Use.
 services.AddCors(options =>
@@ -92,9 +91,7 @@ app.UseOutputCache();
 app.UseResponseCaching();
 app.UseImageSharp();
 
-await using var scope = app.Services.CreateAsyncScope();
-var context = scope.ServiceProvider.GetRequiredService<IBlogService>();
-await context.Populate();
+await app.PopulateBlog();
 
 app.MapGet("/robots.txt", async httpContext =>
 {

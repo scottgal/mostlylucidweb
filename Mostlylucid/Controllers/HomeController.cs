@@ -2,10 +2,9 @@ using System.Diagnostics;
 using Htmx;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Mostlylucid.Blog;
 using Mostlylucid.Config;
 using Mostlylucid.Models;
-using Mostlylucid.Services;
-using Mostlylucid.Services.Markdown;
 using Mostlylucidblog.Models;
 
 namespace Mostlylucid.Controllers;

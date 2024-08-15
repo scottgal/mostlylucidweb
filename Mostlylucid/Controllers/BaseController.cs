@@ -5,9 +5,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Mostlylucid.Blog;
 using Mostlylucid.Config;
-using Mostlylucid.Services;
-using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucid.Controllers;
 

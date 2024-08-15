@@ -2,7 +2,7 @@
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
-using Mostlylucid.Services;
+using Mostlylucid.Blog;
 
 namespace Mostlylucid.Controllers;
 
