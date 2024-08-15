@@ -6,7 +6,7 @@
 Vous pouvez trouver tout le code source pour les messages de blog sur [GitHub](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
 
 **Partie 2 de la série sur l'ajout d'un cadre d'entités à un projet de base.NET.**
-La première partie peut être trouvée [Ici.](/addingentityframeworkforblogpostspt1).
+La première partie peut être trouvée [Ici.](/blog/addingentityframeworkforblogpostspt1).
 
 # Présentation
 

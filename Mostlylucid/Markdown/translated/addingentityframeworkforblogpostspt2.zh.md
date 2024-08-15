@@ -6,7 +6,7 @@
 您可以在博客文章中找到所有源代码 [吉特胡布](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
 
 **关于将实体框架加入.NET核心项目的系列第二部分。**
-第一部分可以找到 [在这里](/addingentityframeworkforblogpostspt1).
+第一部分可以找到 [在这里](/blog/addingentityframeworkforblogpostspt1).
 
 # 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 

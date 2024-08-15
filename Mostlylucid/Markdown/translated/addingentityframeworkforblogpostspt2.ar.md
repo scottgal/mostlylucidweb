@@ -6,7 +6,7 @@
 يمكنك أن تجد كل رموز البيانات الخاصة بكتابات المدونات على: [لا يُحَجْجَه](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
 
 **الجزء 2 من السلسلة المتعلقة بإضافة إطار الكيان إلى مشروع أساسي من مشاريع الشبكة.**
-يمكن العثور على جزء من الجزء الأول [هنا هنا](/addingentityframeworkforblogpostspt1).
+يمكن العثور على جزء من الجزء الأول [هنا هنا](/blog/addingentityframeworkforblogpostspt1).
 
 # أولاً
 

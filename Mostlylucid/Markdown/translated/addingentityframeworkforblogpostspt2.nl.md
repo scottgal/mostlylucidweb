@@ -6,7 +6,7 @@
 U vindt alle broncode voor de blog berichten op [GitHub](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
 
 **Deel 2 van de reeks over het toevoegen van Entity Framework aan een.NET Core project.**
-Deel 1 is te vinden [Hier.](/addingentityframeworkforblogpostspt1).
+Deel 1 is te vinden [Hier.](/blog/addingentityframeworkforblogpostspt1).
 
 # Inleiding
 

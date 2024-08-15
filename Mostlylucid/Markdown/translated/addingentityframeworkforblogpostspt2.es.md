@@ -6,7 +6,7 @@
 Usted puede encontrar todo el código fuente para las entradas del blog en [GitHub](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
 
 **Parte 2 de la serie sobre la adición de Entity Framework a un proyecto.NET Core.**
-Parte 1 se puede encontrar [aquí](/addingentityframeworkforblogpostspt1).
+Parte 1 se puede encontrar [aquí](/blog/addingentityframeworkforblogpostspt1).
 
 # Introducción
 

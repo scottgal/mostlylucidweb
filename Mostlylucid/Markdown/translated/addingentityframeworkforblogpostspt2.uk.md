@@ -6,7 +6,7 @@
 Ви можете знайти всі вихідні коди дописів блогу [GitHub](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
 
 **Частина 2 серії про додавання фреймів сутностей до проекту.NET Core.**
-Частину 1 можна знайти [тут](/addingentityframeworkforblogpostspt1).
+Частину 1 можна знайти [тут](/blog/addingentityframeworkforblogpostspt1).
 
 # Вступ
 

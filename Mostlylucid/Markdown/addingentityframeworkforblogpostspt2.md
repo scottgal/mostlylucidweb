@@ -1,4 +1,4 @@
-﻿# Adding Entity Framework for Blog Posts Part 2
+﻿# Adding Entity Framework for Blog Posts (Part 2)
 <!--category-- ASP.NET, Entity Framework -->
 <datetime class="hidden">2024-08-15T18:00</datetime>
 

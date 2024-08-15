@@ -6,7 +6,7 @@
 आप ब्लॉग पोस्ट के लिए सभी स्रोत कोड पा सकते हैं [GiHh](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
 
 **एंटिटी फ्रेमवर्क को एक परियोजना में जोड़ने पर श्रृंखला का भाग 2**
-पार्ट 1 मिल सकता है [यहाँ](/addingentityframeworkforblogpostspt1).
+पार्ट 1 मिल सकता है [यहाँ](/blog/addingentityframeworkforblogpostspt1).
 
 # परिचय
 
