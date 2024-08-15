@@ -5,7 +5,7 @@
 You can find all the source code for the blog posts on [GitHub](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
 
 **Part 2 of the series on adding Entity Framework to a .NET Core project.**
-Part 1 can be found [here](/addingentityframeworkforblogpostspt1).
+Part 1 can be found [here](/blog/addingentityframeworkforblogpostspt1).
 
 # Introduction
 In the previous post, we set up the database and the context for our blog posts. In this post, we will add the services to interact with the database.
