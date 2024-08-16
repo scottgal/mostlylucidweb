@@ -23,8 +23,6 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
     {
         var posts =await  blogService.GetPagedPosts(page, pageSize);
-   
-        
         if(Request.IsHtmx())
         {
             return PartialView("_BlogSummaryList", posts);

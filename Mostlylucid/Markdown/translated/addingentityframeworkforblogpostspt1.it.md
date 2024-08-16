@@ -5,21 +5,23 @@
 
 Allacciati la cintura perche' sara' lunga!
 
+Potete vedere le parti 2 e 3 [qui](/blog/addingentityframeworkforblogpostspt2) e [qui](/blog/addingentityframeworkforblogpostspt3).
+
 ## Introduzione
 
-Mentre sono stato felice con il mio approccio basato sui file al blogging, come un esercizio ho deciso di passare a utilizzare Postgres per memorizzare post e commenti sul blog. In questo post vi mostrerò come questo è fatto insieme ad alcuni suggerimenti e trucchi che ho raccolto lungo la strada.
+Mentre sono stato felice con il mio approccio basato sui file al blogging, come un esercizio ho deciso di passare a utilizzare Postgres per memorizzare i post e commenti del blog. In questo post vi mostrerò come questo è fatto insieme ad alcuni suggerimenti e trucchi che ho raccolto lungo la strada.
 
 [TOC]
 
 ## Creazione della banca dati
 
-Postgres è un database gratuito con alcune grandi caratteristiche. Sono un utente SQL Server a lungo tempo (ho anche eseguito workshop di prestazioni a Microsoft alcuni anni fa) ma Postgres è una grande alternativa. È libero, open source, e ha una grande comunità; e PGAdmin, per lo strumento di gestione è testa e spalle sopra SQL Server Management Studio.
+Postgres è un database gratuito con alcune grandi caratteristiche. Sono un utente SQL Server a lungo tempo (ho anche eseguito laboratori di prestazioni a Microsoft alcuni anni fa) ma Postgres è una grande alternativa. È libero, open source, e ha una grande comunità; e PGAdmin, per lo strumento di gestione è testa e spalle sopra SQL Server Management Studio.
 
-Per iniziare, è necessario installare Postgres e PGAdmin. È possibile impostare sia come un servizio Windows o utilizzando Docker come ho presentato in un post precedente su[DockerCity name (optional, probably does not need a translation)](/blog/dockercomposedevdeps).
+Per iniziare, è necessario installare Postgres e PGAdmin. È possibile impostarlo sia come un servizio Windows o utilizzando Docker come ho presentato in un post precedente su [DockerCity name (optional, probably does not need a translation)](/blog/dockercomposedevdeps).
 
 ## Centrale EF
 
-In questo post utilizzerò Code First in EF Core, in questo modo potrai gestire il tuo database interamente attraverso il codice. Ovviamente puoi impostare il database manualmente e utilizzare EF Core per impalpare i modelli. O, naturalmente, utilizzare Dapper o un altro strumento e scrivere il tuo SQL a mano (o con un approccio MicroORM).
+In questo post userò Code First in EF Core, in questo modo potrai gestire il tuo database interamente attraverso il codice. Naturalmente è possibile impostare il database manualmente e utilizzare EF Core per impalpare i modelli. O, naturalmente, utilizzare Dapper o un altro strumento e scrivere il vostro SQL a mano (o con un approccio MicroORM).
 
 La prima cosa da fare è installare i pacchetti EF Core NuGet. Qui uso:
 
@@ -29,7 +31,7 @@ La prima cosa da fare è installare i pacchetti EF Core NuGet. Qui uso:
 
 È possibile installare questi pacchetti utilizzando il gestore dei pacchetti NuGet o il dotnet CLI.
 
-Poi dobbiamo pensare ai modelli per gli oggetti Database; questi sono distinti da ViewModels che vengono utilizzati per passare i dati alle viste. Utilizzerò un modello semplice per i post e i commenti del blog.
+Poi dobbiamo pensare ai modelli per gli oggetti Database; questi sono distinti da ViewModel che vengono utilizzati per passare i dati alle viste. Userò un semplice modello per i post del blog e commenti.
 
 ```csharp
 public class BlogPost
@@ -111,7 +113,7 @@ Vedrete che mi riferisco al BlogPost in Commenti, e ICollections of Comments and
 
 ## Impostazione del DbContext
 
-Nella classe DbContext dovrete definire le tabelle e le relazioni. Ecco il mio:
+Nella classe DbContext dovrai definire le tabelle e le relazioni. Ecco il mio:
 
 <details>
 <summary>Expand to see the full code</summary>
@@ -183,13 +185,13 @@ public class MostlylucidDbContext : DbContext
 ```
 
 </details>
-Nel metodo OnModelCreating definisco le relazioni tra le tabelle. Ho usato l'API fluente per definire le relazioni tra le tabelle. Questo è un po' più verboso rispetto all'utilizzo di Annotazioni dati ma lo trovo più leggibile.
+Nel metodo OnModelCreating definisco i rapporti tra le tabelle. Ho usato l'API fluente per definire le relazioni tra le tabelle. Questo è un po 'più verboso rispetto all'utilizzo di annotazioni di dati, ma lo trovo più leggibile.
 
-Potete vedere che ho impostato un paio di indici sulla tabella BlogPost. Questo è per aiutare con le prestazioni quando si interroga il database; è necessario selezionare gli indici in base a come si sta interrogando i dati. In questo caso hash, slug, data pubblicata e lingua sono tutti i campi su cui farò domande.
+Potete vedere che ho impostato un paio di indici sulla tabella BlogPost. Questo è per aiutare con le prestazioni quando si interroga il database; è necessario selezionare gli indici in base a come si sta interrogando i dati. In questo caso hash, slug, data e lingua pubblicate sono tutti i campi su cui interrogherò.
 
 ### Configurazione
 
-Ora abbiamo i nostri modelli e DbContext impostato dobbiamo collegarlo al DB. La mia pratica abituale è quella di aggiungere metodi di estensione, questo aiuta a mantenere tutto più organizzato:
+Ora abbiamo i nostri modelli e DbContext impostati dobbiamo collegarlo al DB. La mia pratica abituale è quella di aggiungere metodi di estensione, questo aiuta a mantenere tutto più organizzato:
 
 ```csharp
 public static class Setup
@@ -221,7 +223,7 @@ public static class Setup
 }
 ```
 
-Qui ho impostato la connessione al database e poi ho eseguito le migrazioni. Chiamo anche un metodo per popolare il database (nel mio caso sto ancora utilizzando l'approccio basato sui file quindi ho bisogno di popolare il database con i post esistenti).
+Qui ho impostato la connessione al database e poi ho eseguito le migrazioni. Chiamo anche un metodo per popolare il database (nel mio caso sto ancora usando l'approccio basato sui file quindi ho bisogno di popolare il database con i post esistenti).
 
 La tua stringa di connessione assomiglierà a questa:
 
@@ -242,7 +244,7 @@ services.SetupEntityFramework(config.GetConnectionString("DefaultConnection") ??
 await app.InitializeDatabase();
 ```
 
-La sezione seguente è responsabile dell'esecuzione della migrazione e dell'effettiva creazione della banca dati.`MigrateAsync`metodo creerà il database se non esiste ed eseguire tutte le migrazioni che sono necessarie. Questo è un ottimo modo per mantenere il database in sincronia con i vostri modelli.
+La sezione seguente è responsabile dell'esecuzione della migrazione e dell'effettiva creazione della banca dati. La `MigrateAsync` metodo creerà il database se non esiste ed esegue tutte le migrazioni che sono necessarie. Questo è un ottimo modo per mantenere il database in sincronia con i vostri modelli.
 
 ```csharp
      await using var scope = 
@@ -254,13 +256,13 @@ La sezione seguente è responsabile dell'esecuzione della migrazione e dell'effe
 
 ## Migrazioni
 
-Una volta che hai tutto questo impostato devi creare la tua migrazione iniziale. Questa è un'istantanea dello stato attuale dei tuoi modelli e sarà usata per creare il database. Puoi farlo usando il dotnet CLI (vedere[qui](https://learn.microsoft.com/en-us/ef/core/cli/dotnet)per i dettagli sull'installazione dello strumento dotnet ef se necessario:
+Una volta che si dispone di tutto questo impostare è necessario per creare la migrazione iniziale. Questa è un'istantanea dello stato attuale dei vostri modelli e sarà usata per creare il database. Puoi farlo usando il dotnet CLI (vedere [qui](https://learn.microsoft.com/en-us/ef/core/cli/dotnet) per i dettagli sull'installazione dello strumento dotnet ef se necessario:
 
 ```bash
 dotnet ef migrations add InitialCreate
 ```
 
-Questo creerà una cartella nel tuo progetto con i file di migrazione. Puoi quindi applicare la migrazione al database usando:
+Questo creerà una cartella nel tuo progetto con i file di migrazione. Puoi quindi applicare la migrazione al database utilizzando:
 
 ```bash
 dotnet ef database update

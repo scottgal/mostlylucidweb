@@ -1,9 +1,9 @@
-# Додавання блоку сутностей для дописів блогу Частина 2
+# Додавання блоку сутностей для дописів блогу (Part 2)
 
 <!--category-- ASP.NET, Entity Framework -->
 <datetime class="hidden">2024- 08- 15T18: 00</datetime>
 
-Ви можете знайти всі вихідні коди дописів блогу [GitHub](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
+Ви можете знайти всі вихідні коди дописів блогу [GitHub](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/Blog)
 
 **Частина 2 серії про додавання фреймів сутностей до проекту.NET Core.**
 Частину 1 можна знайти [тут](/blog/addingentityframeworkforblogpostspt1).
@@ -18,7 +18,7 @@
 
 ### Налаштування
 
-Тепер у нас є клас розширення BlogSetup, який створює ці послуги.
+Тепер у нас є клас розширення BlogSetup, який створює ці послуги. Це продовження від того, що ми зробили в [Частина 1](/blog/addingentityframeworkforblogpostspt1)Там, де ми встановимо базу даних і контекст.
 
 ```csharp
   public static void SetupBlog(this IServiceCollection services, IConfiguration configuration)
@@ -108,63 +108,6 @@ public interface IMarkdownBlogService
 
 Як ви можете бачити, це досить просто і просто має два способи, `GetPages` і `LanguageList`. Ці файли використовуються для обробки файлів Markdown і отримання списку мов.
 
-Це реалізовано у `MarkdownBlogPopulator` Клас.
-
-```csharp
-public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkdownBlogService
-{
-    //Extra methods removed for brevity
-     public async Task<List<BlogPostViewModel>> GetPages()
-    {
-        var pageList = new ConcurrentBag<BlogPostViewModel>();
-        var languages = LanguageList();
-        var pages = await GetLanguagePages(EnglishLanguage);
-        foreach (var page in pages) pageList.Add(page);
-        var pageLanguages = languages.Values.SelectMany(x => x).Distinct().ToList();
-        await Parallel.ForEachAsync(pageLanguages, ParallelOptions, async (pageLang, ct) =>
-        {
-            var langPages = await GetLanguagePages(pageLang);
-            if (langPages is { Count: > 0 })
-                foreach (var page in langPages)
-                    pageList.Add(page);
-        });
-        foreach (var page in pageList)
-        {
-            var currentPagelangs = languages.Where(x => x.Key == page.Slug).SelectMany(x => x.Value)?.ToList();
-            var listLangs = currentPagelangs ?? new List<string>();
-            listLangs.Add(EnglishLanguage);
-            page.Languages = listLangs.OrderBy(x => x).ToArray();
-        }
-
-        return pageList.ToList();
-    }
-    
-     public  Dictionary<string, List<string>> LanguageList()
-    {
-        var pages = Directory.GetFiles(_markdownConfig.MarkdownTranslatedPath, "*.md");
-        Dictionary<string, List<string>> languageList = new();
-        foreach (var page in pages)
-        {
-            var pageName = Path.GetFileNameWithoutExtension(page);
-            var languageCode = pageName.LastIndexOf(".", StringComparison.Ordinal) + 1;
-            var language = pageName.Substring(languageCode);
-            var originPage = pageName.Substring(0, languageCode - 1);
-            if (languageList.TryGetValue(originPage, out var languages))
-            {
-                languages.Add(language);
-                languageList[originPage] = languages;
-            }
-            else
-            {
-                languageList[originPage] = new List<string> { language };
-            }
-        }
-        return languageList;
-    }
- 
-}
-```
-
 #### IBlogPopulator
 
 Populators блогу використовуються у нашому методі налаштування, наведеному вище, щоб заповнювати базу даних або об' єкт статичного кешу (для системи, що працює з файлами) дописами.
@@ -195,6 +138,8 @@ public interface IBlogPopulator
     Task Populate();
 }
 ```
+
+### Впровадження
 
 Досить просто, правильно? Це реалізовано в обох випадках `MarkdownBlogPopulator` і `EFBlogPopulator` Класи.
 
@@ -237,4 +182,6 @@ public interface IBlogPopulator
 
 Ми розділили цю функціональність на інтерфейси, щоб зробити код більш зрозумілим і "регульованим" (як у принципах SOLID). Це дозволяє нам легко обмінюватися послугами на основі конфігурації.
 
-В наступному розділі ми розглянемо детальніше реалізація `EFBlogService` і `MarkdownBlogService` Класи.
+# Включення
+
+В наступному повідомленні ми розглянемо детальніше реалізація регуляторів та переглядів для використання цих послуг.

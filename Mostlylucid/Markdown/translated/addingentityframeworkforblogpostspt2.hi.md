@@ -1,9 +1,9 @@
-# ब्लॉग पोस्ट पार्ट 2 के लिए एंटिटी फ्रेमवर्क जोड़े
+# ब्लॉग पोस्ट के लिए एंटिटी फ्रेमवर्क जोड़े ( पार्ट 2)
 
 <!--category-- ASP.NET, Entity Framework -->
 <datetime class="hidden">2024- 0. 1515टी18: 00</datetime>
 
-आप ब्लॉग पोस्ट के लिए सभी स्रोत कोड पा सकते हैं [GiHh](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
+आप ब्लॉग पोस्ट के लिए सभी स्रोत कोड पा सकते हैं [GiHh](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/Blog)
 
 **एंटिटी फ्रेमवर्क को एक परियोजना में जोड़ने पर श्रृंखला का भाग 2**
 पार्ट 1 मिल सकता है [यहाँ](/blog/addingentityframeworkforblogpostspt1).
@@ -18,7 +18,7 @@
 
 ### सेटअप
 
-अब हम एक ब्लॉग-आवर विस्तार क्लास है जो इन सेवाओं को सेट करती है।
+अब हम एक ब्लॉग-आवर विस्तार क्लास है जो इन सेवाओं को सेट करती है। यह हम में क्या किया से एक विस्तार है [पार्ट 1](/blog/addingentityframeworkforblogpostspt1), जहां हम डाटाबेस और संदर्भ सेट.
 
 ```csharp
   public static void SetupBlog(this IServiceCollection services, IConfiguration configuration)
@@ -108,63 +108,6 @@ public interface IMarkdownBlogService
 
 जैसा कि आप देख सकते हैं यह बहुत सरल है और बस दो तरीकों से है, `GetPages` और `LanguageList`___ ये चयनित फ़ाइलों को चिह्नित करने के लिए प्रयुक्त हैं तथा भाषाओं की सूची को प्राप्त करने के लिए.
 
-यह इस में लागू है `MarkdownBlogPopulator` वर्ग.
-
-```csharp
-public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkdownBlogService
-{
-    //Extra methods removed for brevity
-     public async Task<List<BlogPostViewModel>> GetPages()
-    {
-        var pageList = new ConcurrentBag<BlogPostViewModel>();
-        var languages = LanguageList();
-        var pages = await GetLanguagePages(EnglishLanguage);
-        foreach (var page in pages) pageList.Add(page);
-        var pageLanguages = languages.Values.SelectMany(x => x).Distinct().ToList();
-        await Parallel.ForEachAsync(pageLanguages, ParallelOptions, async (pageLang, ct) =>
-        {
-            var langPages = await GetLanguagePages(pageLang);
-            if (langPages is { Count: > 0 })
-                foreach (var page in langPages)
-                    pageList.Add(page);
-        });
-        foreach (var page in pageList)
-        {
-            var currentPagelangs = languages.Where(x => x.Key == page.Slug).SelectMany(x => x.Value)?.ToList();
-            var listLangs = currentPagelangs ?? new List<string>();
-            listLangs.Add(EnglishLanguage);
-            page.Languages = listLangs.OrderBy(x => x).ToArray();
-        }
-
-        return pageList.ToList();
-    }
-    
-     public  Dictionary<string, List<string>> LanguageList()
-    {
-        var pages = Directory.GetFiles(_markdownConfig.MarkdownTranslatedPath, "*.md");
-        Dictionary<string, List<string>> languageList = new();
-        foreach (var page in pages)
-        {
-            var pageName = Path.GetFileNameWithoutExtension(page);
-            var languageCode = pageName.LastIndexOf(".", StringComparison.Ordinal) + 1;
-            var language = pageName.Substring(languageCode);
-            var originPage = pageName.Substring(0, languageCode - 1);
-            if (languageList.TryGetValue(originPage, out var languages))
-            {
-                languages.Add(language);
-                languageList[originPage] = languages;
-            }
-            else
-            {
-                languageList[originPage] = new List<string> { language };
-            }
-        }
-        return languageList;
-    }
- 
-}
-```
-
 #### ब्लॉगर
 
 ब्लॉगPoperers वर्तमान सेटअप विधि में प्रयोग किया जाता है कि पोस्ट के जरिए डाटाबेस या स्थिर कैश ऑब्जेक्ट (फ़ाइल आधारित सिस्टम के लिए).
@@ -195,6 +138,8 @@ public interface IBlogPopulator
     Task Populate();
 }
 ```
+
+### कार्यान्वयन
 
 बहुत सरल है? यह दोनों में लागू है `MarkdownBlogPopulator` और `EFBlogPopulator` क्लास ।
 
@@ -235,6 +180,8 @@ public interface IBlogPopulator
 
 ```
 
-हमने इस कार्य को इंटरफेस में स्पष्ट कर दिया है कोड और अधिक सरल बनाने के लिए और 'LDD के सिद्धांत में' (जैसे कि वेलिपिक के रूप में). यह हमें कॉन्फ़िगरेशन पर आधारित सेवाओं को आसानी से बदलने देता है.
+हमने इस कार्य को इंटरफेस में विभाजित किया है कोड को अधिक सरल बनाने के लिए और 'एनआईडी सिद्धांतों में' (जैसे कि). यह हमें कॉन्फ़िगरेशन पर आधारित सेवाओं को आसानी से बदलने देता है.
 
-अगले पोस्ट में, हम कार्यान्वयन पर अधिक विस्तार से देखेंगे `EFBlogService` और `MarkdownBlogService` क्लास ।
+# ऑन्टियम
+
+अगले पोस्ट में, हम इन सेवाओं का उपयोग करने के लिए नियंत्रक और दृश्य के कार्यान्वयन पर अधिक विस्तार से देखेंगे ।

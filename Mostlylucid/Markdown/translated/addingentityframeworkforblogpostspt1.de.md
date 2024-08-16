@@ -5,21 +5,23 @@
 
 Schnall dich an, denn das wird ein langer!
 
+Sie können die Teile 2 und 3 sehen [Hierher](/blog/addingentityframeworkforblogpostspt2) und [Hierher](/blog/addingentityframeworkforblogpostspt3).
+
 ## Einleitung
 
-Während ich mit meiner Datei basierten Ansatz zum Bloggen glücklich gewesen, als ein Excercise entschied ich mich, mit Postgres für die Speicherung von Blog-Beiträgen und Kommentare zu bewegen. In diesem Beitrag werde ich zeigen, wie das zusammen mit ein paar Tipps und Tricks, die ich auf dem Weg aufgenommen habe.
+Während ich mit meinem dateibasierten Ansatz beim Bloggen zufrieden war, entschied ich mich als Excercise für die Verwendung von Postgres für die Speicherung von Blogbeiträgen und Kommentaren. In diesem Beitrag werde ich zeigen, wie das gemacht wird zusammen mit ein paar Tipps und Tricks habe ich auf dem Weg abgeholt.
 
 [TOC]
 
 ## Einrichtung der Datenbank
 
-Postgres ist eine kostenlose Datenbank mit einigen tollen Funktionen. Ich bin ein langjähriger SQL Server Benutzer (Ich habe sogar Performance-Workshops bei Microsoft vor ein paar Jahren laufen lassen), aber Postgres ist eine großartige Alternative. Es ist kostenlos, Open Source, und hat eine große Community; und PGAdmin, um Tool für die Verwaltung es ist Kopf und Schultern über SQL Server Management Studio.
+Postgres ist eine kostenlose Datenbank mit einigen tollen Features. Ich bin eine lange Zeit SQL Server Benutzer (Ich habe sogar Performance-Workshops bei Microsoft vor ein paar Jahren) aber Postgres ist eine große Alternative. Es ist kostenlos, Open Source, und hat eine große Gemeinschaft; und PGAdmin, um Werkzeug für die Verwaltung es ist Kopf und Schultern über SQL Server Management Studio.
 
-Um loszulegen, müssen Sie Postgres und PGAdmin installieren. Sie können es entweder als Windows-Service oder mit Docker, wie ich in einem früheren Beitrag auf[Schwanzlutscher](/blog/dockercomposedevdeps).
+Um loszulegen, müssen Sie Postgres und PGAdmin installieren. Sie können es entweder als Windows-Service oder mit Docker, wie ich in einem früheren Beitrag auf [Schwanzlutscher](/blog/dockercomposedevdeps).
 
 ## EF-Kern
 
-In diesem Beitrag werde ich Code First in EF Core verwenden, auf diese Weise können Sie Ihre Datenbank ganz über Code verwalten. Sie können natürlich die Datenbank manuell einrichten und EF Core verwenden, um die Modelle zu gerüsten. Oder natürlich verwenden Sie Dapper oder ein anderes Tool und schreiben Sie Ihre SQL von Hand (oder mit einem MicroORM-Ansatz).
+In diesem Beitrag werde ich Code First in EF Core verwenden, auf diese Weise können Sie Ihre Datenbank vollständig über Code verwalten. Natürlich können Sie die Datenbank manuell einrichten und EF Core verwenden, um die Modelle zu gerüsten. Oder natürlich verwenden Sie Dapper oder ein anderes Tool und schreiben Sie Ihre SQL von Hand (oder mit einem MicroORM-Ansatz).
 
 Als erstes müssen Sie die EF Core NuGet Pakete installieren. Hier verwende ich:
 
@@ -29,7 +31,7 @@ Als erstes müssen Sie die EF Core NuGet Pakete installieren. Hier verwende ich:
 
 Sie können diese Pakete mit dem NuGet Paketmanager oder dem dotnet CLI installieren.
 
-Als nächstes müssen wir über die Modelle für die Datenbank-Objekte nachdenken; diese unterscheiden sich von ViewModels, die verwendet werden, um Daten an die Ansichten zu übergeben. Ich werde ein einfaches Modell für die Blog-Beiträge und Kommentare verwenden.
+Als nächstes müssen wir über die Modelle für die Datenbankobjekte nachdenken; diese unterscheiden sich von ViewModels, die verwendet werden, um Daten an die Ansichten zu übergeben. Ich werde ein einfaches Modell für die Blog-Beiträge und Kommentare verwenden.
 
 ```csharp
 public class BlogPost
@@ -107,11 +109,11 @@ public class Comments
 }
 ```
 
-Sie werden sehen, ich beziehe mich auf den BlogPost in Kommentare, und ICollections of Comments and Categories in B;ogPost. Dies sind Navigationseigenschaften und ist, wie EF Core weiß, wie die Tabellen zusammen zu verbinden.
+Sie werden sehen, ich beziehe mich auf den BlogPost in Kommentare, und ISammlungen von Kommentaren und Kategorien in B;ogPost. Dies sind Navigationseigenschaften und ist, wie EF Core weiß, wie man die Tabellen miteinander verbindet.
 
 ## Einrichtung des DbContext
 
-In der Klasse DbContext müssen Sie die Tabellen und Beziehungen definieren. Hier ist meine:
+In der Klasse DbContext müssen Sie die Tabellen und Beziehungen definieren. Hier ist meins:
 
 <details>
 <summary>Expand to see the full code</summary>
@@ -183,13 +185,13 @@ public class MostlylucidDbContext : DbContext
 ```
 
 </details>
-In der Methode OnModelCreating definiere ich die Beziehungen zwischen den Tabellen. Ich habe die Fluent API benutzt, um die Beziehungen zwischen den Tabellen zu definieren. Dies ist etwas ausführlicher als die Verwendung von Data Annotations, aber ich finde es lesbarer.
+In der Methode OnModelCreating definiere ich die Beziehungen zwischen den Tabellen. Ich habe die Fluent API benutzt, um die Beziehungen zwischen den Tabellen zu definieren. Dies ist ein bisschen wörtlicher als die Verwendung von Data Annotations, aber ich finde es lesbarer.
 
-Sie können sehen, dass ich ein paar Indexe in der BlogPost-Tabelle eingerichtet habe. Dies soll bei der Abfrage der Datenbank helfen; Sie sollten die Indizes auswählen, basierend darauf, wie Sie die Daten abfragen. In diesem Fall sind Hash, Slug, veröffentlichtes Datum und Sprache alle Felder, an denen ich abfragen werde.
+Sie können sehen, dass ich ein paar Indexe auf der BlogPost Tabelle eingerichtet. Dies soll bei der Abfrage der Datenbank helfen; Sie sollten die Indizes entsprechend der Art und Weise auswählen, wie Sie die Daten abfragen. In diesem Fall sind Hash, Schnecke, veröffentlichtes Datum und Sprache alle Felder, an denen ich nachfragen werde.
 
 ### Einrichtung
 
-Jetzt haben wir unsere Modelle und DbContext eingerichtet, die wir in die DB einbinden müssen. Meine übliche Praxis ist es, Erweiterungsmethoden hinzuzufügen, dies hilft, alles besser zu organisieren:
+Jetzt haben wir unsere Modelle und DbContext eingerichtet, die wir in die DB einbinden müssen. Meine übliche Praxis ist es, Erweiterungsmethoden hinzuzufügen, dies hilft, alles mehr organisiert zu halten:
 
 ```csharp
 public static class Setup
@@ -221,7 +223,7 @@ public static class Setup
 }
 ```
 
-Hier richte ich die Datenbankverbindung ein und führe dann die Migrationen aus. Ich rufe auch eine Methode auf, um die Datenbank zu bevölkern (in meinem Fall verwende ich immer noch den dateibasierten Ansatz, so dass ich die Datenbank mit den vorhandenen Beiträgen bevölkern muss).
+Hier habe ich die Datenbankverbindung eingerichtet und dann die Migrationen gestartet. Ich rufe auch eine Methode auf, um die Datenbank zu bevölkern (in meinem Fall verwende ich immer noch den dateibasierten Ansatz, so dass ich die Datenbank mit den vorhandenen Beiträgen bevölkern muss).
 
 Deine Verbindungskette wird so ähnlich aussehen:
 
@@ -242,7 +244,7 @@ services.SetupEntityFramework(config.GetConnectionString("DefaultConnection") ??
 await app.InitializeDatabase();
 ```
 
-Der folgende Abschnitt ist für die Durchführung der Migration und die Einrichtung der Datenbank verantwortlich.`MigrateAsync`Die Methode erstellt die Datenbank, wenn sie nicht existiert und führt alle erforderlichen Migrationen aus. Dies ist eine großartige Möglichkeit, Ihre Datenbank mit Ihren Modellen zu synchronisieren.
+Der folgende Abschnitt ist für die Durchführung der Migration und die Einrichtung der Datenbank verantwortlich. Das `MigrateAsync` Die Methode erstellt die Datenbank, wenn sie nicht existiert und führt alle erforderlichen Migrationen aus. Dies ist eine großartige Möglichkeit, Ihre Datenbank mit Ihren Modellen synchron zu halten.
 
 ```csharp
      await using var scope = 
@@ -254,7 +256,7 @@ Der folgende Abschnitt ist für die Durchführung der Migration und die Einricht
 
 ## Wanderungsbewegungen
 
-Sobald Sie alle diese eingerichtet haben, müssen Sie Ihre erste Migration erstellen. Dies ist eine Momentaufnahme des aktuellen Zustands Ihrer Modelle und wird verwendet, um die Datenbank zu erstellen. Sie können dies mit dem dotnet CLI (siehe[Hierher](https://learn.microsoft.com/en-us/ef/core/cli/dotnet)Einzelheiten zur Installation des dotnet ef-Tools bei Bedarf):
+Sobald Sie all dies eingerichtet haben, müssen Sie Ihre erste Migration erstellen. Dies ist eine Momentaufnahme des aktuellen Zustands Ihrer Modelle und wird verwendet, um die Datenbank zu erstellen. Sie können dies mit dem dotnet CLI (siehe [Hierher](https://learn.microsoft.com/en-us/ef/core/cli/dotnet) Einzelheiten zur Installation des dotnet ef-Tools bei Bedarf):
 
 ```bash
 dotnet ef migrations add InitialCreate

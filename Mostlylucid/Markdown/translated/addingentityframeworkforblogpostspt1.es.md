@@ -5,6 +5,8 @@
 
 ¡Abróchate el cinturón porque será largo!
 
+Puedes ver las partes 2 y 3 [aquí](/blog/addingentityframeworkforblogpostspt2) y [aquí](/blog/addingentityframeworkforblogpostspt3).
+
 ## Introducción
 
 Mientras que he sido feliz con mi enfoque basado en archivos para bloguear, como un ejercicio decidí pasar a usar Postgres para almacenar entradas de blog y comentarios. En este post voy a mostrar cómo se hace junto con algunos consejos y trucos que he recogido a lo largo del camino.

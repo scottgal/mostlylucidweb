@@ -5,23 +5,25 @@
 
 困在里面,因为这将是一个很长的!
 
+可见第2和第3部分 [在这里](/blog/addingentityframeworkforblogpostspt2) 和 [在这里](/blog/addingentityframeworkforblogpostspt3).
+
 ## 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
-虽然我对基于文件的博客方法很满意, 我决定改用Postgres来储存博客文章和评论。
+我决定改用Postgres来储存博客文章与评论。 我将在这篇文章中展示我是如何完成这些的, 以及我一路学到的一些小把戏和小把戏。
 
 [技选委
 
 ## 建立数据库
 
-Postgres 是一个免费数据库, 具有一些伟大的功能。 我是一个长期的 SQL 服务器用户( 我甚至几年前在微软公司举办了性能讲习班 ), 但 Postgres 是一个很棒的替代方案。 它是一个自由、 开放的源码, 拥有一个伟大的社区; PGAdmin 管理它的工具是超越 SQL 服务器管理工作室的正面和肩膀。
+Postgres是一个免费的数据库,具有一些伟大的特点。 我是一个长期的 SQL 服务器用户(我甚至几年前在微软公司举办了性能讲习班), 但Postgres是一个很好的替代方案。 它是自由的开放源码,并且拥有一个伟大的社区; PGADmin, 用来管理它的工具是 SQL 服务器管理工作室之上的头部和肩膀。
 
-启动前, 您需要安装 Postgres 和 PGAdmin 。 您可以设置它作为窗口服务, 或者使用 Docker, 正如我在前一篇文章中介绍的那样 。[嵌嵌入器](/blog/dockercomposedevdeps).
+要开始,你需要安装 Postgres和PGADmin。 您可以设置它作为窗口服务, 或者使用 Docker, 正如我在前一篇文章中展示的 。 [嵌嵌入器](/blog/dockercomposedevdeps).
 
 ## EF 核心核心
 
-在此文章中, 我将使用 EF Core 中的代码第一, 这样您就可以完全通过代码管理您的数据库。 您当然可以手动建立数据库, 并使用 EF Core 来筛选模型。 或者使用 Dapper 或其他工具, 并用手写 SQL (或使用 MicroORM 方法) 。
+在这个职位上,我将使用EF核心的代码一, 这样你就可以完全通过代码管理你的数据库。 当然,您可以手动建立数据库,并使用 EF Core 来支撑模型。 或者当然使用 Dapper 或其他工具, 并用手写您的 SQL (或使用 MicroORM 方法) 。
 
-首先你要做的是安装 EF Core Nuget 软件包。这里我使用:
+你要做的第一件事就是安装 EF Core Nuget 软件包。 我在这里使用:
 
 - 微软. 实体FrameworkCore - 核心EF软件包
 - 微软. Entity FrameworkCorore. 设计 - EF核心工具有效运行需要此功能
@@ -29,7 +31,7 @@ Postgres 是一个免费数据库, 具有一些伟大的功能。 我是一个�
 
 您可以使用 NuGet 软件包管理器或点网 CLI 安装这些软件包 。
 
-接下来我们需要考虑数据库对象的模型; 这些与用于将数据传送到视图的 View 模型不同。 我将使用一个简单的博客文章和评论模式 。
+接下来,我们需要考虑数据库对象的模型;这些模型不同于用于将数据传送到视图的ViewModels。 我将使用一个简单的博客文章和评论模式。
 
 ```csharp
 public class BlogPost
@@ -107,11 +109,11 @@ public class Comments
 }
 ```
 
-您会看到我指的是“评论中的BlogPost”和“B:ogPost”中的评论和分类集。这些是导航属性,EF Core知道如何将表格合并在一起。
+你会看到我指的是评论中的博客Post, 以及B;ogPost中的评论和分类集。 这些是导航特性,是EF核心如何知道如何将表格合在一起的。
 
 ## 设置 DbContext
 
-在DbContext课上 你需要定义表格和关系
+在DbContext类中 你需要定义表格 和关系。 这是我的:
 
 <details>
 <summary>Expand to see the full code</summary>
@@ -183,13 +185,13 @@ public class MostlylucidDbContext : DbContext
 ```
 
 </details>
-在 OnModelCrection 方法中, 我定义了表格之间的关系。 我使用流畅的 API 来定义表格之间的关系。 这比使用数据说明要多一点动词, 但我发现它更容易读取 。
+在“OnModelCreate”方法中,我定义了各表格之间的关系。 我用流利的API来定义表格之间的关系 这比使用数据说明要多一点,但我发现它更易读。
 
-您可以看到我在 BlogPost 表格上设置了几个索引。 这是用来帮助查询数据库时的性能; 您应该根据您如何查询数据来选择指数。 在这种情况下, 散列、 散列、 发布日期和语言都是我将要查询的字段 。
+你可以看到我在BlogPost桌上设置了几张索引。 这是用来帮助查询数据库时的性能; 您应该根据您如何查询数据来选择指数 。 在此情况下,哈希、鼻涕虫、公布日期和语言都是我将要查询的领域。
 
 ### 设置设置设置设置设置设置设置
 
-现在,我们有了模型和DbContext, 我们需要把它连接到 DB。 我通常的做法就是添加扩展方法, 这有助于让一切更有条理:
+现在我们有我们的模型和DbContext 设置,我们需要把它连接到 DB。 我通常的做法是增加推广方法, 这有助于让一切组织得更井井有条:
 
 ```csharp
 public static class Setup
@@ -221,7 +223,7 @@ public static class Setup
 }
 ```
 
-在此我设置了数据库连接, 然后运行迁移 。 同时我呼吁一种输入数据库的方法( 在我的案例中, 我仍在使用基于文件的方法, 所以我需要将数据库以现有位置填充 ) 。
+在这里,我设置了数据库连接 并运行迁移。 我也呼吁一种方法来填充数据库(我的情况是,我仍在使用基于文件的方法,所以我需要用现有职位填充数据库)。
 
 您的连接字符串将看起来类似 :
 
@@ -242,7 +244,7 @@ services.SetupEntityFramework(config.GetConnectionString("DefaultConnection") ??
 await app.InitializeDatabase();
 ```
 
-下一节负责管理迁移并实际建立数据库。`MigrateAsync`如果数据库不存在, 将会创建数据库, 并运行任何需要的迁移 。 这是将数据库与模型同步的好方法 。
+下一节负责管理移徙工作,并实际建立数据库。 缩略 `MigrateAsync` 方法将创建数据库, 如果它不存在, 并运行任何所需的迁移 。 这是保持数据库与模型同步的好方法。
 
 ```csharp
      await using var scope = 
@@ -254,13 +256,13 @@ await app.InitializeDatabase();
 
 ## 移徙移民
 
-一旦您设置了所有这些设置, 您需要创建您初始的迁移 。 这是您模型当前状态的快照, 并将用于创建数据库 。 您可以使用点网 CLI( 参见) 来创建数据库 。[在这里](https://learn.microsoft.com/en-us/ef/core/cli/dotnet)需要时安装 dotnet ef 工具的详细信息 :
+一旦您有了所有这些设置, 您需要创建您的初始迁移 。 这是您模型当前状态的快照, 将用于创建数据库 。 您可以使用 dotnet CTL( 参见 [在这里](https://learn.microsoft.com/en-us/ef/core/cli/dotnet) 需要时安装 dotnet ef 工具的详细信息 :
 
 ```bash
 dotnet ef migrations add InitialCreate
 ```
 
-这将在您的项目中创建一个文件夹, 包含迁移文件。 然后您可以使用 :
+这将在您的工程中创建一个文件夹, 并使用迁移文件 。 然后,您可以使用下列方法将迁移应用到数据库:
 
 ```bash
 dotnet ef database update

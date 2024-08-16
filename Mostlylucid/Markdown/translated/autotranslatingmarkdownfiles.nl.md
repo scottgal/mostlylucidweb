@@ -1,20 +1,23 @@
 # Automatisch mark-downbestanden vertalen met EasyNMT
 
+<datetime class="hidden">2024-08-03T13:30</datetime>
+
+<!--category-- EasyNMT, Markdown -->
 ## Inleiding
 
-EasyNMT is een lokaal installeerbare dienst die een eenvoudige interface biedt naar een aantal machinevertaaldiensten. In deze tutorial gebruiken we EasyNMT om automatisch een Markdown-bestand van Engels naar meerdere talen te vertalen.
+EasyNMT is een lokaal te installeren dienst die een eenvoudige interface biedt naar een aantal machinevertaaldiensten. In deze tutorial zullen we EasyNMT gebruiken om automatisch een Markdown-bestand van Engels naar meerdere talen te vertalen.
 
-U kunt alle bestanden voor deze tutorial vinden in de[GitHub repository](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/MarkdownTranslator)voor dit project.
+U kunt alle bestanden voor deze tutorial vinden in de [GitHub repository](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/MarkdownTranslator) voor dit project.
 
-LET OP: Dit is nog steeds vrij ruw, Ik zal blijven verfijnen als ik ga.
+De uitvoer hiervan genereerde een BUNCH van nieuwe markdown bestanden in de doeltalen. Dit is een super eenvoudige manier om een blog post vertaald in meerdere talen.
 
-Ik heb dit bestand alleen vertaald op (goed en[over mij](/blog/aboutme)als ik verfijn de methode; er zijn een paar problemen met de vertaling die ik moet uitwerken.
+[Vertaalde berichten](/translatedposts.png)
 
 [TOC]
 
 ## Vereisten
 
-Een installatie van EasyNMT is vereist om deze tutorial te volgen. Ik voer het meestal uit als een Docker service. U kunt de installatie instructies vinden[Hier.](https://github.com/UKPLab/EasyNMT/blob/main/docker/README.md)die betrekking heeft op hoe het te draaien als een docker service.
+Een installatie van EasyNMT is vereist om deze tutorial te volgen. Ik doe het meestal als een Docker service. U kunt de installatie-instructies vinden [Hier.](https://github.com/UKPLab/EasyNMT/blob/main/docker/README.md) die betrekking heeft op hoe het te draaien als een docker service.
 
 ```shell
 docker run -d -p 24080:80 --env MAX_WORKERS_BACKEND=6 --env MAX_WORKERS_FRONTEND=6 easynmt/api:2.0-cpu
@@ -26,33 +29,78 @@ OF als u een NVIDIA GPU beschikbaar heeft:
 docker run -d -p 24080:80 --env MAX_WORKERS_BACKEND=6 --env MAX_WORKERS_FRONTEND=6 easynmt/api:2.0.2-cuda11.3
 ```
 
-De MAX_WORKERS_BACKEND en MAX_WORKERS_FRONTEND omgevingsvariabelen stellen het aantal werknemers in dat EasyNMT zal gebruiken. U kunt deze aanpassen aan uw machine.
+De MAX_WORKERS_BACKEND en MAX_WORKERS_FRONTEND omgevingsvariabelen bepalen het aantal werknemers dat EasyNMT zal gebruiken. U kunt deze aanpassen aan uw machine.
 
-OPMERKING: EasyNMT is niet de SMOOTHEST-service om uit te voeren, maar het is de beste die ik heb gevonden voor dit doel. Het is een beetje persnickety over de invoer string die het is doorgegeven, dus je kan nodig hebben om wat pre-processing van uw invoer tekst te doen voordat het door te geven aan EasyNMT.
+OPMERKING: EasyNMT is niet de SMOOTHEST dienst om te draaien, maar het is de beste die ik heb gevonden voor dit doel. Het is een beetje persnickety over de invoer string die het is doorgegeven, dus je kan nodig hebben om een aantal pre-verwerking van uw invoer tekst te doen voordat het door te geven aan EasyNMT.
+
+Oh en het vertaalde ook 'Conclusie' in een of andere onzin over het indienen van het voorstel bij de EU...verraad van de training set.
 
 ## Native Approach to Load Balancing
 
-Easy NMT is een dorst beest als het gaat om middelen, dus in mijn MarkdownVertalerService heb ik een super eenvoudige willekeurige IP-selector die gewoon de een willekeurige IP uit de lijst van machines die ik heb. Dit is een beetje naïef en kan worden verbeterd met behulp van een meer geavanceerde load balancing algoritme.
+Easy NMT is een dorst beest als het gaat om middelen, dus in mijn MarkdownVertalerService heb ik een super eenvoudige willekeurige IP-selector die gewoon draait door de lijst van IP's van een lijst van machines die ik gebruik om EasyNMT draaien.
+
+In eerste instantie doet dit een stap op de `model_name` methode op de EasyNMT service, dit is een snelle, eenvoudige manier om te controleren of de service is up. Als dat zo is, voegt het IP toe aan een lijst van werkende IP's. Als dat niet zo is, voegt het het niet toe aan de lijst.
 
 ```csharp
-    private string[] IPs = new[] { "http://192.168.0.30:24080", "http://localhost:24080", "http://192.168.0.74:24080" };
+    private string[] IPs = translateServiceConfig.IPs;
+    public async ValueTask<bool> IsServiceUp(CancellationToken cancellationToken)
+    {
+        var workingIPs = new List<string>();
 
-     var ip = IPs[random.Next(IPs.Length)];
-     logger.LogInformation("Sendign request to {IP}", ip);
-     var response = await client.PostAsJsonAsync($"{ip}/translate", postObject, cancellationToken);
+        try
+        {
+            foreach (var ip in IPs)
+            {
+                logger.LogInformation("Checking service status at {IP}", ip);
+                var response = await client.GetAsync($"{ip}/model_name", cancellationToken);
+                if (response.IsSuccessStatusCode)
+                {
+                    workingIPs.Add(ip);
+                }
+            }
 
+            IPs = workingIPs.ToArray();
+            if (!IPs.Any()) return false;
+            return true;
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error checking service status");
+            return false;
+        }
+    }
 ```
+
+Vervolgens binnen de `Post` methode van `MarkdownTranslatorService` We draaien door de werkende IP's om de volgende te vinden.
+
+```csharp
+          if(!IPs.Any())
+            {
+                logger.LogError("No IPs available for translation");
+                throw new Exception("No IPs available for translation");
+            }
+            var ip = IPs[currentIPIndex];
+            
+            logger.LogInformation("Sending request to {IP}", ip);
+        
+            // Update the index for the next request
+            currentIPIndex = (currentIPIndex + 1) % IPs.Length;
+```
+
+Dit is een super eenvoudige manier om het saldo van de verzoeken over een aantal machines te laden. Het is niet perfect (het is niet verantwoordelijk voor een super drukke machine voor exampel), maar het is goed genoeg voor mijn doeleinden.
+
+De schmick. ` currentIPIndex = (currentIPIndex + 1) % IPs.Length;` draait gewoon door de lijst van IP's die begint op 0 en gaat naar de lengte van de lijst.
 
 ## Een markdown-bestand vertalen
 
-Dit is de code die ik heb in het MarkdownTranslatorService.cs bestand. Het is een eenvoudige dienst die een markdown string en een doeltaal neemt en de vertaalde markdown string teruggeeft.
+Dit is de code die ik heb in het MarkdownVertalerService.cs bestand. Het is een eenvoudige dienst die een markdown string en een doeltaal neemt en de vertaalde markdown string teruggeeft.
 
 ```csharp
     public async Task<string> TranslateMarkdown(string markdown, string targetLang, CancellationToken cancellationToken)
     {
         var document = Markdig.Markdown.Parse(markdown);
         var textStrings = ExtractTextStrings(document);
-        var batchSize = 50;
+        var batchSize = 10;
         var stringLength = textStrings.Count;
         List<string> translatedStrings = new();
         for (int i = 0; i < stringLength; i += batchSize)
@@ -69,9 +117,22 @@ Dit is de code die ik heb in het MarkdownTranslatorService.cs bestand. Het is ee
 
 Zoals u kunt zien heeft het een aantal stappen:
 
-1. `  var document = Markdig.Markdown.Parse(markdown);`- Dit verwerkt de markdown string in een document.
-2. `  var textStrings = ExtractTextStrings(document);`- Dit haalt de tekststrings uit het document.
-3. `  var batchSize = 50;`- Dit stelt de batchgrootte voor de vertaaldienst in. EasyNMT heeft een limiet op het aantal tekens dat het in één keer kan vertalen.
+1. `  var document = Markdig.Markdown.Parse(markdown);` - Dit verwerkt de markdown string in een document.
+2. `  var textStrings = ExtractTextStrings(document);` - Dit haalt de tekststrings uit het document.
+   Dit maakt gebruik van de methode
+
+```csharp
+  private bool IsWord(string text)
+    {
+        var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg" };
+        if (imageExtensions.Any(text.Contains)) return false;
+        return text.Any(char.IsLetter);
+    } 
+```
+
+Dit controleert of het 'woord' echt een werk is; afbeeldingsnamen kunnen de zinsverdelingsfunctionaliteit in EasyNMT verstoren.
+
+3. `  var batchSize = 10;` - Dit bepaalt de batchgrootte voor de vertaaldienst. EasyNMT heeft een limiet op het aantal woorden dat het kan vertalen in één keer (ongeveer 500, dus 10 lijnen is over het algemeen een goede batch grootte hier).
 4. `csharp await Post(batch, targetLang, cancellationToken)`
    Dit roept op tot de methode die vervolgens de batch plaatst naar de EasyNMT service.
 
@@ -97,23 +158,49 @@ Zoals u kunt zien heeft het een aantal stappen:
     }
 ```
 
-5. `  ReinsertTranslatedStrings(document, translatedStrings.ToArray());`- Dit plaatst de vertaalde tekenreeksen weer terug in het document. Met behulp van MarkDig's mogelijkheid om het document te laten lopen en teksttekens te vervangen.
+5. `  ReinsertTranslatedStrings(document, translatedStrings.ToArray());` - Dit plaatst de vertaalde tekenreeksen terug in het document. Met behulp van MarkDig's mogelijkheid om het document te laten lopen en teksttekens te vervangen.
+
+```csharp
+
+    private void ReinsertTranslatedStrings(MarkdownDocument document, string[] translatedStrings)
+    {
+        int index = 0;
+
+        foreach (var node in document.Descendants())
+        {
+            if (node is LiteralInline literalInline && index < translatedStrings.Length)
+            {
+                var content = literalInline.Content.ToString();
+         
+                if (!IsWord(content)) continue;
+                literalInline.Content = new Markdig.Helpers.StringSlice(translatedStrings[index]);
+                index++;
+            }
+        }
+    }
+```
 
 ## Hosted Service
 
-Om dit alles uit te voeren gebruik ik een IHostedLifetimeService die wordt gestart in het Program.cs bestand. Deze dienst leest in een markdown bestand, vertaalt het naar een aantal talen en schrijft de vertaalde bestanden naar schijf.
+Om dit alles uit te voeren gebruik ik een IHostedLifetimeService die gestart is in het programma.cs bestand. Deze dienst leest in een markdown bestand, vertaalt het naar een aantal talen en schrijft de vertaalde bestanden naar de schijf.
 
 ```csharp
-    public async Task StartedAsync(CancellationToken cancellationToken)
+  public async Task StartedAsync(CancellationToken cancellationToken)
     {
-        var files = Directory.GetFiles("Markdown", "*.md");
-
-        var outDir = "Markdown/translated";
-
-        var languages = new[] { "es", "fr", "de", "it", "jap", "uk", "zh" };
-        foreach (var language in languages)
+        if(!await blogService.IsServiceUp(cancellationToken))
         {
-            foreach (var file in files)
+            logger.LogError("Translation service is not available");
+            return;
+        }
+        ParallelOptions parallelOptions = new() { MaxDegreeOfParallelism = blogService.IPCount, CancellationToken = cancellationToken};
+        var files = Directory.GetFiles(markdownConfig.MarkdownPath, "*.md");
+
+        var outDir = markdownConfig.MarkdownTranslatedPath;
+
+        var languages = translateServiceConfig.Languages;
+        foreach(var language in languages)
+        {
+            await Parallel.ForEachAsync(files, parallelOptions, async (file,ct) =>
             {
                 var fileChanged = await file.IsFileChanged(outDir);
                 var outName = Path.GetFileNameWithoutExtension(file);
@@ -121,28 +208,26 @@ Om dit alles uit te voeren gebruik ik een IHostedLifetimeService die wordt gesta
                 var outFileName = $"{outDir}/{outName}.{language}.md";
                 if (File.Exists(outFileName) && !fileChanged)
                 {
-                    continue;
+                    return;
                 }
 
                 var text = await File.ReadAllTextAsync(file, cancellationToken);
                 try
                 {
                     logger.LogInformation("Translating {File} to {Language}", file, language);
-                    var translatedMarkdown = await blogService.TranslateMarkdown(text, language, cancellationToken);
+                    var translatedMarkdown = await blogService.TranslateMarkdown(text, language, ct);
                     await File.WriteAllTextAsync(outFileName, translatedMarkdown, cancellationToken);
                 }
                 catch (Exception e)
                 {
                     logger.LogError(e, "Error translating {File} to {Language}", file, language);
                 }
-            }
+            });
         }
-
-        logger.LogInformation("Background translation service started");
-    }
+       
 ```
 
-Zoals u kunt zien controleert het ook de hash van het bestand om te zien of het is veranderd voordat het te vertalen. Dit is om te voorkomen dat het vertalen van bestanden die niet zijn veranderd.
+Zoals je kunt zien controleert het ook de hash van het bestand om te zien of het is veranderd voordat het te vertalen. Dit is om te voorkomen dat het vertalen van bestanden die niet zijn veranderd.
 
 Dit wordt gedaan door het berekenen van een snelle hash van het oorspronkelijke markdown bestand vervolgens testen om te zien of dat bestand is veranderd voordat het probeert te vertalen.
 
@@ -169,13 +254,14 @@ De Setup in Program.cs is vrij eenvoudig:
 services.AddHttpClient<MarkdownTranslatorService>(options =>
 {
     options.Timeout = TimeSpan.FromMinutes(15);
-    options.BaseAddress = new Uri("http://192.168.0.30:24080");
 });
 ```
 
 Ik heb de HostedService (BackgroundTranslateService) en de HttpClient voor de MarkdownTranslatorService opgezet.
 Een Hosted Service is een langlopende service die op de achtergrond draait. Het is een goede plek om diensten te plaatsen die continu op de achtergrond moeten draaien of gewoon een tijdje duren om te voltooien. De nieuwe IHostedLifetimeService interface is een beetje flexibeler dan de oude IHostedService interface en laat ons taken volledig op de achtergrond gemakkelijker uitvoeren dan de oudere IHostedService.
 
-Hier kunt u zien dat ik de timeout voor de HttpClient op 15 minuten zet. Dit komt omdat EasyNMT een beetje traag kan reageren (vooral de eerste keer met een taalmodel). Ik stel ook het basisadres in op het IP-adres van de machine die de EasyNMT service draait.
+Hier zie je dat ik de time-out voor de HttpClient op 15 minuten zet. Dit komt omdat EasyNMT een beetje traag kan reageren (vooral de eerste keer met behulp van een taalmodel). Ik stel ook het basisadres in op het IP-adres van de machine die de EasyNMT service draait.
 
-I
+## Conclusie
+
+Dit is een vrij eenvoudige manier om een markdown bestand te vertalen naar meerdere talen. Het is niet perfect, maar het is een goed begin. Ik over het algemeen uitvoeren van dit voor elke nieuwe blog post en het wordt gebruikt in de `MarkdownBlogService` om de vertaalde namen voor elke blog post te trekken.

@@ -5,8 +5,11 @@
 
 Buckle in because this will be a long one!
 
+You can see parts 2 and 3 [here](/blog/addingentityframeworkforblogpostspt2) and [here](/blog/addingentityframeworkforblogpostspt3).
+
 ## Introduction
 While I've been happy with my file based approach to blogging, as an excercise I decided to move to using Postgres for storing blog posts and comments. In this post I'll show how that's done along with a few tips and tricks I've picked up along the way.
+
 
 [TOC]
 

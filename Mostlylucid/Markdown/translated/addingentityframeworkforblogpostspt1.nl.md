@@ -5,6 +5,8 @@
 
 Doe je gordel om, want dit wordt een lange.
 
+Je kunt de delen 2 en 3 zien [Hier.](/blog/addingentityframeworkforblogpostspt2) en [Hier.](/blog/addingentityframeworkforblogpostspt3).
+
 ## Inleiding
 
 Terwijl ik ben blij geweest met mijn file based benadering van bloggen, als een oefening heb ik besloten om te verhuizen naar het gebruik van Postgres voor het opslaan van blog berichten en opmerkingen. In deze post zal ik laten zien hoe dat wordt gedaan samen met een paar tips en trucs die ik heb opgepikt langs de weg.

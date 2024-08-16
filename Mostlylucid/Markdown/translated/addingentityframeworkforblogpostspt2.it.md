@@ -1,9 +1,9 @@
-# Aggiunta del quadro dell'entità per i post del blog Parte 2
+# Aggiunta del quadro dell'entità per i post del blog (parte 2)
 
 <!--category-- ASP.NET, Entity Framework -->
 <datetime class="hidden">2024-08-15T18:00</datetime>
 
-Potete trovare tutto il codice sorgente per i post del blog su [GitHubCity name (optional, probably does not need a translation)](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
+Potete trovare tutto il codice sorgente per i post del blog su [GitHubCity name (optional, probably does not need a translation)](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/Blog)
 
 **Parte 2 della serie sull'aggiunta di Entity Framework a un progetto.NET Core.**
 Si può trovare la parte 1 [qui](/blog/addingentityframeworkforblogpostspt1).
@@ -18,7 +18,7 @@ Nel prossimo post spiegheremo come questi servizi funzionano ora con i controllo
 
 ### Configurazione
 
-Ora abbiamo una classe di estensione BlogSetup che imposta questi servizi.
+Ora abbiamo una classe di estensione BlogSetup che imposta questi servizi. Questa è un'estensione da quello che abbiamo fatto in [Parte 1](/blog/addingentityframeworkforblogpostspt1), dove abbiamo creato il database e il contesto.
 
 ```csharp
   public static void SetupBlog(this IServiceCollection services, IConfiguration configuration)
@@ -108,63 +108,6 @@ public interface IMarkdownBlogService
 
 Come potete vedere è abbastanza semplice e ha solo due metodi, `GetPages` e `LanguageList`. Questi sono utilizzati per elaborare i file Markdown e ottenere l'elenco delle lingue.
 
-Ciò è attuato nel `MarkdownBlogPopulator` classe.
-
-```csharp
-public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkdownBlogService
-{
-    //Extra methods removed for brevity
-     public async Task<List<BlogPostViewModel>> GetPages()
-    {
-        var pageList = new ConcurrentBag<BlogPostViewModel>();
-        var languages = LanguageList();
-        var pages = await GetLanguagePages(EnglishLanguage);
-        foreach (var page in pages) pageList.Add(page);
-        var pageLanguages = languages.Values.SelectMany(x => x).Distinct().ToList();
-        await Parallel.ForEachAsync(pageLanguages, ParallelOptions, async (pageLang, ct) =>
-        {
-            var langPages = await GetLanguagePages(pageLang);
-            if (langPages is { Count: > 0 })
-                foreach (var page in langPages)
-                    pageList.Add(page);
-        });
-        foreach (var page in pageList)
-        {
-            var currentPagelangs = languages.Where(x => x.Key == page.Slug).SelectMany(x => x.Value)?.ToList();
-            var listLangs = currentPagelangs ?? new List<string>();
-            listLangs.Add(EnglishLanguage);
-            page.Languages = listLangs.OrderBy(x => x).ToArray();
-        }
-
-        return pageList.ToList();
-    }
-    
-     public  Dictionary<string, List<string>> LanguageList()
-    {
-        var pages = Directory.GetFiles(_markdownConfig.MarkdownTranslatedPath, "*.md");
-        Dictionary<string, List<string>> languageList = new();
-        foreach (var page in pages)
-        {
-            var pageName = Path.GetFileNameWithoutExtension(page);
-            var languageCode = pageName.LastIndexOf(".", StringComparison.Ordinal) + 1;
-            var language = pageName.Substring(languageCode);
-            var originPage = pageName.Substring(0, languageCode - 1);
-            if (languageList.TryGetValue(originPage, out var languages))
-            {
-                languages.Add(language);
-                languageList[originPage] = languages;
-            }
-            else
-            {
-                languageList[originPage] = new List<string> { language };
-            }
-        }
-        return languageList;
-    }
- 
-}
-```
-
 #### IBlogPopulatorCity name (optional, probably does not need a translation)
 
 I blogPopulatori sono utilizzati nel nostro metodo di configurazione sopra per popolare il database o oggetto di cache statico (per il sistema basato su file) con i post.
@@ -195,6 +138,8 @@ public interface IBlogPopulator
     Task Populate();
 }
 ```
+
+### Attuazione
 
 Semplice, vero? Ciò è attuato in entrambi i casi. `MarkdownBlogPopulator` e `EFBlogPopulator` lezioni.
 
@@ -235,6 +180,8 @@ Semplice, vero? Ciò è attuato in entrambi i casi. `MarkdownBlogPopulator` e `E
 
 ```
 
-Abbiamo segregato questa funzionalità in interfacce per rendere il codice più comprensibile e "segregato" (come nei principi SOLID). Questo ci permette di scambiare facilmente i servizi in base alla configurazione.
+Abbiamo suddiviso questa funzionalità in interfacce per rendere il codice più comprensibile e "segregato" (come nei principi SOLID). Questo ci permette di scambiare facilmente i servizi in base alla configurazione.
 
-Nel prossimo post, esamineremo più dettagliatamente l'attuazione della `EFBlogService` e `MarkdownBlogService` lezioni.
+# In conclusione
+
+Nel prossimo post, esamineremo più in dettaglio l'implementazione dei Controller e Views per utilizzare questi servizi.

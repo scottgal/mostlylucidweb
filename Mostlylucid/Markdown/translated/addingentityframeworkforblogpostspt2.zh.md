@@ -1,9 +1,9 @@
-# 添加实体博客文章框架第2部分
+# 添加博客文章实体框架(第2部分)
 
 <!--category-- ASP.NET, Entity Framework -->
 <datetime class="hidden">2024-08-15T18:00</datetime>
 
-您可以在博客文章中找到所有源代码 [吉特胡布](https://github.com/scottgal/mostlylucidweb/tree/local/Mostlylucid/Blog)
+您可以在博客文章中找到所有源代码 [吉特胡布](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid/Blog)
 
 **关于将实体框架加入.NET核心项目的系列第二部分。**
 第一部分可以找到 [在这里](/blog/addingentityframeworkforblogpostspt1).
@@ -18,7 +18,7 @@
 
 ### 设置设置设置设置设置设置设置
 
-现在我们有一个BlogSetup推广班来提供这些服务。
+现在我们有一个BlogSetup推广班来提供这些服务。 这是对我们所作所为的延伸 [第一部分 第一部分](/blog/addingentityframeworkforblogpostspt1),我们建立数据库和上下文。
 
 ```csharp
   public static void SetupBlog(this IServiceCollection services, IConfiguration configuration)
@@ -108,63 +108,6 @@ public interface IMarkdownBlogService
 
 正如你可以看到的,它非常简单 并且只是有两种方法, `GetPages` 和 `LanguageList`.. 这些用于处理 Markdown 文件并获取语言列表 。
 
-这项工作在以下项目中实施: `MarkdownBlogPopulator` 类。
-
-```csharp
-public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkdownBlogService
-{
-    //Extra methods removed for brevity
-     public async Task<List<BlogPostViewModel>> GetPages()
-    {
-        var pageList = new ConcurrentBag<BlogPostViewModel>();
-        var languages = LanguageList();
-        var pages = await GetLanguagePages(EnglishLanguage);
-        foreach (var page in pages) pageList.Add(page);
-        var pageLanguages = languages.Values.SelectMany(x => x).Distinct().ToList();
-        await Parallel.ForEachAsync(pageLanguages, ParallelOptions, async (pageLang, ct) =>
-        {
-            var langPages = await GetLanguagePages(pageLang);
-            if (langPages is { Count: > 0 })
-                foreach (var page in langPages)
-                    pageList.Add(page);
-        });
-        foreach (var page in pageList)
-        {
-            var currentPagelangs = languages.Where(x => x.Key == page.Slug).SelectMany(x => x.Value)?.ToList();
-            var listLangs = currentPagelangs ?? new List<string>();
-            listLangs.Add(EnglishLanguage);
-            page.Languages = listLangs.OrderBy(x => x).ToArray();
-        }
-
-        return pageList.ToList();
-    }
-    
-     public  Dictionary<string, List<string>> LanguageList()
-    {
-        var pages = Directory.GetFiles(_markdownConfig.MarkdownTranslatedPath, "*.md");
-        Dictionary<string, List<string>> languageList = new();
-        foreach (var page in pages)
-        {
-            var pageName = Path.GetFileNameWithoutExtension(page);
-            var languageCode = pageName.LastIndexOf(".", StringComparison.Ordinal) + 1;
-            var language = pageName.Substring(languageCode);
-            var originPage = pageName.Substring(0, languageCode - 1);
-            if (languageList.TryGetValue(originPage, out var languages))
-            {
-                languages.Add(language);
-                languageList[originPage] = languages;
-            }
-            else
-            {
-                languageList[originPage] = new List<string> { language };
-            }
-        }
-        return languageList;
-    }
- 
-}
-```
-
 #### IBlogPoppuputor
 
 BlogPopulators 用于上述设置方法, 以填充数据库或静态缓存对象( 以文件为基础的系统),
@@ -195,6 +138,8 @@ public interface IBlogPopulator
     Task Populate();
 }
 ```
+
+### 执行 执行情况 执行
 
 很简单吧? 这在以下两个方面都得到了实施: `MarkdownBlogPopulator` 和 `EFBlogPopulator` 班级。
 
@@ -235,6 +180,8 @@ public interface IBlogPopulator
 
 ```
 
-我们将这一功能分为接口,使代码更容易理解和“隔离”(如SOLID原则)。 这使得我们可以轻松地根据配置换掉服务。
+我们已经将这个功能分成接口, 使代码更容易理解, 并且“分离”(如SOLID原则) 。 这使得我们可以轻松地根据配置换掉服务。
 
-下一位,我们将更详细地研究执行《1990年代联合国 `EFBlogService` 和 `MarkdownBlogService` 班级。
+# 在结论结论中
+
+在下一个职位上,我们将更详细地研究主计长和看法的执行情况,以便利用这些服务。
