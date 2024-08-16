@@ -29,6 +29,7 @@
             <!-- Submit Button -->
             <button class="btn btn-primary mt-4"
                     type="submit"
+                    data-umami-event="Send Comment Click"
                     x-on:click="document.getElementById('hiddenComment').value = window.simplemde ? window.simplemde.value() : ''">
                 Comment
             </button>
