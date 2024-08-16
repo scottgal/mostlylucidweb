@@ -5,23 +5,5 @@
     Layout = "_Layout";
 }
 <div id="Comment">
-@if (Model.Authenticated)
-{
-    <div class=" max-w-none border-b border-grey-lighter py-2 dark:prose-dark sm:py-2">
-        <p class="font-body text-lg font-medium text-primary dark:text-white pb-4">Welcome @Model.Name please comment below.</p>
-        <textarea id="comment"></textarea>
-       <button class="btn btn-primary" hx-action="Submit" hx-controller="Contact" hx-post hx-vals="js:{comment: simplemde.value()}"  hx-swap="outerHTML" hx-target="#Comment" onclick="prepareForSubmission()">Comment</button>
-    
-    </div>
-}
-else
-{
-    <div class=" max-w-none border-b border-grey-lighter py-2 dark:prose-dark sm:py-2">
-        <p class="font-body text-lg font-medium text-primary dark:text-white">Please login to send a message to me!</p>
-        <div class="w-[200px] h-[39px] overflow-hidden rounded py-8">
-            <div id="google_button2">
-            </div>
-        </div>
-    </div>
-}
+   <partial name="_ContactForm" model="Model"/>
 </div>

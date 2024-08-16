@@ -10,34 +10,44 @@ using Mostlylucid.Models.Contact;
 namespace Mostlylucid.Controllers;
 
 [Route("contact")]
-public class ContactController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings,IBlogService blogService,
-    CommentService commentService, EmailSenderHostedService sender, ILogger<BaseController> logger) : BaseController(authSettingsSettings,analyticsSettings, blogService, logger)
+public class ContactController(
+    AuthSettings authSettingsSettings,
+    AnalyticsSettings analyticsSettings,
+    IBlogService blogService,
+    CommentService commentService,
+    EmailSenderHostedService sender,
+    ILogger<BaseController> logger) : BaseController(authSettingsSettings, analyticsSettings, blogService, logger)
 {
-   [Route("")]
+    [Route("")]
     public IActionResult Index()
     {
-        var user = GetUserInfo();
-        var model = new ContactViewModel(){Email = user.Email, Name = user.Name, Authenticated = user.LoggedIn};
+        ;
+        var model = new ContactViewModel();
         return View("Contact", model);
     }
-    
+
     [HttpPost]
     [Route("submit")]
-    [Authorize]
-    public async Task<IActionResult> Submit(string comment)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Submit([Bind(Prefix = "")] ContactViewModel comment)
     {
-        var user = GetUserInfo();
-            var commentHtml = commentService.ProcessComment(comment);
-            var contactModel = new ContactEmailModel()
-            {
-                SenderEmail = user.Email,
-                SenderName =user.Name,
-                Comment = commentHtml,
-            };
-            await sender.SendEmailAsync(contactModel);
-            return PartialView("_Response", new ContactViewModel(){Email = user.Email, Name = user.Name, Comment = commentHtml, Authenticated = user.LoggedIn});
+        ViewBag.Title = "Contact";
+        if (!ModelState.IsValid)
+        {
+            return PartialView("_ContactForm", comment);
+        }
+
+        var commentHtml = commentService.ProcessComment(comment.Comment);
+        var contactModel = new ContactEmailModel()
+        {
+            SenderEmail = string.IsNullOrEmpty(comment.Email) ? "Anonymous" : comment.Email,
+            SenderName = string.IsNullOrEmpty(comment.Name) ? "Anonymous" : comment.Name,
+            Comment = commentHtml,
+        };
+        await sender.SendEmailAsync(contactModel);
+        return PartialView("_Response",
+            new ContactViewModel() { Email = comment.Email, Name = comment.Name, Comment = commentHtml });
 
         return RedirectToAction("Index", "Home");
     }
-    
 }

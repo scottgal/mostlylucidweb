@@ -1,10 +1,13 @@
-﻿namespace Mostlylucid.Models.Contact;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Mostlylucid.Models.Contact;
 
 public class ContactViewModel : BaseViewModel
 {
-    public string Email { get; set; }
+    [EmailAddress(ErrorMessage = "Invalid Email Address")]
+    public string? Email { get; set; }
     
-    public string Name { get; set; }
+    [Required(ErrorMessage = "Comment is required")]
+    public string? Comment { get; set; }
     
-    public string Comment { get; set; }
 }

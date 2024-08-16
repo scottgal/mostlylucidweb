@@ -2,6 +2,7 @@
 const path = require('path');
 
 module.exports = (env, argv) => {
+
     const isProduction = argv.mode === 'production';
 
     return {
@@ -20,12 +21,12 @@ module.exports = (env, argv) => {
                 new TerserPlugin({
                     terserOptions: {
                         mangle: {
-                            // You can set `true` to enable variable and function name mangling
-                            properties: false, // Do not mangle properties (you might not want this if you rely on specific property names)
+                            // Enable variable and function name mangling
+                            properties: false, // Do not mangle properties
                         },
                         format: {
                             comments: false, // Remove comments
-                            beautify: false, // Disable beautification (set to true if you want readable output)
+                            beautify: false, // Disable beautification
                         },
                         compress: {
                             drop_console: true, // Drop console statements
@@ -37,5 +38,7 @@ module.exports = (env, argv) => {
                 }),
             ] : [],
         },
+        // Add the devtool property for source maps
+        devtool: isProduction ? 'source-map' : 'eval-source-map', // Use full source maps for production and eval-source-map for development
     };
 };

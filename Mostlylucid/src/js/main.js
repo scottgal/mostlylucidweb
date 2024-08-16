@@ -48,27 +48,16 @@ function setLogoutLink() {
         logoutLink.href = baseUrl + '?returnUrl=' + encodeURIComponent(currentUrl);
     }
 }
-
-const currentUrl = window.location.href;
-let simplemde;
 document.addEventListener('DOMContentLoaded', function () {
     initGoogleSignIn();
     hljs.highlightAll();
     mermaid.initialize({ startOnLoad: true });
-    if (document.getElementById("comment") != null)
-    {
-        simplemde = new SimpleMDE({ element: document.getElementById("comment") });
-    }
+    initializeSimpleMDE();
     setLogoutLink();
 });
 document.body.addEventListener('htmx:afterSwap', function(evt) {
     hljs.highlightAll();
-    if (document.getElementById("comment") != null)
-    {
-        simplemde = new SimpleMDE({ element: document.getElementById("comment") });
-
-
-    }
+   initializeSimpleMDE();
     const url = evt.detail.pathInfo.requestPath;
 
     // Track the page view in Umami
@@ -81,6 +70,18 @@ document.body.addEventListener('htmx:afterSwap', function(evt) {
     setLogoutLink();
 });
 
+function initializeSimpleMDE() {
+    if (window.simplemde) {
+        window.simplemde.toTextArea();
+        window.simplemde = null;
+    }
+    const element = document.getElementById("comment");
+    // Initialize a new SimpleMDE instance
+    window.simplemde = new SimpleMDE({ element: element });
+
+}
+
+window.simplemde = null;
 function renderButton(element)
 {
     google.accounts.id.renderButton(
