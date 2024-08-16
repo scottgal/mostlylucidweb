@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Htmx;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mostlylucid.Blog;
 using Mostlylucid.Blog.Markdown;
@@ -31,6 +32,11 @@ public class ContactController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Submit([Bind(Prefix = "")] ContactViewModel comment)
     {
+        //Only allow HTMX requests
+        if(!Request.IsHtmx())
+        {
+            return RedirectToAction("Index", "Contact");
+        }
         ViewBag.Title = "Contact";
         if (!ModelState.IsValid)
         {
