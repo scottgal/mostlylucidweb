@@ -16,7 +16,6 @@ builder.Host.UseSerilog((context, configuration) =>
 var config = builder.Configuration;
 builder.Configuration.AddEnvironmentVariables();
 builder.Configure<AnalyticsSettings>();
-
 var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
@@ -32,7 +31,7 @@ if (translateServiceConfig.Enabled) services.SetupTranslateService();
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 services.SetupEmail(builder.Configuration);
 services.SetupRSS();
-services.SetupBlog(config);
+services.SetupBlog(config, builder.Environment);
 
 // Setup CORS for Google Auth Use.
 services.AddCors(options =>

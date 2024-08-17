@@ -10,7 +10,7 @@ namespace Mostlylucid.Blog;
 
 public static class BlogSetup
 {
-    public static void SetupBlog(this IServiceCollection services, IConfiguration configuration)
+    public static void SetupBlog(this IServiceCollection services, IConfiguration configuration, IWebHostEnvironment env)
     {
         var config = services.ConfigurePOCO<BlogConfig>(configuration.GetSection(BlogConfig.Section));
        services.ConfigurePOCO<MarkdownConfig>(configuration.GetSection(MarkdownConfig.Section));
@@ -26,6 +26,10 @@ public static class BlogSetup
                 Log.Information("Using Database based blog");
                 services.AddDbContext<MostlylucidDbContext>(options =>
                 {
+                    if (env.IsDevelopment())
+                    {
+                        options.EnableSensitiveDataLogging(true);
+                    }
                     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
                 });
                 services.AddScoped<IBlogService, EFBlogService>();

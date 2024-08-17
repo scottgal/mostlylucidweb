@@ -14,7 +14,6 @@ public class BlogPostEntity
     public string HtmlContent { get; set; }
     public string PlainTextContent { get; set; }
     public string ContentHash { get; set; }
-
     
     public int WordCount { get; set; }
     

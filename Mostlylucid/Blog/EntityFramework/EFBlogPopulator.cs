@@ -6,63 +6,97 @@ using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog.EntityFramework;
 
-public class EFBlogPopulator(
-    IMarkdownBlogService markdownBlogService,
-    MostlylucidDbContext context,
-    ILogger<EFBlogPopulator> logger) : BaseService, IBlogPopulator
+public class EFBlogPopulator : EFBaseService, IBlogPopulator
 {
+    private readonly ILogger<EFBlogPopulator> _logger;
+    private readonly IMarkdownBlogService _markdownBlogService;
+
+    public EFBlogPopulator(IMarkdownBlogService markdownBlogService,
+        MostlylucidDbContext context,
+        ILogger<EFBlogPopulator> logger) : base(context)
+    {
+        _markdownBlogService = markdownBlogService;
+        _logger = logger;
+    }
+
     public async Task Populate()
     {
-        var posts = await markdownBlogService.GetPages();
-        var languages = markdownBlogService.LanguageList();
+        var posts = await _markdownBlogService.GetPages();
+        var languages = _markdownBlogService.LanguageList();
 
         var languageEntities = await EnsureLanguages(languages);
         await EnsureCategoriesAndPosts(posts, languageEntities);
 
-        await context.SaveChangesAsync();
+        await Context.SaveChangesAsync();
     }
 
+private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List<string>> languages)
+{
+    // Extract the list of distinct languages from the input dictionary
+    var languageList = languages.SelectMany(x => x.Value).Distinct().ToList();
+    
+    // Retrieve the current languages from the database (trimmed and distinct)
+    var currentLanguages = await Context.Languages.Select(x => x.Name.Trim()).ToListAsync();
 
-    private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List<string>> languages)
+    // List to hold language entities, both from DB and new ones
+    var languageEntities = new List<LanguageEntity>();
+    
+    // Check if English exists in the database, add if missing
+    var enLang = new LanguageEntity { Name = MarkdownBaseService.EnglishLanguage };
+    
+    if (!currentLanguages.Contains(MarkdownBaseService.EnglishLanguage))
     {
-        var languageList = languages.SelectMany(x => x.Value).ToList();
-        var currentLanguages = await context.Languages.Select(x => x.Name).ToListAsync();
-
-        var languageEntities = new List<LanguageEntity>();
-        var enLang = new LanguageEntity { Name = EnglishLanguage };
-
-        if (!currentLanguages.Contains(EnglishLanguage)) context.Languages.Add(enLang);
-        languageEntities.Add(enLang);
-
-        foreach (var language in languageList)
-        {
-            if (languageEntities.Any(x => x.Name == language)) continue;
-
-            var langItem = new LanguageEntity { Name = language };
-
-            if (!currentLanguages.Contains(language)) context.Languages.Add(langItem);
-
-            languageEntities.Add(langItem);
-        }
-
-        await context.SaveChangesAsync(); // Save the languages first so we can reference them in the blog posts
-        return languageEntities;
+        // Add English to context if it's not in the DB and add to the list
+        Context.Languages.Add(enLang);
+        languageEntities.Add(enLang); 
     }
+    else
+    {
+        // Fetch the existing English language entity from the DB and add it to the list
+        var existingEnglishLanguage = await Context.Languages.FirstOrDefaultAsync(x => x.Name == MarkdownBaseService.EnglishLanguage);
+        languageEntities.Add(existingEnglishLanguage);
+    }
+
+    // Iterate through the provided language list
+    foreach (var language in languageList)
+    {
+        if (currentLanguages.Contains(language))
+        {
+            // Fetch the existing language entity from the DB and add it to the list
+            var existingLanguage = await Context.Languages.FirstOrDefaultAsync(x => x.Name == language);
+            languageEntities.Add(existingLanguage);
+        }
+        else
+        {
+            // Add the new language to context and to the list
+            var newLanguage = new LanguageEntity { Name = language };
+            Context.Languages.Add(newLanguage);
+            languageEntities.Add(newLanguage);
+        }
+    }
+
+    await Context.SaveChangesAsync();
+    // Do not call SaveChangesAsync here if you want to defer saving
+    return languageEntities;
+}
+
 
     private async Task EnsureCategoriesAndPosts(
         IEnumerable<BlogPostViewModel> posts,
         List<LanguageEntity> languageEntities)
     {
-        var existingPosts = await context.BlogPosts.Select(x => x.ContentHash).ToListAsync();
-        var existingCategories = await context.Categories.Select(x => x.Name).ToListAsync();
+        var existingCategories = await Context.Categories.Select(x => x.Name).ToListAsync();
 
         var languages = languageEntities.ToDictionary(x => x.Name, x => x);
         var categories = new List<CategoryEntity>();
 
         foreach (var post in posts)
         {
+            var currentPost =
+                await PostsQuery()
+                    .FirstOrDefaultAsync(x => x.Slug == post.Slug && x.LanguageEntity.Name == post.Language);
             await AddCategoriesToContext(post.Categories, existingCategories, categories);
-            await AddBlogPostToContext(post, languages[post.Language], categories, existingPosts);
+            await AddBlogPostToContext(post, languages[post.Language], categories, currentPost);
         }
     }
 
@@ -77,7 +111,7 @@ public class EFBlogPopulator(
 
             var cat = new CategoryEntity { Name = category };
 
-            if (!existingCategories.Contains(category)) await context.Categories.AddAsync(cat);
+            if (!existingCategories.Contains(category)) await Context.Categories.AddAsync(cat);
 
             categories.Add(cat);
         }
@@ -87,36 +121,55 @@ public class EFBlogPopulator(
         BlogPostViewModel post,
         LanguageEntity postLanguageEntity,
         List<CategoryEntity> categories,
-        List<string> existingPosts)
+        BlogPostEntity? currentPost)
     {
-        var hash = post.HtmlContent.ContentHash();
-        if (existingPosts.Contains(hash)) return;
-
-        var blogPost = new BlogPostEntity
+        try
         {
-            Title = post.Title,
-            Slug = post.Slug,
-            HtmlContent = post.HtmlContent,
-            PlainTextContent = post.PlainTextContent,
-            ContentHash = hash,
-            PublishedDate = post.PublishedDate,
-            LanguageEntity = postLanguageEntity,
-            LanguageId = postLanguageEntity.Id,
-            Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList()
-        };
+            var hash = post.HtmlContent.ContentHash();
+            var currentCategoryNames = currentPost?.Categories.Select(x => x.Name).ToArray() ?? Array.Empty<string>();
+            var categoriesChanged = false;
+            if (!currentCategoryNames.All(post.Categories.Contains) ||
+                !post.Categories.All(currentCategoryNames.Contains))
+            {
+                categoriesChanged = true;
+                _logger.LogInformation("Categories have changed for post {Post}", post.Slug);
+            }
 
-        var currentPost =
-            await context.BlogPosts.FirstOrDefaultAsync(x => x.Slug == post.Slug && x.LanguageEntity.Name == post.Language);
-        if (currentPost != null)
-        {
-            if (currentPost.ContentHash == hash) return;
-            logger.LogInformation("Updating post {Post}", post.Slug);
-            context.BlogPosts.Update(blogPost);
+            var dateChanged = currentPost?.PublishedDate.UtcDateTime.Date != post.PublishedDate.ToUniversalTime().Date;
+            var titleChanged = currentPost?.Title != post.Title;
+            if (!titleChanged && !dateChanged && hash == currentPost?.ContentHash && !categoriesChanged)
+            {
+                _logger.LogInformation("Post {Post} has not changed", post.Slug);
+                return;
+            }
+
+            var blogPost = new BlogPostEntity
+            {
+                Title = post.Title,
+                Slug = post.Slug,
+                HtmlContent = post.HtmlContent,
+                PlainTextContent = post.PlainTextContent,
+                ContentHash = hash,
+                PublishedDate = post.PublishedDate,
+                LanguageEntity = postLanguageEntity,
+                Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList()
+            };
+
+
+            if (currentPost != null)
+            {
+                _logger.LogInformation("Updating post {Post}", post.Slug);
+                Context.BlogPosts.Update(blogPost);
+            }
+            else
+            {
+                _logger.LogInformation("Adding post {Post}", post.Slug);
+                await Context.BlogPosts.AddAsync(blogPost);
+            }
         }
-        else
+        catch (Exception e)
         {
-            logger.LogInformation("Adding post {Post}", post.Slug);
-            await context.BlogPosts.AddAsync(blogPost);
+            _logger.LogError(e, "Error adding post {Post}", post.Slug);
         }
     }
 }

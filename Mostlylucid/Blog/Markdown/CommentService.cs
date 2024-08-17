@@ -5,7 +5,7 @@ using Mostlylucid.Controllers;
 
 namespace Mostlylucid.Blog.Markdown;
 
-public class CommentService(MarkdownConfig markdownConfig) : BaseService
+public class CommentService(MarkdownConfig markdownConfig) : Blog.MarkdownBaseService
 {
     private static readonly Regex CommentNameRegex = new("<!--name\\s+(.*?)\\s+-->\n",
         RegexOptions.Compiled | RegexOptions.Singleline);

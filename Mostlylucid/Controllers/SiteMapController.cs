@@ -29,9 +29,9 @@ public class SiteMapController(IBlogService blogService, IHttpContextAccessor ht
         List<SiteMapPage> siteMapPages = new();
         siteMapPages.Add(new SiteMapPage(Url.Action("Index", "Home"), DateTime.UtcNow, 1, ChangeFrequency.Daily));
         siteMapPages.AddRange( pages.Select(x =>
-            new SiteMapPage( x.Language == BaseService.EnglishLanguage ? Url.Action("Show", "Blog", new {x.Slug}): 
+            new SiteMapPage( x.Language == MarkdownBaseService.EnglishLanguage ? Url.Action("Show", "Blog", new {x.Slug}): 
                 Url.Action("Language", "Blog", new {x.Slug, x.Language})
-                , x.PublishedDate, x.Language == BaseService.EnglishLanguage ?1 : 0.8, ChangeFrequency.Daily)).ToList());
+                , x.PublishedDate, x.Language == MarkdownBaseService.EnglishLanguage ?1 : 0.8, ChangeFrequency.Daily)).ToList());
         
         
         XNamespace sitemap = "http://www.sitemaps.org/schemas/sitemap/0.9";

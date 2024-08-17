@@ -5,7 +5,7 @@ using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog;
 
-public class BaseService
+public class MarkdownBaseService
 {
     public const string EnglishLanguage = "en";
     protected   MarkdownPipeline Pipeline() =>  new MarkdownPipelineBuilder()

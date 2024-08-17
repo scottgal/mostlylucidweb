@@ -93,5 +93,3 @@ Esto también mantiene su página de acuerdo con su diseño y diseño elegido.
 ## Conclusión
 
 Esta es una forma sencilla de manejar errores en una aplicación ASP.NET Core. Proporciona una buena experiencia de usuario y nos permite hacer un seguimiento de los errores. Es una buena idea registrar errores en un servicio de registro para que pueda realizar un seguimiento de ellos y solucionarlos antes de que se conviertan en un problema.
-
-

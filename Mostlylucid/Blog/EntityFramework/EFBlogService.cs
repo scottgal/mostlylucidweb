@@ -6,31 +6,18 @@ using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog.EntityFramework;
 
-public class EFBlogService : BaseService, IBlogService
+public class EFBlogService(
+    MostlylucidDbContext context,
+    ILogger<EFBlogService> logger)
+    : EFBaseService(context), IBlogService
 {
-    private readonly MostlylucidDbContext _context;
-    private readonly ILogger<EFBlogService> _logger;
-    private readonly IMarkdownBlogService _markdownBlogService;
 
-    public EFBlogService(MostlylucidDbContext context, IMarkdownBlogService markdownBlogService,
-        ILogger<EFBlogService> logger)
-    {
-        _logger = logger;
-        _context = context;
-        _markdownBlogService = markdownBlogService;
-    }
-
-    public async Task<List<string>> GetCategories() => await _context.Categories.Select(x => x.Name).ToListAsync();
- 
-
-    private IQueryable<BlogPostEntity> PostsQuery()=>_context.BlogPosts.Include(x => x.Categories)
-            .Include(x => x.LanguageEntity);
-    
-    
+    private IQueryable<BlogPostEntity> NoTrackingQuery() => PostsQuery().AsNoTrackingWithIdentityResolution();
     public async Task<List<BlogPostViewModel>> GetPosts(DateTime? startDate = null, string category = "")
     {
-        var posts = await PostsQuery().ToListAsync();
-        _logger.LogInformation("Getting posts");
+        
+        var posts = await NoTrackingQuery().ToListAsync();
+        logger.LogInformation("Getting posts");
         return posts.Select(p => new BlogPostViewModel
         {
             Title = p.Title,
@@ -42,10 +29,10 @@ public class EFBlogService : BaseService, IBlogService
     }
 
     public async Task<PostListViewModel> GetPostsByCategory(string category, int page = 1, int pageSize = 10,
-        string language = EnglishLanguage)
+        string language = MarkdownBaseService.EnglishLanguage)
     {
         
-        var count = await PostsQuery()
+        var count = await NoTrackingQuery()
             .Where(x => x.Categories.Any(c => c.Name == category) && x.LanguageEntity.Name == language).CountAsync();
         var posts = await PostsQuery()
             .Where(x => x.Categories.Any(c => c.Name == category) && x.LanguageEntity.Name == language)
@@ -66,9 +53,9 @@ public class EFBlogService : BaseService, IBlogService
     }
 
     public Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "",
-        string language = EnglishLanguage)
+        string language = MarkdownBaseService.EnglishLanguage)
     {
-        var query = PostsQuery();
+        var query = NoTrackingQuery();
         if (category != "") query = query.Where(x => x.Categories.Any(c => c.Name == category));
         if (startDate != null) query = query.Where(x => x.PublishedDate >= startDate);
 
@@ -82,17 +69,17 @@ public class EFBlogService : BaseService, IBlogService
 
     public async Task<BlogPostViewModel?> GetPost(string slug, string language = "")
     {
-        if (string.IsNullOrEmpty(language)) language = EnglishLanguage;
-        var post = await PostsQuery().FirstOrDefaultAsync(x => x.Slug == slug && x.LanguageEntity.Name == language);
+        if (string.IsNullOrEmpty(language)) language =MarkdownBaseService.EnglishLanguage;
+        var post = await NoTrackingQuery().FirstOrDefaultAsync(x => x.Slug == slug && x.LanguageEntity.Name == language);
         if (post == null) return null;
         var langArr = await GetLanguagesForSlug(slug);
         return post.ToPostModel(langArr);
     }
 
     public async Task<PostListViewModel> GetPagedPosts(int page = 1, int pageSize = 10,
-        string language = EnglishLanguage)
+        string language = MarkdownBaseService.EnglishLanguage)
     {
-        var query =PostsQuery().Where(x => x.LanguageEntity.Name == language);
+        var query =NoTrackingQuery().Where(x => x.LanguageEntity.Name == language);
         var count = await query.CountAsync();
         var posts = await query
             .OrderByDescending(x=>x.PublishedDate)
@@ -103,14 +90,14 @@ public class EFBlogService : BaseService, IBlogService
         return await GetPostList(count, posts, page, pageSize);
     }
 
-    private async Task<List<string>> GetLanguagesForSlug(string slug)=> await PostsQuery()
+    private async Task<List<string>> GetLanguagesForSlug(string slug)=> await NoTrackingQuery()
         .Where(x => x.Slug == slug).Select(x=>x.LanguageEntity.Name).ToListAsync();
  
 
 
     private async Task<Dictionary<string, List<string>>> GetLanguagesForSlugs(List<string> slugs)
     {
-        var langSlugs = await PostsQuery()
+        var langSlugs = await NoTrackingQuery()
             .Where(x => slugs.Contains(x.Slug))
             .Select(x => new { x.Slug, x.LanguageEntity.Name }).ToListAsync();
 
@@ -134,8 +121,7 @@ public class EFBlogService : BaseService, IBlogService
 
     private async Task<PostListViewModel> GetPostList(int count, List<BlogPostEntity> posts, int page, int pageSize)
     {
-        var languages = await _context.BlogPosts.Include(x => x.LanguageEntity)
-            .Where(x => posts.Select(x => x.Slug).Contains(x.Slug)).Select(x =>
+        var languages = await NoTrackingQuery().Select(x =>
                 new { x.Slug, x.LanguageEntity.Name }
             ).ToListAsync();
 

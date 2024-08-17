@@ -3,7 +3,7 @@ using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog.Markdown;
 
-public class MarkdownBaseService(MarkdownConfig markdownConfig) : BaseService
+public class MarkdownBaseService(MarkdownConfig markdownConfig) : Blog.MarkdownBaseService
 {
         
     private static readonly Dictionary<(string slug, string language), BlogPostViewModel> PageCache = new();
