@@ -14,6 +14,7 @@
       - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
       - Analytics__UmamiPath=${ANALYTICS_UMAMIPATH}
       - Analytics__WebsiteId=${ANALYTICS_WEBSITEID}
+      - ConnectionStrings__DefaultConnection=${POSTGRES_CONNECTIONSTRING}
     volumes:
       - /mnt/imagecache:/app/wwwroot/cache
       - /mnt/markdown/comments:/app/Markdown/comments
