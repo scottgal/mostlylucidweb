@@ -89,4 +89,3 @@ This also keeps your page in accordance with your chosen layout and design.
 
 ## In Conclusion
 This is a simple way to handle errors in an ASP.NET Core application. It provides a good user experience and allows us to keep track of errors. It's a good idea to log errors to a logging service so you can keep track of them and fix them before they become a problem.
-```
