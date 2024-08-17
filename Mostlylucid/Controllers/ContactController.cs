@@ -22,6 +22,8 @@ public class ContactController(
     [Route("")]
     public IActionResult Index()
     {
+        
+        ViewBag.Title = "Contact";
         ;
         var model = new ContactViewModel();
         return View("Contact", model);
@@ -32,12 +34,13 @@ public class ContactController(
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Submit([Bind(Prefix = "")] ContactViewModel comment)
     {
+        ViewBag.Title = "Contact";
         //Only allow HTMX requests
         if(!Request.IsHtmx())
         {
             return RedirectToAction("Index", "Contact");
         }
-        ViewBag.Title = "Contact";
+      
         if (!ModelState.IsValid)
         {
             return PartialView("_ContactForm", comment);

@@ -34,6 +34,7 @@
         },
     };
 }
+
 window.global = global;
 function setLogoutLink() {
     // Get the logout link
@@ -65,17 +66,23 @@ document.body.addEventListener('htmx:afterSwap', function(evt) {
         umami.track(props => ({ ...props, url:url }));
 
     }
+    else
+    {
+        console.log('umami is not defined');
+    }
     initGoogleSignIn();
     mermaid.run();
     setLogoutLink();
 });
 
 function initializeSimpleMDE() {
+    const element = document.getElementById("comment");
+    if (!element) return;
     if (window.simplemde) {
         window.simplemde.toTextArea();
         window.simplemde = null;
     }
-    const element = document.getElementById("comment");
+
     // Initialize a new SimpleMDE instance
     window.simplemde = new SimpleMDE({ element: element });
 

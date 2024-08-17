@@ -1,7 +1,7 @@
 ﻿@model Mostlylucid.Models.Contact.ContactViewModel
 
 
- <form asp-action="Submit" hx-boost="true" hx-target="#Comment" method="post" x-data>
+ <form asp-action="Submit" hx-boost="true" hx-push-url="false" hx-target="#Comment" method="post" x-data>
         @Html.AntiForgeryToken()
         <div class="max-w-none border-b border-grey-lighter py-2 dark:prose-dark sm:py-2">
             <div asp-validation-summary="All" class="text-red-500" id="validationsummary"></div>

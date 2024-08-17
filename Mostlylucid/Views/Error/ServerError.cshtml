@@ -1,0 +1,16 @@
+﻿
+
+<h1>500 - Server Errpr</h1>
+
+<p>Sorry there seems to be an error with that page.</p>
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (!window.hasTracked) {
+                umami.track('500', { page:'@ViewData["OriginalUrl"]'});
+                window.hasTracked = true;
+            }
+        });
+
+    </script>
+}

@@ -12,19 +12,22 @@ namespace Mostlylucid.Controllers;
 
 public class BaseController : Controller
 {
-    private readonly AuthSettings _authSettingsSettings;
-    private readonly IBlogService _blogService;
+    private readonly AuthSettings? _authSettingsSettings;
+    private readonly IBlogService? _blogService;
     private readonly ILogger<BaseController> _logger;
     private readonly AnalyticsSettings _analyticsSettings;
 
+    public BaseController(AnalyticsSettings analyticsSettings, ILogger<BaseController> logger)
+    {
+        _analyticsSettings = analyticsSettings;
+        _logger = logger;
+    }
 
     
-    public BaseController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings, IBlogService blogService, ILogger<BaseController> logger)
+    public BaseController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings, IBlogService blogService, ILogger<BaseController> logger) : this(analyticsSettings, logger)
     {
-        _logger = logger;
         _authSettingsSettings = authSettingsSettings;
         _blogService = blogService;
-        _analyticsSettings = analyticsSettings;
        
     }
     
@@ -37,9 +40,15 @@ public class BaseController : Controller
             ViewBag.UmamiPath = _analyticsSettings.UmamiPath;
             ViewBag.UmamiWebsiteId = _analyticsSettings.WebsiteId;
         }
-        _logger.LogInformation("Adding categories to viewbag");
-        ViewBag.Categories =(await  _blogService.GetCategories()).OrderBy(x=>x).ToList();
-       await base.OnActionExecutionAsync(filterContext, next);
+
+        if (_blogService != null)
+        {
+
+            _logger.LogInformation("Adding categories to viewbag");
+            ViewBag.Categories = (await _blogService.GetCategories()).OrderBy(x => x).ToList();
+        }
+
+        await base.OnActionExecutionAsync(filterContext, next);
     }
     
     public record LoginData(bool LoggedIn, string? Name, string? AvatarUrl, string? Email, string? Identifier, bool IsAdmin = false);

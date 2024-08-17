@@ -16,11 +16,14 @@
           href="https://@Context.Request.Host/rss" />
 
     <!-- Dynamic RSS Feed Links for each category -->
-    @foreach(var category in ViewBag.Categories)
+    @if (ViewBag.Categories != null)
     {
-    <link rel="alternate" type="application/atom+xml"
-          title="RSS Feed for mostlylucid.net - @category"
-          href="https://@Context.Request.Host/rss?category=@category" />
+        foreach (var category in ViewBag.Categories)
+        {
+            <link rel="alternate" type="application/atom+xml"
+                  title="RSS Feed for mostlylucid.net - @category"
+                  href="https://@Context.Request.Host/rss?category=@category"/>
+        }
     }
 
     <!-- Facebook Meta Tags -->
@@ -107,24 +110,29 @@
                 <ul class="flex flex-wrap items-center justify-end space-x-4">
                     <li class="group relative mb-1">
                         <div class="flex items-center space-x-4">
-                            @if (Model.Authenticated)
+                            @if (Model != null)
                             {
-                            <div class="flex items-center space-x-4">
-                                @if (Model.AvatarUrl != null)
-                                {
-                                <img src="@Model.AvatarUrl" class="h-10 w-10 rounded-full" alt="User Avatar" />
-                                }
-                                <span class="text-blue-dark dark:text-white">Logged in as @Model.Name</span>
-                                <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-primary text-white rounded">
-                                    Logout
-                                </a>
-                            </div>
+                                
+                           
+                            if (Model.Authenticated)
+                            {
+                                <div class="flex items-center space-x-4">
+                                    @if (Model.AvatarUrl != null)
+                                    {
+                                        <img src="@Model.AvatarUrl" class="h-10 w-10 rounded-full" alt="User Avatar"/>
+                                    }
+                                    <span class="text-blue-dark dark:text-white">Logged in as @Model.Name</span>
+                                    <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-primary text-white rounded">
+                                        Logout
+                                    </a>
+                                </div>
                             }
                             else
                             {
-                            <div class="w-[200px] h-[39px] overflow-hidden rounded">
-                                <div id="google_button"></div>
-                            </div>
+                                <div class="w-[200px] h-[39px] overflow-hidden rounded">
+                                    <div id="google_button"></div>
+                                </div>
+                            }
                             }
                         </div>
                     </li>

@@ -66,14 +66,23 @@ services
 var app = builder.Build();
 app.UseSerilogRequestLogging();
 
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    //Hnadle unhandled exceptions 500 erros
+    app.UseExceptionHandler("/error/500");
+    //Handle 404 erros
+
     app.UseHsts();
 }
+else
+{
+    app.UseDeveloperExceptionPage();
+    app.UseHttpsRedirection();
+}
 
-app.UseHttpsRedirection();
+app.UseStatusCodePagesWithReExecute("/error/{0}");
 var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -103,6 +112,7 @@ app.MapGet("/robots.txt", async httpContext =>
     policyBuilder.Expire(TimeSpan.FromDays(60));
     policyBuilder.Cache();
 });
+
 
 app.MapControllerRoute(
     name: "sitemap",
