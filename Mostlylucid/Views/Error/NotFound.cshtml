@@ -5,9 +5,6 @@
 <p>Sorry that Url doesn't look valid</p>
 @section Scripts {
     <script>
-
-   
-
             document.addEventListener('DOMContentLoaded', function () {
                 if (!window.hasTracked) {
                     umami.track('404', { page:'@ViewData["OriginalUrl"]'});
