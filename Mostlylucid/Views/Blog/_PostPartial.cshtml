@@ -20,6 +20,7 @@
                         class="inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">@category</span>
                 </a>
             }
+            <a asp-action="Edit" class="ml-4 text-sm  btn-sm btn btn-outline btn-primary" asp-controller="Editor" asp-route-slug="@Model.Slug" asp-route-language="@Model.Language" ><i class=" bx bx-edit"></i> edit</a>
         </div>
      
             @if (Model.Languages.Length > 1)

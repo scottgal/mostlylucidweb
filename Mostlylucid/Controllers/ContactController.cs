@@ -20,6 +20,7 @@ public class ContactController(
     ILogger<BaseController> logger) : BaseController(authSettingsSettings, analyticsSettings, blogService, logger)
 {
     [Route("")]
+    [HttpGet]
     public IActionResult Index()
     {
         

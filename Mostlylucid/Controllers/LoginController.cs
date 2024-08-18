@@ -12,6 +12,7 @@ namespace Mostlylucid.Controllers
     public class LoginController : Controller
     {
         [Route("challenge")]
+        [HttpGet]
         public IActionResult Login(string returnUrl = "/")
         {
             // Challenge the user using Google authentication
@@ -20,6 +21,7 @@ namespace Mostlylucid.Controllers
         }
 
         [Route("logout")]
+        [HttpGet]
         public async Task<IActionResult> Logout(string returnUrl = "/")
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

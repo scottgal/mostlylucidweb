@@ -11,6 +11,8 @@ public class BlogPostEntity
     
     public string Title { get; set; }
     public string Slug { get; set; }
+    
+    public string OriginalMarkdown { get; set; } = string.Empty;
     public string HtmlContent { get; set; }
     public string PlainTextContent { get; set; }
     public string ContentHash { get; set; }

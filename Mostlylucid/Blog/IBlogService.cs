@@ -15,7 +15,10 @@ public interface IBlogService
 
 public interface IMarkdownBlogService
 {
+    BlogPostViewModel GetPageFromMarkdown(string markdownLines, DateTime publishedDate, string filePath);
     Task<List<BlogPostViewModel>> GetPages();
+    Task<BlogPostViewModel?> GetPageFromSlug(string slug, string language = "");
     
     Dictionary<string, List<String>> LanguageList();
+    
 }

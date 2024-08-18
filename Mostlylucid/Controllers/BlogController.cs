@@ -33,6 +33,7 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     }
 
     [Route("{slug}")]
+        [HttpGet]
     [ResponseCache(Duration = 300, VaryByHeader  = "hx-request", VaryByQueryKeys = new[] { nameof(slug), nameof(language)}, Location = ResponseCacheLocation.Any)]
     [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"hx-request"} ,VaryByQueryKeys = new[] { nameof(slug), nameof(language)})]
     public async Task<IActionResult> Show(string slug, string language = MarkdownBaseService.EnglishLanguage)

@@ -115,6 +115,7 @@ public class MarkdownTranslatorService(TranslateServiceConfig translateServiceCo
     {
         var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg" };
         if (imageExtensions.Any(text.Contains)) return false;
+        
         return text.Any(char.IsLetter);
     }
 

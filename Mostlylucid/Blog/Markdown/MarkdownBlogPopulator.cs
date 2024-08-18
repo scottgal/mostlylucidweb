@@ -39,7 +39,18 @@ public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkd
         if (GetPageCache() is { Count: > 0 }) return;
         Dictionary<(string slug, string lang), BlogPostViewModel> pageCache = new();
         var pages = await GetPages();
-        foreach (var page in pages) pageCache.TryAdd((page.Slug, page.Language), page);
+        foreach (var page in pages)
+        {
+            if (page.Language != EnglishLanguage)
+            {
+                //Do not cache markdown for translated pages
+                page.OriginalMarkdown = string.Empty;
+            }
+         
+                pageCache.TryAdd((page.Slug, page.Language), page);
+            
+           
+        }
         SetPageCache(pageCache);
     }
 
@@ -55,17 +66,12 @@ public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkd
         return categories;
     }
 
-    private async Task<BlogPostViewModel> GetPage(string filePath)
+    private Regex SplitRegex => new(@"\r\n|\r|\n", RegexOptions.Compiled);
+
+    public BlogPostViewModel GetPageFromMarkdown(string markdownLines, DateTime publishedDate, string filePath)
     {
         var pipeline = Pipeline();
-        var fileInfo = new FileInfo(filePath);
-
-        // Ensure the file exists
-        if (!fileInfo.Exists) throw new FileNotFoundException("The specified file does not exist.", filePath);
-
-        // Read all lines from the file
-        var lines = await File.ReadAllLinesAsync(filePath);
-
+        var lines =  SplitRegex.Split(markdownLines);
         // Get the title from the first line
         var title = lines.Length > 0 ? Markdig.Markdown.ToPlainText(lines[0].Trim()) : string.Empty;
 
@@ -75,7 +81,6 @@ public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkd
         // Extract categories from the text
         var categories = GetCategories(restOfTheLines);
 
-        var publishedDate = fileInfo.CreationTime;
         var publishDate = DateRegex.Match(restOfTheLines).Groups[1].Value;
         if (!string.IsNullOrWhiteSpace(publishDate))
             publishedDate = DateTime.ParseExact(publishDate, "yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture);
@@ -93,6 +98,7 @@ public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkd
         // Return the parsed and processed content
         return new BlogPostViewModel
         {
+            OriginalMarkdown =  string.Join(Environment.NewLine, lines),
             Categories = categories,
             WordCount = restOfTheLines.WordCount(),
             HtmlContent = processed,
@@ -101,6 +107,31 @@ public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkd
             Slug = slug,
             Title = title
         };
+    }
+
+    public async Task<BlogPostViewModel?> GetPageFromSlug(string slug, string language = "")
+    {
+
+        var pagePath =Path.Combine(_markdownConfig.MarkdownPath, $"{slug}.md");
+        if (!string.IsNullOrEmpty(language) && language != EnglishLanguage)
+            pagePath = Path.Combine(_markdownConfig.MarkdownTranslatedPath, $"{slug}.{language}.md");
+        if (!File.Exists(pagePath))
+            return null;
+        return await GetPage(pagePath);
+    }
+    
+    private async Task<BlogPostViewModel> GetPage(string filePath)
+    {
+      
+        var fileInfo = new FileInfo(filePath);
+        // Ensure the file exists
+        if (!fileInfo.Exists) throw new FileNotFoundException("The specified file does not exist.", filePath);
+        // Read all lines from the file
+        var lines = await File.ReadAllTextAsync(filePath);
+        var publishedDate = fileInfo.CreationTime;
+        return  GetPageFromMarkdown(lines, publishedDate, filePath);
+
+  
     }
 
 

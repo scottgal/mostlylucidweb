@@ -48,6 +48,7 @@ public class BackgroundTranslateService(MarkdownConfig markdownConfig,
                 }
 
                 var text = await File.ReadAllTextAsync(file, cancellationToken);
+       
                 try
                 {
                     logger.LogInformation("Translating {File} to {Language}", file, language);

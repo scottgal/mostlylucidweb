@@ -147,6 +147,7 @@ private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List
             {
                 Title = post.Title,
                 Slug = post.Slug,
+                OriginalMarkdown = post.OriginalMarkdown,
                 HtmlContent = post.HtmlContent,
                 PlainTextContent = post.PlainTextContent,
                 ContentHash = hash,

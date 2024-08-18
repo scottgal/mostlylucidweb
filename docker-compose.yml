@@ -78,7 +78,6 @@
     networks:
       - app_network
     restart: always
-
   caddy:
     image: caddy:latest
     ports:
@@ -90,6 +89,14 @@
     networks:
       - app_network
     restart: always
+  easynmt:
+    image: easynmt/api:2.0.2-cpu
+    volumes:
+      - /mnt/easynmt:/cache/
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
 networks:
   app_network:
     driver: bridge
