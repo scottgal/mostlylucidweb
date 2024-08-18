@@ -117,7 +117,9 @@ public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkd
             pagePath = Path.Combine(_markdownConfig.MarkdownTranslatedPath, $"{slug}.{language}.md");
         if (!File.Exists(pagePath))
             return null;
-        return await GetPage(pagePath);
+        var model= await GetPage(pagePath);
+        model.Language = language;
+        return model;
     }
     
     private async Task<BlogPostViewModel> GetPage(string filePath)
