@@ -7,7 +7,7 @@
 One thing I thought it would be fun to add is a way to look at the markdown for the articles on the site with a live rendering of the markdown. This is a simple markdown editor that uses SimpleMDE and a server side rendering of the markdown using the markkdig library which I use to render these blog posts.
 
 In the heading of blog posts next to the categories list you'll now see an 'edit' button
-![Edit Button](/editbutton.png). If you click this you'll get a page which has a markdown editor and a preview of the markdown. You can edit the markdown and see the changes in real time (hit Ctrl-Alt-R (or ⌘-Alt-R on Mac) or Enter to refresh). You can also hit the <i class="bx bx-save"></i> button to save the markdown file to your local machine.
+![Edit Button](editbutton.png). If you click this you'll get a page which has a markdown editor and a preview of the markdown. You can edit the markdown and see the changes in real time (hit Ctrl-Alt-R (or ⌘-Alt-R on Mac) or Enter to refresh). You can also hit the <i class="bx bx-save"></i> button to save the markdown file to your local machine.
 
 OF COURSE this doesn't save the file to the server, it just downloads the file to your local machine. I'm not going to let you edit my blog posts!
 
