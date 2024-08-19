@@ -39,15 +39,17 @@ jobs:
         echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
 
         # Define the default tags for the main branch
-        TAGS="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP"
+        TAGS="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest"
+        ADDITIONAL_TAG="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP"
 
         # If the branch is 'local', modify the tags
         if [ "${{ github.ref }}" == "refs/heads/local" ]; then
-          TAGS="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:local --tag ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP-local"
+          TAGS="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:local"
+          ADDITIONAL_TAG="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP-local"
         fi
 
         # Build the Docker image with the appropriate tags
-        docker build . --file Mostlylucid/Dockerfile --tag $TAGS
+        docker build . --file Mostlylucid/Dockerfile --tag $TAGS --tag $ADDITIONAL_TAG
 
     - name: Push the Docker image to Docker Hub
       run: |
