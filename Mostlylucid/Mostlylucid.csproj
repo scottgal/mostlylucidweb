@@ -161,7 +161,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Umami.Net\Umami.Net\Umami.Net.csproj" />
+      <ProjectReference Include="..\Umami.Net\Umami.Net.csproj" />
     </ItemGroup>
 
     <Target Name="BuildCss" BeforeTargets="Compile">
