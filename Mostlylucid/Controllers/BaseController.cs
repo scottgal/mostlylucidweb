@@ -39,6 +39,7 @@ public class BaseController : Controller
          
             ViewBag.UmamiPath = _analyticsSettings.UmamiPath;
             ViewBag.UmamiWebsiteId = _analyticsSettings.WebsiteId;
+            ViewBag.UmamiScript = _analyticsSettings.UmamiScript;
         }
 
         if (_blogService != null)

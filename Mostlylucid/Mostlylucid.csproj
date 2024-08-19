@@ -160,6 +160,10 @@
     
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Umami.Net\Umami.Net\Umami.Net.csproj" />
+    </ItemGroup>
+
     <Target Name="BuildCss" BeforeTargets="Compile">
         <Exec Command="npm run dev" Condition=" '$(Configuration)' == 'Debug' " />
         <Exec Command="npm run build" Condition=" '$(Configuration)' == 'Release' " EnvironmentVariables="NODE_ENV=production" />

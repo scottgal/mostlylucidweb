@@ -2,19 +2,22 @@
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Umami.Net;
 
 namespace Mostlylucid.RSS;
 
 [Microsoft.AspNetCore.Components.Route("rss")]
-public class RssController(RSSFeedService rssFeedService, ILogger<RssController> logger) : Controller
+public class RssController(RSSFeedService rssFeedService,UmamiClient umamiClient, ILogger<RssController> logger) : Controller
 {
 
     [HttpGet]
-    [ResponseCache(Duration = 3600, VaryByQueryKeys = new string[] { nameof(category), nameof(startDate) }, Location = ResponseCacheLocation.Any)]
-    [OutputCache(Duration = 3600, VaryByQueryKeys = new string[] { nameof(category), nameof(startDate) })]
+    [ResponseCache(Duration = 3600, VaryByQueryKeys = new [] { nameof(category), nameof(startDate) }, Location = ResponseCacheLocation.Any)]
+    [OutputCache(Duration = 3600, VaryByQueryKeys = new [] { nameof(category), nameof(startDate) })]
 
 public async Task< IActionResult> Index([FromQuery] string category = null, [FromQuery] string startDate = null)
-    {
+{
+
+    await umamiClient.TrackUrl();
         DateTime? startDateTime = null;
         if (DateTime.TryParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None,
                 out DateTime startDateTIme))

@@ -8,7 +8,8 @@ using Mostlylucid.RSS;
 using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-
+using Umami.Net;
+using Umami.Net.Config;
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
@@ -26,7 +27,7 @@ var services = builder.Services;
 services.AddOutputCache(); // Remove duplicate call later in your code
 services.AddControllersWithViews();
 services.AddResponseCaching();
-
+services.SetupUmamiClient(config);
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 if (translateServiceConfig.Enabled) services.SetupTranslateService();

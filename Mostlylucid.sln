@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		http-client.private.env.json = http-client.private.env.json
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umami.Net", "..\Umami.Net\Umami.Net\Umami.Net.csproj", "{73985E64-8870-476C-967A-94CCA5A6D0AB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -22,5 +24,9 @@ Global
 		{8E41D6C3-E042-4C06-B700-A00D6210B0E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E41D6C3-E042-4C06-B700-A00D6210B0E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8E41D6C3-E042-4C06-B700-A00D6210B0E7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73985E64-8870-476C-967A-94CCA5A6D0AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73985E64-8870-476C-967A-94CCA5A6D0AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73985E64-8870-476C-967A-94CCA5A6D0AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73985E64-8870-476C-967A-94CCA5A6D0AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
