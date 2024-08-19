@@ -25,6 +25,8 @@ public static class Setup
         .AddPolicyHandler(GetRetryPolicy())
        #if DEBUG 
         .AddLogger<HttpLogger>();
+        #else
+        ;
         #endif
         
         services.AddHttpContextAccessor();

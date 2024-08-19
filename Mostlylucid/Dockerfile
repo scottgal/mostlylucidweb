@@ -40,7 +40,6 @@ RUN npm install
 
 # Build Tailwind CSS and other assets
 RUN npm --version
-RUN npx tailwindcss -i ./src/css/main.css -o ./wwwroot/css/dist/main.css
 
 # Build the project
 RUN dotnet build "./Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/build
