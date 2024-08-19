@@ -43,11 +43,11 @@ RUN npm --version
 RUN npx tailwindcss -i ./src/css/main.css -o ./wwwroot/css/dist/main.css
 
 # Build the project
-RUN dotnet build "Mostlylucid/Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet build "./Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # Publish the application, ensuring all referenced projects are included
 FROM build AS publish
-RUN dotnet publish "Mostlylucid/Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # Final image
 FROM base AS final
