@@ -15,7 +15,7 @@ public static class LanguageConverter
         { "nl", "Nederlands (Dutch)" },
         { "hi", "हिन्दी (Hindi)"  },  // Hindi
         { "ar", "العربية (Arabic)" },  // Arabic
-        { "uk", "Українська (Ukranian)" },  // Ukrainian
+        { "uk", "Українська (Ukrainian)" },  // Ukrainian
         { "fi", "Suomi (Finnish)"  },  // Finnish
         { "sv", "Svenska (Swedish)" },  // Swedish
         { "en", "English" }
