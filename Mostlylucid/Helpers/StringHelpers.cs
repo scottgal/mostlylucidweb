@@ -23,7 +23,7 @@ public static class StringHelpers
             guid[0], guid[1], guid[2], guid[3], guid[4], guid[5], guid[6], guid[7], guid[8], guid[9], guid[10], guid[11], guid[12], guid[13], guid[14], guid[15]);
         return guidS.ToLowerInvariant();
     }
-
+     
      
     public static string ContentHash(this string content)
     {

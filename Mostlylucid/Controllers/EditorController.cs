@@ -8,11 +8,9 @@ namespace Mostlylucid.Controllers;
 
 [Route("editor")]
 public class EditorController(
-    MarkdownConfig markdownConfig,
     IBlogService blogService,
     AuthSettings authSettings,
     AnalyticsSettings analyticsSettings,
-    IMarkdownBlogService markdownBlogService,
     ILogger<EditorController> logger) : BaseController(authSettings,
     analyticsSettings, blogService, logger)
 {
@@ -25,7 +23,7 @@ public class EditorController(
             return View("Editor", new EditorModel());
         }
 
-        var blogPost = await markdownBlogService.GetPageFromSlug(slug, language);
+        var blogPost = await blogService.GetPost(slug, language);
         if (blogPost == null)
         {
             return NotFound();

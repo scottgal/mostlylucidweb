@@ -5,6 +5,7 @@ namespace Mostlylucid.Blog.Markdown;
 
 public class MarkdownBaseService(MarkdownConfig markdownConfig) : Blog.MarkdownBaseService
 {
+    protected MarkdownConfig MarkdownConfig => markdownConfig;
         
     private static readonly Dictionary<(string slug, string language), BlogPostViewModel> PageCache = new();
 

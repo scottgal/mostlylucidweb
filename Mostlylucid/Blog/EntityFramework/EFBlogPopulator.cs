@@ -8,15 +8,15 @@ namespace Mostlylucid.Blog.EntityFramework;
 
 public class EFBlogPopulator : EFBaseService, IBlogPopulator
 {
-    private readonly ILogger<EFBlogPopulator> _logger;
+
     private readonly IMarkdownBlogService _markdownBlogService;
 
     public EFBlogPopulator(IMarkdownBlogService markdownBlogService,
         MostlylucidDbContext context,
-        ILogger<EFBlogPopulator> logger) : base(context)
+        ILogger<EFBlogPopulator> logger) : base(context, logger)
     {
         _markdownBlogService = markdownBlogService;
-        _logger = logger;
+
     }
 
     public async Task Populate()
@@ -123,54 +123,6 @@ private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List
         List<CategoryEntity> categories,
         BlogPostEntity? currentPost)
     {
-        try
-        {
-            var hash = post.HtmlContent.ContentHash();
-            var currentCategoryNames = currentPost?.Categories.Select(x => x.Name).ToArray() ?? Array.Empty<string>();
-            var categoriesChanged = false;
-            if (!currentCategoryNames.All(post.Categories.Contains) ||
-                !post.Categories.All(currentCategoryNames.Contains))
-            {
-                categoriesChanged = true;
-                _logger.LogInformation("Categories have changed for post {Post}", post.Slug);
-            }
-
-            var dateChanged = currentPost?.PublishedDate.UtcDateTime.Date != post.PublishedDate.ToUniversalTime().Date;
-            var titleChanged = currentPost?.Title != post.Title;
-            if (!titleChanged && !dateChanged && hash == currentPost?.ContentHash && !categoriesChanged)
-            {
-                _logger.LogInformation("Post {Post} has not changed", post.Slug);
-                return;
-            }
-
-            var blogPost = new BlogPostEntity
-            {
-                Title = post.Title,
-                Slug = post.Slug,
-                OriginalMarkdown = post.OriginalMarkdown,
-                HtmlContent = post.HtmlContent,
-                PlainTextContent = post.PlainTextContent,
-                ContentHash = hash,
-                PublishedDate = post.PublishedDate,
-                LanguageEntity = postLanguageEntity,
-                Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList()
-            };
-
-
-            if (currentPost != null)
-            {
-                _logger.LogInformation("Updating post {Post}", post.Slug);
-                Context.BlogPosts.Update(blogPost);
-            }
-            else
-            {
-                _logger.LogInformation("Adding post {Post}", post.Slug);
-                await Context.BlogPosts.AddAsync(blogPost);
-            }
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Error adding post {Post}", post.Slug);
-        }
+        await SavePost(post, currentPost, categories, new List<LanguageEntity> { postLanguageEntity });
     }
 }

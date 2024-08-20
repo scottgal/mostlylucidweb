@@ -38,6 +38,8 @@ public static class BlogSetup
                 break;
         }
         services.AddScoped<IMarkdownBlogService, MarkdownBlogPopulator>();
+
+        services.AddScoped<MarkdownRenderingService>();
     }
     
     public static async Task PopulateBlog(this WebApplication app)
