@@ -1,4 +1,4 @@
-﻿# Adding Entity Framework for Blog Posts (Part 6)
+﻿# Adding Entity Framework for Blog Posts (Pt 6)
 <!--category-- ASP.NET, Entity Framework -->
 <datetime class="hidden">2024-08-20T05:45</datetime>
 
@@ -56,6 +56,11 @@ public class BackgroundEFBlogUpdater(IServiceScopeFactory scopeFactory, ILogger<
     }
 }
 ```
+Note that one critical aspect here is that EF is very picky about it's scoping. I had to use `IServiceScopeFactory` to create a new scope for the service. This is because the service is a singleton and EF doesn't like being used in a singleton.
+The use of the `IServiceScopeFactory` is a common pattern in ASP.NET Core when you need to use a scoped service in a singleton service.
+
+I also had to use `Task.Run` to run the task in a new thread. This is because the `IHostedService` runs on the main thread and I didn't want to block the application from starting.
+
 
 This is the `BackgroundEFBlogUpdater` class. It's injected using the `SetupBlog` extension method I showed before:
 ```csharp
