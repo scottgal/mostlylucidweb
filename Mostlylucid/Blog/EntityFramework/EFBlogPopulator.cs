@@ -88,35 +88,30 @@ private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List
         IEnumerable<BlogPostViewModel> posts,
         List<LanguageEntity> languageEntities)
     {
-        var existingCategories = await Context.Categories.Select(x => x.Name).ToListAsync();
-
         var languages = languageEntities.ToDictionary(x => x.Name, x => x);
-        var categories = new List<CategoryEntity>();
-
         var currentPosts = await PostsQuery().ToListAsync();
         foreach (var post in posts)
         {
+            var existingCategories = Context.Categories.Local.ToList();
             var currentPost =
                 currentPosts.FirstOrDefault(x => x.Slug == post.Slug && x.LanguageEntity.Name == post.Language);
-            await AddCategoriesToContext(post.Categories, existingCategories, categories);
-            await AddBlogPostToContext(post, languages[post.Language], categories, currentPost);
+            await AddCategoriesToContext(post.Categories, existingCategories);
+            existingCategories = Context.Categories.Local.ToList();
+            await AddBlogPostToContext(post, languages[post.Language], existingCategories, currentPost);
         }
     }
 
     private async Task AddCategoriesToContext(
         IEnumerable<string> categoryList,
-        List<string> existingCategories,
-        List<CategoryEntity> categories)
+        List<CategoryEntity> existingCategories)
     {
         foreach (var category in categoryList)
         {
-            if (categories.Any(x => x.Name == category)) continue;
+            if (existingCategories.Any(x => x.Name == category)) continue;
 
             var cat = new CategoryEntity { Name = category };
 
-            if (!existingCategories.Contains(category)) await Context.Categories.AddAsync(cat);
-
-            categories.Add(cat);
+             await Context.Categories.AddAsync(cat);
         }
     }
 

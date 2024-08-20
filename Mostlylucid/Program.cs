@@ -107,7 +107,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 await app.PopulateBlog();
-
+if (translateServiceConfig.Enabled)  await app.Translate();
 app.MapGet("/robots.txt", async httpContext =>
 {
     var robotsContent = $"User-agent: *\nDisallow: \nDisallow: /cgi-bin/\nSitemap: https://{httpContext.Request.Host}/sitemap.xml";

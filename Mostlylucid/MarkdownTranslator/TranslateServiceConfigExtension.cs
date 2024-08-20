@@ -10,7 +10,15 @@ public static class TranslateServiceConfigExtension
             options.Timeout = TimeSpan.FromSeconds(120);
         });
         services.AddHostedService<BackgroundTranslateService>();
+        services.AddScoped<BackgroundTranslateService>();
         services.AddSingleton<TranslateCacheService>();
+    }
+
+    public static async Task Translate(this WebApplication app)
+    {
+        await using var scope = app.Services.CreateAsyncScope();
+        var cacheService = scope.ServiceProvider.GetRequiredService<BackgroundTranslateService>();
+        await cacheService.TranslateAllFilesAsync();
     }
     
     

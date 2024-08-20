@@ -57,29 +57,28 @@ public class EFBaseService
                 return currentPost;
             }
 
-            var blogPost = new BlogPostEntity
-            {
-                Title = post.Title,
-                Slug = post.Slug,
-                OriginalMarkdown = post.OriginalMarkdown,
-                HtmlContent = post.HtmlContent,
-                PlainTextContent = post.PlainTextContent,
-                ContentHash = hash,
-                PublishedDate = post.PublishedDate,
-                LanguageEntity = postLanguageEntity,
-                Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList()
-            };
-
+            
+            var blogPost = currentPost ?? new BlogPostEntity();
+            
+            blogPost.Title = post.Title;
+            blogPost.Slug = post.Slug;
+            blogPost.OriginalMarkdown = post.OriginalMarkdown;
+            blogPost.HtmlContent = post.HtmlContent;
+            blogPost.PlainTextContent = post.PlainTextContent;
+            blogPost.ContentHash = hash;
+            blogPost.PublishedDate = post.PublishedDate;
+            blogPost.LanguageEntity = postLanguageEntity;
+            blogPost.Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList();
 
             if (currentPost != null)
             {
                 Logger.LogInformation("Updating post {Post}", post.Slug);
-                Context.BlogPosts.Update(blogPost);
+                Context.BlogPosts.Update(blogPost); // Update the existing post
             }
             else
             {
-                Logger.LogInformation("Adding post {Post}", post.Slug);
-                await Context.BlogPosts.AddAsync(blogPost);
+                Logger.LogInformation("Adding new post {Post}", post.Slug);
+                Context.BlogPosts.Add(blogPost); // Add a new post
             }
             return blogPost;
         }

@@ -66,8 +66,13 @@ public class EFBlogService(
             .ToListAsync();
     }
 
+    public Task<bool> EntryExists(string slug, string language)
+    {
+        return PostsQuery().AnyAsync(x => x.Slug == slug && x.LanguageEntity.Name == language);
+    }
 
-   public async  Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
+
+    public async  Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
     {
       var post = await PostsQuery().FirstOrDefaultAsync(x => x.Slug == slug && x.LanguageEntity.Name == language);
       var model = markdownRenderingService.GetPageFromMarkdown(markdowm, DateTime.Now, slug);

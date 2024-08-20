@@ -11,6 +11,8 @@ public interface IBlogService
     Task<PostListViewModel> GetPagedPosts(int page = 1, int pageSize = 10, string language = MarkdownBaseService.EnglishLanguage);
     Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "", string language = MarkdownBaseService.EnglishLanguage);
     
+    Task<bool> EntryExists(string slug, string language);
+    
     Task<BlogPostViewModel> SavePost(string slug, string language,  string markdowm);
 }
 

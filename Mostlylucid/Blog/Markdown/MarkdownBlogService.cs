@@ -30,6 +30,12 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService
         return await Task.FromResult(pageCache.Select(x=> GetListModel(x)).ToList());
     }
 
+    public async Task<bool> EntryExists(string slug, string language)
+    {
+       var file =Path.Combine(MarkdownConfig.MarkdownTranslatedPath,  $"{slug}.{language}.md");
+         return  await Task.FromResult(File.Exists(file));
+    }
+
     public  async Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
     {
         var outPath = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");

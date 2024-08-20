@@ -2,7 +2,6 @@
 using Mostlylucid.Blog;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
-using Mostlylucid.Helpers;
 using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.MarkdownTranslator;
@@ -19,17 +18,21 @@ public class BackgroundTranslateService(
         logger.LogInformation("Background translation service started");
     }
 
-    private readonly BufferBlock<(PageTranslationModel, TaskCompletionSource<(BlogPostViewModel? model,bool complete)>)> _translations = new();
+    private readonly
+        BufferBlock<(PageTranslationModel, TaskCompletionSource<(BlogPostViewModel? model, bool complete)>)>
+        _translations = new();
+
     private Task _sendTask = Task.CompletedTask;
 
-    public async Task<Task<(BlogPostViewModel? model,bool complete)>> Translate(PageTranslationModel message)
+    public async Task<Task<(BlogPostViewModel? model, bool complete)>> Translate(PageTranslationModel message)
     {
-        var tcs = new TaskCompletionSource<(BlogPostViewModel? model,bool complete)>();
+        var tcs = new TaskCompletionSource<(BlogPostViewModel? model, bool complete)>();
         await _translations.SendAsync((message, tcs));
         return tcs.Task;
     }
 
-    public async Task<List<Task<(BlogPostViewModel? model, bool complete)>>> TranslateForAllLanguages(PageTranslationModel message)
+    public async Task<List<Task<(BlogPostViewModel? model, bool complete)>>> TranslateForAllLanguages(
+        PageTranslationModel message)
     {
         var tasks = new List<Task<(BlogPostViewModel? model, bool complete)>>();
         foreach (var language in translateServiceConfig.Languages)
@@ -48,16 +51,15 @@ public class BackgroundTranslateService(
         return tasks;
     }
 
-    public string OutFileName(string originalFileName, string language) => Path.GetFileNameWithoutExtension(originalFileName) + "." + language + ".md";
-    
+    public string OutFileName(string originalFileName, string language) => Path.Combine(
+        markdownConfig.MarkdownTranslatedPath,
+        Path.GetFileNameWithoutExtension(originalFileName) + "." + language + ".md");
+
     public async Task TranslateAllFilesAsync()
     {
         var markdownFiles = Directory.GetFiles(markdownConfig.MarkdownPath, "*.md");
         foreach (var file in markdownFiles)
         {
-            var fileChanged = await file.IsFileChanged(file);
-            var text = await File.ReadAllTextAsync(file);
-            
             await TranslateForAllLanguages(new PageTranslationModel
             {
                 OriginalMarkdown = await File.ReadAllTextAsync(file),
@@ -77,9 +79,19 @@ public class BackgroundTranslateService(
         while (!cancellationToken.IsCancellationRequested && _translations.TryReceive(out var item))
 
         {
+            if (item.Item1.Persist)
+            {
+                var fileChanged =
+                    await item.Item1.OriginalFileName.IsFileChanged(markdownConfig.MarkdownTranslatedPath);
+
+                var entryExists = await scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IBlogService>()
+                    .EntryExists(item.Item1.OriginalFileName, item.Item1.Language);
+                if (!fileChanged && entryExists) continue;
+            }
+
             var translateModel = item.Item1;
             var tcs = item.Item2;
-            var outFileName = translateModel.OutFileName;
+
             logger.LogInformation("Translating {File} to {Language}", translateModel.OriginalFileName,
                 translateModel.Language);
             try
@@ -91,16 +103,15 @@ public class BackgroundTranslateService(
                 BlogPostViewModel? postModel = null;
                 if (item.Item1.Persist)
                 {
-
-
                     var blogService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IBlogService>();
-                     postModel = await blogService.SavePost(translateModel.OriginalFileName, translateModel.Language,
+                    postModel = await blogService.SavePost(translateModel.OriginalFileName, translateModel.Language,
                         translatedMarkdown);
                 }
                 else
                 {
-                    var populatorService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<MarkdownRenderingService>();
-                    postModel =  populatorService.GetPageFromMarkdown(translatedMarkdown, DateTime.Now,  translateModel.OutFileName);
+                    var populatorService = scopeFactory.CreateScope().ServiceProvider
+                        .GetRequiredService<MarkdownRenderingService>();
+                    postModel = populatorService.GetPageFromMarkdown(translatedMarkdown, DateTime.Now, "");
                 }
 
                 tcs.SetResult((postModel, true));
