@@ -8,6 +8,7 @@ namespace Mostlylucid.Controllers;
 public class ErrorController(AnalyticsSettings analyticsSettings, ILogger<ErrorController> logger) : BaseController(analyticsSettings, logger)
 {
     [Route("/error/{statusCode}")]
+    [HttpGet]
     public IActionResult HandleError(int statusCode)
     {
         // Retrieve the original request information

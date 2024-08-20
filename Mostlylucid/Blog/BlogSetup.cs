@@ -33,10 +33,13 @@ public static class BlogSetup
                     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
                 });
                 services.AddScoped<IBlogService, EFBlogService>();
-                services.AddScoped<IMarkdownBlogService, MarkdownBlogPopulator>();
+            
                 services.AddScoped<IBlogPopulator, EFBlogPopulator>();
                 break;
         }
+        services.AddScoped<IMarkdownBlogService, MarkdownBlogPopulator>();
+
+        services.AddScoped<MarkdownRenderingService>();
     }
     
     public static async Task PopulateBlog(this WebApplication app)

@@ -1,0 +1,121 @@
+﻿@using Mostlylucid.Blog.Markdown
+@using MarkdownBaseService = Mostlylucid.Blog.MarkdownBaseService
+@model Mostlylucid.Models.Editor.EditorModel
+
+<div class="min-h-screen bg-gray-100">
+    
+    @if(Model.PostViewModel.Language != MarkdownBaseService.EnglishLanguage)
+    {
+        <a asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.PostViewModel.Slug" asp-route-language="@Model.PostViewModel.Language" class="text-green-dark dark:text-green"><i class="bx bx-chevron-left"></i> Back to "@Model.PostViewModel.Title"</a>
+    }
+    else
+    {
+        <a asp-action="Show" asp-controller="Blog" asp-route-slug="@Model.PostViewModel.Slug" class="text-green-dark dark:text-green"><i class="bx bx-chevron-left"></i> Back to "@Model.PostViewModel.Title"</a>
+    }
+        
+
+    <p class="text-blue-dark dark:text-blue-light">This is a viewer only at the moment <a asp-action="Show" asp-controller="Blog" asp-route-slug="markdownprevieweditor" class="text-green-dark dark:text-green"> see the article</a> on how this works.</p>
+    <div class="container mx-auto p-0">
+ 
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Column 1 -->
+            <div class="bg-white dark:bg-custom-dark-bg  p-0 rounded shadow-md">
+                <p class="text-blue-dark dark:text-blue-light">To update the preview hit Ctrl-Alt-R (or ⌘-Alt-R on Mac) or Enter to refresh. The Save <i class="bx bx-save"></i> icon lets you save the markdown file to disk </p>
+                <textarea class="markdowneditor hidden" id="markdowneditor">@Model.Markdown</textarea>
+
+            </div>
+
+            <!-- Column 2 -->
+            <div class="bg-white dark:bg-custom-dark-bg p-0 rounded shadow-md">
+                <p class="text-blue-dark dark:text-blue-light">This is a preview from the server running through my markdig pipeline</p>
+                <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2" id="categories">
+                    @foreach (var category in Model.PostViewModel.Categories)
+                    {
+                        <span
+                            class="inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">@category</span>
+
+                    }
+                </div>
+                <h2 class="pb-2 block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-3xl md:text-3xl" id="title">@Model.PostViewModel.Title</h2>
+                <date id="publishedDate" class="py-2">@Model.PostViewModel.PublishedDate.ToString("D")</date>
+                <div class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2" id="renderedcontent">
+                    @Html.Raw(Model.PostViewModel.HtmlContent)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script>
+        window.addEventListener('load', function () {
+            console.log('Page loaded without refresh');
+
+            // Trigger on change event of SimpleMDE editor
+            window.simplemde.codemirror.on("keydown", function(instance, event) {
+            let triggerUpdate= false;
+                // Check if the Enter key is pressed
+                if ((event.ctrlKey || event.metaKey) && event.altKey && event.key.toLowerCase() === "r") {
+                    event.preventDefault(); // Prevent the default behavior (e.g., browser refresh)
+                    triggerUpdate = true;
+                    }
+                    if (event.key === "Enter")
+                    {
+                        triggerUpdate = true;
+                    }
+
+                if (triggerUpdate) {
+        
+                    var content = simplemde.value();
+
+                    // Send content to WebAPI endpoint
+                    fetch('/api/editor/getcontent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ content: content })  // JSON object with 'content' key
+                    })
+                        .then(response => response.json())  // Parse the JSON response
+                        .then(data => {
+                            // Render the returned HTML content into the div
+                            document.getElementById('renderedcontent').innerHTML = data.htmlContent;
+                            document.getElementById('title').innerHTML  = data.title;// Assuming the returned JSON has an 'htmlContent' property
+                            const date = new Date(data.publishedDate);
+
+                            const formattedDate = new Intl.DateTimeFormat('en-GB', {
+                                weekday: 'long',  // Full weekday name
+                                day: 'numeric',   // Day of the month
+                                month: 'long',    // Full month name
+                                year: 'numeric'   // Full year
+                            }).format(date);
+                            
+                            document.getElementById('publishedDate').innerHTML = formattedDate;
+                           populateCategories(data.categories);
+                            
+                            
+                            mermaid.run();
+                            hljs.highlightAll();
+                        })
+                        .catch(error => console.error('Error:', error));
+                }
+            });
+
+            function populateCategories(categories) {
+                var categoriesDiv = document.getElementById('categories');
+                categoriesDiv.innerHTML = ''; // Clear the div
+
+                categories.forEach(function(category) {
+                    // Create the span element
+                    let span = document.createElement('span');
+                    span.className = 'inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white'; // Apply the style class
+                    span.textContent = category;
+
+                    // Append the span to the categories div
+                    categoriesDiv.appendChild(span);
+                });
+            }
+        });
+    </script>
+}

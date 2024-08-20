@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Mostlylucid.EntityFramework;
 using Mostlylucid.EntityFramework.Models;
+using Mostlylucid.Helpers;
 using Mostlylucid.Mappers;
 using Mostlylucid.Models.Blog;
 
@@ -8,8 +9,9 @@ namespace Mostlylucid.Blog.EntityFramework;
 
 public class EFBlogService(
     MostlylucidDbContext context,
+    MarkdownRenderingService markdownRenderingService,
     ILogger<EFBlogService> logger)
-    : EFBaseService(context), IBlogService
+    : EFBaseService(context, logger), IBlogService
 {
 
     private IQueryable<BlogPostEntity> NoTrackingQuery() => PostsQuery().AsNoTrackingWithIdentityResolution();
@@ -17,7 +19,7 @@ public class EFBlogService(
     {
         
         var posts = await NoTrackingQuery().ToListAsync();
-        logger.LogInformation("Getting posts");
+        Logger.LogInformation("Getting posts");
         return posts.Select(p => new BlogPostViewModel
         {
             Title = p.Title,
@@ -65,7 +67,14 @@ public class EFBlogService(
     }
 
 
-
+   public async  Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
+    {
+      var post = await PostsQuery().FirstOrDefaultAsync(x => x.Slug == slug && x.LanguageEntity.Name == language);
+      var model = markdownRenderingService.GetPageFromMarkdown(markdowm, DateTime.Now, slug);
+     await SavePost(model, post);
+     await Context.SaveChangesAsync();
+        return model;
+    }
 
     public async Task<BlogPostViewModel?> GetPost(string slug, string language = "")
     {

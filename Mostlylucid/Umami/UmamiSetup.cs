@@ -17,7 +17,6 @@ public static class UmamiSetup
         }) .SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Set lifetime to five minutes
         .AddPolicyHandler(GetRetryPolicy());;
         services.AddScoped<UmamiService>();
-        services.AddScoped<AuthService>();
 
     }
     static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()

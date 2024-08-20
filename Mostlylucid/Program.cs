@@ -8,7 +8,8 @@ using Mostlylucid.RSS;
 using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-
+using Umami.Net;
+using Umami.Net.Config;
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
@@ -26,7 +27,9 @@ var services = builder.Services;
 services.AddOutputCache(); // Remove duplicate call later in your code
 services.AddControllersWithViews();
 services.AddResponseCaching();
-
+services.SetupUmamiClient(config);
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
 if (translateServiceConfig.Enabled) services.SetupTranslateService();
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 services.SetupEmail(builder.Configuration);
@@ -72,16 +75,14 @@ if (!app.Environment.IsDevelopment())
     //Hnadle unhandled exceptions 500 erros
     app.UseExceptionHandler("/error/500");
     //Handle 404 erros
-
-    app.UseHsts();
 }
 else
 {
     app.UseDeveloperExceptionPage();
     app.UseHttpsRedirection();
+    app.UseHsts();
 }
 
-app.UseStatusCodePagesWithReExecute("/error/{0}");
 var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -91,6 +92,8 @@ app.UseStaticFiles(new StaticFileOptions
             "Cache-Control", $"public, max-age={cacheMaxAgeOneWeek}");
     }
 });
+app.UseStatusCodePagesWithReExecute("/error/{0}");
+
 app.UseRouting();
 app.UseCors("AllowMostlylucid");
 app.UseAuthentication();
@@ -98,7 +101,11 @@ app.UseAuthorization();
 app.UseOutputCache();
 app.UseResponseCaching();
 app.UseImageSharp();
-
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 await app.PopulateBlog();
 
 app.MapGet("/robots.txt", async httpContext =>
@@ -111,7 +118,6 @@ app.MapGet("/robots.txt", async httpContext =>
     policyBuilder.Expire(TimeSpan.FromDays(60));
     policyBuilder.Cache();
 });
-
 
 app.MapControllerRoute(
     name: "sitemap",

@@ -29,7 +29,16 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService
 
         return await Task.FromResult(pageCache.Select(x=> GetListModel(x)).ToList());
     }
-    
+
+    public  async Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
+    {
+        var outPath = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");
+        if(language != EnglishLanguage)
+            outPath = Path.Combine(MarkdownConfig.MarkdownTranslatedPath,  $"{slug}.{language}.md");
+        await File.WriteAllTextAsync(outPath, outPath);
+        return await GetPost(slug, language);
+    }
+
 
     public async Task<List<BlogPostViewModel>> GetPosts(DateTime? startDate = null, string category = "")
     {
@@ -68,8 +77,8 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService
 
         return await Task.FromResult(model);
     }
-
-
+    
+    
     public async Task<BlogPostViewModel?> GetPost(string slug, string language = EnglishLanguage)
     {
         try

@@ -15,6 +15,7 @@ namespace Mostlylucid.Controllers;
     {
         [OutputCache(Duration = 3600,VaryByHeaderNames = new[] {"hx-request"},VaryByQueryKeys = new[] {"page", "pageSize"})]
         [ResponseCache(Duration = 300, VaryByHeader = "hx-request", VaryByQueryKeys = new[] {"page", "pageSize"}, Location = ResponseCacheLocation.Any)]
+        [HttpGet]
     public async Task<IActionResult> Index(int page = 1,int pageSize = 5)
     {
             var authenticateResult = GetUserInfo();
@@ -34,6 +35,7 @@ namespace Mostlylucid.Controllers;
     }
     
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    [HttpGet]
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });

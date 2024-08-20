@@ -57,6 +57,10 @@ namespace Mostlylucid.Migrations
                     b.Property<int>("LanguageId")
                         .HasColumnType("integer");
 
+                    b.Property<string>("OriginalMarkdown")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("PlainTextContent")
                         .IsRequired()
                         .HasColumnType("text");

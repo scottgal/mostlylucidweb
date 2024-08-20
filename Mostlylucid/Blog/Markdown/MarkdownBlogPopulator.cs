@@ -1,28 +1,13 @@
 ﻿using System.Collections.Concurrent;
-using System.Globalization;
-using System.Text.RegularExpressions;
 using Mostlylucid.Config.Markdown;
-using Mostlylucid.Helpers;
 using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog.Markdown;
 
-public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkdownBlogService
+public class MarkdownBlogPopulator(MarkdownConfig markdownConfig, MarkdownRenderingService markdownRenderingService)
+    : MarkdownBaseService(markdownConfig), IBlogPopulator, IMarkdownBlogService
 {
-    private static readonly Regex DateRegex = new(
-        @"<datetime class=""hidden"">(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})</datetime>",
-        RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
-
-    private static readonly Regex CategoryRegex = new(@"<!--\s*category\s*--\s*([^,]+?)\s*(?:,\s*([^,]+?)\s*)?-->",
-        RegexOptions.Compiled | RegexOptions.Singleline);
-
-    private readonly MarkdownConfig _markdownConfig;
-
-    public MarkdownBlogPopulator(MarkdownConfig markdownConfig) : base(
-        markdownConfig)
-    {
-        _markdownConfig = markdownConfig;
-    }
+    private readonly MarkdownConfig _markdownConfig = markdownConfig;
 
     private ParallelOptions ParallelOptions => new() { MaxDegreeOfParallelism = 4 };
 
@@ -39,68 +24,44 @@ public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkd
         if (GetPageCache() is { Count: > 0 }) return;
         Dictionary<(string slug, string lang), BlogPostViewModel> pageCache = new();
         var pages = await GetPages();
-        foreach (var page in pages) pageCache.TryAdd((page.Slug, page.Language), page);
+        foreach (var page in pages)
+        {
+            pageCache.TryAdd((page.Slug, page.Language), page);
+            
+           
+        }
         SetPageCache(pageCache);
     }
 
-    private static string[] GetCategories(string markdownText)
-    {
-        var matches = CategoryRegex.Matches(markdownText);
-        var categories = matches
-            .SelectMany(match => match.Groups.Cast<Group>()
-                .Skip(1) // Skip the entire match group
-                .Where(group => group.Success) // Ensure the group matched
-                .Select(group => group.Value.Trim()))
-            .ToArray();
-        return categories;
-    }
 
+
+  
+
+    public async Task<BlogPostViewModel?> GetPageFromSlug(string slug, string language = "")
+    {
+
+        var pagePath =Path.Combine(_markdownConfig.MarkdownPath, $"{slug}.md");
+        if (!string.IsNullOrEmpty(language) && language != EnglishLanguage)
+            pagePath = Path.Combine(_markdownConfig.MarkdownTranslatedPath, $"{slug}.{language}.md");
+        if (!File.Exists(pagePath))
+            return null;
+        var model= await GetPage(pagePath);
+        model.Language = language;
+        return model;
+    }
+    
     private async Task<BlogPostViewModel> GetPage(string filePath)
     {
-        var pipeline = Pipeline();
+      
         var fileInfo = new FileInfo(filePath);
-
         // Ensure the file exists
         if (!fileInfo.Exists) throw new FileNotFoundException("The specified file does not exist.", filePath);
-
         // Read all lines from the file
-        var lines = await File.ReadAllLinesAsync(filePath);
-
-        // Get the title from the first line
-        var title = lines.Length > 0 ? Markdig.Markdown.ToPlainText(lines[0].Trim()) : string.Empty;
-
-        // Concatenate the rest of the lines with newline characters
-        var restOfTheLines = string.Join(Environment.NewLine, lines.Skip(1));
-
-        // Extract categories from the text
-        var categories = GetCategories(restOfTheLines);
-
+        var lines = await File.ReadAllTextAsync(filePath);
         var publishedDate = fileInfo.CreationTime;
-        var publishDate = DateRegex.Match(restOfTheLines).Groups[1].Value;
-        if (!string.IsNullOrWhiteSpace(publishDate))
-            publishedDate = DateTime.ParseExact(publishDate, "yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture);
+        return markdownRenderingService.GetPageFromMarkdown(lines, publishedDate, filePath);
 
-        // Remove category tags from the text
-        restOfTheLines = CategoryRegex.Replace(restOfTheLines, "");
-        restOfTheLines = DateRegex.Replace(restOfTheLines, "");
-        // Process the rest of the lines as either HTML or plain text
-        var processed = Markdig.Markdown.ToHtml(restOfTheLines, pipeline);
-        var plainText = Markdig.Markdown.ToPlainText(restOfTheLines, pipeline);
-
-        // Generate the slug from the page filename
-        var slug = GetSlug(filePath);
-
-        // Return the parsed and processed content
-        return new BlogPostViewModel
-        {
-            Categories = categories,
-            WordCount = restOfTheLines.WordCount(),
-            HtmlContent = processed,
-            PlainTextContent = plainText,
-            PublishedDate = publishedDate,
-            Slug = slug,
-            Title = title
-        };
+  
     }
 
 
@@ -170,11 +131,5 @@ public class MarkdownBlogPopulator : MarkdownBaseService, IBlogPopulator, IMarkd
         return languageList;
     }
 
-    private string GetSlug(string fileName)
-    {
-        var slug = Path.GetFileNameWithoutExtension(fileName);
-        if (slug.Contains(".")) slug = slug.Substring(0, slug.IndexOf(".", StringComparison.Ordinal));
 
-        return slug.ToLowerInvariant();
-    }
 }

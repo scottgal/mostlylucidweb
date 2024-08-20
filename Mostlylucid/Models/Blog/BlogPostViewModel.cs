@@ -10,6 +10,8 @@ public class BlogPostViewModel : BaseViewModel
     
     public string Language { get; set; }= string.Empty;
     
+    public string OriginalMarkdown { get; set; }= string.Empty;
+    
     public string[] Languages { get; set; } = Array.Empty<string>();
     
     public string HtmlContent { get; set; }= string.Empty;
