@@ -101,11 +101,10 @@ app.UseAuthorization();
 app.UseOutputCache();
 app.UseResponseCaching();
 app.UseImageSharp();
-if (app.Environment.IsDevelopment())
-{
+
     app.UseSwagger();
     app.UseSwaggerUI();
-}
+
 await app.PopulateBlog();
 if (translateServiceConfig.Enabled)  await app.Translate();
 app.MapGet("/robots.txt", async httpContext =>
@@ -118,6 +117,7 @@ app.MapGet("/robots.txt", async httpContext =>
     policyBuilder.Expire(TimeSpan.FromDays(60));
     policyBuilder.Cache();
 });
+
 
 app.MapControllerRoute(
     name: "sitemap",

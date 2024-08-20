@@ -12,15 +12,15 @@ Searching for content is a critical part of any content heavy website. It enhanc
 There's a number of ways to do full text searching including
 1. Just Searching an in memory data structure (like a list), this is relatively simple to implement but doesn't scale well. Additionally it doesn't support complex queries without a lot of work.
 2. Using a database like SQL Server or Postgres. While this does work and has support from almost all database types it's not always the best solution for more complex data structures or complex queries; however it's what this article will cover.
-3. Using a lightweight Search technology like Lucene or SQLite FTS. This is a middle ground between the two above solutions. It's more complex than just searching a list but less complex than a full database solution. However it's still pretty complex to implement (expecially for ingesting data) and doesn't scale as well as a full search solution
-4Using a search engine like ElasticSearch, OpenSearch or Azure Search. This is the most complex solution but also the most powerful. It's also the most scalable and can handle complex queries with ease.
+3. Using a lightweight Search technology like [Lucene](https://lucenenet.apache.org/) or SQLite FTS. This is a middle ground between the two above solutions. It's more complex than just searching a list but less complex than a full database solution. However; it's still pretty complex to implement (especially for ingesting data) and doesn't scale as well as a full search solution. In truth many other search technologies [use Lucene under the hood for ](https://www.elastic.co/search-labs/blog/elasticsearch-lucene-vector-database-gains) it's amazing vector search capabilities.
+4. Using a search engine like ElasticSearch, OpenSearch or Azure Search. This is the most complex & resource intensive solution but also the most powerful. It's also the most scalable and can handle complex queries with ease. I'll go into excruciating depth in the next week or so on how to self-host, configure and use OpenSearch from C#. 
 
-# Database Full Text Searching
-In this blog I've recently moved to using PostgreSQL for my database. Postgres has a full text search feature that is very powerful and (somewhat) easy to use. It's also very fast and can handle complex queries with ease.
+# Database Full Text Searching with Postgres
+In this blog I've recently moved to using Postgres for my database. Postgres has a full text search feature that is very powerful and (somewhat) easy to use. It's also very fast and can handle complex queries with ease.
 
 When building yout `DbContext` you can specify which fields have full text search functionality enabled. 
 
-Postgres uses the concept of search vectors to achieve fast, efficient Full Text Searching. A search vector is a data structure that contains the words in a document and their positions. This allows Postgres to quickly search for words in a document and return the results.
+Postgres uses the concept of search vectors to achieve fast, efficient Full Text Searching. A search vector is a data structure that contains the words in a document and their positions. Essentially precomputing the search vector for each row in the database allows Postgres to search for words in the document very quickly.
 It uses two special data types to achieve this:
 
 - TSVector: A special PostgreSQL data type that stores a list of lexemes (think of it as a vector of words). It is the indexed version of the document used for fast searching.
@@ -212,7 +212,9 @@ We then use the `Rank` function to rank the results by relevance based on the qu
 
 This lets us use the endpoint as follows, where we can pass in the first few letters of a word and get back all the posts that match that word:
 
-![API](searchapi.png?width=600&format=webp&quality=50)
+You can view the [API in action here](https://www.mostlylucid.net/swagger/index.html) look for the `/api/SearchApi`. (Note; I've enabled Swagger for this site so you can see the API in action but most of the time this should be reserved for `IsDevelopment()).
+
+![API](searchapi.png?)
 
 In future I'll add a TypeAhead feature to the search box on the site that uses this functionality.
 
