@@ -26,7 +26,7 @@ public class SearchApi(MostlylucidDbContext context) : ControllerBase
             .OrderByDescending(x =>
                 // Rank based on the precomputed SearchVector
                 x.SearchVector.Rank(EF.Functions.ToTsQuery("english", query + ":*"))) // Use precomputed SearchVector for ranking
-            .Select(x => new { x.Title, x.Slug })
+            .Select(x => new { x.Title, x.Slug,  })
             .ToListAsync();
         
         var output = posts.Select(x => new SearchResults(x.Title.Trim(), x.Slug)).ToList();

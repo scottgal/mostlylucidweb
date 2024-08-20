@@ -16,8 +16,7 @@ public class RssController(RSSFeedService rssFeedService,UmamiClient umamiClient
 
 public async Task< IActionResult> Index([FromQuery] string category = null, [FromQuery] string startDate = null)
 {
-
-    await umamiClient.TrackUrl();
+    
         DateTime? startDateTime = null;
         if (DateTime.TryParseExact(startDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None,
                 out DateTime startDateTIme))

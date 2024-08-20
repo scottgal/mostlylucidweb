@@ -29,5 +29,6 @@ public class BlogPostEntity
     
     [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
     public NpgsqlTsVector SearchVector { get; set; }
+  
     
 }

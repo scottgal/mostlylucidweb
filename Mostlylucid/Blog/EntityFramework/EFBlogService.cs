@@ -59,7 +59,7 @@ public class EFBlogService(
         string language = MarkdownBaseService.EnglishLanguage)
     {
         var query = NoTrackingQuery();
-        if (category != "") query = query.Where(x => x.Categories.Any(c => c.Name == category));
+        if (!string.IsNullOrEmpty(category)) query = query.Where(x => x.Categories.Any(c => c.Name == category));
         if (startDate != null) query = query.Where(x => x.PublishedDate >= startDate);
 
         return query.Where(x => x.LanguageEntity.Name == language)
