@@ -53,6 +53,7 @@ public static class BlogSetup
         
            var blogContext = scope.ServiceProvider.GetRequiredService<MostlylucidDbContext>();
            Log.Information("Migrating database");
+           await blogContext.Database.EnsureDeletedAsync();
            await blogContext.Database.MigrateAsync();
         }
 
