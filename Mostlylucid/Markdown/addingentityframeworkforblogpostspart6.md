@@ -2,7 +2,7 @@
 <!--category-- ASP.NET, Entity Framework -->
 <datetime class="hidden">2024-08-20T05:45</datetime>
 
-## Introduction
+# Introduction
 Now that I have this blog running using Entity Framework I can add new posts and languages easily. I just add a new markdown file to the project and check it in. The GitHub action triggers and the site is updated.
 
 In this post I'll cover a couple of small additions I made to this process and how it enables future enhancements. 
