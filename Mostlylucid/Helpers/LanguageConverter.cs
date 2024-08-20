@@ -7,19 +7,20 @@ public static class LanguageConverter
 {
     private static readonly Dictionary<string, string> LanguageMap = new Dictionary<string, string>
     {
-        { "es", "Spanish" },
-        { "fr", "French" },
-        { "de", "German" },
-        { "it", "Italian" },
-        { "zh", "Chinese" },
-        { "nl", "Dutch" },
-        { "hi", "Hindi" },
-        { "ar", "Arabic" },
-        { "uk", "Ukrainian" },
-        { "fi", "Finnish" },
-        { "sv", "Swedish" },
-        {"en", "English"}
+        { "es", "Español" },
+        { "fr", "Français" },
+        { "de", "Deutsch" },
+        { "it", "Italiano" },
+        { "zh", "中文" },  // Chinese (Simplified)
+        { "nl", "Nederlands" },
+        { "hi", "हिन्दी" },  // Hindi
+        { "ar", "العربية" },  // Arabic
+        { "uk", "Українська" },  // Ukrainian
+        { "fi", "Suomi" },  // Finnish
+        { "sv", "Svenska" },  // Swedish
+        { "en", "English" }
     };
+
 
     public static string ConvertCodeToLanguage(this string code)
     {
