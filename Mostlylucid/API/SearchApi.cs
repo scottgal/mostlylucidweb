@@ -12,21 +12,20 @@ public class SearchApi(MostlylucidDbContext context) : ControllerBase
 {
     [HttpGet]
     public async Task<JsonHttpResult<List<SearchResults>>> Search(string query)
-    {;
-
+    {
         var posts = await context.BlogPosts
             .Include(x => x.Categories)
             .Include(x => x.LanguageEntity)
             .Where(x =>
-                EF.Functions.ToTsVector("english", x.Title + " " + x.PlainTextContent)
-                    .Matches(EF.Functions.WebSearchToTsQuery("english", query)) // Search in title and content
+                // Search using the precomputed SearchVector
+                x.SearchVector.Matches(EF.Functions.ToTsQuery("english", query + ":*")) // Use precomputed SearchVector for title and content
                 && x.Categories.Any(c =>
                     EF.Functions.ToTsVector("english", c.Name)
-                        .Matches(EF.Functions.WebSearchToTsQuery("english", query))) // Search in categories
-                && x.LanguageEntity.Name == "en") // Filter by language
+                        .Matches(EF.Functions.ToTsQuery("english", query + ":*"))) // Search in categories
+                && x.LanguageEntity.Name == "en")// Filter by language
             .OrderByDescending(x =>
-                EF.Functions.ToTsVector("english", x.Title + " " + x.PlainTextContent)
-                    .Rank(EF.Functions.WebSearchToTsQuery("english", query))) // Rank by relevance
+                // Rank based on the precomputed SearchVector
+                x.SearchVector.Rank(EF.Functions.ToTsQuery("english", query + ":*"))) // Use precomputed SearchVector for ranking
             .Select(x => new { x.Title, x.Slug })
             .ToListAsync();
         

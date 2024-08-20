@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using NpgsqlTypes;
 
 namespace Mostlylucid.EntityFramework.Models;
 
@@ -25,5 +26,8 @@ public class BlogPostEntity
     public ICollection<CategoryEntity> Categories { get; set; }
     
     public DateTimeOffset PublishedDate { get; set; }
+    
+    [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    public NpgsqlTsVector SearchVector { get; set; }
     
 }

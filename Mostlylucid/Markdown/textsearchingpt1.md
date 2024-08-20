@@ -77,6 +77,8 @@ to_tsvector
 Apply this as a migration to our database and we're ready to start searching.
 
 # Searching
+
+## TsVector Index
 To search we use will use the `EF.Functions.ToTsVector` and `EF.Functions.WebSearchToTsQuery` functions to create a search vector and query. We can then use the `Matches` function to search for the query in the search vector.
 
 ```csharp
@@ -146,6 +148,73 @@ public class SearchApi(MostlylucidDbContext context) : ControllerBase
     }
 
 ```
+
+## Generated Column and TypeAhead
+An alternative approach to using these 'simple' TsVector Indices is to use a generated column to store the Search Vector and then use this to search. This is a more complex approach but allows for better performance. 
+Here we modify our `BlogPostEntity` to add a special type of column:
+
+```csharp
+   [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+    public NpgsqlTsVector SearchVector { get; set; }
+```
+This is a computed column that generates the search vector for the row. We can then use this column to search for words in the document. 
+
+We then set up this index inside our entity definition (yet to confirm but this may also allow us to have multiple languages by specifying a language column for each post).
+
+```csharp
+   entity.Property(b => b.SearchVector)
+                .HasComputedColumnSql("to_tsvector('english', coalesce(\"Title\", '') || ' ' || coalesce(\"PlainTextContent\", ''))", stored: true);
+```
+
+You'll see here that we use `HasComputedColumnSql` to explicity specify the PostGreSQL function to generate the search vector. We also specify that the column is stored in the database. This is important as it tells Postgres to store the search vector in the database. This allows us to search for words in the document using the search vector.
+
+In the database this generated this for  each row, which are the 'lexemes' in the document and their positions:
+
+```csharp
+"'1992':464 '1996':468 '20':480 '200':115 '2007':426 '2009':428 '2012':88 '2015':397 '2018':370 '2020':372 '2021':288,327,329,399 '2022':196,243,245,290 '2024':156,158,198 '25':21,477,486,522 '3d':346 '6':203,256 '8':179,485 '90':120,566 'ab':282 'access':221 'accomplish':14 'achiev':118 'across':60 'adapt':579 'advanc':134 'applic':168,316,526 'apr':155,197 'architect':83,97,159 'architectur':307,337 ...
+```
+
+### SearchAPI
+We can then use this column to search for words in the document. We can use the `Matches` function to search for the query in the search vector. We can also use the `Rank` function to rank the results by relevance.
+
+```csharp
+       var posts = await context.BlogPosts
+            .Include(x => x.Categories)
+            .Include(x => x.LanguageEntity)
+            .Where(x =>
+                // Search using the precomputed SearchVector
+                x.SearchVector.Matches(EF.Functions.ToTsQuery("english", query + ":*")) // Use precomputed SearchVector for title and content
+                && x.Categories.Any(c =>
+                    EF.Functions.ToTsVector("english", c.Name)
+                        .Matches(EF.Functions.ToTsQuery("english", query + ":*"))) // Search in categories
+                && x.LanguageEntity.Name == "en") // Filter by language
+            .OrderByDescending(x =>
+                // Rank based on the precomputed SearchVector
+                x.SearchVector.Rank(EF.Functions.ToTsQuery("english", query + ":*"))) // Use precomputed SearchVector for ranking
+            .Select(x => new { x.Title, x.Slug })
+            .ToListAsync();
+```
+You'l lsee here that we also use a different query constructor `EF.Functions.ToTsQuery("english", query + ":*")`  which allows us to offer a TypeAhead type functionality (where we can type e.g. 'cat' and get 'cat', 'cats', 'caterpillar' etc). 
+
+Additionally it lets us simplify the main blog post query to just search for the query in the `SearchVector` column. This is a powerful feature that allows us to search for words in the `Title`, `PlainTextContent`. We still use the index we showed above for the `CategoryEntity`.
+
+```csharp
+x.Categories.Any(c =>
+                    EF.Functions.ToTsVector("english", c.Name)
+                        .Matches(EF.Functions.ToTsQuery("english", query + ":*"))) 
+```
+
+We then use the `Rank` function to rank the results by relevance based on the query.
+
+```csharp
+ x.SearchVector.Rank(EF.Functions.ToTsQuery("english", query + ":*")))
+ ```
+
+This lets us use the endpoint as follows, where we can pass in the first few letters of a word and get back all the posts that match that word:
+
+![API](searchapi.png?width=600&format=webp&quality=50)
+
+In future I'll add a TypeAhead feature to the search box on the site that uses this functionality.
 
 # In Conclusion
 You can see that it's possible to get powerful search functionality using Postgres and Entity Framework. However it has complexities and limitations we need to account for (like the language thing). In the next part I'll cover how we'd do this using OpenSearch - which is has a ton more setup but is more powerful and scalable.

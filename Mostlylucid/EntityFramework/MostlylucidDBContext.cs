@@ -34,9 +34,12 @@ public class MostlylucidDbContext : DbContext
             entity.HasIndex(x => x.ContentHash).IsUnique();
             entity.HasIndex(x => x.PublishedDate);
 
-                entity.HasIndex(b => new { b.Title, b.PlainTextContent})
-                .HasMethod("GIN")
-                .IsTsVectorExpressionIndex("english");
+            
+            entity.Property(b => b.SearchVector)
+                .HasComputedColumnSql("to_tsvector('english', coalesce(\"Title\", '') || ' ' || coalesce(\"PlainTextContent\", ''))", stored: true);
+            
+           entity.HasIndex(b => b.SearchVector)
+                .HasMethod("GIN");
             entity.HasMany(b => b.Comments)
                 .WithOne(c => c.BlogPostEntity)
                 .HasForeignKey(c => c.BlogPostId);
