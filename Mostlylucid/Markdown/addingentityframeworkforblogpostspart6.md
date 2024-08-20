@@ -20,7 +20,7 @@ In the previous parts I showed how I used a `MarkdownBlogService` to get the blo
 The update process is as follows:
 
 ```mermaid 
-   flowchart TD
+   flowchart LR
     A[Write New Markdown File] -->|Checkin To Github| B(Github Action Triggers)
     B --> C(Builds Docker Image)
     C --> D(Watchtower Pulls new Image)
