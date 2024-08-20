@@ -7,17 +7,17 @@ public static class LanguageConverter
 {
     private static readonly Dictionary<string, string> LanguageMap = new Dictionary<string, string>
     {
-        { "es", "Español" },
-        { "fr", "Français" },
-        { "de", "Deutsch" },
-        { "it", "Italiano" },
-        { "zh", "中文" },  // Chinese (Simplified)
-        { "nl", "Nederlands" },
-        { "hi", "हिन्दी" },  // Hindi
-        { "ar", "العربية" },  // Arabic
-        { "uk", "Українська" },  // Ukrainian
-        { "fi", "Suomi" },  // Finnish
-        { "sv", "Svenska" },  // Swedish
+        { "es", "Español (Spanish)" },
+        { "fr", "Français (French)" },
+        { "de", "Deutsch (German)" },
+        { "it", "Italiano (Italian)" },
+        { "zh", "中文 (Chinese Simplified)" },  // Chinese (Simplified)
+        { "nl", "Nederlands (Dutch)" },
+        { "hi", "हिन्दी (Hindi)"  },  // Hindi
+        { "ar", "العربية (Arabic)" },  // Arabic
+        { "uk", "Українська (Ukranian)" },  // Ukrainian
+        { "fi", "Suomi (Finnish)"  },  // Finnish
+        { "sv", "Svenska (Swedish)" },  // Swedish
         { "en", "English" }
     };
 
