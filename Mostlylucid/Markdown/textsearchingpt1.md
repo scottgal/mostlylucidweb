@@ -98,6 +98,7 @@ To search we use will use the `EF.Functions.ToTsVector` and `EF.Functions.WebSea
        
 ```
 The EF.Functions.WebSearchToTsQuery function generates the query for the row based on common Web Search engine syntax. 
+
 ```postgresql
 SELECT websearch_to_tsquery('english', '"sad cat" or "fat rat"');
        websearch_to_tsquery

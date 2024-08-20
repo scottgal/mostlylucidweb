@@ -114,7 +114,7 @@ public class EFBlogService(
     {
         var langSlugs = await NoTrackingQuery()
             .Where(x => slugs.Contains(x.Slug))
-            .Select(x => new { x.Slug, x.LanguageEntity.Name }).ToListAsync();
+            .Select(x => new { x.Slug, x.LanguageEntity.Name }).OrderBy(x=>x.Name).ToListAsync();
 
         var outDict = new Dictionary<string, List<string>>();
 
@@ -138,13 +138,13 @@ public class EFBlogService(
     {
         var languages = await NoTrackingQuery().Select(x =>
                 new { x.Slug, x.LanguageEntity.Name }
-            ).ToListAsync();
+            ).OrderBy(x=>x.Name).ToListAsync();
 
         var postModels = new List<PostListModel>();
 
         foreach (var postResult in posts)
         {
-            var langArr = languages.Where(x => x.Slug == postResult.Slug).Select(x => x.Name).ToArray();
+            var langArr = languages.Where(x => x.Slug == postResult.Slug).Select(x => x.Name).OrderBy(x=>x).ToArray();
 
             postModels.Add(postResult.ToListModel(langArr));
         }

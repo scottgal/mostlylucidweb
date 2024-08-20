@@ -1,4 +1,5 @@
-﻿@model (string slug, string[] languuages, string? selectedLanguage)
+﻿@using Mostlylucid.Helpers
+@model (string slug, string[] languuages, string? selectedLanguage)
 
 
 @foreach (var language in Model.languuages)
@@ -8,7 +9,9 @@ var active= "opacity-50 hover:opacity-100";
     {
         active = "opacity-100";
     }
-        <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.slug" asp-route-language="@language" class="rounded outline outline-1  outline-green-dark dark:outline-white inline-block w-6 h-4  @active">
-            <img src="~/img/flags/@(language).svg" alt="@language" class="rounded" />
-        </a>
+    <div class="tooltip" data-tip="@language.ConvertCodeToLanguage()">
+    <a hx-boost="true"   hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.slug" asp-route-language="@language" class=" rounded outline outline-1  outline-green-dark dark:outline-white inline-block w-6 h-4  @active">
+        <img src="~/img/flags/@(language).svg" alt="@language.ConvertCodeToLanguage()" class="rounded" />
+    </a>
+    </div>
 }

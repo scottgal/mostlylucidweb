@@ -1,14 +1,15 @@
-﻿@model List<string>
+﻿@using Mostlylucid.Helpers
+@model List<string>
 
 <div x-data="{ open: false, selectedLanguage: 'Select Language', selectedFlag: '' }" class="relative inline-block">
     <!-- Dropdown Button -->
     <button x-on:click="open = !open" class="btn btn-sm btn-outline flex items-center space-x-2">
         <!-- Dynamically Show the Flag Icon -->
         <template x-if="selectedFlag">
-            <img :src="selectedFlag" class="h-5 w-5" alt="Selected Language Flag">
+            <img :src="selectedFlag" class="h-4 w-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="Selected Language Flag">
         </template>
         <span x-text="selectedLanguage"></span>
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class=" h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
     </button>
@@ -21,9 +22,9 @@
             {
             <li>
                 <a href="#"
-                   x-on:click.prevent="selectedLanguage = '@(language)'; selectedFlag = '/img/flags/@(language).svg'; open = false"
+                   x-on:click.prevent="selectedLanguage = '@(language.ConvertCodeToLanguage())'; selectedFlag = '/img/flags/@(language).svg'; open = false"
                    class="flex dark:text-white text-black items-center p-2 hover:bg-gray-100">
-                    <img src="/img/flags/@(language).svg" class="h-5 w-5 mr-2" alt="@language"> @language
+                    <img src="/img/flags/@(language).svg" class=" ml-2 h-4 w-4 mr-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="@language"> @language.ConvertCodeToLanguage()
                 </a>
             </li>
             }

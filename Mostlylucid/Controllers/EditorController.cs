@@ -15,7 +15,7 @@ public class EditorController(
     ILogger<EditorController> logger) : BaseController(authSettings,
     analyticsSettings, blogService, logger)
 {
-    public string GetUserId()
+    private string GetUserId()
     {
         var userId = Request.Cookies["UserIdentifier"];
         if (userId == null)

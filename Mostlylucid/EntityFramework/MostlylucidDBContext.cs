@@ -34,6 +34,9 @@ public class MostlylucidDbContext : DbContext
             entity.HasIndex(x => x.ContentHash).IsUnique();
             entity.HasIndex(x => x.PublishedDate);
 
+                entity.HasIndex(b => new { b.Title, b.PlainTextContent})
+                .HasMethod("GIN")
+                .IsTsVectorExpressionIndex("english");
             entity.HasMany(b => b.Comments)
                 .WithOne(c => c.BlogPostEntity)
                 .HasForeignKey(c => c.BlogPostId);
@@ -70,6 +73,7 @@ public class MostlylucidDbContext : DbContext
 
         modelBuilder.Entity<CategoryEntity>(entity =>
         {
+            entity.HasIndex(b => b.Name).HasMethod("GIN").IsTsVectorExpressionIndex("english");;
             entity.HasKey(c => c.Id); // Assuming Category has a primary key named Id
 
             entity.HasMany(c => c.BlogPosts)

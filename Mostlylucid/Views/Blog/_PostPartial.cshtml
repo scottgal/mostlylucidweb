@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Http.Extensions
+@using Mostlylucid.Helpers
 @model Mostlylucid.Models.Blog.BlogPostViewModel
 
 
@@ -29,7 +30,7 @@
                 <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2">
                     <p class="font-body  font-bold text-primary dark:text-white">NOTE: Apart from  
                         <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="en" class="rounded-full outline outline-1 outline-white inline-block">
-                            <img src="~/img/flags/en.svg" alt="en" class="w-4 h-4 rounded" />
+                            <img src="~/img/flags/en.svg" alt="@("en".ConvertCodeToLanguage())" class="w-4 h-4 rounded" />
                         </a>   (and even then it's questionable, I'm Scottish).  These are machine translated in languages I don't read. If they're terrible please <a asp-controller="Contact" class="text-blue-dark dark:text-blue" asp-action="Index">contact me. </a>  <br/>
                         You can see how this translation was done in <a href="/blog/autotranslatingmarkdownfiles" class="text-blue-dark dark:text-blue" >this article. </a> </p>
                     <div class="flex space-x-2 items-center pb-4 pt-2">
