@@ -12,7 +12,7 @@ In this post I'll cover a couple of small additions I made to this process and h
 See parts [1](/blog/addingentityframeworkforblogpostspt1), [2](/blog/addingentityframeworkforblogpostspt2), [3](/blog/addingentityframeworkforblogpostspt3) , [4](/blog/addingentityframeworkforblogpostspt4) and [5](/blog/addingentityframeworkforblogpostspt5) for the previous steps.
 
 
-## Background Updating
+# Background Updating
 One of the issues I faced with moving to EF was keeping my process for updating the site while not delaying the site update. I wanted to keep the process of adding a new post as simple as possible.
 
 In the previous parts I showed how I used a `MarkdownBlogService` to get the blog posts and languages. This service was injected into our controllers and views. This service was a simple service that read markdown files from disk and returned them as `BlogViewModels`.

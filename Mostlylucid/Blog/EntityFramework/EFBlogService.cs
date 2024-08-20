@@ -38,6 +38,7 @@ public class EFBlogService(
             .Where(x => x.Categories.Any(c => c.Name == category) && x.LanguageEntity.Name == language).CountAsync();
         var posts = await PostsQuery()
             .Where(x => x.Categories.Any(c => c.Name == category) && x.LanguageEntity.Name == language)
+            .OrderByDescending(x=>x.PublishedDate.DateTime)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -96,7 +97,7 @@ public class EFBlogService(
         var query =NoTrackingQuery().Where(x => x.LanguageEntity.Name == language);
         var count = await query.CountAsync();
         var posts = await query
-            .OrderByDescending(x=>x.PublishedDate)
+            .OrderByDescending(x=>x.PublishedDate.DateTime)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
