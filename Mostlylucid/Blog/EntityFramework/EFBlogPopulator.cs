@@ -36,7 +36,7 @@ private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List
     var languageList = languages.SelectMany(x => x.Value).Distinct().ToList();
     
     // Retrieve the current languages from the database (trimmed and distinct)
-    var currentLanguages = await Context.Languages.Select(x => x.Name.Trim()).ToListAsync();
+    var currentLanguages = await Context.Languages.ToListAsync();
 
     // List to hold language entities, both from DB and new ones
     var languageEntities = new List<LanguageEntity>();
@@ -44,7 +44,9 @@ private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List
     // Check if English exists in the database, add if missing
     var enLang = new LanguageEntity { Name = MarkdownBaseService.EnglishLanguage };
     
-    if (!currentLanguages.Contains(MarkdownBaseService.EnglishLanguage))
+    var currentLanguageNames = currentLanguages.Select(x => x.Name).ToList();
+    
+    if (!currentLanguageNames.Contains(MarkdownBaseService.EnglishLanguage))
     {
         // Add English to context if it's not in the DB and add to the list
         Context.Languages.Add(enLang);
@@ -60,10 +62,11 @@ private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List
     // Iterate through the provided language list
     foreach (var language in languageList)
     {
-        if (currentLanguages.Contains(language))
+        if (currentLanguageNames.Contains(language))
         {
             // Fetch the existing language entity from the DB and add it to the list
-            var existingLanguage = await Context.Languages.FirstOrDefaultAsync(x => x.Name == language);
+            var existingLanguage =  currentLanguages.First(x => x.Name == language);
+            
             languageEntities.Add(existingLanguage);
         }
         else
@@ -90,11 +93,11 @@ private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List
         var languages = languageEntities.ToDictionary(x => x.Name, x => x);
         var categories = new List<CategoryEntity>();
 
+        var currentPosts = await PostsQuery().ToListAsync();
         foreach (var post in posts)
         {
             var currentPost =
-                await PostsQuery()
-                    .FirstOrDefaultAsync(x => x.Slug == post.Slug && x.LanguageEntity.Name == post.Language);
+                currentPosts.FirstOrDefault(x => x.Slug == post.Slug && x.LanguageEntity.Name == post.Language);
             await AddCategoriesToContext(post.Categories, existingCategories, categories);
             await AddBlogPostToContext(post, languages[post.Language], categories, currentPost);
         }

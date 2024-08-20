@@ -35,6 +35,7 @@ public static class BlogSetup
                 services.AddScoped<IBlogService, EFBlogService>();
             
                 services.AddScoped<IBlogPopulator, EFBlogPopulator>();
+                services.AddHostedService<BackgroundEFBlogUpdater>();
                 break;
         }
         services.AddScoped<IMarkdownBlogService, MarkdownBlogPopulator>();
@@ -54,8 +55,12 @@ public static class BlogSetup
            Log.Information("Migrating database");
            await blogContext.Database.MigrateAsync();
         }
-    
-        var context = scope.ServiceProvider.GetRequiredService<IBlogPopulator>();
-        await context.Populate();
+
+        if (config.Mode == BlogMode.File)
+        {
+            var context = scope.ServiceProvider.GetRequiredService<IBlogPopulator>();
+            await context.Populate();
+        }
+     
     }
 }

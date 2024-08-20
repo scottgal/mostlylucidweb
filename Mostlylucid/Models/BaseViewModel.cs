@@ -7,4 +7,6 @@ public class BaseViewModel
     public string? Name { get; set; }
     
     public string? AvatarUrl { get; set; }
+    
+    public bool IsAdmin { get; set; }
 }

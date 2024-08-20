@@ -87,9 +87,22 @@ public class BackgroundTranslateService(
                 var translatedMarkdown =
                     await markdownTranslatorService.TranslateMarkdown(translateModel.OriginalMarkdown,
                         translateModel.Language, cancellationToken);
-                
-                var blogService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IBlogService>();
-                var postModel = await blogService.SavePost(translateModel.OriginalFileName, translateModel.Language, translatedMarkdown);
+
+                BlogPostViewModel? postModel = null;
+                if (item.Item1.Persist)
+                {
+
+
+                    var blogService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IBlogService>();
+                     postModel = await blogService.SavePost(translateModel.OriginalFileName, translateModel.Language,
+                        translatedMarkdown);
+                }
+                else
+                {
+                    var populatorService = scopeFactory.CreateScope().ServiceProvider.GetRequiredService<MarkdownRenderingService>();
+                    postModel =  populatorService.GetPageFromMarkdown(translatedMarkdown, DateTime.Now,  translateModel.OutFileName);
+                }
+
                 tcs.SetResult((postModel, true));
             }
             catch (Exception e)

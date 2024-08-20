@@ -119,11 +119,11 @@
                                 <div class="flex items-center space-x-4">
                                     @if (Model.AvatarUrl != null)
                                     {
-                                        <img src="@Model.AvatarUrl" class="h-10 w-10 rounded-full" alt="User Avatar"/>
+                                        <img src="@Model.AvatarUrl" class="h-6 w-6 rounded-full" alt="User Avatar"/>
                                     }
                                     <span class="text-blue-dark dark:text-white">Logged in as @Model.Name</span>
-                                    <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-primary text-white rounded">
-                                        Logout
+                                    <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-outline btn-sm text-blue-dark dark:text-white">
+                                        <i class="bx bx-log-out"></i>  Logout
                                     </a>
                                 </div>
                             }

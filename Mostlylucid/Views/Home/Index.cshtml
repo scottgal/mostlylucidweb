@@ -54,9 +54,10 @@
         <a href="/rss" target="_blank" class="flex items-center text-xl text-primary dark:text-white hover:text-secondary dark:hover:text-secondary transition-colors ">
             <i class="bx bx-rss"></i>
             <h3 class="ml-3">
-            RSS
+                RSS
             </h3>
         </a>
+        <a asp-action="Edit" class="ml-4 text-sm  btn-sm btn btn-outline btn-primary" asp-controller="Editor"  ><i class=" bx bx-edit"></i> new</a>
 
     </div>
         <partial name="_BlogSummaryList" model="Model.Posts"/>

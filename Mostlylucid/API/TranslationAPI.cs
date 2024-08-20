@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.Models.Blog;
 
@@ -6,17 +7,14 @@ namespace Mostlylucid.API;
 
 [ApiController]
 [Route("api/[controller]")]
-public class TranslateController : ControllerBase
+public class TranslateController(BackgroundTranslateService backgroundTranslateService,IMemoryCache memoryCache) : ControllerBase
 {
-    private readonly BackgroundTranslateService _backgroundTranslateService;
+
     
     // Dictionary to hold tasks that are triggered
     private static readonly Dictionary<Guid, Task<(BlogPostViewModel? model, bool complete)>> _translationTasks = new();
 
-    public TranslateController(BackgroundTranslateService backgroundTranslateService)
-    {
-        _backgroundTranslateService = backgroundTranslateService;
-    }
+
 
     [HttpPost("start-translation")]
     public async Task<IActionResult> StartTranslation([FromBody] PageTranslationModel model)
@@ -25,7 +23,7 @@ public class TranslateController : ControllerBase
         var taskId = Guid.NewGuid();
 
         // Trigger translation and store the associated task
-        var translationTask = await _backgroundTranslateService.Translate(model);
+        var translationTask = await backgroundTranslateService.Translate(model);
         _translationTasks[taskId] = translationTask;
 
         // Return the task ID to the client
