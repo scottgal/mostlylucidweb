@@ -50,7 +50,7 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
        post.AvatarUrl = user.AvatarUrl;
        if(Request.IsHtmx())
        {
-               Response.Headers.TryAdd("HX-Push-Url", Request.GetEncodedUrl());
+      
               return PartialView("_PostPartial", post);
        }
        return View("Post", post);
