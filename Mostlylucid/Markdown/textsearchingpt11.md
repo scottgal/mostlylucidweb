@@ -13,8 +13,6 @@ To add a search capability I had to make some changes to the search api. I added
 ```csharp
     private async Task<List<(string Title, string Slug)>> GetSearchResultForQuery(string query)
     {
-    
-
         var processedQuery = query;
         var posts = await context.BlogPosts
             .Include(x => x.Categories)
@@ -172,6 +170,20 @@ When a result is selected we navigate to the url of the result.
                     this.highlightedIndex = -1; // Reset index on new search
                 });
         },
+```
+### HTMX
+I also changed the fetch to work with HTMX, this simply changes the `search` method to use an HTMX refresh:
+```javascript
+     selectResult(result) {
+            htmx.ajax('GET', result.url, {
+                target: '#contentcontainer',  // The container to update
+                swap: 'innerHTML',            // Replace the content inside the target
+                pushUrl: true                 // Push the URL to the browser history
+            });
+            this.results = []; // Clear the results
+            this.highlightedIndex = -1; // Reset the highlighted index
+            this.query = ''; // Clear the query
+        }
 ```
 
 ## In Conclusion
