@@ -57,34 +57,44 @@ EF.Functions.ToTsQuery("english", query + ":*")
 Using [Alpine.js](https://alpinejs.dev/) I made a simple Partial control which provides a super simple search box. 
 
 ```razor
-<div x-data="window.mostlylucid.typeahead()" class="relative">
-    <input
-        type="text"
-        x-model="query"
-        x-on:input.debounce.300ms="search"
-        x-on:keydown.down.prevent="moveDown"
-        x-on:keydown.up.prevent="moveUp"
-        x-on:keydown.enter.prevent="selectHighlighted"
-        placeholder="Search..."
-        class="input input-bordered w-full"
-    />
+<div x-data="window.mostlylucid.typeahead()" class="relative"    x-on:click.outside="results = []">
 
+    <label class="input input-sm dark:bg-custom-dark-bg bg-white input-bordered flex items-center gap-2">
+       
+        
+        <input
+            type="text"
+            x-model="query"
+
+            x-on:input.debounce.300ms="search"
+            x-on:keydown.down.prevent="moveDown"
+            x-on:keydown.up.prevent="moveUp"
+            x-on:keydown.enter.prevent="selectHighlighted"
+            placeholder="Search..."
+            class="border-0 grow  input-sm text-black dark:text-white bg-transparent w-full"/>
+        <i class="bx bx-search"></i>
+    </label>
     <!-- Dropdown -->
     <ul x-show="results.length > 0"
-        class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg">
+        class="absolute z-10 my-2 w-full bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-b-neutral-600 dark:border-gray-300   rounded-lg shadow-lg">
         <template x-for="(result, index) in results" :key="result.slug">
             <li
                 x-on:click="selectResult(result)"
                 :class="{
-                    'bg-accent': index === highlightedIndex,
-                    'hover:bg-accent-content': true
+                    'dark:bg-blue-dark bg-blue-light': index === highlightedIndex,
+                    'dark:hover:bg-blue-dark hover:bg-blue-light': true
                 }"
-                class="cursor-pointer text-sm p-2"
+                class="cursor-pointer text-sm p-2 m-2"
                 x-text="result.title"
             ></li>
         </template>
     </ul>
 </div>
+```
+This has a bunch of CSS classes to render correctly for either dark or light mode. The Alpine.js code is pretty simple. It's a simple typeahead control that calls the search api when the user types in the search box.
+We also have a little code to handle unfocus to close the search results. 
+```html
+   x-on:click.outside="results = []"
 ```
 
 Note we have a debounce in here to avoid hammering the server with requests.
