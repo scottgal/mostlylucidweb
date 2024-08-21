@@ -186,8 +186,9 @@ window.mostlylucid.typeahead = function () {
             htmx.ajax('GET', result.url, {
                 target: '#contentcontainer',  // The container to update
                 swap: 'innerHTML',            // Replace the content inside the target
-                pushUrl: true                 // Push the URL to the browser history
+                               // Push the URL to the browser history
             });
+         
             this.results = []; // Clear the results
             this.highlightedIndex = -1; // Reset the highlighted index
             this.query = ''; // Clear the query
