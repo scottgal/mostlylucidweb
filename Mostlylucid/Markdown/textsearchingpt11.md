@@ -168,4 +168,3 @@ When a result is selected we navigate to the url of the result.
 This adds a powerful yet simple search capability to the site. It's a great way to help users find what they're looking for. 
 It gives this site a more professional feel and makes it easier to navigate.
 ![Search](searchbox.png)
-```
