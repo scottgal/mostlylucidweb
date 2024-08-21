@@ -1,19 +1,23 @@
 ﻿<div x-data="window.mostlylucid.typeahead()" class="relative"    x-on:click.outside="results = []">
-    <input
-        type="text"
-        x-model="query"
-     
-        x-on:input.debounce.300ms="search"
-        x-on:keydown.down.prevent="moveDown"
-        x-on:keydown.up.prevent="moveUp"
-        x-on:keydown.enter.prevent="selectHighlighted"
-        placeholder="Search..."
-        class="input input-sm input-bordered text-black dark:text-white dark:bg-custom-dark-bg bg-white w-full"
-    />
 
+    <label class="input input-sm dark:bg-custom-dark-bg bg-white input-bordered flex items-center gap-2">
+       
+        
+        <input
+            type="text"
+            x-model="query"
+
+            x-on:input.debounce.300ms="search"
+            x-on:keydown.down.prevent="moveDown"
+            x-on:keydown.up.prevent="moveUp"
+            x-on:keydown.enter.prevent="selectHighlighted"
+            placeholder="Search..."
+            class="border-0 grow  input-sm text-black dark:text-white bg-transparent w-full"/>
+        <i class="bx bx-search"></i>
+    </label>
     <!-- Dropdown -->
     <ul x-show="results.length > 0"
-        class="absolute z-10 mt-2 w-full bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-b-neutral-600 dark:border-gray-300   rounded-lg shadow-lg">
+        class="absolute z-10 my-2 w-full bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-b-neutral-600 dark:border-gray-300   rounded-lg shadow-lg">
         <template x-for="(result, index) in results" :key="result.slug">
             <li
                 x-on:click="selectResult(result)"
@@ -21,7 +25,7 @@
                     'dark:bg-blue-dark bg-blue-light': index === highlightedIndex,
                     'dark:hover:bg-blue-dark hover:bg-blue-light': true
                 }"
-                class="cursor-pointer text-sm p-2"
+                class="cursor-pointer text-sm p-2 m-2"
                 x-text="result.title"
             ></li>
         </template>
