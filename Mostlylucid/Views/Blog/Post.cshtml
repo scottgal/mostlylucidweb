@@ -1,6 +1,9 @@
-﻿@model Mostlylucid.Models.Blog.BlogPostViewModel
+﻿@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@using Mostlylucid.Helpers
+@model Mostlylucid.Models.Blog.BlogPostViewModel
 
 @{
     Layout = "_Layout";
+    ViewBag.Title = $"{Model.Title} ({Model.Language.ConvertCodeToLanguage()})";
 }
 <partial name="_PostPartial" model="Model"/>
