@@ -68,6 +68,7 @@ window.onload= function () {
         mermaid.initialize({ startOnLoad: true });
         mermaidInitialized = true;  // Set the flag to true after initialization
     }
+    updateMetaUrls();
 
     // SimpleMDE Initialization
     initializeSimpleMDE();
@@ -86,12 +87,21 @@ document.body.addEventListener('htmx:afterSwap', function(evt) {
     } else {
         console.log('umami is not defined');
     }
-
+    updateMetaUrls();
     initGoogleSignIn();
     mermaid.run();
     setLogoutLink();
 });
 
+
+function updateMetaUrls()
+{
+    var currentUrl = window.location.href;
+
+    // Set the current URL in the og:url and twitter:url meta tags
+    document.getElementById('metaOgUrl').setAttribute('content', currentUrl);
+    document.getElementById('metaTwitterUrl').setAttribute('content', currentUrl);
+}
 
 function initializeSimpleMDE() {
     if(simpleMDEInitialized) return;
