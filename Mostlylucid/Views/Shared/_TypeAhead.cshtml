@@ -1,7 +1,8 @@
-﻿<div x-data="window.mostlylucid.typeahead()" class="relative">
+﻿<div x-data="window.mostlylucid.typeahead()" class="relative"    x-on:click.outside="results = []">
     <input
         type="text"
         x-model="query"
+     
         x-on:input.debounce.300ms="search"
         x-on:keydown.down.prevent="moveDown"
         x-on:keydown.up.prevent="moveUp"
