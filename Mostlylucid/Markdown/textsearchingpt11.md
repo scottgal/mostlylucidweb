@@ -5,6 +5,12 @@
 ## Introduction
 In the [last article](/blog/textsearchingpt1) I showed you how to set up a full text search using the built in full text search capabilities of Postgres. While I exposed a search api I didn't have a way to actually use it so...it was a bit of a tease. In this article I'll show you how to use the search api to search for text in your database.
 
+This will add a little search box to the header of the site which will allow users to search for text in the blog posts.
+
+![Search](searchbox.png)
+
+**Note: The elephant in the room is that I do not consider the best way to do this. To support multi-language is super complex (I'd need a different column per language) and I'd need to handle stemming and other language specific things. I'm going to ignore this for now and just focus on English. LATER we'll show how to handle this in OpenSearch.** 
+
 [TOC]
 
 ## Searching for text
@@ -193,4 +199,3 @@ We also change the url in the history to the new url.
 ## In Conclusion
 This adds a powerful yet simple search capability to the site. It's a great way to help users find what they're looking for. 
 It gives this site a more professional feel and makes it easier to navigate.
-![Search](searchbox.png)
