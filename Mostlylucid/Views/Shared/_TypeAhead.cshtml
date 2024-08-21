@@ -8,18 +8,18 @@
         x-on:keydown.up.prevent="moveUp"
         x-on:keydown.enter.prevent="selectHighlighted"
         placeholder="Search..."
-        class="input input-bordered w-full"
+        class="input input-sm input-bordered text-black dark:text-white dark:bg-custom-dark-bg bg-white w-full"
     />
 
     <!-- Dropdown -->
     <ul x-show="results.length > 0"
-        class="absolute z-10 mt-2 w-full bg-white border border-gray-300 rounded-lg shadow-lg">
+        class="absolute z-10 mt-2 w-full bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-b-neutral-600 dark:border-gray-300   rounded-lg shadow-lg">
         <template x-for="(result, index) in results" :key="result.slug">
             <li
                 x-on:click="selectResult(result)"
                 :class="{
-                    'bg-accent': index === highlightedIndex,
-                    'hover:bg-accent-content': true
+                    'dark:bg-blue-dark bg-blue-light': index === highlightedIndex,
+                    'dark:hover:bg-blue-dark hover:bg-blue-light': true
                 }"
                 class="cursor-pointer text-sm p-2"
                 x-text="result.title"
