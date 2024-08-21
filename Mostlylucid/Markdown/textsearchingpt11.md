@@ -174,17 +174,21 @@ When a result is selected we navigate to the url of the result.
 ### HTMX
 I also changed the fetch to work with HTMX, this simply changes the `search` method to use an HTMX refresh:
 ```javascript
-     selectResult(result) {
-            htmx.ajax('GET', result.url, {
-                target: '#contentcontainer',  // The container to update
-                swap: 'innerHTML',            // Replace the content inside the target
-                pushUrl: true                 // Push the URL to the browser history
-            });
-            this.results = []; // Clear the results
-            this.highlightedIndex = -1; // Reset the highlighted index
-            this.query = ''; // Clear the query
-        }
+    selectResult(result) {
+    htmx.ajax('get', result.url, {
+        target: '#contentcontainer',  // The container to update
+        swap: 'innerHTML', // Replace the content inside the target
+    }).then(function() {
+        history.pushState(null, '', result.url); // Push the new url to the history
+    });
+
+    this.results = []; // Clear the results
+    this.highlightedIndex = -1; // Reset the highlighted index
+    this.query = ''; // Clear the query
+}
 ```
+Note that we swap the innerHTML of the `contentcontainer` with the result of the search. This is a simple way to update the content of the page with the search result without a page refresh.
+We also change the url in the history to the new url.
 
 ## In Conclusion
 This adds a powerful yet simple search capability to the site. It's a great way to help users find what they're looking for. 
