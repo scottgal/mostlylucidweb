@@ -131,6 +131,54 @@ function initializeSimpleMDE() {
 
 }
 
+window.mostlylucid = window.mostlylucid || {};
+
+window.mostlylucid.typeahead = function () {
+    return {
+        query: '',
+        results: [],
+        highlightedIndex: -1, // Tracks the currently highlighted index
+
+        search() {
+            if (this.query.length < 2) {
+                this.results = [];
+                this.highlightedIndex = -1;
+                return;
+            }
+
+            fetch(`/api/search/${encodeURIComponent(this.query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    this.results = data;
+                    this.highlightedIndex = -1; // Reset index on new search
+                });
+        },
+
+        moveDown() {
+            if (this.highlightedIndex < this.results.length - 1) {
+                this.highlightedIndex++;
+            }
+        },
+
+        moveUp() {
+            if (this.highlightedIndex > 0) {
+                this.highlightedIndex--;
+            }
+        },
+
+        selectHighlighted() {
+            if (this.highlightedIndex >= 0 && this.highlightedIndex < this.results.length) {
+                this.selectResult(this.results[this.highlightedIndex]);
+            }
+        },
+
+        selectResult(result) {
+           window.location.href = result.url;
+            this.results = []; // Clear the results
+            this.highlightedIndex = -1; // Reset the highlighted index
+        }
+    }
+}
 window.simplemde = null;
 
 function saveContentToDisk(content, slug, language) {
@@ -161,6 +209,9 @@ function saveContentToDisk(content, slug, language) {
 
     console.log("Download triggered for " + filename);
 }
+
+
+
 function renderButton(element)
 {
     google.accounts.id.renderButton(

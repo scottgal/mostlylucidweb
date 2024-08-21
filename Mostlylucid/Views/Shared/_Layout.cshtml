@@ -112,35 +112,38 @@ dark:text-white dark:group-hover:text-secondary"></span>
             <div class="w-full lg:w-auto">
                 <ul class="flex flex-wrap items-center justify-end space-x-4">
                     <li class="group relative mb-1">
+                        <partial name="_TypeAhead"/>
+                    </li>
+                    <li class="group relative mb-1">
                         <div class="flex items-center space-x-4">
                             @if (Model != null)
                             {
-                                
-                           
-                            if (Model.Authenticated)
-                            {
-                                <div class="flex items-center space-x-4">
-                                    @if (Model.AvatarUrl != null)
-                                    {
-                                        <img src="@Model.AvatarUrl" class="h-6 w-6 rounded-full" alt="User Avatar"/>
-                                    }
-                                    <span class="text-blue-dark dark:text-white">Logged in as @Model.Name</span>
-                                    <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-outline btn-sm text-blue-dark dark:text-white">
-                                        <i class="bx bx-log-out"></i>  Logout
-                                    </a>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="w-[200px] h-[39px] overflow-hidden rounded">
-                                    <div id="google_button"></div>
-                                </div>
-                            }
+
+
+                                if (Model.Authenticated)
+                                {
+                                    <div class="flex items-center space-x-4">
+                                        @if (Model.AvatarUrl != null)
+                                        {
+                                            <img src="@Model.AvatarUrl" class="h-6 w-6 rounded-full" alt="User Avatar"/>
+                                        }
+                                        <span class="text-blue-dark dark:text-white">Logged in as @Model.Name</span>
+                                        <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-outline btn-sm text-blue-dark dark:text-white">
+                                            <i class="bx bx-log-out"></i> Logout
+                                        </a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="w-[200px] h-[39px] overflow-hidden rounded">
+                                        <div id="google_button"></div>
+                                    </div>
+                                }
                             }
                         </div>
                     </li>
                     <li class="group relative mb-1">
-                        <partial name="_Socials" />
+                        <partial name="_Socials"/>
                     </li>
                     <li class="group relative mb-1">
                         <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
@@ -158,15 +161,14 @@ dark:text-white dark:group-hover:text-secondary"></span>
                     </li>
                     <li class="group relative mb-1">
                         <div class="absolute left-0 bottom-0 z-20 h-0 w-full opacity-75 transition-all group-hover:h-2 group-hover:bg-yellow"></div>
-                        <a asp-action="Index" asp-controller="Contact" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary" data-umami-event="Contact Click"  >Contact</a>
+                        <a asp-action="Index" asp-controller="Contact" class="relative z-30 block px-2 font-body text-lg font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary" data-umami-event="Contact Click">Contact</a>
                     </li>
                     <li class="group relative mb-1">
                         <div class="flex items-center">
                             <i
                                 class="bx mr-8 cursor-pointer text-3xl text-primary dark:text-white"
                                 x-on:click="themeSwitch()"
-                                :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"
-                            ></i>
+                                :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"></i>
                         </div>
                     </li>
                 </ul>
