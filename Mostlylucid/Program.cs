@@ -85,7 +85,6 @@ else
 app.UseOutputCache();
 app.UseResponseCaching();
 app.UseImageSharp();
-
 var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -102,12 +101,13 @@ app.UseCors("AllowMostlylucid");
 app.UseAuthentication();
 app.UseAuthorization();
 
-
+if (app.Environment.IsDevelopment())
+{
     app.UseSwagger();
     app.UseSwaggerUI();
-
+}
 await app.PopulateBlog();
-if (translateServiceConfig.Enabled)  await app.Translate();
+
 app.MapGet("/robots.txt", async httpContext =>
 {
     var robotsContent = $"User-agent: *\nDisallow: \nDisallow: /cgi-bin/\nSitemap: https://{httpContext.Request.Host}/sitemap.xml";
@@ -118,7 +118,6 @@ app.MapGet("/robots.txt", async httpContext =>
     policyBuilder.Expire(TimeSpan.FromDays(60));
     policyBuilder.Cache();
 });
-
 
 app.MapControllerRoute(
     name: "sitemap",
