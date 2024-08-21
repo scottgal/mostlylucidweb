@@ -183,9 +183,14 @@ window.mostlylucid.typeahead = function () {
         },
 
         selectResult(result) {
-           window.location.href = result.url;
+            htmx.ajax('GET', result.url, {
+                target: '#contentcontainer',  // The container to update
+                swap: 'innerHTML',            // Replace the content inside the target
+                pushUrl: true                 // Push the URL to the browser history
+            });
             this.results = []; // Clear the results
             this.highlightedIndex = -1; // Reset the highlighted index
+            this.query = ''; // Clear the query
         }
     }
 }
@@ -222,20 +227,24 @@ function saveContentToDisk(content, slug, language) {
 
 
 
-function renderButton(element)
-{
-    google.accounts.id.renderButton(
-        element,
-        {
-            type: "standard",
-            size: "large",
-            width: 200,
-            theme: "filled_black",
-            text: "sign_in_with",
-            shape: "rectangular",
-            logo_alignment: "left"
-        }
-    );
+function renderButton(element) {
+    // Check if the button has already been initialized
+    if (!element.getAttribute('data-google-rendered')) {
+        google.accounts.id.renderButton(
+            element,
+            {
+                type: "standard",
+                size: "large",
+                width: 200,
+                theme: "filled_black",
+                text: "sign_in_with",
+                shape: "rectangular",
+                logo_alignment: "left"
+            }
+        );
+        // Mark the element as initialized
+        element.setAttribute('data-google-rendered', 'true');
+    }
 }
 function initGoogleSignIn() {
     google.accounts.id.initialize({
