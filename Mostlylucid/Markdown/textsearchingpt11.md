@@ -7,7 +7,7 @@ In the [last article](/blog/textsearchingpt1) I showed you how to set up a full 
 
 This will add a little search box to the header of the site which will allow users to search for text in the blog posts.
 
-![Search](searchbox.png)
+![Search](searchbox.png?format=webp&quality=25)
 
 **Note: The elephant in the room is that I do not consider the best way to do this. To support multi-language is super complex (I'd need a different column per language) and I'd need to handle stemming and other language specific things. I'm going to ignore this for now and just focus on English. LATER we'll show how to handle this in OpenSearch.** 
 
