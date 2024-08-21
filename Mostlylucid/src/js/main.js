@@ -183,7 +183,7 @@ window.mostlylucid.typeahead = function () {
         },
 
         selectResult(result) {
-            htmx.ajax('GET', result.url, {
+            htmx.ajax('get', result.url, {
                 target: '#contentcontainer',  // The container to update
                 swap: 'innerHTML',            // Replace the content inside the target
                 

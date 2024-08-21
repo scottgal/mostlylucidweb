@@ -24,7 +24,8 @@ public class SearchApi(MostlylucidDbContext context) : ControllerBase
             posts = await GetSearchResultForQuery(query);
         }
 
-        var output = posts.Select(x => new SearchResults(x.Title.Trim(), x.Slug, @Url.ActionLink("Show", "Blog", new{ x.Slug}) )).ToList();
+        var host = Request.Host.Value;
+        var output = posts.Select(x => new SearchResults(x.Title.Trim(), x.Slug, @Url.ActionLink("Show", "Blog", new{ x.Slug}, protocol:"https", host:host) )).ToList();
         
         return TypedResults.Json(output);
     }
