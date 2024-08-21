@@ -82,6 +82,9 @@ else
     app.UseHttpsRedirection();
     app.UseHsts();
 }
+app.UseOutputCache();
+app.UseResponseCaching();
+app.UseImageSharp();
 
 var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();
 app.UseStaticFiles(new StaticFileOptions
@@ -98,9 +101,7 @@ app.UseRouting();
 app.UseCors("AllowMostlylucid");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseOutputCache();
-app.UseResponseCaching();
-app.UseImageSharp();
+
 
     app.UseSwagger();
     app.UseSwaggerUI();

@@ -214,7 +214,7 @@ This lets us use the endpoint as follows, where we can pass in the first few let
 
 You can view the [API in action here](https://www.mostlylucid.net/swagger/index.html) look for the `/api/SearchApi`. (Note; I've enabled Swagger for this site so you can see the API in action but most of the time this should be reserved for `IsDevelopment()).
 
-![API](searchapi.png?)
+![API](searchapi.png?width=900&format=webp&quality=50)
 
 In future I'll add a TypeAhead feature to the search box on the site that uses this functionality.
 
