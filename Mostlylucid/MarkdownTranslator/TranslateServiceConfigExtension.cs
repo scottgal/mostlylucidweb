@@ -12,8 +12,10 @@ public static class TranslateServiceConfigExtension
         {
             options.Timeout = TimeSpan.FromSeconds(120);
         });
-        services.AddHostedService<BackgroundTranslateService>();
-        services.AddSingleton<TranslateCacheService>();
+        services.AddSingleton<BackgroundTranslateService>(); 
+        services.AddHostedService(provider => provider.GetRequiredService<BackgroundTranslateService>());
+        
+       services.AddSingleton<TranslateCacheService>();
         services.AddScoped<IMarkdownFileBlogService, MarkdownBlogService>();
     }
 

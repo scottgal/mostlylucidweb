@@ -31,6 +31,17 @@ public class BackgroundTranslateService(
 
     }
 
+    public async Task<bool> Ping(CancellationToken cancellationToken)
+    {
+        if (!await markdownTranslatorService.IsServiceUp(cancellationToken))
+        {
+            logger.LogError("Translation service is not available");
+            return false;
+        }
+
+        return true;
+    }
+
     private readonly
         BufferBlock<(PageTranslationModel, TaskCompletionSource<(BlogPostViewModel? model, bool complete)>)>
         _translations = new();

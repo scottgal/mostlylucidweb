@@ -30,7 +30,7 @@ services.AddResponseCaching();
 services.SetupUmamiClient(config);
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
-if (translateServiceConfig.Enabled) services.SetupTranslateService();
+services.SetupTranslateService();
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 services.SetupEmail(builder.Configuration);
 services.SetupRSS();

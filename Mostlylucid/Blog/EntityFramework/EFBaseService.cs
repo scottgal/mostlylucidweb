@@ -6,16 +6,10 @@ using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog.EntityFramework;
 
-public class EFBaseService
+public class EFBaseService(MostlylucidDbContext context, ILogger<EFBaseService> logger)
 {
-    protected  readonly MostlylucidDbContext Context;
-    protected readonly ILogger<EFBaseService> Logger;
-
-    public EFBaseService(MostlylucidDbContext context, ILogger<EFBaseService> logger)
-    {
-        Context = context;
-        Logger = logger;
-    }
+    protected  readonly MostlylucidDbContext Context = context;
+    protected readonly ILogger<EFBaseService> Logger = logger;
 
     public async Task<List<string>> GetCategories() => await Context.Categories.Select(x => x.Name).ToListAsync();
     

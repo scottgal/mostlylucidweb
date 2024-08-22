@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.Models.Blog;
@@ -30,6 +31,14 @@ public class TranslateController(BackgroundTranslateService backgroundTranslateS
         return Ok(new { TaskId = taskId });
     }
 
+    [HttpGet("ping")]
+    
+    public async Task<Results<Ok<string>, BadRequest<string>>> Ping(CancellationToken cancellationToken)
+    {
+        if(await backgroundTranslateService.Ping(cancellationToken))
+        return  TypedResults.Ok <string>("Good");
+        return TypedResults.BadRequest("bad");
+    }
     [HttpGet("check-status/{taskId}")]
     public async Task<IActionResult> CheckStatus(Guid taskId)
     {

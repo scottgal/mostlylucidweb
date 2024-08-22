@@ -3,8 +3,14 @@ using Mostlylucid.Email.Models;
 
 namespace Mostlylucid.Email
 {
+    public interface IEmailSenderHostedService : IHostedService
+    {
+        Task SendEmailAsync(BaseEmailModel message);
+        void Dispose();
+    }
+
     public class EmailSenderHostedService(EmailService emailService, ILogger<EmailSenderHostedService> logger)
-        : IHostedService, IDisposable
+        : IHostedService, IDisposable, IEmailSenderHostedService
     {
         private readonly BufferBlock<BaseEmailModel> _mailMessages = new();
         private Task _sendTask = Task.CompletedTask;
