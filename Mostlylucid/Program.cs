@@ -36,7 +36,7 @@ services.SetupEmail(builder.Configuration);
 services.SetupRSS();
 services.SetupBlog(config, builder.Environment);
 
-builder.Services.AddAntiforgery(options =>
+services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN";
     options.SuppressXFrameOptionsHeader = false;
