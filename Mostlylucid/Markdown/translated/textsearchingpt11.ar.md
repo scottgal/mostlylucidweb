@@ -1,20 +1,23 @@
-﻿# Full Text Searching (Pt 1.1)
+# نص كامل متصفح (Ptt 1 1)
 
 <!--category-- Postgres, Alpine -->
-<datetime class="hidden">2024-08-21T20:30</datetime>
-## Introduction
-In the [last article](/blog/textsearchingpt1) I showed you how to set up a full text search using the built in full text search capabilities of Postgres. While I exposed a search api I didn't have a way to actually use it so...it was a bit of a tease. In this article I'll show you how to use the search api to search for text in your database.
+<datetime class="hidden">2024-08-21TT20:30</datetime>
 
-This will add a little search box to the header of the site which will allow users to search for text in the blog posts.
+## أولاً
 
-![Search](searchbox.png?format=webp&quality=25)
+في الـ [المادة 4 من المادة 4](/blog/textsearchingpt1) لقد أريتكم كيف تجهزون بحثاً كاملاً عن النص باستخدام قدرات البحث النصي الكامل للبريد بينما كنتُ أكشف عن بحث لم يكن لديّ طريقة لأستخدمه فعلاً لذا... لقد كان نوعاً ما مُثيراً. في هذه المقالة سأريكم كيف تستخدمون البحث Api للبحث عن نص في قاعدة بياناتكم.
 
-**Note: The elephant in the room is that I do not consider the best way to do this. To support multi-language is super complex (I'd need a different column per language) and I'd need to handle stemming and other language specific things. I'm going to ignore this for now and just focus on English. LATER we'll show how to handle this in OpenSearch.** 
+سيضيف هذا صندوق بحث صغير إلى عنوان الموقع مما سيسمح للمستخدمين بالبحث عن النصوص في المدوّنات.
 
-[TOC]
+![](searchbox.png?format=webp&quality=25)
 
-## Searching for text
-To add a search capability I had to make some changes to the search api. I added handling for phrases using the `EF.Functions.WebSearchToTsQuery("english", processedQuery)`
+**ملاحظة: الفيل في الغرفة هو أنني لا أعتبر أن أفضل طريقة للقيام بذلك. لدعم اللغات المتعددة هي معقدة جداً (أحتاج إلى عمود مختلف لكل لغة) وأحتاج إلى التعامل مع التشابك وأشياء لغوية أخرى محددة. سأتجاهل هذا في الوقت الراهن وأركز فقط على اللغة الإنجليزية. بعد ذلك سنظهر كيفية التعامل مع هذا في OpenSearch.**
+
+[رابعاً -
+
+## 
+
+إلى إضافة a بحث قدرة أنا كان لا بُدَّ أنْ أَجْعلَ بَعْض التغييرات إلى بحث api. أضفت مناولة لعبارة تستخدم `EF.Functions.WebSearchToTsQuery("english", processedQuery)`
 
 ```csharp
     private async Task<List<(string Title, string Slug)>> GetSearchResultForQuery(string query)
@@ -41,7 +44,8 @@ To add a search capability I had to make some changes to the search api. I added
     }
 ```
 
-This is optionally used when there's a space in the query
+هذا مُستخدم اختيارياً عندما يكون هناك فراغ في الدالة
+
 ```csharp
     if (!query.Contains(" "))
         {
@@ -52,13 +56,17 @@ This is optionally used when there's a space in the query
             posts = await GetSearchResultForQuery(query);
         }
 ```
-Otherwise I use the existing search method which appends the prefix character.
+
+وإلا سأستخدم طريقة البحث الحالية التي تذييل حرف البادئة.
+
 ```csharp
 EF.Functions.ToTsQuery("english", query + ":*")
 
 ```
-## Search Control
-Using [Alpine.js](https://alpinejs.dev/) I made a simple Partial control which provides a super simple search box. 
+
+## 
+
+& بوصة [الألابين](https://alpinejs.dev/) لقد قمت بسيطرة جزئية بسيطة والتي توفر صندوق بحث بسيط جداً
 
 ```razor
 <div x-data="window.mostlylucid.typeahead()" class="relative"    x-on:click.outside="results = []">
@@ -95,16 +103,19 @@ Using [Alpine.js](https://alpinejs.dev/) I made a simple Partial control which p
     </ul>
 </div>
 ```
-This has a bunch of CSS classes to render correctly for either dark or light mode. The Alpine.js code is pretty simple. It's a simple typeahead control that calls the search api when the user types in the search box.
-We also have a little code to handle unfocus to close the search results. 
+
+هذا يحتوي على مجموعة من فصول CSS لتشكل بشكل صحيح إما لـ الظلام أو وضع الضوء. رمز (ألبين جس) بسيط جداً إنها تحكم بسيط من النوع الذي يدعو البحث Api عندما يقوم المستخدم بالأنواع في صندوق البحث.
+لدينا أيضا رمز صغير للتعامل مع عدم التركيز لإغلاق نتائج البحث.
+
 ```html
    x-on:click.outside="results = []"
 ```
 
-Note we have a debounce in here to avoid hammering the server with requests.
+ملاحظة لدينا منفذ هنا لتجنب الضغط على الخادم مع الطلبات.
 
-## The Typeahead JS
-This calls into our JS function (defined in `src/js/main.js`)
+## نوع الرأس المُسْطَة
+
+وهذا ما يدعونا إلى القيام بوظيفتنا (المحددة في `src/js/main.js`)
 
 ```javascript
 window.mostlylucid = window.mostlylucid || {};
@@ -157,9 +168,9 @@ window.mostlylucid.typeahead = function () {
 }
 ```
 
-As you can see this is pretty simple (much of the complexity is handling the up and down keys to select results).
-This posts to our `SearchApi`
-When a result is selected we navigate to the url of the result.
+كما ترون هذا بسيط جداً (الكثير من التعقيد هو مناولة المفاتيح العلوية والأسفلية لاختيار النتائج).
+هذه الوظائـف إلى `SearchApi`
+عندما يتم اختيار نتيجة فإننا نبحر إلى أوريل النتيجة.
 
 ```javascript
      search() {
@@ -177,8 +188,11 @@ When a result is selected we navigate to the url of the result.
                 });
         },
 ```
-### HTMX
-I also changed the fetch to work with HTMX, this simply changes the `search` method to use an HTMX refresh:
+
+### XXXX
+
+قمت أيضاً بتغيير الجلب للعمل مع HTMX، هذا ببساطة يغير `search` إلى استخدام a HTMX:
+
 ```javascript
     selectResult(result) {
     htmx.ajax('get', result.url, {
@@ -193,9 +207,11 @@ I also changed the fetch to work with HTMX, this simply changes the `search` met
     this.query = ''; // Clear the query
 }
 ```
-Note that we swap the innerHTML of the `contentcontainer` with the result of the search. This is a simple way to update the content of the page with the search result without a page refresh.
-We also change the url in the history to the new url.
 
-## In Conclusion
-This adds a powerful yet simple search capability to the site. It's a great way to help users find what they're looking for. 
-It gives this site a more professional feel and makes it easier to navigate.
+ملاحظة أننا نتبادل داخل HHTML من `contentcontainer` مع نتيجة البحث. وهذه طريقة بسيطة لتحديث محتوى الصفحة بنتيجة البحث دون ان تنعش الصفحة.
+كما أننا نغير الطور في التاريخ إلى الطور الجديد.
+
+## في الإستنتاج
+
+وهذا يضيف قدرة بحثية قوية ولكنها بسيطة إلى الموقع. إنها طريقة عظيمة لمساعدة المستخدمين في العثور على ما يبحثون عنه.
+يعطي هذا الموقع شعور أكثر احترافية ويجعله أسهل للتنقل.

@@ -12,6 +12,7 @@ public class SearchApi(MostlylucidDbContext context) : ControllerBase
 {
     [HttpGet]
     [Route("search/{query}")]
+    [ValidateAntiForgeryToken]
     public async Task<JsonHttpResult<List<SearchResults>>> Search(string query)
     {
         List<(string Title, string Slug)> posts = new();
@@ -33,8 +34,6 @@ public class SearchApi(MostlylucidDbContext context) : ControllerBase
     
     private async Task<List<(string Title, string Slug)>> GetSearchResultForQuery(string query)
     {
-    
-
         var processedQuery = query;
         var posts = await context.BlogPosts
             .Include(x => x.Categories)

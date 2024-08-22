@@ -1,20 +1,23 @@
-﻿# Full Text Searching (Pt 1.1)
+# Ricerca completa del testo (Pt 1.1)
 
 <!--category-- Postgres, Alpine -->
 <datetime class="hidden">2024-08-21T20:30</datetime>
-## Introduction
-In the [last article](/blog/textsearchingpt1) I showed you how to set up a full text search using the built in full text search capabilities of Postgres. While I exposed a search api I didn't have a way to actually use it so...it was a bit of a tease. In this article I'll show you how to use the search api to search for text in your database.
 
-This will add a little search box to the header of the site which will allow users to search for text in the blog posts.
+## Introduzione
 
-![Search](searchbox.png?format=webp&quality=25)
+Nella [ultimo articolo](/blog/textsearchingpt1) Vi ho mostrato come impostare una ricerca di testo completo utilizzando le funzionalità di ricerca di testo completo di Postgres. Mentre esponevo una pipi' di ricerca, non avevo un modo per usarla, quindi... era un po' una presa in giro. In questo articolo vi mostrerò come usare l'api di ricerca per cercare il testo nel vostro database.
 
-**Note: The elephant in the room is that I do not consider the best way to do this. To support multi-language is super complex (I'd need a different column per language) and I'd need to handle stemming and other language specific things. I'm going to ignore this for now and just focus on English. LATER we'll show how to handle this in OpenSearch.** 
+Questo aggiungerà una piccola casella di ricerca all'intestazione del sito che permetterà agli utenti di cercare testo nei post del blog.
+
+![Cerca](searchbox.png?format=webp&quality=25)
+
+**Nota: L'elefante nella stanza è che non considero il modo migliore per farlo. Per supportare multi-lingua è super complesso (avrei bisogno di una colonna diversa per lingua) e dovrei gestire le cose specifiche di lingua e di stiramento. Ignorero' questo per ora e mi concentrero' solo sull'inglese. Dopo mostreremo come gestire questa cosa in OpenSearch.**
 
 [TOC]
 
-## Searching for text
-To add a search capability I had to make some changes to the search api. I added handling for phrases using the `EF.Functions.WebSearchToTsQuery("english", processedQuery)`
+## Ricerca del testo
+
+Per aggiungere una capacità di ricerca ho dovuto apportare alcune modifiche alla ricerca api. Ho aggiunto la manipolazione per le frasi usando il `EF.Functions.WebSearchToTsQuery("english", processedQuery)`
 
 ```csharp
     private async Task<List<(string Title, string Slug)>> GetSearchResultForQuery(string query)
@@ -41,7 +44,8 @@ To add a search capability I had to make some changes to the search api. I added
     }
 ```
 
-This is optionally used when there's a space in the query
+Questo viene usato opzionalmente quando c'è uno spazio nella query
+
 ```csharp
     if (!query.Contains(" "))
         {
@@ -52,13 +56,17 @@ This is optionally used when there's a space in the query
             posts = await GetSearchResultForQuery(query);
         }
 ```
-Otherwise I use the existing search method which appends the prefix character.
+
+Altrimenti uso il metodo di ricerca esistente che aggiunge il carattere prefisso.
+
 ```csharp
 EF.Functions.ToTsQuery("english", query + ":*")
 
 ```
-## Search Control
-Using [Alpine.js](https://alpinejs.dev/) I made a simple Partial control which provides a super simple search box. 
+
+## Controllo di ricerca
+
+Uso [Alpine.js](https://alpinejs.dev/) Ho fatto un semplice controllo parziale che fornisce una casella di ricerca super semplice.
 
 ```razor
 <div x-data="window.mostlylucid.typeahead()" class="relative"    x-on:click.outside="results = []">
@@ -95,16 +103,19 @@ Using [Alpine.js](https://alpinejs.dev/) I made a simple Partial control which p
     </ul>
 </div>
 ```
-This has a bunch of CSS classes to render correctly for either dark or light mode. The Alpine.js code is pretty simple. It's a simple typeahead control that calls the search api when the user types in the search box.
-We also have a little code to handle unfocus to close the search results. 
+
+Questo ha una serie di classi CSS da rendere correttamente per la modalità scura o leggera. Il codice Alpine.js è piuttosto semplice. Si tratta di un semplice tipo di controllo che chiama l'api di ricerca quando l'utente digita nella casella di ricerca.
+Abbiamo anche un po 'di codice per gestire sfocato per chiudere i risultati della ricerca.
+
 ```html
    x-on:click.outside="results = []"
 ```
 
-Note we have a debounce in here to avoid hammering the server with requests.
+Si noti che abbiamo un debounce qui per evitare di martellare il server con le richieste.
 
-## The Typeahead JS
-This calls into our JS function (defined in `src/js/main.js`)
+## Il JS Typeahead
+
+Questo chiama nella nostra funzione JS (defined in `src/js/main.js`)
 
 ```javascript
 window.mostlylucid = window.mostlylucid || {};
@@ -157,9 +168,9 @@ window.mostlylucid.typeahead = function () {
 }
 ```
 
-As you can see this is pretty simple (much of the complexity is handling the up and down keys to select results).
-This posts to our `SearchApi`
-When a result is selected we navigate to the url of the result.
+Come potete vedere questo è abbastanza semplice (molta della complessità è la gestione dei tasti su e giù per selezionare i risultati).
+Questo post per il nostro `SearchApi`
+Quando viene selezionato un risultato, navighiamo verso l'url del risultato.
 
 ```javascript
      search() {
@@ -177,8 +188,11 @@ When a result is selected we navigate to the url of the result.
                 });
         },
 ```
+
 ### HTMX
-I also changed the fetch to work with HTMX, this simply changes the `search` method to use an HTMX refresh:
+
+Ho anche cambiato il fetch per lavorare con HTMX, questo semplicemente cambia il `search` metodo per utilizzare un aggiornamento HTMX:
+
 ```javascript
     selectResult(result) {
     htmx.ajax('get', result.url, {
@@ -193,9 +207,11 @@ I also changed the fetch to work with HTMX, this simply changes the `search` met
     this.query = ''; // Clear the query
 }
 ```
-Note that we swap the innerHTML of the `contentcontainer` with the result of the search. This is a simple way to update the content of the page with the search result without a page refresh.
-We also change the url in the history to the new url.
 
-## In Conclusion
-This adds a powerful yet simple search capability to the site. It's a great way to help users find what they're looking for. 
-It gives this site a more professional feel and makes it easier to navigate.
+Si noti che scambiamo l'HTML interno del `contentcontainer` con il risultato della ricerca. Questo è un modo semplice per aggiornare il contenuto della pagina con il risultato di ricerca senza un aggiornamento pagina.
+Cambiamo anche l'url della storia con il nuovo url.
+
+## In conclusione
+
+Questo aggiunge una potente ma semplice capacità di ricerca al sito. E 'un ottimo modo per aiutare gli utenti a trovare quello che stanno cercando.
+Dà a questo sito una sensazione più professionale e rende più facile da navigare.

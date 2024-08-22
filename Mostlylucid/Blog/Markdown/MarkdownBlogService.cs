@@ -1,9 +1,10 @@
 ﻿using Mostlylucid.Config.Markdown;
+using Mostlylucid.Helpers;
 using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog.Markdown;
 
-public class MarkdownBlogService : MarkdownBaseService, IBlogService
+public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownFileBlogService
 {
     private readonly ILogger<MarkdownBlogService> _logger;
 
@@ -36,12 +37,29 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService
          return  await Task.FromResult(File.Exists(file));
     }
 
+    public async Task<bool> EntryChanged(string slug, string language, string hash)
+    {
+        string fileName = "";
+        if (language == EnglishLanguage)
+        {
+            fileName = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");
+        }
+        else
+             {
+                 Path.Combine(MarkdownConfig.MarkdownTranslatedPath,  $"{slug}.{language}.md");
+             }
+
+        if (!File.Exists(fileName)) return true;
+        var content = await File.ReadAllTextAsync(fileName);
+        return content.ContentHash() != hash;
+    }
+    
     public  async Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
     {
         var outPath = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");
         if(language != EnglishLanguage)
             outPath = Path.Combine(MarkdownConfig.MarkdownTranslatedPath,  $"{slug}.{language}.md");
-        await File.WriteAllTextAsync(outPath, outPath);
+        await File.WriteAllTextAsync(outPath, markdowm);
         return await GetPost(slug, language);
     }
 

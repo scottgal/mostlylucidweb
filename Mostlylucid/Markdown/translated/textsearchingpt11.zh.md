@@ -1,20 +1,23 @@
-﻿# Full Text Searching (Pt 1.1)
+# 全文本搜索 (Pt 1. 1)
 
 <!--category-- Postgres, Alpine -->
 <datetime class="hidden">2024-08-21T20:30</datetime>
-## Introduction
-In the [last article](/blog/textsearchingpt1) I showed you how to set up a full text search using the built in full text search capabilities of Postgres. While I exposed a search api I didn't have a way to actually use it so...it was a bit of a tease. In this article I'll show you how to use the search api to search for text in your database.
 
-This will add a little search box to the header of the site which will allow users to search for text in the blog posts.
+## 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
-![Search](searchbox.png?format=webp&quality=25)
+在 [最后一条](/blog/textsearchingpt1) 我教过你如何使用 Postgres 的全文本搜索能力 设置完整的文本搜索 虽然我揭发了一个搜索提示......我没有办法真正使用它......所以... 在本篇文章中,我将教你如何使用搜索信头在数据库中搜索文本。
 
-**Note: The elephant in the room is that I do not consider the best way to do this. To support multi-language is super complex (I'd need a different column per language) and I'd need to handle stemming and other language specific things. I'm going to ignore this for now and just focus on English. LATER we'll show how to handle this in OpenSearch.** 
+这将在网站页眉上添加一个小搜索框, 让用户可以搜索博客文章中的文字。
 
-[TOC]
+![搜索搜索](searchbox.png?format=webp&quality=25)
 
-## Searching for text
-To add a search capability I had to make some changes to the search api. I added handling for phrases using the `EF.Functions.WebSearchToTsQuery("english", processedQuery)`
+**注意: 房间里的大象是我不认为这样做的最佳方式。 支持多语种非常复杂(我需要不同语言的专栏), 我暂时不理会这个,只关注英语。 过会儿我们会在OpenSearch展示如何处理这件事**
+
+[技选委
+
+## 正在搜索文本
+
+为了增加搜索能力,我不得不对搜索程序做一些修改。 我添加了使用 `EF.Functions.WebSearchToTsQuery("english", processedQuery)`
 
 ```csharp
     private async Task<List<(string Title, string Slug)>> GetSearchResultForQuery(string query)
@@ -41,7 +44,8 @@ To add a search capability I had to make some changes to the search api. I added
     }
 ```
 
-This is optionally used when there's a space in the query
+当查询中有空格时, 此选项可选择使用
+
 ```csharp
     if (!query.Contains(" "))
         {
@@ -52,13 +56,17 @@ This is optionally used when there's a space in the query
             posts = await GetSearchResultForQuery(query);
         }
 ```
-Otherwise I use the existing search method which appends the prefix character.
+
+否则,我使用现有的搜索方法来附加前缀字符。
+
 ```csharp
 EF.Functions.ToTsQuery("english", query + ":*")
 
 ```
-## Search Control
-Using [Alpine.js](https://alpinejs.dev/) I made a simple Partial control which provides a super simple search box. 
+
+## 搜索控制
+
+使用 [阿尔卑山](https://alpinejs.dev/) 我做了一个简单的部分控制 提供了一个超级简单的搜索箱
 
 ```razor
 <div x-data="window.mostlylucid.typeahead()" class="relative"    x-on:click.outside="results = []">
@@ -95,16 +103,19 @@ Using [Alpine.js](https://alpinejs.dev/) I made a simple Partial control which p
     </ul>
 </div>
 ```
-This has a bunch of CSS classes to render correctly for either dark or light mode. The Alpine.js code is pretty simple. It's a simple typeahead control that calls the search api when the user types in the search box.
-We also have a little code to handle unfocus to close the search results. 
+
+这有一堆 CSS 类可以校正 用于暗模式或光模式 。 阿尔卑斯山的密码很简单 当用户在搜索框中输入类型时, 它是一个简单的类型头控件, 它会调用搜索 spi 。
+我们还有一个小的代码 处理无焦点 关闭搜索结果。
+
 ```html
    x-on:click.outside="results = []"
 ```
 
-Note we have a debounce in here to avoid hammering the server with requests.
+注意,我们这里有一个跳跃 以避免敲敲服务器 与请求。
 
-## The Typeahead JS
-This calls into our JS function (defined in `src/js/main.js`)
+## 《联署材料》
+
+这要求我们发挥联合联合办事处的职能(定义如下: `src/js/main.js`)
 
 ```javascript
 window.mostlylucid = window.mostlylucid || {};
@@ -157,9 +168,9 @@ window.mostlylucid.typeahead = function () {
 }
 ```
 
-As you can see this is pretty simple (much of the complexity is handling the up and down keys to select results).
-This posts to our `SearchApi`
-When a result is selected we navigate to the url of the result.
+正如你可以看到的,这很简单(许多复杂因素是处理选择结果的上下键)。
+担任此职位, `SearchApi`
+当选中结果时, 我们将导航到结果的 URL 。
 
 ```javascript
      search() {
@@ -177,8 +188,11 @@ When a result is selected we navigate to the url of the result.
                 });
         },
 ```
+
 ### HTMX
-I also changed the fetch to work with HTMX, this simply changes the `search` method to use an HTMX refresh:
+
+我还改了HTMX的接头工作,这简单改变了HTMX的 `search` 使用 HTMX 刷新的方法 :
+
 ```javascript
     selectResult(result) {
     htmx.ajax('get', result.url, {
@@ -193,9 +207,11 @@ I also changed the fetch to work with HTMX, this simply changes the `search` met
     this.query = ''; // Clear the query
 }
 ```
-Note that we swap the innerHTML of the `contentcontainer` with the result of the search. This is a simple way to update the content of the page with the search result without a page refresh.
-We also change the url in the history to the new url.
 
-## In Conclusion
-This adds a powerful yet simple search capability to the site. It's a great way to help users find what they're looking for. 
-It gives this site a more professional feel and makes it easier to navigate.
+请注意,我们交换 内HTML `contentcontainer` 与搜索的结果。 这是以搜索结果更新页面内容的简单方式, 无需更新页面 。
+我们还将历史的内脏改成新的内脏。
+
+## 在结论结论中
+
+这为该场址增加了强大而简单的搜索能力。 这是帮助用户找到他们要找的东西的好方法
+它让这个网站更专业,更便于浏览。
