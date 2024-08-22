@@ -120,11 +120,10 @@ public class BackgroundTranslateService(
                 var slug = Path.GetFileNameWithoutExtension(translateModel.OriginalFileName);
                 if (translateModel.Persist)
                 {
-                    var blogService=scope.ServiceProvider
-                        .GetRequiredService<IBlogService>();
+             
                     var fileBlogService = scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>();
                     var entryExists =await fileBlogService.EntryExists(slug, translateModel.Language);
-               var entryChanged = await blogService.EntryChanged(slug, MarkdownBaseService.EnglishLanguage, translateModel.OriginalMarkdown.ContentHash());
+               var entryChanged = await fileBlogService.EntryChanged(slug, MarkdownBaseService.EnglishLanguage, translateModel.OriginalMarkdown.ContentHash());
                     if (entryExists && !entryChanged) continue;
                 }
 

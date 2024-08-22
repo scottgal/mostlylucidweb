@@ -1,5 +1,5 @@
 ﻿using Mostlylucid.Config.Markdown;
-using Mostlylucid.Helpers;
+using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog.Markdown;
@@ -8,7 +8,8 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
 {
     private readonly ILogger<MarkdownBlogService> _logger;
 
-    public MarkdownBlogService(MarkdownConfig markdownConfig, ILogger<MarkdownBlogService> logger) : base(markdownConfig)
+    public MarkdownBlogService(MarkdownConfig markdownConfig, ILogger<MarkdownBlogService> logger) : base(
+        markdownConfig)
     {
         _logger = logger;
     }
@@ -20,7 +21,8 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
         return await Task.FromResult(categories);
     }
 
-    public async Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "", string language = EnglishLanguage)
+    public async Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "",
+        string language = EnglishLanguage)
     {
         var pageCache = GetPageCache().Select(x => x.Value).Where(x => x.Language == language);
 
@@ -28,39 +30,48 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
 
         if (startDate != null) pageCache = pageCache.Where(x => x.PublishedDate >= startDate);
 
-        return await Task.FromResult(pageCache.Select(x=> GetListModel(x)).ToList());
+        return await Task.FromResult(pageCache.Select(x => GetListModel(x)).ToList());
     }
 
     public async Task<bool> EntryExists(string slug, string language)
     {
-       var file =Path.Combine(MarkdownConfig.MarkdownTranslatedPath,  $"{slug}.{language}.md");
-         return  await Task.FromResult(File.Exists(file));
+        var file = Path.Combine(MarkdownConfig.MarkdownTranslatedPath, $"{slug}.{language}.md");
+        return await Task.FromResult(File.Exists(file));
     }
 
     public async Task<bool> EntryChanged(string slug, string language, string hash)
     {
         string fileName = "";
+        var originalFileName = fileName = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");
+        var fileChanged = await originalFileName.IsFileChanged(MarkdownConfig.MarkdownTranslatedPath);
         if (language == EnglishLanguage)
         {
-            fileName = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");
+            fileName = originalFileName;
         }
         else
-             {
-                 Path.Combine(MarkdownConfig.MarkdownTranslatedPath,  $"{slug}.{language}.md");
-             }
+        {
+            Path.Combine(MarkdownConfig.MarkdownTranslatedPath, $"{slug}.{language}.md");
+        }
 
         if (!File.Exists(fileName)) return true;
-        var content = await File.ReadAllTextAsync(fileName);
-        return content.ContentHash() != hash;
+        return fileChanged;
     }
-    
-    public  async Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
+
+    public async Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
     {
-        var outPath = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");
-        if(language != EnglishLanguage)
-            outPath = Path.Combine(MarkdownConfig.MarkdownTranslatedPath,  $"{slug}.{language}.md");
-        await File.WriteAllTextAsync(outPath, markdowm);
-        return await GetPost(slug, language);
+        try
+        {
+            var outPath = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");
+            if (language != EnglishLanguage)
+                outPath = Path.Combine(MarkdownConfig.MarkdownTranslatedPath, $"{slug}.{language}.md");
+            await File.WriteAllTextAsync(outPath, markdowm);
+            return await GetPost(slug, language) ?? new BlogPostViewModel();
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Error saving post {PostName}", slug);
+            return new BlogPostViewModel();
+        }
     }
 
 
@@ -101,8 +112,8 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
 
         return await Task.FromResult(model);
     }
-    
-    
+
+
     public async Task<BlogPostViewModel?> GetPost(string slug, string language = EnglishLanguage)
     {
         try
@@ -122,7 +133,8 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
     }
 
 
-    public async Task<PostListViewModel> GetPagedPosts(int page = 1, int pageSize = 10, string language = EnglishLanguage)
+    public async Task<PostListViewModel> GetPagedPosts(int page = 1, int pageSize = 10,
+        string language = EnglishLanguage)
     {
         var model = new PostListViewModel();
         var posts = GetPageCache().Where(x => x.Value.Language == language)
@@ -133,13 +145,4 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
         model.Page = page;
         return await Task.FromResult(model);
     }
-
-
-
-
-
-
-
-
-
 }
