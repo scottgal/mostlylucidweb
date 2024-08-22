@@ -71,8 +71,14 @@ public class EFBlogService(
     {
         return PostsQuery().AnyAsync(x => x.Slug == slug && x.LanguageEntity.Name == language);
     }
+    
+    public Task<bool> EntryChanged(string slug, string language, string hash)
+    {
+        return PostsQuery().AnyAsync(x => x.Slug == slug && x.LanguageEntity.Name == language && x.ContentHash != hash);
+    }
 
 
+  
     public async  Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
     {
       var post = await PostsQuery().FirstOrDefaultAsync(x => x.Slug == slug && x.LanguageEntity.Name == language);

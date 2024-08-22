@@ -36,10 +36,10 @@ public class EFBaseService
             return null;
         }
         categories ??= await Context.Categories.Where(x => post.Categories.Contains(x.Name)).ToListAsync();
-         currentPost ??= await PostsQuery().Where(x=>x.Slug == post.Slug).FirstOrDefaultAsync();
+         currentPost ??= await PostsQuery().Where(x=>x.Slug == post.Slug && x.LanguageEntity == postLanguageEntity).FirstOrDefaultAsync();
         try
         {
-            var hash = post.HtmlContent.ContentHash();
+            var hash = post.OriginalMarkdown.ContentHash();
             var currentCategoryNames = currentPost?.Categories.Select(x => x.Name).ToArray() ?? Array.Empty<string>();
             var categoriesChanged = false;
             if (!currentCategoryNames.All(post.Categories.Contains) ||

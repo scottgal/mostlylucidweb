@@ -1,4 +1,7 @@
-﻿namespace Mostlylucid.MarkdownTranslator;
+﻿using Mostlylucid.Blog;
+using Mostlylucid.Blog.Markdown;
+
+namespace Mostlylucid.MarkdownTranslator;
 
 public static class TranslateServiceConfigExtension
 {
@@ -10,16 +13,11 @@ public static class TranslateServiceConfigExtension
             options.Timeout = TimeSpan.FromSeconds(120);
         });
         services.AddHostedService<BackgroundTranslateService>();
-        services.AddScoped<BackgroundTranslateService>();
         services.AddSingleton<TranslateCacheService>();
+        services.AddScoped<IMarkdownFileBlogService, MarkdownBlogService>();
     }
 
-    public static async Task Translate(this WebApplication app)
-    {
-        await using var scope = app.Services.CreateAsyncScope();
-        var cacheService = scope.ServiceProvider.GetRequiredService<BackgroundTranslateService>();
-        await cacheService.TranslateAllFilesAsync();
-    }
+  
     
     
 }

@@ -33,8 +33,6 @@ public class SearchApi(MostlylucidDbContext context) : ControllerBase
     
     private async Task<List<(string Title, string Slug)>> GetSearchResultForQuery(string query)
     {
-    
-
         var processedQuery = query;
         var posts = await context.BlogPosts
             .Include(x => x.Categories)
