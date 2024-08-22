@@ -164,10 +164,29 @@ console.log(token);
                     'X-CSRF-TOKEN': token // Attach the AntiForgery token in the headers
                 }
             })
-                .then(response => response.json())
+                .then(response => {
+                 if(response.ok){
+                     
+          
+                  return  response.json();
+                 }
+                 return Promise.reject(response);
+                })
                 .then(data => {
                     this.results = data;
                     this.highlightedIndex = -1; // Reset index on new search
+                })
+                .catch((response) => {
+                    console.log(response.status, response.statusText);
+                    if(response.status === 400)
+                    {
+                        console.log('Bad request, reloading page to try to fix it.');
+                        window.location.reload();
+                    }
+                    response.json().then((json) => {
+                        console.log(json);
+                    })
+                    console.log("Error fetching search results");
                 });
         },
 
