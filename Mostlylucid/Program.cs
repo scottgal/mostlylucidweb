@@ -21,7 +21,11 @@ var auth = builder.Configure<AuthSettings>();
 var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
 var services = builder.Services;
 
-
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-CSRF-TOKEN";
+    options.SuppressXFrameOptionsHeader = false;
+});
 // Add services to
 // the container.
 services.AddOutputCache(); // Remove duplicate call later in your code
