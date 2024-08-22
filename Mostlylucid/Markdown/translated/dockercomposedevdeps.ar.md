@@ -19,7 +19,7 @@
 
 # يجري إنشاء ملفّ
 
-يستخدم Doker Compus ملف YAML لتعريف الخدمات التي تريد تشغيلها. هنا مثال لـ a `devdeps-docker-compose.yml` ملفّ تعريف a قاعدة بيانات خدمة:
+يستخدم Doker Compus ملف YAML لتعريف الخدمات التي تريد تشغيلها. هنا مثال لـ a `devdeps-docker-compose.yml` الملف الذي يعرّف خدمة قاعدة البيانات وخدمة البريد الإلكتروني:
 
 ```yaml
 services: 
@@ -78,13 +78,13 @@ POSTGRES_PASSWORD=<somepassword>
 ```json
   "SmtpSettings":
 {
-"Server": "smtp.gmail.com",
-"Port": 587,
+"Server": "localhost",
+"Port": 2525,
 "SenderName": "Mostlylucid",
 "Username": "",
 "SenderEmail": "scott.galloway@gmail.com",
 "Password": "",
-"EnableSSL": "true",
+"EnableSSL": "false",
 "EmailSendTry": 3,
 "EmailSendFailed": "true",
 "ToMail": "scott.galloway@gmail.com",

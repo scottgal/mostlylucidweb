@@ -5,7 +5,7 @@
 
 # Introducción
 
-Cuando desarrollamos software tradicionalmente hicimos girar una base de datos, una cola de mensajes, una caché y tal vez algunos otros servicios. Esto puede ser una molestia para manejar, especialmente si estás trabajando en varios proyectos. Docker Compose es una herramienta que te permite definir y ejecutar aplicaciones Docker multicontenedor. Es una gran manera de gestionar tus dependencias de desarrollo.
+Cuando desarrollamos software tradicionalmente hacíamos girar una base de datos, una cola de mensajes, una caché y tal vez algunos otros servicios. Esto puede ser un dolor para manejar, especialmente si usted está trabajando en varios proyectos. Docker Compose es una herramienta que le permite definir y ejecutar aplicaciones Docker multicontenedor. Es una gran manera de gestionar sus dependencias de desarrollo.
 
 En este post, te mostraré cómo usar Docker Compose para gestionar tus dependencias de desarrollo.
 
@@ -13,13 +13,13 @@ En este post, te mostraré cómo usar Docker Compose para gestionar tus dependen
 
 # Requisitos previos
 
-Primero tendrás que instalar el escritorio Docker en cualquier plataforma que estés usando. Puedes descargarlo desde[aquí](https://www.docker.com/products/docker-desktop).
+Primero tendrás que instalar el escritorio Docker en cualquier plataforma que estés usando. Puedes descargarlo desde [aquí](https://www.docker.com/products/docker-desktop).
 
 **NOTA: He encontrado que en Windows realmente necesita ejecutar Docker Desktop instalador como administrador para asegurarse de que se instala correctamente.**
 
 # Crear un archivo Docker Compose
 
-Docker Compose utiliza un archivo YAML para definir los servicios que desea ejecutar. He aquí un ejemplo de un simple`devdeps-docker-compose.yml`archivo que define un servicio de base de datos:
+Docker Compose utiliza un archivo YAML para definir los servicios que desea ejecutar. Aquí hay un ejemplo de un simple `devdeps-docker-compose.yml` archivo que define un servicio de base de datos y un servicio de correo electrónico:
 
 ```yaml
 services: 
@@ -59,9 +59,9 @@ Nota aquí He especificado volúmenes para persistir los datos para cada servici
 
 Esto asegura que los datos persistan entre los recorridos de los contenedores.
 
-También especifico un`env_file`para la`postgres`service. Este es un archivo que contiene variables de entorno que se pasan al contenedor.
-Puede ver una lista de variables de entorno que se pueden pasar al contenedor PostgreSQL[aquí](https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/#1-Environment-variables).
-Aquí hay un ejemplo de un`.env`archivo:
+También especifico un `env_file` para la `postgres` servicio. Este es un archivo que contiene variables de entorno que se pasan al contenedor.
+Puede ver una lista de variables de entorno que se pueden pasar al contenedor PostgreSQL [aquí](https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/#1-Environment-variables).
+Aquí hay un ejemplo de un `.env` archivo:
 
 ```shell
 POSTGRES_DB=postgres
@@ -71,20 +71,20 @@ POSTGRES_PASSWORD=<somepassword>
 
 Esto configura una base de datos predeterminada, contraseña y usuario para PostgreSQL.
 
-Aquí también ejecuto el servicio SMTP4Dev, esta es una gran herramienta para probar la funcionalidad de correo electrónico en su aplicación. Puede encontrar más información al respecto[aquí](https://github.com/rnwood/smtp4dev/wiki/Installation#how-to-run-smtp4dev-in-docker).
+Aquí también ejecuto el servicio SMTP4Dev, esta es una gran herramienta para probar la funcionalidad de correo electrónico en su aplicación. Puedes encontrar más información al respecto. [aquí](https://github.com/rnwood/smtp4dev/wiki/Installation#how-to-run-smtp4dev-in-docker).
 
-Si miras en mi`appsettings.Developmet.json`archivo que verá Tengo la siguiente configuración para el servidor SMTP:
+Si miras en mi `appsettings.Developmet.json` archivo que verá Tengo la siguiente configuración para el servidor SMTP:
 
 ```json
   "SmtpSettings":
 {
-"Server": "smtp.gmail.com",
-"Port": 587,
+"Server": "localhost",
+"Port": 2525,
 "SenderName": "Mostlylucid",
 "Username": "",
 "SenderEmail": "scott.galloway@gmail.com",
 "Password": "",
-"EnableSSL": "true",
+"EnableSSL": "false",
 "EmailSendTry": 3,
 "EmailSendFailed": "true",
 "ToMail": "scott.galloway@gmail.com",
@@ -95,17 +95,17 @@ Si miras en mi`appsettings.Developmet.json`archivo que verá Tengo la siguiente 
 
 Esto funciona para SMTP4Dev y me permite probar esta funcionalidad (puedo enviar a cualquier dirección, y ver el correo electrónico en la interfaz SMTP4Dev en http://localhost:3002/).
 
-Una vez que estés seguro de que todo está funcionando puedes probar en un servidor SMTP real como GMAIL (por ejemplo, ver[aquí](addingasyncsendingforemails)para saber cómo hacerlo)
+Una vez que estés seguro de que todo está funcionando puedes probar en un servidor SMTP real como GMAIL (por ejemplo, ver [aquí](addingasyncsendingforemails) para saber cómo hacerlo)
 
 # Funcionamiento de los servicios
 
-Para ejecutar los servicios definidos en el`devdeps-docker-compose.yml`archivo, es necesario ejecutar el siguiente comando en el mismo directorio que el archivo:
+Para ejecutar los servicios definidos en el `devdeps-docker-compose.yml` archivo, es necesario ejecutar el siguiente comando en el mismo directorio que el archivo:
 
 ```shell
 docker compose -f .\devdeps-docker-compose.yml up -d
 ```
 
-Tenga en cuenta que debe ejecutarlo inicialmente de esta manera; esto asegura que puede ver los elementos de configuración pasados desde el`.env`archivo.
+Tenga en cuenta que debe ejecutarlo inicialmente de esta manera; esto asegura que puede ver los elementos de configuración pasados desde el `.env` archivo.
 
 ```shell
 docker compose -f .\devdeps-docker-compose.yml config

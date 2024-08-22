@@ -19,7 +19,7 @@
 
 # एक डॉक लाया जा रहा है फ़ाइल
 
-डॉकर लिखें एक YAएमएल फ़ाइल का उपयोग उन सेवाओं को पारिभाषित करने के लिए करता है जो आप चलाना चाहते हैं. यहाँ एक सरल का उदाहरण है `devdeps-docker-compose.yml` फ़ाइल जो डाटाबेस सेवा पारिभाषित करता है:
+डॉकर लिखें एक YAएमएल फ़ाइल का उपयोग उन सेवाओं को पारिभाषित करने के लिए करता है जो आप चलाना चाहते हैं. यहाँ एक सरल का उदाहरण है `devdeps-docker-compose.yml` फ़ाइल जो डाटाबेस सेवा तथा ईमेल सेवा पारिभाषित करता है:
 
 ```yaml
 services: 
@@ -78,13 +78,13 @@ POSTGRES_PASSWORD=<somepassword>
 ```json
   "SmtpSettings":
 {
-"Server": "smtp.gmail.com",
-"Port": 587,
+"Server": "localhost",
+"Port": 2525,
 "SenderName": "Mostlylucid",
 "Username": "",
 "SenderEmail": "scott.galloway@gmail.com",
 "Password": "",
-"EnableSSL": "true",
+"EnableSSL": "false",
 "EmailSendTry": 3,
 "EmailSendFailed": "true",
 "ToMail": "scott.galloway@gmail.com",

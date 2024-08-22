@@ -16,7 +16,7 @@ First you'll need to install docker desktop on whatever platform you're using. Y
 **NOTE: I've found that on Windows you really need to run Docker Desktop installer as admin to ensure it installs correctly.**
 
 # Creating a Docker Compose file
-Docker Compose uses a YAML file to define the services you want to run. Here's an example of a simple `devdeps-docker-compose.yml` file that defines a database service:
+Docker Compose uses a YAML file to define the services you want to run. Here's an example of a simple `devdeps-docker-compose.yml` file that defines a database service and an Email service:
 
 ```yaml
 services: 
@@ -72,13 +72,13 @@ If you look in my `appsettings.Developmet.json` file you'll see I have the follo
 ```json
   "SmtpSettings":
 {
-"Server": "smtp.gmail.com",
-"Port": 587,
+"Server": "localhost",
+"Port": 2525,
 "SenderName": "Mostlylucid",
 "Username": "",
 "SenderEmail": "scott.galloway@gmail.com",
 "Password": "",
-"EnableSSL": "true",
+"EnableSSL": "false",
 "EmailSendTry": 3,
 "EmailSendFailed": "true",
 "ToMail": "scott.galloway@gmail.com",

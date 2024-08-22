@@ -19,7 +19,7 @@ Ensin sinun täytyy asentaa docker-työpöytä millä tahansa alustalla, jota k�
 
 # Docker Composite -tiedoston luominen
 
-Docker Compose käyttää YaML-tiedostoa määritelläkseen palvelut, joita haluat ajaa. Tässä esimerkki yksinkertaisesta `devdeps-docker-compose.yml` tietokantapalvelun määrittelevä tiedosto:
+Docker Compose käyttää YaML-tiedostoa määritelläkseen palvelut, joita haluat ajaa. Tässä esimerkki yksinkertaisesta `devdeps-docker-compose.yml` tiedosto, joka määrittelee tietokantapalvelun ja sähköpostipalvelun:
 
 ```yaml
 services: 
@@ -78,13 +78,13 @@ Jos katsot minun `appsettings.Developmet.json` Tiedosto näet, että minulla on 
 ```json
   "SmtpSettings":
 {
-"Server": "smtp.gmail.com",
-"Port": 587,
+"Server": "localhost",
+"Port": 2525,
 "SenderName": "Mostlylucid",
 "Username": "",
 "SenderEmail": "scott.galloway@gmail.com",
 "Password": "",
-"EnableSSL": "true",
+"EnableSSL": "false",
 "EmailSendTry": 3,
 "EmailSendFailed": "true",
 "ToMail": "scott.galloway@gmail.com",

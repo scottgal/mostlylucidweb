@@ -19,7 +19,7 @@
 
 # Створення файла компонування Docker
 
-Для визначення служб, які ви бажаєте запустити Docker Compose використовує файл YML. Ось приклад простого `devdeps-docker-compose.yml` файл, який визначає службу бази даних:
+Для визначення служб, які ви бажаєте запустити Docker Compose використовує файл YML. Ось приклад простого `devdeps-docker-compose.yml` файл, який визначає службу бази даних і службу електронної пошти:
 
 ```yaml
 services: 
@@ -78,13 +78,13 @@ POSTGRES_PASSWORD=<somepassword>
 ```json
   "SmtpSettings":
 {
-"Server": "smtp.gmail.com",
-"Port": 587,
+"Server": "localhost",
+"Port": 2525,
 "SenderName": "Mostlylucid",
 "Username": "",
 "SenderEmail": "scott.galloway@gmail.com",
 "Password": "",
-"EnableSSL": "true",
+"EnableSSL": "false",
 "EmailSendTry": 3,
 "EmailSendFailed": "true",
 "ToMail": "scott.galloway@gmail.com",

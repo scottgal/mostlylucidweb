@@ -19,7 +19,7 @@ Först måste du installera docker skrivbord på vilken plattform du än använd
 
 # Skapa en dockerkomponera fil
 
-Docker Compose använder en YAML-fil för att definiera de tjänster du vill köra. Här är ett exempel på en enkel `devdeps-docker-compose.yml` Fil som definierar en databastjänst:
+Docker Compose använder en YAML-fil för att definiera de tjänster du vill köra. Här är ett exempel på en enkel `devdeps-docker-compose.yml` fil som definierar en databastjänst och en e-posttjänst:
 
 ```yaml
 services: 
@@ -78,13 +78,13 @@ Om du tittar i min `appsettings.Developmet.json` fil du ser Jag har följande ko
 ```json
   "SmtpSettings":
 {
-"Server": "smtp.gmail.com",
-"Port": 587,
+"Server": "localhost",
+"Port": 2525,
 "SenderName": "Mostlylucid",
 "Username": "",
 "SenderEmail": "scott.galloway@gmail.com",
 "Password": "",
-"EnableSSL": "true",
+"EnableSSL": "false",
 "EmailSendTry": 3,
 "EmailSendFailed": "true",
 "ToMail": "scott.galloway@gmail.com",
