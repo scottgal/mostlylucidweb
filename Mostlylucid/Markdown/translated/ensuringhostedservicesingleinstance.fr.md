@@ -1,7 +1,7 @@
 # Assurer votre service IHostedService (ou IHostedLifecycleService) est une seule instance
 
 <!--category-- ASP.NET -->
-<datetime class="hidden">2024-08-21T16:08</datetime>
+<datetime class="hidden">2024-08-22T16:08</datetime>
 
 ## Présentation
 
@@ -16,7 +16,7 @@ Cela pourrait être évident pour certains, mais ce n'est pas pour d'autres (et 
 
 Eh bien, son un problème que la plupart des articles sur ceux-ci couvrent comment utiliser un `IHostedService` mais ils ne couvrent pas comment s'assurer que le service est une seule instance. Ceci est important car vous ne voulez pas plusieurs instances du service en cours d'exécution en même temps.
 
-Qu'est-ce que je veux dire? Eh bien dans ASP.NET la façon de register un IHostedService ou IHostedlifeCycleService (essentiellement la même avec plus de dérogations pour la gestion du cycle de vie) vous utilisez ce
+Qu'est-ce que je veux dire? Bien dans ASP.NET la façon d'enregistrer un IHostedService ou IHostedlifeCycleService (essentiellement la même avec plus de dérogations pour la gestion du cycle de vie) vous utilisez ce
 
 ```csharp
   services.AddHostedService(EmailSenderHostedService);

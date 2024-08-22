@@ -1,7 +1,7 @@
 # 确保您所住的服务(或IHEPLSYSYS)仅举一例
 
 <!--category-- ASP.NET -->
-<datetime class="hidden">2024-08-221T16:08</datetime>
+<datetime class="hidden">2024-008-222T16:08</datetime>
 
 ## 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
@@ -16,7 +16,7 @@
 
 因为大部分条款 都涉及到如何使用 `IHostedService` 但它们并不包括如何确保 服务是一个单一的例子。 这一点很重要,因为你不希望 多种服务同时运行。
 
-什麽意思? 在 ASP.NET 中,您使用这个方法来重新注册“一服务或一服务或一服务”或“一服务或一服务/一服务” (基本上与使用寿命周期管理的更多超控制功能基本相同)
+什麽意思? 在 ASP.NET 中,您使用这个方法来登记 iHosted Services 或 IHostedliveCycleServices (基本上与使用寿命周期管理的更多超控制) 。
 
 ```csharp
   services.AddHostedService(EmailSenderHostedService);

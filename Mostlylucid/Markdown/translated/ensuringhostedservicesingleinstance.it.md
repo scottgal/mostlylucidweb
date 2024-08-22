@@ -1,7 +1,7 @@
 # Garantire il vostro IHostedService (o IHostedLifecycleService) è una singola istanza
 
 <!--category-- ASP.NET -->
-<datetime class="hidden">2024-08-21T16:08</datetime>
+<datetime class="hidden">2024-08-22T16:08</datetime>
 
 ## Introduzione
 
@@ -16,7 +16,7 @@ Questo potrebbe essere ovvio per alcuni, ma non è per altri (e non è stato imm
 
 Beh, è un problema come la maggior parte degli articoli fuori questi come utilizzare un `IHostedService` ma non coprono come assicurarsi che il servizio sia una singola istanza. Questo è importante perché non si vogliono più istanze del servizio in esecuzione allo stesso tempo.
 
-Cosa voglio dire? Bene in ASP.NET il modo per registrare un IHostedService o IHostedlifeCycleService (fondamentalmente lo stesso con più overrides per la gestione del ciclo di vita) si utilizza questo
+Cosa voglio dire? Bene in ASP.NET il modo per registrare un IHostedService o IHostedlifeCycleService (fondamentalmente lo stesso con più sovrascritture per la gestione del ciclo di vita) si utilizza questo
 
 ```csharp
   services.AddHostedService(EmailSenderHostedService);

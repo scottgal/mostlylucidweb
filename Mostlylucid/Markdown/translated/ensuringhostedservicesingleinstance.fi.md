@@ -1,7 +1,7 @@
 # IHostedServicen (tai IHostedLifecycleService) varmistaminen on yksi esimerkki
 
 <!--category-- ASP.NET -->
-<datetime class="hidden">2024-08-21T16:08</datetime>
+<datetime class="hidden">2024-08-22T16:08</datetime>
 
 ## Johdanto
 
@@ -16,7 +16,7 @@ Tämä voi olla selvää joillekin, mutta ei muille (eikä heti minulle!).
 
 No se on numero, koska suurin osa artikkeleista näistä kattaa, miten käyttää `IHostedService` Ne eivät kuitenkaan kata, miten varmistetaan, että palvelu on yksittäinen tapaus. Tämä on tärkeää, koska et halua, että palvelu toimii useita kertoja samaan aikaan.
 
-Mitä tarkoitan? No ASP.NETissä tapa rekisteröidä IHostedService tai IHostedlifeCycleService (periaatteessa sama, jossa on enemmän ohituksia elinkaaren hallintaan) käytät tätä
+Mitä tarkoitan? No ASP.NETissä tapa rekisteröidä IHostedService tai IHostedlifeCycleService (periaatteessa sama, kun elinkaaren hallintaan käytetään useampia ohituksia) käytät tätä
 
 ```csharp
   services.AddHostedService(EmailSenderHostedService);

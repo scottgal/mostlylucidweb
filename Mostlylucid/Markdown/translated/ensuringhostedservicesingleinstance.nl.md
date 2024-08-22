@@ -1,7 +1,7 @@
 # Ervoor zorgen dat uw IHostedService (of IHostedLifecycleService) één instantie is
 
 <!--category-- ASP.NET -->
-<datetime class="hidden">2024-08-21T16:08</datetime>
+<datetime class="hidden">2024-08-22T16:08</datetime>
 
 ## Inleiding
 

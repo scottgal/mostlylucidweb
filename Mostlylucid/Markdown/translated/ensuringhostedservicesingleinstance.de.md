@@ -1,7 +1,7 @@
 # Sicherstellen, dass Ihr IHostedService (oder IHostedLifecycleService) eine einzige Instanz ist
 
 <!--category-- ASP.NET -->
-<datetime class="hidden">2024-08-21T16:08</datetime>
+<datetime class="hidden">2024-08-22T16:08</datetime>
 
 ## Einleitung
 
@@ -16,7 +16,7 @@ Dies mag für einige offensichtlich sein, aber es ist nicht für andere (und war
 
 Nun, es ist ein Problem, da die meisten der Artikel, die diese umfassen, wie man eine `IHostedService` Aber sie decken nicht ab, wie man sicherstellt, dass der Dienst eine einzige Instanz ist. Dies ist wichtig, da Sie nicht möchten, dass mehrere Instanzen des Dienstes gleichzeitig ausgeführt werden.
 
-Was soll ich sagen? Gut in ASP.NET die Art und Weise, einen IHostedService oder IHostedlifeCycleService zu registieren (basisch die gleiche mit mehr Überbrückungen für das Lebenszyklusmanagement) Sie verwenden diese
+Was soll ich sagen? Gut in ASP.NET die Art und Weise, einen IHostedService oder IHostedlifeCycleService zu registrieren (basisch die gleiche mit mehr Überbrückungen für das Lebenszyklusmanagement), benutzen Sie diese
 
 ```csharp
   services.AddHostedService(EmailSenderHostedService);

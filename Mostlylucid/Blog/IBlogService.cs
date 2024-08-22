@@ -19,6 +19,8 @@ public interface IBlogService
 
 public interface IMarkdownFileBlogService
 {
+    Task<bool> EntryChanged(string slug, string language, string hash);
+    Task<bool> EntryExists(string slug, string language);
         Task<BlogPostViewModel> SavePost(string slug, string language,  string markdowm);
 }
 

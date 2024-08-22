@@ -1,6 +1,6 @@
 ﻿# Ensuring your IHostedService (or IHostedLifecycleService) is a single instance
 <!--category-- ASP.NET -->
-<datetime class="hidden">2024-08-21T16:08</datetime>
+<datetime class="hidden">2024-08-22T16:08</datetime>
 ## Introduction
 This is a dumb little article because I was a bit confused about how to ensure that my `IHostedService` was a single instance. I thought it was a bit more complicated than it actually was. So I thought I'd write a little article about it. Just in case anyone else was confused about it.
 

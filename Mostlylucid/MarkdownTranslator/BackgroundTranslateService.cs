@@ -22,8 +22,6 @@ public class BackgroundTranslateService(
             logger.LogError("Translation service is not available");
             return;
         }
-
-        await Task.Delay(10000);
         _sendTask =  TranslateFilesAsync(cancellationTokenSource.Token);
         if(translateServiceConfig.Enabled)
             await TranslateAllFilesAsync();
@@ -124,8 +122,8 @@ public class BackgroundTranslateService(
                 {
                     var blogService=scope.ServiceProvider
                         .GetRequiredService<IBlogService>();
-
-                    var entryExists =await blogService.EntryExists(slug, translateModel.Language);
+                    var fileBlogService = scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>();
+                    var entryExists =await fileBlogService.EntryExists(slug, translateModel.Language);
                var entryChanged = await blogService.EntryChanged(slug, MarkdownBaseService.EnglishLanguage, translateModel.OriginalMarkdown.ContentHash());
                     if (entryExists && !entryChanged) continue;
                 }
