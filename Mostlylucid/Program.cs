@@ -36,6 +36,11 @@ services.SetupEmail(builder.Configuration);
 services.SetupRSS();
 services.SetupBlog(config, builder.Environment);
 
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-CSRF-TOKEN";
+    options.SuppressXFrameOptionsHeader = false;
+});
 // Setup CORS for Google Auth Use.
 services.AddCors(options =>
 {
