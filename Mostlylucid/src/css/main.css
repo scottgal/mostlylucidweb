@@ -77,27 +77,26 @@ html {
 }
 
 .pagination {
-    @apply py-2 flex list-none p-0 m-0 justify-center items-center flex-wrap; /* Added flex-wrap */
+    @apply flex list-none p-0 m-0 justify-center items-center flex-wrap; /* Added flex-wrap */
 }
 
 .page-item {
-    @apply mx-1 text-black dark:text-white rounded;
+    @apply mx-1 text-black dark:text-white opacity-80 rounded outline outline-1  outline-neutral-700 dark:outline-neutral-400;
 }
 
 .page-item a {
-    @apply block rounded-md transition duration-300 ease-in-out text-sm sm:text-base px-2 sm:px-4; /* Responsive font size and padding */
+    @apply block rounded-md transition duration-300 ease-in-out text-sm sm:text-base px-3 py-1; /* Responsive font size and padding */
+    @apply min-w-8 min-h-6; /* Fixed width and height */
+    @apply flex items-center justify-center; /* Center text horizontally and vertically */
 }
 
 .page-item a:hover {
-    @apply bg-blue-dark text-white;
+    @apply bg-blue-dark text-white opacity-100;
 }
 
-.page-item.disabled a {
-    @apply text-blue-dark pointer-events-none cursor-not-allowed;
-}
 
 .page-item.active {
-    @apply bg-blue-dark;
+    @apply bg-blue-dark opacity-100;
 }
 
 .page-item.active a {
@@ -105,10 +104,18 @@ html {
 }
 
 .page-link {
-    @apply block px-2 sm:px-4 py-2 text-blue-dark dark:text-blue-light text-sm sm:text-base; /* Responsive padding and font size */
+    @apply block text-neutral-700 dark:text-grey text-sm sm:text-base; /* Responsive padding and font size */
+}
+
+.page-item.disabled a.page-link {
+    @apply  text-neutral-500 dark:text-neutral-700 pointer-events-none cursor-not-allowed;
 }
 
 .page-item:focus a,
 .page-item a:focus {
     @apply outline-none; /* Tailwind's outline class could be used if custom color needed */
+}
+
+.border-gray-light {
+    @apply border border-grey;
 }

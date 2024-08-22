@@ -8,6 +8,10 @@
         <UserSecretsId>c720973b-30fe-465d-a96f-6c9923332a29</UserSecretsId>
     </PropertyGroup>
 
+  <Target Name="BuildCss" BeforeTargets="BeforeBuild">
+    <Exec Command="npm run dev" Condition=" '$(Configuration)' == 'Debug' " />
+    <Exec Command="npm run build" Condition=" '$(Configuration)' == 'Release' " EnvironmentVariables="NODE_ENV=production" />
+  </Target>
   <PropertyGroup>
     <PreserveCompilationContext>true</PreserveCompilationContext>
   </PropertyGroup>
@@ -63,8 +67,5 @@
     </ItemGroup>
   
 
-    <Target Name="BuildCss" BeforeTargets="Compile">
-        <Exec Command="npm run dev" Condition=" '$(Configuration)' == 'Debug' " />
-        <Exec Command="npm run build" Condition=" '$(Configuration)' == 'Release' " EnvironmentVariables="NODE_ENV=production" />
-    </Target>
+
 </Project>
