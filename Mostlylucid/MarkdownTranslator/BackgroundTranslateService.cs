@@ -20,11 +20,17 @@ public class BackgroundTranslateService(
     private readonly CancellationTokenSource cancellationTokenSource = new();
     private Task _healthCheckTask = Task.CompletedTask;
 
+    public bool TranslationServiceUp { get; set; }
     private Task _sendTask = Task.CompletedTask;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        if (!await StartupHealthCheck(cancellationToken)) logger.LogError("Translation service is not available");
+        if (!await StartupHealthCheck(cancellationToken))
+        {
+            TranslationServiceUp = false;
+            logger.LogError("Translation service is not available");
+        }
+        TranslationServiceUp = true;
         _healthCheckTask = PeriodicHealthCheck(cancellationToken);
 
         _sendTask = TranslateFilesAsync(cancellationTokenSource.Token);
@@ -83,14 +89,17 @@ public class BackgroundTranslateService(
                     logger.LogError("Translation service is not available");
                     await cancellationTokenSource.CancelAsync();
                     _translations.Writer.Complete();
+                    TranslationServiceUp = false;
                 }
                 else
                 {
                     logger.LogInformation("Translation service is healthy");
+                    TranslationServiceUp = true;
                 }
             }
             catch (Exception ex)
             {
+                TranslationServiceUp = false;
                 logger.LogError(ex, "Error during service health check");
                 await cancellationTokenSource.CancelAsync();
                 _translations.Writer.Complete();
@@ -122,6 +131,7 @@ public class BackgroundTranslateService(
             OriginalMarkdown = message.OriginalMarkdown,
             Persist = false
         };
+
         return await Translate(translateMessage);
     }
 
@@ -231,11 +241,16 @@ public class BackgroundTranslateService(
         var slug = Path.GetFileNameWithoutExtension(translateModel.OriginalFileName);
         if (translateModel.Persist)
         {
-            var fileBlogService = scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>();
-            var entryExists = await fileBlogService.EntryExists(slug, translateModel.Language);
-            var entryChanged = await fileBlogService.EntryChanged(slug, MarkdownBaseService.EnglishLanguage,
-                translateModel.OriginalMarkdown.ContentHash());
-            if (entryExists && !entryChanged) return;
+            if (await EntryChanged(scope, slug, translateModel))
+            {
+                logger.LogInformation("Entry {Slug} has changed, translating", slug);
+            }
+            else
+            {
+                logger.LogInformation("Entry {Slug} has not changed, skipping translation", slug);
+                tcs.SetResult(new TaskCompletion(null, translateModel.Language, true, DateTime.Now));
+                return;
+            }
         }
 
 
@@ -250,14 +265,7 @@ public class BackgroundTranslateService(
 
             if (item.Item1.Persist)
             {
-                var blogService = scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>();
-                _ = await blogService.SavePost(slug, translateModel.Language,
-                    translatedMarkdown);
-            }
-            else
-            {
-                var populatorService = scopeFactory.CreateScope().ServiceProvider
-                    .GetRequiredService<MarkdownRenderingService>();
+                await PersistTranslation(scope, slug, translateModel, translatedMarkdown);
             }
 
             tcs.SetResult(new TaskCompletion(translatedMarkdown, translateModel.Language, true, DateTime.Now));
@@ -268,6 +276,24 @@ public class BackgroundTranslateService(
                 translateModel.Language);
             tcs.SetException(e);
         }
+    }
+
+    private async  Task<bool> EntryChanged(IServiceScope scope, string slug, PageTranslationModel translateModel)
+    {
+        var fileBlogService = scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>();
+        var entryExists = await fileBlogService.EntryExists(slug, translateModel.Language);
+        var entryChanged = await fileBlogService.EntryChanged(slug, MarkdownBaseService.EnglishLanguage,
+            translateModel.OriginalMarkdown.ContentHash());
+        return !entryExists || entryChanged;
+    }
+    
+    private async Task PersistTranslation(IServiceScope scope,string slug, PageTranslationModel translateModel, string translatedMarkdown)
+    {
+        var blogService = translateServiceConfig.Mode == AutoTranslateMode.SaveToDisk
+            ? scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>()
+            : scope.ServiceProvider.GetRequiredService<IBlogService>(); 
+        _ = await blogService.SavePost(slug, translateModel.Language,
+            translatedMarkdown);
     }
 }
 

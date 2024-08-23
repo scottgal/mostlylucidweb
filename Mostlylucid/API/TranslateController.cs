@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Mostlylucid.Helpers;
 using Mostlylucid.MarkdownTranslator;
-using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.API;
 
@@ -13,11 +12,17 @@ public class TranslateController(
     TranslateCacheService translateCacheService) : ControllerBase
 {
     [HttpPost("start-translation")]
-    public async Task<IActionResult> StartTranslation([FromBody] MarkdownTranslationModel model)
+    [ValidateAntiForgeryToken]
+    public async Task<Results<Ok<string>, BadRequest<string>>> StartTranslation([FromBody] MarkdownTranslationModel model)
     {
+        if(backgroundTranslateService.TranslationServiceUp)
+        {
+            return TypedResults.BadRequest("Translation service is down");
+        }
         // Create a unique identifier for this translation task
         var taskId = Guid.NewGuid().ToString("N");
         var userId = Request.GetUserId(Response);
+       
         // Trigger translation and store the associated task
         var translationTask = await backgroundTranslateService.Translate(model);
     
@@ -25,13 +30,14 @@ public class TranslateController(
         translateCacheService.AddTask(userId, translateTask);
 
         // Return the task ID to the client
-        return Ok(new { TaskId = taskId });
+        return TypedResults.Ok(taskId);
     }
+    
 
     [HttpGet("ping")]
-    public async Task<Results<Ok<string>, BadRequest<string>>> Ping(CancellationToken cancellationToken)
+    public async Task<Results<Ok<string>, BadRequest<string>>> Ping()
     {
-        if (await backgroundTranslateService.Ping(cancellationToken))
+        if (backgroundTranslateService.TranslationServiceUp)
             return TypedResults.Ok<string>("Good");
         return TypedResults.BadRequest("bad");
     }
