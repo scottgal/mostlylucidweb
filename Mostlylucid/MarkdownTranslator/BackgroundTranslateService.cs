@@ -19,21 +19,86 @@ public class BackgroundTranslateService(
         _translations = Channel.CreateUnbounded<(PageTranslationModel, TaskCompletionSource<TaskCompletion>)>();
 
     private Task _sendTask = Task.CompletedTask;
+    private Task _healthCheckTask = Task.CompletedTask;
     private readonly CancellationTokenSource cancellationTokenSource = new();
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        if (!await markdownTranslatorService.IsServiceUp(cancellationToken))
+        if(!await StartupHealthCheck(cancellationToken))
         {
             logger.LogError("Translation service is not available");
-            return;
         }
+        // Start periodic health check task
+        _healthCheckTask = PeriodicHealthCheck(cancellationToken);
 
         _sendTask = TranslateFilesAsync(cancellationTokenSource.Token);
         if (translateServiceConfig.Enabled)
             await TranslateAllFilesAsync();
     }
 
+    private async Task<bool> StartupHealthCheck(CancellationToken cancellationToken)
+    {
+        var count = 1;
+        var isUp = false;
+        while (true)
+        {
+       
+            if (await markdownTranslatorService.IsServiceUp(cancellationToken))
+            {
+                logger.LogInformation("Translation service is available");
+                isUp = true;
+                break;
+            }
+            await Task.Delay(10000, cancellationToken);
+            count++;
+            if (count > 3)
+            {
+                logger.LogError("Translation service is not available trying again (count: {Count})", count); 
+                _translations.Writer.Complete();
+                await cancellationTokenSource.CancelAsync();
+                isUp = false;
+                break;
+            }
+        }
+
+        return isUp;
+    }
+
+    private async Task PeriodicHealthCheck(CancellationToken cancellationToken)
+    {
+        // Run the health check periodically (e.g., every 60 seconds)
+        const int delayMilliseconds = 60000;
+     
+     
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                if (!await markdownTranslatorService.IsServiceUp(cancellationToken))
+                {
+                    logger.LogError("Translation service is not available");
+                    await cancellationTokenSource.CancelAsync();
+                    _translations.Writer.Complete();
+                }
+                else
+                {
+                    logger.LogInformation("Translation service is healthy");
+                }
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error during service health check");
+                await cancellationTokenSource.CancelAsync();
+                _translations.Writer.Complete();
+            }
+
+            // Wait before checking again
+            await Task.Delay(delayMilliseconds, cancellationToken);
+        }
+    }
+
+
+    
     public async Task StopAsync(CancellationToken cancellationToken)
     {
         _translations.Writer.Complete();
