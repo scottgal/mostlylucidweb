@@ -1,0 +1,11 @@
+﻿@model List<Mostlylucid.MarkdownTranslator.TranslateTask>
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>@item.TaskId</td>
+        <td>@item.Task?.Status</td>
+        <td>@item.language</td>
+  
+    </tr>
+}

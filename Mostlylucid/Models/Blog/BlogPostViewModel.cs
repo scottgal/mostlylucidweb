@@ -10,7 +10,7 @@ public class BlogPostViewModel : BaseViewModel
     
     public string Language { get; set; }= string.Empty;
     
-    public string OriginalMarkdown { get; set; }= string.Empty;
+    public string Markdown { get; set; }= string.Empty;
     
     public string[] Languages { get; set; } = Array.Empty<string>();
     
@@ -34,5 +34,13 @@ public class BlogPostViewModel : BaseViewModel
     public DateTime PublishedDate { get; set; }
     
     
+
+}
+
+public class TranslationModel 
+{
+
+    
+    public string TranslatedMarkdown { get; set; }= string.Empty;
 
 }

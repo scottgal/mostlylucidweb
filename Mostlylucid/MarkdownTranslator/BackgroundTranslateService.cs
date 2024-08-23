@@ -3,7 +3,6 @@ using Mostlylucid.Blog;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Helpers;
-using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.MarkdownTranslator;
 
@@ -14,7 +13,13 @@ public class BackgroundTranslateService(
     IServiceScopeFactory scopeFactory,
     ILogger<BackgroundTranslateService> logger) : IHostedService
 {
-    private CancellationTokenSource cancellationTokenSource = new();
+    private readonly
+        BufferBlock<(PageTranslationModel, TaskCompletionSource<TaskCompletion>)>
+        _translations = new();
+
+    private Task _sendTask = Task.CompletedTask;
+    private readonly CancellationTokenSource cancellationTokenSource = new();
+
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         if (!await markdownTranslatorService.IsServiceUp(cancellationToken))
@@ -22,11 +27,16 @@ public class BackgroundTranslateService(
             logger.LogError("Translation service is not available");
             return;
         }
-        _sendTask =  TranslateFilesAsync(cancellationTokenSource.Token);
-        if(translateServiceConfig.Enabled)
-            await TranslateAllFilesAsync();
-   
 
+        _sendTask = TranslateFilesAsync(cancellationTokenSource.Token);
+        if (translateServiceConfig.Enabled)
+            await TranslateAllFilesAsync();
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await cancellationTokenSource.CancelAsync();
+        logger.LogInformation("Background translation service stopped");
     }
 
     public async Task<bool> Ping(CancellationToken cancellationToken)
@@ -40,23 +50,36 @@ public class BackgroundTranslateService(
         return true;
     }
 
-    private readonly
-        BufferBlock<(PageTranslationModel, TaskCompletionSource<(BlogPostViewModel? model, bool complete)>)>
-        _translations = new();
-
-    private Task _sendTask = Task.CompletedTask;
-
-    public async Task<Task<(BlogPostViewModel? model, bool complete)>> Translate(PageTranslationModel message)
+    public async Task<Task<TaskCompletion>> Translate(MarkdownTranslationModel message)
     {
-        var tcs = new TaskCompletionSource<(BlogPostViewModel? model, bool complete)>();
+        // Create a TaskCompletionSource that will eventually hold the result of the translation
+
+        var translateMessage = new PageTranslationModel
+        {
+            Language = message.Language,
+            OriginalFileName = "",
+            OriginalMarkdown = message.OriginalMarkdown,
+            Persist = false
+        };
+        return await Translate(translateMessage);
+    }
+
+    private async Task<Task<TaskCompletion>> Translate(PageTranslationModel message)
+    {
+        // Create a TaskCompletionSource that will eventually hold the result of the translation
+        var tcs = new TaskCompletionSource<TaskCompletion>();
+        // Send the translation request along with the TaskCompletionSource to be processed
         await _translations.SendAsync((message, tcs));
+
+        // Await the TaskCompletionSource task to get the result once the translation is complete
         return tcs.Task;
     }
 
-    public async Task<List<Task<(BlogPostViewModel? model, bool complete)>>> TranslateForAllLanguages(
+
+    public async Task<List<Task<TaskCompletion>>> TranslateForAllLanguages(
         PageTranslationModel message)
     {
-        var tasks = new List<Task<(BlogPostViewModel? model, bool complete)>>();
+        var tasks = new List<Task<TaskCompletion>>();
         foreach (var language in translateServiceConfig.Languages)
         {
             var translateMessage = new PageTranslationModel
@@ -66,7 +89,7 @@ public class BackgroundTranslateService(
                 OriginalMarkdown = message.OriginalMarkdown,
                 Persist = message.Persist
             };
-            var tcs = new TaskCompletionSource<(BlogPostViewModel? model, bool complete)>();
+            var tcs = new TaskCompletionSource<TaskCompletion>();
             await _translations.SendAsync((translateMessage, tcs));
             tasks.Add(tcs.Task);
         }
@@ -75,22 +98,17 @@ public class BackgroundTranslateService(
     }
 
 
-
     public async Task TranslateAllFilesAsync()
     {
         try
         {
-
-        var markdownFiles = Directory.GetFiles(markdownConfig.MarkdownPath, "*.md");
-        foreach (var file in markdownFiles)
-        {
-            await TranslateForAllLanguages(new PageTranslationModel
-            {
-                OriginalMarkdown = await File.ReadAllTextAsync(file),
-                OriginalFileName = file,
-            });
-        }
-        
+            var markdownFiles = Directory.GetFiles(markdownConfig.MarkdownPath, "*.md");
+            foreach (var file in markdownFiles)
+                await TranslateForAllLanguages(new PageTranslationModel
+                {
+                    OriginalMarkdown = await File.ReadAllTextAsync(file),
+                    OriginalFileName = file
+                });
         }
         catch (Exception e)
         {
@@ -109,78 +127,95 @@ public class BackgroundTranslateService(
 
         try
         {
-        while (!cancellationToken.IsCancellationRequested)
-
-        {
-
-            var scope = scopeFactory.CreateScope();
-                var item = await _translations.ReceiveAsync(cancellationToken);
-                var translateModel = item.Item1;
-                var tcs = item.Item2;
-                var slug = Path.GetFileNameWithoutExtension(translateModel.OriginalFileName);
-                if (translateModel.Persist)
+            var processingTasks = new List<Task>();
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                while (processingTasks.Count < markdownTranslatorService.IPCount &&
+                       !cancellationToken.IsCancellationRequested)
                 {
-             
-                    var fileBlogService = scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>();
-                    var entryExists =await fileBlogService.EntryExists(slug, translateModel.Language);
-               var entryChanged = await fileBlogService.EntryChanged(slug, MarkdownBaseService.EnglishLanguage, translateModel.OriginalMarkdown.ContentHash());
-                    if (entryExists && !entryChanged) continue;
+                    var item = await _translations.ReceiveAsync(cancellationToken);
+                    var translateModel = item.Item1;
+                    var tcs = item.Item2;
+                    // Start the task and add it to the list
+                    var task = TranslateTask(cancellationToken, translateModel, item, tcs);
+                    processingTasks.Add(task);
                 }
 
-        
+                // Wait for any of the tasks to complete
+                var completedTask = await Task.WhenAny(processingTasks);
 
-                logger.LogInformation("Translating {File} to {Language}", translateModel.OriginalFileName,
-                    translateModel.Language);
+                // Remove the completed task
+                processingTasks.Remove(completedTask);
+
+                // Optionally handle the result of the completedTask here
                 try
                 {
-                    var translatedMarkdown =
-                        await markdownTranslatorService.TranslateMarkdown(translateModel.OriginalMarkdown,
-                            translateModel.Language, cancellationToken);
-
-                    BlogPostViewModel? postModel = null;
-                    if (item.Item1.Persist)
-                    {
-                        var blogService = scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>();
-                        postModel = await blogService.SavePost(slug, translateModel.Language,
-                            translatedMarkdown);
-                    }
-                    else
-                    {
-                        var populatorService = scopeFactory.CreateScope().ServiceProvider
-                            .GetRequiredService<MarkdownRenderingService>();
-                        postModel = populatorService.GetPageFromMarkdown(translatedMarkdown, DateTime.Now, "");
-                    }
-
-                    tcs.SetResult((postModel, true));
+                    await completedTask; // Catch exceptions if needed
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    logger.LogError(e, "Error translating {File} to {Language}", translateModel.OriginalFileName,
-                        translateModel.Language);
-                    tcs.SetException(e);
+                    logger.LogError(ex, "Error translating markdown");
                 }
-
             }
-         
         }
-        
+
         catch (OperationCanceledException)
         {
-           logger.LogError("Translation service was cancelled");
+            logger.LogError("Translation service was cancelled");
         }
         catch (Exception e)
         {
-            logger.LogError(e,"Error translating markdown");
+            logger.LogError(e, "Error translating markdown");
         }
-        
     }
 
-    public async Task StopAsync(CancellationToken cancellationToken)
+    private async Task TranslateTask(CancellationToken cancellationToken, PageTranslationModel translateModel,
+        (PageTranslationModel, TaskCompletionSource<TaskCompletion>) item,
+        TaskCompletionSource<TaskCompletion> tcs)
     {
-        await cancellationTokenSource.CancelAsync();
-        logger.LogInformation("Background translation service stopped");
+        var scope = scopeFactory.CreateScope();
+
+        var slug = Path.GetFileNameWithoutExtension(translateModel.OriginalFileName);
+        if (translateModel.Persist)
+        {
+            var fileBlogService = scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>();
+            var entryExists = await fileBlogService.EntryExists(slug, translateModel.Language);
+            var entryChanged = await fileBlogService.EntryChanged(slug, MarkdownBaseService.EnglishLanguage,
+                translateModel.OriginalMarkdown.ContentHash());
+            if (entryExists && !entryChanged) return;
+        }
+
+
+        logger.LogInformation("Translating {File} to {Language}", translateModel.OriginalFileName,
+            translateModel.Language);
+        try
+        {
+            var translatedMarkdown =
+                await markdownTranslatorService.TranslateMarkdown(translateModel.OriginalMarkdown,
+                    translateModel.Language, cancellationToken);
+
+
+            if (item.Item1.Persist)
+            {
+                var blogService = scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>();
+                _ = await blogService.SavePost(slug, translateModel.Language,
+                    translatedMarkdown);
+            }
+            else
+            {
+                var populatorService = scopeFactory.CreateScope().ServiceProvider
+                    .GetRequiredService<MarkdownRenderingService>();
+            }
+
+            tcs.SetResult(new TaskCompletion(translatedMarkdown, translateModel.Language, true, DateTime.Now));
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error translating {File} to {Language}", translateModel.OriginalFileName,
+                translateModel.Language);
+            tcs.SetException(e);
+        }
     }
-
-
-
 }
+
+public record TaskCompletion(string? TranslatedMarkdown, string Language, bool Complete, DateTime? EndTime);

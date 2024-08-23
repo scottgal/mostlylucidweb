@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using Mostlylucid.Config.Markdown;
+using Mostlylucid.Helpers;
 using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog.Markdown;
@@ -54,14 +55,15 @@ public class MarkdownBlogPopulator(MarkdownConfig markdownConfig, MarkdownRender
     {
       
         var fileInfo = new FileInfo(filePath);
+       
         // Ensure the file exists
         if (!fileInfo.Exists) throw new FileNotFoundException("The specified file does not exist.", filePath);
         // Read all lines from the file
         var lines = await File.ReadAllTextAsync(filePath);
         var publishedDate = fileInfo.CreationTime;
-        return markdownRenderingService.GetPageFromMarkdown(lines, publishedDate, filePath);
+        var viewModel= markdownRenderingService.GetPageFromMarkdown(lines, publishedDate, filePath);
 
-  
+        return viewModel;
     }
 
 

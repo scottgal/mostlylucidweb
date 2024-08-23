@@ -5,20 +5,21 @@ namespace Mostlylucid.MarkdownTranslator;
 
 public class TranslateCacheService(IMemoryCache memoryCache)
 {
-    public async Task<List<TranslateTask>> GetTask(Guid userId)
+    public List<TranslateTask> GetTasks(string userId)
     {
         if (memoryCache.TryGetValue(userId, out List<TranslateTask>? task))
         {
             return task;
         }
 
-        return new();
+        return new List<TranslateTask>();
     }
     
-    public async Task AddTask(Guid userId, TranslateTask task)
+    public void AddTask(string userId, TranslateTask task)
     {
         if (memoryCache.TryGetValue(userId, out List<TranslateTask>? tasks))
         {
+            tasks??= new();
             tasks.Add(task);
             memoryCache.Set(userId, tasks, new MemoryCacheEntryOptions
             {
@@ -32,7 +33,9 @@ public class TranslateCacheService(IMemoryCache memoryCache)
                 AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1)
             });
         }
+
+        return;
     }
 }
 
-public record TranslateTask(Guid TaskId, Task<(BlogPostViewModel? model, bool complete)> Task);
+public record TranslateTask(string TaskId, string language,  Task<TaskCompletion>? Task);

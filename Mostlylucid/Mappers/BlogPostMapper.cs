@@ -18,7 +18,7 @@ public static class BlogPostMapper
             Language = postEntity.LanguageEntity.Name,
             WordCount = postEntity.WordCount,
             Languages = languages.OrderBy(x => x).ToArray(),
-            OriginalMarkdown = postEntity.OriginalMarkdown,
+            Markdown = postEntity.Markdown,
             PublishedDate = postEntity.PublishedDate.DateTime
         };
     }

@@ -2,85 +2,91 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Mostlylucid.EntityFramework;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using NpgsqlTypes;
 
 #nullable disable
 
 namespace Mostlylucid.Migrations
 {
     [DbContext(typeof(MostlylucidDbContext))]
-    [Migration("20240819224301_OriginalMarkdown")]
-    partial class OriginalMarkdown
+    partial class MostlylucidDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasDefaultSchema("Mostlylucid")
+                .HasDefaultSchema("mostlylucid")
                 .HasAnnotation("ProductVersion", "8.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("BlogPostCategory", b =>
-                {
-                    b.Property<int>("BlogPostId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("BlogPostId", "CategoryId");
-
-                    b.HasIndex("CategoryId");
-
-                    b.ToTable("BlogPostCategory", "Mostlylucid");
-                });
-
             modelBuilder.Entity("Mostlylucid.EntityFramework.Models.BlogPostEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ContentHash")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("content_hash");
 
                     b.Property<string>("HtmlContent")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("html_content");
 
                     b.Property<int>("LanguageId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("language_id");
 
-                    b.Property<string>("OriginalMarkdown")
+                    b.Property<string>("Markdown")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("markdown");
 
                     b.Property<string>("PlainTextContent")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("plain_text_content");
 
                     b.Property<DateTimeOffset>("PublishedDate")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("published_date");
+
+                    b.Property<NpgsqlTsVector>("SearchVector")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("tsvector")
+                        .HasColumnName("search_vector")
+                        .HasComputedColumnSql("to_tsvector('english', coalesce(title, '') || ' ' || coalesce(plain_text_content, ''))", true);
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("slug");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.Property<DateTimeOffset>("UpdatedDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<int>("WordCount")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("word_count");
 
                     b.HasKey("Id");
 
@@ -91,26 +97,37 @@ namespace Mostlylucid.Migrations
 
                     b.HasIndex("PublishedDate");
 
+                    b.HasIndex("SearchVector");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("SearchVector"), "GIN");
+
                     b.HasIndex("Slug", "LanguageId");
 
-                    b.ToTable("BlogPosts", "Mostlylucid");
+                    b.ToTable("blogposts", "mostlylucid");
                 });
 
             modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CategoryEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories", "Mostlylucid");
+                    b.HasIndex("Name")
+                        .HasAnnotation("Npgsql:TsVectorConfig", "english");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Name"), "GIN");
+
+                    b.ToTable("categories", "mostlylucid");
                 });
 
             modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentEntity", b =>
@@ -122,32 +139,40 @@ namespace Mostlylucid.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Avatar")
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("avatar");
 
                     b.Property<int>("BlogPostId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("blog_post_id");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("content");
 
                     b.Property<DateTimeOffset>("Date")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("email");
 
                     b.Property<bool>("Moderated")
-                        .HasColumnType("boolean");
+                        .HasColumnType("boolean")
+                        .HasColumnName("moderated");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.Property<string>("Slug")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("slug");
 
                     b.HasKey("Id");
 
@@ -159,39 +184,41 @@ namespace Mostlylucid.Migrations
 
                     b.HasIndex("Slug");
 
-                    b.ToTable("Comments", "Mostlylucid");
+                    b.ToTable("comments", "mostlylucid");
                 });
 
             modelBuilder.Entity("Mostlylucid.EntityFramework.Models.LanguageEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("text")
+                        .HasColumnName("name");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Languages", "Mostlylucid");
+                    b.ToTable("languages", "mostlylucid");
                 });
 
-            modelBuilder.Entity("BlogPostCategory", b =>
+            modelBuilder.Entity("blogpostcategory", b =>
                 {
-                    b.HasOne("Mostlylucid.EntityFramework.Models.BlogPostEntity", null)
-                        .WithMany()
-                        .HasForeignKey("BlogPostId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("BlogPostId")
+                        .HasColumnType("integer");
 
-                    b.HasOne("Mostlylucid.EntityFramework.Models.CategoryEntity", null)
-                        .WithMany()
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("BlogPostId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("blogpostcategory", "mostlylucid");
                 });
 
             modelBuilder.Entity("Mostlylucid.EntityFramework.Models.BlogPostEntity", b =>
@@ -214,6 +241,21 @@ namespace Mostlylucid.Migrations
                         .IsRequired();
 
                     b.Navigation("BlogPostEntity");
+                });
+
+            modelBuilder.Entity("blogpostcategory", b =>
+                {
+                    b.HasOne("Mostlylucid.EntityFramework.Models.BlogPostEntity", null)
+                        .WithMany()
+                        .HasForeignKey("BlogPostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Mostlylucid.EntityFramework.Models.CategoryEntity", null)
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Mostlylucid.EntityFramework.Models.BlogPostEntity", b =>

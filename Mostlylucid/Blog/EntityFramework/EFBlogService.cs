@@ -79,10 +79,10 @@ public class EFBlogService(
 
 
   
-    public async  Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
+    public async  Task<BlogPostViewModel> SavePost(string slug, string language, string markdown)
     {
       var post = await PostsQuery().FirstOrDefaultAsync(x => x.Slug == slug && x.LanguageEntity.Name == language);
-      var model = markdownRenderingService.GetPageFromMarkdown(markdowm, DateTime.Now, slug);
+      var model = markdownRenderingService.GetPageFromMarkdown(markdown, DateTime.Now, slug);
      await SavePost(model, post);
      await Context.SaveChangesAsync();
         return model;

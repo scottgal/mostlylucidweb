@@ -57,14 +57,14 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
         return fileChanged;
     }
 
-    public async Task<BlogPostViewModel> SavePost(string slug, string language, string markdowm)
+    public async Task<BlogPostViewModel> SavePost(string slug, string language, string markdown)
     {
         try
         {
             var outPath = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");
             if (language != EnglishLanguage)
                 outPath = Path.Combine(MarkdownConfig.MarkdownTranslatedPath, $"{slug}.{language}.md");
-            await File.WriteAllTextAsync(outPath, markdowm);
+            await File.WriteAllTextAsync(outPath, markdown);
             return await GetPost(slug, language) ?? new BlogPostViewModel();
         }
         catch (Exception e)

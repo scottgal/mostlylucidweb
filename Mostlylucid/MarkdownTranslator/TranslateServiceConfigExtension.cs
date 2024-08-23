@@ -14,7 +14,8 @@ public static class TranslateServiceConfigExtension
         });
         services.AddSingleton<BackgroundTranslateService>(); 
         services.AddHostedService(provider => provider.GetRequiredService<BackgroundTranslateService>());
-        
+
+        services.AddSingleton<TranslateCacheService>();
        services.AddSingleton<TranslateCacheService>();
         services.AddScoped<IMarkdownFileBlogService, MarkdownBlogService>();
     }

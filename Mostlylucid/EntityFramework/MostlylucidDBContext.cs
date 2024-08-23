@@ -26,7 +26,7 @@ public class MostlylucidDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.HasDefaultSchema("Mostlylucid");
+        modelBuilder.HasDefaultSchema("mostlylucid");
         
         modelBuilder.Entity<BlogPostEntity>(entity =>
         {
@@ -34,9 +34,12 @@ public class MostlylucidDbContext : DbContext
             entity.HasIndex(x => x.ContentHash).IsUnique();
             entity.HasIndex(x => x.PublishedDate);
 
+            entity.Property(b=>b.UpdatedDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
+            
             
             entity.Property(b => b.SearchVector)
-                .HasComputedColumnSql("to_tsvector('english', coalesce(\"Title\", '') || ' ' || coalesce(\"PlainTextContent\", ''))", stored: true);
+                .HasComputedColumnSql("to_tsvector('english', coalesce(title, '') || ' ' || coalesce(plain_text_content, ''))", stored: true);
             
            entity.HasIndex(b => b.SearchVector)
                 .HasMethod("GIN");
@@ -50,7 +53,7 @@ public class MostlylucidDbContext : DbContext
             entity.HasMany(b => b.Categories)
                 .WithMany(c => c.BlogPosts)
                 .UsingEntity<Dictionary<string, object>>(
-                    "BlogPostCategory",
+                    "blogpostcategory",
                     c => c.HasOne<CategoryEntity>().WithMany().HasForeignKey("CategoryId"),
                     b => b.HasOne<BlogPostEntity>().WithMany().HasForeignKey("BlogPostId")
                 );
@@ -82,7 +85,7 @@ public class MostlylucidDbContext : DbContext
             entity.HasMany(c => c.BlogPosts)
                 .WithMany(b => b.Categories)
                 .UsingEntity<Dictionary<string, object>>(
-                    "BlogPostCategory",
+                    "blogpostcategory",
                     b => b.HasOne<BlogPostEntity>().WithMany().HasForeignKey("BlogPostId"),
                     c => c.HasOne<CategoryEntity>().WithMany().HasForeignKey("CategoryId")
                 );

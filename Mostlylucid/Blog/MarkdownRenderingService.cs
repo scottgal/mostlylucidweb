@@ -57,7 +57,7 @@ public class MarkdownRenderingService : MarkdownBaseService
         // Return the parsed and processed content
         return new BlogPostViewModel
         {
-            OriginalMarkdown =  string.Join(Environment.NewLine, lines),
+            Markdown =  string.Join(Environment.NewLine, lines),
             Categories = categories,
             WordCount = restOfTheLines.WordCount(),
             HtmlContent = processed,

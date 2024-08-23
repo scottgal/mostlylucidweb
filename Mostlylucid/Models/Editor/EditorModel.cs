@@ -8,4 +8,6 @@ public class EditorModel : BaseViewModel
     public BlogPostViewModel PostViewModel { get; set; } = new();
     
     public List<string> Languages { get; set; } = new();
+    
+    public string UserSessionId { get; set; } = string.Empty;
 }

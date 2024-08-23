@@ -16,7 +16,7 @@ public class EFBaseService(MostlylucidDbContext context, ILogger<EFBaseService> 
     protected IQueryable<BlogPostEntity> PostsQuery()=>Context.BlogPosts.Include(x => x.Categories)
         .Include(x => x.LanguageEntity);
 
-    public async Task<BlogPostEntity?> SavePost(BlogPostViewModel post, BlogPostEntity? currentPost =null ,
+    protected async Task<BlogPostEntity?> SavePost(BlogPostViewModel post, BlogPostEntity? currentPost =null ,
         List<CategoryEntity>? categories = null,
         List<LanguageEntity>? languages = null)
     {
@@ -33,7 +33,7 @@ public class EFBaseService(MostlylucidDbContext context, ILogger<EFBaseService> 
          currentPost ??= await PostsQuery().Where(x=>x.Slug == post.Slug && x.LanguageEntity == postLanguageEntity).FirstOrDefaultAsync();
         try
         {
-            var hash = post.OriginalMarkdown.ContentHash();
+            var hash = post.Markdown.ContentHash();
             var currentCategoryNames = currentPost?.Categories.Select(x => x.Name).ToArray() ?? Array.Empty<string>();
             var categoriesChanged = false;
             if (!currentCategoryNames.All(post.Categories.Contains) ||
@@ -53,17 +53,16 @@ public class EFBaseService(MostlylucidDbContext context, ILogger<EFBaseService> 
 
             
             var blogPost = currentPost ?? new BlogPostEntity();
-            
             blogPost.Title = post.Title;
             blogPost.Slug = post.Slug;
-            blogPost.OriginalMarkdown = post.OriginalMarkdown;
+            blogPost.Markdown = post.Markdown;
             blogPost.HtmlContent = post.HtmlContent;
             blogPost.PlainTextContent = post.PlainTextContent;
             blogPost.ContentHash = hash;
             blogPost.PublishedDate = post.PublishedDate;
             blogPost.LanguageEntity = postLanguageEntity;
             blogPost.Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList();
-
+            blogPost.UpdatedDate = DateTimeOffset.UtcNow;
             if (currentPost != null)
             {
                 Logger.LogInformation("Updating post {Post}", post.Slug);
