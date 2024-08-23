@@ -1,5 +1,4 @@
 ﻿using System.Threading.Channels;
-using System.Threading.Tasks.Dataflow;
 using Mostlylucid.Blog;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
@@ -18,22 +17,27 @@ public class BackgroundTranslateService(
         Channel<(PageTranslationModel, TaskCompletionSource<TaskCompletion>)>
         _translations = Channel.CreateUnbounded<(PageTranslationModel, TaskCompletionSource<TaskCompletion>)>();
 
-    private Task _sendTask = Task.CompletedTask;
-    private Task _healthCheckTask = Task.CompletedTask;
     private readonly CancellationTokenSource cancellationTokenSource = new();
+    private Task _healthCheckTask = Task.CompletedTask;
+
+    private Task _sendTask = Task.CompletedTask;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        if(!await StartupHealthCheck(cancellationToken))
-        {
-            logger.LogError("Translation service is not available");
-        }
-        // Start periodic health check task
+        if (!await StartupHealthCheck(cancellationToken)) logger.LogError("Translation service is not available");
         _healthCheckTask = PeriodicHealthCheck(cancellationToken);
 
         _sendTask = TranslateFilesAsync(cancellationTokenSource.Token);
         if (translateServiceConfig.Enabled)
             await TranslateAllFilesAsync();
+    }
+
+
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        _translations.Writer.Complete();
+        await cancellationTokenSource.CancelAsync();
+        logger.LogInformation("Background translation service stopped");
     }
 
     private async Task<bool> StartupHealthCheck(CancellationToken cancellationToken)
@@ -42,18 +46,18 @@ public class BackgroundTranslateService(
         var isUp = false;
         while (true)
         {
-       
-            if (await markdownTranslatorService.IsServiceUp(cancellationToken))
+            if (await Ping(cancellationToken))
             {
                 logger.LogInformation("Translation service is available");
                 isUp = true;
                 break;
             }
+
             await Task.Delay(10000, cancellationToken);
             count++;
             if (count > 3)
             {
-                logger.LogError("Translation service is not available trying again (count: {Count})", count); 
+                logger.LogError("Translation service is not available trying again (count: {Count})", count);
                 _translations.Writer.Complete();
                 await cancellationTokenSource.CancelAsync();
                 isUp = false;
@@ -68,13 +72,13 @@ public class BackgroundTranslateService(
     {
         // Run the health check periodically (e.g., every 60 seconds)
         const int delayMilliseconds = 60000;
-     
-     
+
+
         while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
-                if (!await markdownTranslatorService.IsServiceUp(cancellationToken))
+                if (!await Ping(cancellationToken))
                 {
                     logger.LogError("Translation service is not available");
                     await cancellationTokenSource.CancelAsync();
@@ -95,15 +99,6 @@ public class BackgroundTranslateService(
             // Wait before checking again
             await Task.Delay(delayMilliseconds, cancellationToken);
         }
-    }
-
-
-    
-    public async Task StopAsync(CancellationToken cancellationToken)
-    {
-        _translations.Writer.Complete();
-        await cancellationTokenSource.CancelAsync();
-        logger.LogInformation("Background translation service stopped");
     }
 
     public async Task<bool> Ping(CancellationToken cancellationToken)
@@ -183,12 +178,6 @@ public class BackgroundTranslateService(
 
     private async Task TranslateFilesAsync(CancellationToken cancellationToken)
     {
-        if (!await markdownTranslatorService.IsServiceUp(cancellationToken))
-        {
-            logger.LogError("Translation service is not available");
-            return;
-        }
-
         try
         {
             var processingTasks = new List<Task>();
