@@ -15,7 +15,7 @@ public class TranslateController(
     [ValidateAntiForgeryToken]
     public async Task<Results<Ok<string>, BadRequest<string>>> StartTranslation([FromBody] MarkdownTranslationModel model)
     {
-        if(backgroundTranslateService.TranslationServiceUp)
+        if(!backgroundTranslateService.TranslationServiceUp)
         {
             return TypedResults.BadRequest("Translation service is down");
         }
