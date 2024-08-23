@@ -53,7 +53,6 @@ public class BackgroundTranslateService(
     public async Task<Task<TaskCompletion>> Translate(MarkdownTranslationModel message)
     {
         // Create a TaskCompletionSource that will eventually hold the result of the translation
-
         var translateMessage = new PageTranslationModel
         {
             Language = message.Language,
@@ -70,8 +69,6 @@ public class BackgroundTranslateService(
         var tcs = new TaskCompletionSource<TaskCompletion>();
         // Send the translation request along with the TaskCompletionSource to be processed
         await _translations.SendAsync((message, tcs));
-
-        // Await the TaskCompletionSource task to get the result once the translation is complete
         return tcs.Task;
     }
 
