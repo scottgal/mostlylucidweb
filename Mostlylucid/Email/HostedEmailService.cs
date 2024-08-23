@@ -1,24 +1,20 @@
-﻿using System.Threading.Tasks.Dataflow;
+﻿using System.Threading.Channels;
+using System.Threading.Tasks.Dataflow;
 using Mostlylucid.Email.Models;
 
 namespace Mostlylucid.Email
 {
-    public interface IEmailSenderHostedService : IHostedService
-    {
-        Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
-    }
 
     public class EmailSenderHostedService(EmailService emailService, ILogger<EmailSenderHostedService> logger)
-        : IHostedService, IDisposable, IEmailSenderHostedService
+        : IHostedService, IDisposable
     {
-        private readonly BufferBlock<BaseEmailModel> _mailMessages = new();
+        private readonly Channel<BaseEmailModel> _mailMessages = Channel.CreateUnbounded<BaseEmailModel>();
         private Task _sendTask = Task.CompletedTask;
         private CancellationTokenSource cancellationTokenSource = new();
 
         public async Task SendEmailAsync(BaseEmailModel message)
         {
-            await _mailMessages.SendAsync(message);
+            await _mailMessages.Writer.WriteAsync(message);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -35,6 +31,7 @@ namespace Mostlylucid.Email
 
             // Cancel the token to signal the background task to stop
             await cancellationTokenSource.CancelAsync();
+            _mailMessages.Writer.Complete();
 
             // Wait until the background task completes or the cancellation token triggers
             await Task.WhenAny(_sendTask, Task.Delay(Timeout.Infinite, cancellationToken));
@@ -49,7 +46,7 @@ namespace Mostlylucid.Email
                 BaseEmailModel? message = null;
                 try
                 {
-                    message = await _mailMessages.ReceiveAsync(token);
+                    message = await _mailMessages.Reader.ReadAsync(token);
                     switch (message)
                     {
                         case ContactEmailModel contactEmailModel:
@@ -71,7 +68,7 @@ namespace Mostlylucid.Email
                     await Task.Delay(1000, token); // Delay and respect the cancellation token
                     if (message != null)
                     {
-                        await _mailMessages.SendAsync(message, token);
+                        await _mailMessages.Writer.WriteAsync(message, token);
                     }
                 }
             }

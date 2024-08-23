@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks.Dataflow;
+﻿using System.Threading.Channels;
+using System.Threading.Tasks.Dataflow;
 using Mostlylucid.Blog;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
@@ -14,8 +15,8 @@ public class BackgroundTranslateService(
     ILogger<BackgroundTranslateService> logger) : IHostedService
 {
     private readonly
-        BufferBlock<(PageTranslationModel, TaskCompletionSource<TaskCompletion>)>
-        _translations = new();
+        Channel<(PageTranslationModel, TaskCompletionSource<TaskCompletion>)>
+        _translations = Channel.CreateUnbounded<(PageTranslationModel, TaskCompletionSource<TaskCompletion>)>();
 
     private Task _sendTask = Task.CompletedTask;
     private readonly CancellationTokenSource cancellationTokenSource = new();
@@ -35,6 +36,7 @@ public class BackgroundTranslateService(
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
+        _translations.Writer.Complete();
         await cancellationTokenSource.CancelAsync();
         logger.LogInformation("Background translation service stopped");
     }
@@ -68,7 +70,7 @@ public class BackgroundTranslateService(
         // Create a TaskCompletionSource that will eventually hold the result of the translation
         var tcs = new TaskCompletionSource<TaskCompletion>();
         // Send the translation request along with the TaskCompletionSource to be processed
-        await _translations.SendAsync((message, tcs));
+        await _translations.Writer.WriteAsync((message, tcs));
         return tcs.Task;
     }
 
@@ -87,7 +89,7 @@ public class BackgroundTranslateService(
                 Persist = message.Persist
             };
             var tcs = new TaskCompletionSource<TaskCompletion>();
-            await _translations.SendAsync((translateMessage, tcs));
+            await _translations.Writer.WriteAsync((translateMessage, tcs));
             tasks.Add(tcs.Task);
         }
 
@@ -130,7 +132,7 @@ public class BackgroundTranslateService(
                 while (processingTasks.Count < markdownTranslatorService.IPCount &&
                        !cancellationToken.IsCancellationRequested)
                 {
-                    var item = await _translations.ReceiveAsync(cancellationToken);
+                    var item = await _translations.Reader.ReadAsync(cancellationToken);
                     var translateModel = item.Item1;
                     var tcs = item.Item2;
                     // Start the task and add it to the list

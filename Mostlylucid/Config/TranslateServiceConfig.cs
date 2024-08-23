@@ -7,7 +7,24 @@ public class TranslateServiceConfig :IConfigSection
     public bool Enabled { get; set; }
     
     public string[] IPs { get; set; }
-    
+
+    public string ServiceIPs
+    {
+        get => string.Join(";", IPs);
+        set
+        {
+            if(string.IsNullOrEmpty(value)) return;
+            if(value.Contains(";"))
+            {
+                IPs = value.Split(";");
+            }
+            else
+            {
+                IPs = new string[]{value};
+            }
+        }
+    }
+
     public string[] Languages { get; set; }
     
     public AutoTranslateMode Mode { get; set; } = AutoTranslateMode.SaveToDisk;
