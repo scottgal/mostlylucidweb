@@ -7,6 +7,8 @@
 
 所以有一阵子以来 我用简单NMT翻译 `.md` 不同语言的文件 [在这里](/blog/autotranslatingmarkdownfiles).. 我想"露面"这个 这样你们也能一起玩一玩
 
+见本系列的第二部分。 [在这里](/blog/backgroundtranslationspt2).
+
 你们眼中的鹰会注意到 我给记分编辑加了点滴
 
 ![下调下调](translatedropdown.png)

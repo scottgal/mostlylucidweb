@@ -6,6 +6,8 @@
 ## Introduction
 So for a while now I've used EasyNMT to translate my `.md` files into different languages [here](/blog/autotranslatingmarkdownfiles). I've wanted to 'surface' this so you can all have a play with it too. 
 
+See the second part of this series [here](/blog/backgroundtranslationspt2).
+
 The eagle eyed amongst you will have noticed that I've added a little drop down to the markdown editor.
 
 ![Dropdown](translatedropdown.png)

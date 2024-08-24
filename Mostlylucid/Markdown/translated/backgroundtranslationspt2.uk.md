@@ -7,6 +7,8 @@
 
 На нашому попередньому посту [тут](/blog/backgroundtranslationspt1) ми обговорили, як можна використовувати RiseNMT для нашого перекладу `.md` файли на різні мови. Ми також обговорили, як можна використати цю функціональність для користувача, додавши спадний список до редактора markdown. У цьому розділі ми обговоримо, як можна використовувати фонову службу для виконання перекладацьких завдань.
 
+Дивіться першу частину цієї серії [тут](/blog/backgroundtranslationspt1).
+
 [TOC]
 
 ## Налаштування панелі
@@ -158,7 +160,7 @@
     [ValidateAntiForgeryToken]
     public async Task<Results<Ok<string>, BadRequest<string>>> StartTranslation([FromBody] MarkdownTranslationModel model)
     {
-        if(backgroundTranslateService.TranslationServiceUp)
+        if(!backgroundTranslateService.TranslationServiceUp)
         {
             return TypedResults.BadRequest("Translation service is down");
         }

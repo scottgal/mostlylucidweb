@@ -7,6 +7,8 @@
 
 Dans notre post précédent [Ici.](/blog/backgroundtranslationspt1) nous avons discuté de la façon dont nous pouvons utiliser EasyNMT pour traduire notre `.md` fichiers dans différentes langues. Nous avons également discuté de la façon dont nous pouvons faire surface cette fonctionnalité à l'utilisateur en ajoutant un menu déroulant à l'éditeur de balisage. Dans ce post, nous allons discuter de la façon dont nous pouvons utiliser un service d'arrière-plan pour gérer les tâches de traduction.
 
+Voir la première partie de cette série [Ici.](/blog/backgroundtranslationspt1).
+
 [TOC]
 
 ## Configuration de Docker
@@ -158,7 +160,7 @@ Dans l'API, nous vérifions maintenant que le service est en place avant de lanc
     [ValidateAntiForgeryToken]
     public async Task<Results<Ok<string>, BadRequest<string>>> StartTranslation([FromBody] MarkdownTranslationModel model)
     {
-        if(backgroundTranslateService.TranslationServiceUp)
+        if(!backgroundTranslateService.TranslationServiceUp)
         {
             return TypedResults.BadRequest("Translation service is down");
         }

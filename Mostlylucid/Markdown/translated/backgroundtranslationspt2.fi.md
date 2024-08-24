@@ -7,6 +7,8 @@
 
 Edellisessä viestissämme [täällä](/blog/backgroundtranslationspt1) Keskustelimme siitä, miten voimme käyttää EasyNMT:tä kääntämään `.md` tiedostot eri kielille. Keskustelimme myös siitä, miten voimme pintaa tämän toiminnon käyttäjälle lisäämällä pudotuslaskun markown-editoriin. Tässä viestissä keskustellaan siitä, miten voimme käyttää taustapalvelua käännöstehtävien hoitamiseen.
 
+Katso sarjan ensimmäinen osa [täällä](/blog/backgroundtranslationspt1).
+
 [TÄYTÄNTÖÖNPANO
 
 ## Dockerin asettelu
@@ -158,7 +160,7 @@ API:ssä tarkistamme nyt, onko palvelu päällä, ennen kuin laukaisemme käänn
     [ValidateAntiForgeryToken]
     public async Task<Results<Ok<string>, BadRequest<string>>> StartTranslation([FromBody] MarkdownTranslationModel model)
     {
-        if(backgroundTranslateService.TranslationServiceUp)
+        if(!backgroundTranslateService.TranslationServiceUp)
         {
             return TypedResults.BadRequest("Translation service is down");
         }

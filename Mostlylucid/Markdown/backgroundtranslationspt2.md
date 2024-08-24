@@ -6,6 +6,8 @@
 ## Introduction
 In our previous post [here](/blog/backgroundtranslationspt1) we discussed how we can use EasyNMT to translate our `.md` files into different languages. We also discussed how we can surface this functionality to the user by adding a dropdown to the markdown editor. In this post we'll discuss how we can use a background service to handle the translation tasks.
 
+See the first part of this series [here](/blog/backgroundtranslationspt1).
+
 [TOC]
 
 ## Docker Setup

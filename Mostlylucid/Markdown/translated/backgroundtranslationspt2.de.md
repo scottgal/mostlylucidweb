@@ -7,6 +7,8 @@
 
 In unserem vorherigen Beitrag [Hierher](/blog/backgroundtranslationspt1) wir diskutierten, wie wir EasyNMT verwenden können, um unsere `.md` Dateien in verschiedenen Sprachen. Wir diskutierten auch, wie wir diese Funktionalität an den Benutzer anpassen können, indem wir dem Markdown-Editor einen Dropdown hinzufügen. In diesem Beitrag werden wir besprechen, wie wir einen Hintergrunddienst verwenden können, um die Übersetzungsaufgaben zu bewältigen.
 
+Siehe den ersten Teil dieser Serie [Hierher](/blog/backgroundtranslationspt1).
+
 [TOC]
 
 ## Docker-Einrichtung
@@ -158,7 +160,7 @@ In der API überprüfen wir nun, ob der Dienst vor dem Abfeuern einer Übersetzu
     [ValidateAntiForgeryToken]
     public async Task<Results<Ok<string>, BadRequest<string>>> StartTranslation([FromBody] MarkdownTranslationModel model)
     {
-        if(backgroundTranslateService.TranslationServiceUp)
+        if(!backgroundTranslateService.TranslationServiceUp)
         {
             return TypedResults.BadRequest("Translation service is down");
         }

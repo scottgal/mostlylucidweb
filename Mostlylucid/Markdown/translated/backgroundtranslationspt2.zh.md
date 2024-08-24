@@ -7,6 +7,8 @@
 
 上任职务 [在这里](/blog/backgroundtranslationspt1) 我们讨论了我们如何利用“易NMT”来翻译我们 `.md` 不同语言的文件 。 我们还讨论了我们如何向用户展示这个功能, 在标记编辑器中添加一个下调 。 我们将讨论如何使用背景服务来完成翻译任务。
 
+见本系列的第一部分 [在这里](/blog/backgroundtranslationspt1).
+
 [技选委
 
 ## doccc 设置
@@ -158,7 +160,7 @@
     [ValidateAntiForgeryToken]
     public async Task<Results<Ok<string>, BadRequest<string>>> StartTranslation([FromBody] MarkdownTranslationModel model)
     {
-        if(backgroundTranslateService.TranslationServiceUp)
+        if(!backgroundTranslateService.TranslationServiceUp)
         {
             return TypedResults.BadRequest("Translation service is down");
         }

@@ -7,6 +7,8 @@
 
 Joten jo jonkin aikaa olen käyttänyt EasyNMT kääntää minun `.md` tiedostot eri kielille [täällä](/blog/autotranslatingmarkdownfiles)...................................................................................................................................... Olen halunnut "pinnata" tämän, jotta te kaikki voitte leikkiä sen kanssa.
 
+Katso sarjan toinen osa [täällä](/blog/backgroundtranslationspt2).
+
 Kotka on varmasti huomannut, että olen lisännyt pienen tipan alas maaliviiva-editorille.
 
 ![Pudotus](translatedropdown.png)

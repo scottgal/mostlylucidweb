@@ -7,6 +7,8 @@
 
 हमारे पिछले पोस्ट में [यहाँ](/blog/backgroundtranslationspt1) हमने चर्चा की कि हम अपने अनुवाद के लिए आसान - सेएनएमई इस्तेमाल कैसे कर सकते हैं `.md` फ़ाइल को भिन्न भाषाएँ में. हमने यह भी चर्चा की कि कैसे हम इस कार्य को उपयोक्ता के सामने डाल सकते हैं ताकि निशान के संपादक को नीचे दबा सकें । इस पोस्ट में हम चर्चा करेंगे कि कैसे हम अनुवाद कार्य को नियंत्रित करने के लिए एक पृष्ठभूमि सेवा का उपयोग कर सकते हैं।
 
+इस श्रृंखला का पहला भाग देखिए [यहाँ](/blog/backgroundtranslationspt1).
+
 [विषय
 
 ## डॉकर सेटअप
@@ -158,7 +160,7 @@
     [ValidateAntiForgeryToken]
     public async Task<Results<Ok<string>, BadRequest<string>>> StartTranslation([FromBody] MarkdownTranslationModel model)
     {
-        if(backgroundTranslateService.TranslationServiceUp)
+        if(!backgroundTranslateService.TranslationServiceUp)
         {
             return TypedResults.BadRequest("Translation service is down");
         }
