@@ -26,7 +26,7 @@ public class TranslateController(
         // Trigger translation and store the associated task
         var translationTask = await backgroundTranslateService.Translate(model);
     
-        var translateTask = new TranslateTask(taskId, model.Language, translationTask);
+        var translateTask = new TranslateTask(taskId, DateTime.Now,  model.Language, translationTask);
         translateCacheService.AddTask(userId, translateTask);
 
         // Return the task ID to the client

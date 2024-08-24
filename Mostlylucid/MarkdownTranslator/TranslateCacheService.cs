@@ -32,4 +32,4 @@ public class TranslateCacheService(IMemoryCache memoryCache)
     }
 }
 
-public record TranslateTask(string TaskId, string language, Task<TaskCompletion>? Task);
+public record TranslateTask(string TaskId,DateTime started, string language, Task<TaskCompletion>? Task);
