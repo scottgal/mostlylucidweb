@@ -8,7 +8,7 @@ In the previous parts of this series we introduced the concept of full text sear
 Previous parts:
 - [Full Text Searching with Postgres](/blog/textsearchingpt1)
 - [Search Box with Postgres](/blog/textsearchingpt11)
-- [Introduction to OpenSearch](/blog/textsearchingpt3)
+- [Introduction to OpenSearch](/blog/textsearchingpt2)
 
 In this part we'll cover how to start using you new shiny OpenSearch instance with ASP.NET Core.
 
