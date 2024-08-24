@@ -21,6 +21,12 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
         return await Task.FromResult(categories);
     }
 
+    public Task<List<BlogPostViewModel>> GetAllPosts()
+    {
+        var posts = GetPageCache().Select(x => x.Value).ToList();
+        return Task.FromResult(posts);
+    }
+
     public async Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "",
         string language = EnglishLanguage)
     {

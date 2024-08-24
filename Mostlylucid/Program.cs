@@ -4,6 +4,7 @@ using Mostlylucid.Blog;
 using Mostlylucid.Config;
 using Mostlylucid.Email;
 using Mostlylucid.MarkdownTranslator;
+using Mostlylucid.OpenSearch;
 using Mostlylucid.RSS;
 using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
@@ -31,6 +32,7 @@ services.SetupUmamiClient(config);
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 services.SetupTranslateService();
+//services.SetupOpenSearch(config);
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 services.SetupEmail(builder.Configuration);
 services.SetupRSS();
@@ -73,7 +75,7 @@ services
 var app = builder.Build();
 app.UseSerilogRequestLogging();
 
-
+//await app.SetupOpenSearchIndex();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

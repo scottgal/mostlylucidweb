@@ -12,6 +12,8 @@ public class BlogPostViewModel : BaseViewModel
     
     public string Markdown { get; set; }= string.Empty;
     
+    public DateTimeOffset UpdatedDate { get; set; }
+    
     public string[] Languages { get; set; } = Array.Empty<string>();
     
     public string HtmlContent { get; set; }= string.Empty;

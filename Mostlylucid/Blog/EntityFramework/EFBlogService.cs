@@ -55,6 +55,12 @@ public class EFBlogService(
         return postListViewModel;
     }
 
+    public async Task<List<BlogPostViewModel>> GetAllPosts()
+    {
+        var posts = await NoTrackingQuery().ToListAsync();
+        return posts.Select(p => p.ToPostModel()).ToList();
+    }
+    
     public Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "",
         string language = MarkdownBaseService.EnglishLanguage)
     {

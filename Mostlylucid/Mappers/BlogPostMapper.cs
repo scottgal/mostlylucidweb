@@ -6,7 +6,7 @@ namespace Mostlylucid.Mappers;
 
 public static class BlogPostMapper
 {
-    public static BlogPostViewModel ToPostModel(this BlogPostEntity postEntity, List<string> languages)
+    public static BlogPostViewModel ToPostModel(this BlogPostEntity postEntity, List<string>? languages = null)
     {
         return new BlogPostViewModel()
         {
@@ -17,7 +17,8 @@ public static class BlogPostMapper
             Slug = postEntity.Slug,
             Language = postEntity.LanguageEntity.Name,
             WordCount = postEntity.WordCount,
-            Languages = languages.OrderBy(x => x).ToArray(),
+            UpdatedDate = postEntity.UpdatedDate.DateTime,
+            Languages = languages?.OrderBy(x => x).ToArray() ?? Array.Empty<string>(),
             Markdown = postEntity.Markdown,
             PublishedDate = postEntity.PublishedDate.DateTime
         };
