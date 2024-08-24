@@ -209,7 +209,7 @@ This query will return us all the indexes matching the pattern `mostlylucid-blog
 
 Dev Tools in OpenSearch Dashboards is a great way to test your queries before you put them into your code.
 
-[!Dev Tools](devtools.png?width=900&quality=25)
+![Dev Tools](devtools.png?width=900&quality=25)
 
 ## Searching the Index
 Now we can start searching the index. We can use the `Search` method on the client to do this. 
