@@ -7,6 +7,12 @@
 
 La ricerca di contenuti è una parte critica di qualsiasi sito web pesante contenuto. Migliora la scopribilità e l'esperienza degli utenti. In questo post coprirò come ho aggiunto testo completo alla ricerca di questo sito
 
+Prossime parti di questa serie:
+
+- [Casella di ricerca con Postgres](/blog/textsearchingpt11)
+- [Introduzione alla ricerca aperta](/blog/textsearchingpt2)
+- [Opensearch con C#](/blog/textsearchingpt3)
+
 [TOC]
 
 # Avvicinamenti

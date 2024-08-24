@@ -7,6 +7,13 @@ In the previous parts of this series we introduced the concept of full text sear
 
 In this part we'll cover how to get OpenSearch up and running; in the next part I'll cover how to get data into opensearch and query it.
 
+Previous parts in this series:
+- [Full Text Searching with Postgres](/blog/textsearchingpt1)
+- [Search Box with Postgres](/blog/textsearchingpt11)
+
+Next parts in this series:
+- [Opensearch with C#](/blog/textsearchingpt3)
+
 [TOC]
 
 ## What is OpenSearch?

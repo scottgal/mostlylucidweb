@@ -7,6 +7,12 @@
 
 Die Suche nach Inhalten ist ein kritischer Teil von Inhalten schwere Website. Es verbessert die Auffindbarkeit und Benutzererfahrung. In diesem Beitrag werde ich abdecken, wie ich hinzugefügt Volltext Suche nach dieser Website
 
+Nächste Teile dieser Serie:
+
+- [Suchfeld mit Postgres](/blog/textsearchingpt11)
+- [Einführung in OpenSearch](/blog/textsearchingpt2)
+- [Offene Suche mit C#](/blog/textsearchingpt3)
+
 [TOC]
 
 # Ansätze

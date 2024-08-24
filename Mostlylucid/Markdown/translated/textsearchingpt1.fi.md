@@ -7,6 +7,12 @@
 
 Sisällön etsiminen on kriittinen osa mitä tahansa sisältöä painavia verkkosivuja. Se parantaa löytävyyttä ja käyttökokemusta. Tässä viestissä kirjoitan, miten lisäsin koko tekstin etsiessäni tätä sivustoa
 
+Seuraavat osat tässä sarjassa:
+
+- [Hakulaatikko, jossa postgres](/blog/textsearchingpt11)
+- [Johdatus avoimeen hakuun](/blog/textsearchingpt2)
+- [Avaa haku C#:llä](/blog/textsearchingpt3)
+
 [TÄYTÄNTÖÖNPANO
 
 # Lähestymistavat

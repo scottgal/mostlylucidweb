@@ -7,6 +7,12 @@
 
 搜索内容是任何内容重的网站的关键部分。 它提高了可发现性和用户经验。 本文将报导我如何加入搜寻网站全文的全文,
 
+本系列的下一部分:
+
+- [带有海报的搜索框](/blog/textsearchingpt11)
+- [OpenSearch 介绍介绍](/blog/textsearchingpt2)
+- [用 C # 打开搜索](/blog/textsearchingpt3)
+
 [技选委
 
 # 方法方法

@@ -6,6 +6,11 @@
 # Introduction
 Searching for content is a critical part of any content heavy website. It enhances discoverability and user experience. In this post I'll cover how I added full text searching for this site
 
+Next parts in this series:
+- [Search Box with Postgres](/blog/textsearchingpt11)
+- [Introduction to OpenSearch](/blog/textsearchingpt2)
+- [Opensearch with C#](/blog/textsearchingpt3)
+
 [TOC]
 
 # Approaches

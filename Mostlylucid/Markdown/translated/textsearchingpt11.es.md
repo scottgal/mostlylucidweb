@@ -7,6 +7,15 @@
 
 En el [último artículo](/blog/textsearchingpt1) Te mostré cómo configurar una búsqueda de texto completo usando las capacidades de búsqueda de texto completo de Postgres. Mientras desenmascaraba una búsqueda no tenía una forma de usarla, así que... era un poco provocador. En este artículo te mostraré cómo usar el api de búsqueda para buscar texto en tu base de datos.
 
+Las partes anteriores de esta serie:
+
+- [Búsqueda de texto completo con Postgres](/blog/textsearchingpt1)
+
+Las siguientes partes de esta serie:
+
+- [Introducción a OpenSearch](/blog/textsearchingpt2)
+- [Búsqueda abierta con C#](/blog/textsearchingpt3)
+
 Esto añadirá un pequeño cuadro de búsqueda a la cabecera del sitio que permitirá a los usuarios buscar texto en las publicaciones del blog.
 
 ![Buscar](searchbox.png?format=webp&quality=25)
