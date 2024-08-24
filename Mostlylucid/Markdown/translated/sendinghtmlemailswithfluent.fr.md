@@ -3,7 +3,7 @@
 <datetime class="hidden">2024-08-07T00:30</datetime>
 
 <!--category-- ASP.NET, FluentEmail -->
-Il s'agit d'un article assez simple, mais qui couvrira une partie de l'utilisation[Courriel fluide](https://github.com/lukencode/FluentEmail)dans ASP.NET Core pour envoyer des courriels HTML Je n'ai pas vu ailleurs.
+Il s'agit d'un article assez simple, mais qui couvrira une partie de l'utilisation [Courriel fluide](https://github.com/lukencode/FluentEmail) dans ASP.NET Core pour envoyer des courriels HTML Je n'ai pas vu ailleurs.
 
 ## Le problème
 
@@ -55,7 +55,7 @@ public static class Setup
 
 Paramètres ##SMTP
 
-Comme vous le verrez, j'ai également utilisé la méthode IConfigSection mentionnée dans mon[article précédent](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco)pour obtenir les paramètres SMTP.
+Comme vous le verrez, j'ai également utilisé la méthode IConfigSection mentionnée dans mon [article précédent](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco) pour obtenir les paramètres SMTP.
 
 ```csharp
   var smtpSettings = services.ConfigurePOCO<SmtpSettings>(config.GetSection(SmtpSettings.Section));
@@ -83,7 +83,7 @@ Cela vient du fichier appsettings.json:
 
 ## GMAIL / Google SMTP
 
-Note: Pour Google SMTP si vous utilisez MFA (que vous**Vraiment*au cas où vous auriez besoin de faire un[mot de passe de l'application pour votre compte](https://myaccount.google.com/apppasswords).
+Note: Pour Google SMTP si vous utilisez MFA (que vous **Vraiment* au cas où vous auriez besoin de faire un [mot de passe de l'application pour votre compte](https://myaccount.google.com/apppasswords).
 
 Pour dev local, vous pouvez ajouter ceci à votre fichier secret.json :
 
@@ -120,11 +120,40 @@ docker compose config
 
 Pour vous montrer à quoi ressemble le fichier avec ces injectés.
 
+## Annoyances d'email fluide
+
+Un problème avec Fluent Email est que vous devez ajouter ceci à votre csproj
+
+```xml
+  <PropertyGroup>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
+```
+
+C'est parce que FluentEmail utilise RazorLight qui a besoin de cela pour fonctionner.
+
+Pour les fichiers modèles, vous pouvez soit les inclure dans votre projet en tant que fichiers Contenu ou comme je le fais dans le conteneur Docker, copiez les fichiers à l'image finale
+
+```yaml
+FROM build AS publish
+RUN dotnet publish "Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+
+COPY --from=publish /app/publish .
+# Copy the Markdown directory
+COPY ./Mostlylucid/Markdown /app/Markdown
+COPY ./Mostlylucid/Email/Templates /app/Email/Templates
+# Switch to a non-root user
+USER $APP_UID
+```
+
 ## Service de courrier électronique
 
 Retournez au code!
 
-Maintenant nous avons tout configuré nous pouvons ajouter le service d'email. Il s'agit d'un service simple qui prend un modèle et envoie un e-mail:
+Maintenant nous avons tout mis en place, nous pouvons ajouter le service d'email. Il s'agit d'un service simple qui prend un modèle et envoie un courriel:
 
 ```csharp
 public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
@@ -169,7 +198,7 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 }
 ```
 
-Comme vous pouvez le voir ici, nous avons deux méthodes, l'une pour les commentaires et l'autre pour le formulaire de contact ([Envoyez-moi un courrier!](/contact)Dans cette application, je vous fais vous connecter afin que je puisse obtenir le courrier de (et pour éviter le spam).
+Comme vous pouvez le voir ici, nous avons deux méthodes, l'une pour les commentaires et l'autre pour le formulaire de contact ([Envoyez-moi un courrier!](/contact) )............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................. Dans cette application, je vous fais vous connecter afin que je puisse obtenir le courrier de (et pour éviter le spam).
 
 La plupart du travail est fait ici :
 

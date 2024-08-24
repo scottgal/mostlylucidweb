@@ -5,7 +5,7 @@
 
 ## 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
-令我对目前设置感到不快的一件事是,我不得不使用谷歌分析工具获取访问者数据(其中有多少????????? 。 )所以我想找到一些可以自我主机的东西,没有将数据传送到谷歌或其他第三方。 我找到了一些可以自我主机的东西,没有将数据传送到谷歌或其他第三方。[木美](https://umami.is/)这是一个简单、自我托管的网络分析解决方案。它是谷歌分析的伟大替代方案,并且(相对而言)很容易建立。
+利用谷歌分析工具获取访问者数据(究竟有多少?? ) 。 所以我想找到一些可以自我主机的东西, 没有将数据传送到谷歌或其他第三方。 我发现 [木美](https://umami.is/) 这是一个简单、自我托管的网络分析解决方案。 这是谷歌分析的绝佳替代方法 并且(相对而言)很容易建立
 
 [技选委
 
@@ -15,7 +15,7 @@
 
 ### docker 合成器
 
-我想把乌玛美 加入我目前的套套套中 我需要为我的新服务`docker-compose.yml`。 我将以下内容添加到文件底部 :
+我想把乌玛美 加入我目前的套套套中 我需要为我的新服务 `docker-compose.yml` 文件。 我在文件底部添加了以下内容:
 
 ```yaml
   umami:
@@ -63,8 +63,8 @@
 
 此 docker-competect. yml 文件包含以下设置 :
 
-1. 名为新服务的新服务`umami`使用`ghcr.io/umami-software/umami:postgresql-latest`此服务用于运行 Umami 分析服务 。
-2. 名为新服务的新服务`db`使用`postgres:16-alpine`此服务用于运行Umami用来存储数据的Postgres数据库。
+1. 名为新服务的新服务 `umami` 使用 `ghcr.io/umami-software/umami:postgresql-latest` 图像。 此服务用于运行 Umami 分析服务 。
+2. 名为新服务的新服务 `db` 使用 `postgres:16-alpine` 图像。 此服务用于运行Umami用来存储数据的Postgres数据库。
    此服务的注释, 我将它映射到服务器上的目录上, 这样数据会在重新启动之间持续 。
 
 ```yaml
@@ -72,17 +72,17 @@
       - /mnt/umami/postgres:/var/lib/postgresql/data
 ```
 
-您需要这位导演的存在, 并可以被服务器上的docker用户写写( 而不是Linux专家, 所以777人可能在这里超杀!) )!
+您需要这位导演的存在 并且可以被您服务器上的docker用户写写( 也不是Linux专家, 所以777在这里可能太过杀!) )
 
 ```shell
 chmod 777 /mnt/umami/postgres
 ```
 
-3. 名为新服务的新服务`cloudflaredumami`使用`cloudflare/cloudflared:latest`图像 。 此服务用于通过 Cloudflare 通过 Cloudflare 隧道连接 Umami 服务, 以便从互联网上访问它 。
+3. 名为新服务的新服务 `cloudflaredumami` 使用 `cloudflare/cloudflared:latest` 图像。 使用这项服务,通过云花为乌马米服务铺路,以便从互联网上接入。
 
 ### 信封文件
 
-为支持这一支持,我还更新了`.env`包括以下文件:
+为支持这一支持,我还更新了 `.env` 包括以下文件:
 
 ```shell
 CLOUDFLARED_UMAMI_TOKEN=<cloudflaretoken>
@@ -100,7 +100,7 @@ UMAMI_PASS=${POSTGRES_PASSWORD}
 DATABASE_URL=postgresql://${UMAMI_USER}:${UMAMI_PASS}@db:5432/${POSTGRES_DB}
 ```
 
-这将设置 docker 曲组的配置( the`<>`elemets 显然需要替换为您自己的值 。`cloudflaredumami`服务用于通过云雾隧道连接 Umami 服务, 以便从互联网上访问它。 使用 BASE_ PATH 是可能的, 但对于 Umami 来说, 它讨厌地需要重建来改变基础路径, 因此我离开它作为现在的根路径 。
+这将设置 docker 曲组的配置( the `<>` elemets显然需要用你自己的数值取代。 缩略 `cloudflaredumami` 服务用于通过云层隧道连接Umami服务,以便从互联网上接入。 使用BASE_PATH是有可能的, 但对于Umami来说,它讨厌地需要重建 来改变基本路径, 所以我已经离开它作为现在的根路径。
 
 ### Cloudflare Cloudflare 隧道
 
@@ -108,11 +108,11 @@ DATABASE_URL=postgresql://${UMAMI_USER}:${UMAMI_PASS}@db:5432/${POSTGRES_DB}
 
 ![Cloudflare Cloudflare 隧道](umamisetup.png)
 
-设置通向Umami服务的隧道, 并允许它从互联网上接入。 注意, 我将它指向`umami`在 docker- comption 文件中的服务( 它与云点隧道的网络相同, 是一个有效名称 ) 。
+建立通向Umami服务的隧道, 注意,我指出 `umami` 在 docker- comption 文件中的服务( 它与云点隧道的网络相同, 是一个有效名称 ) 。
 
 ### 页面中的 Umami 设置
 
-启用脚脚脚脚脚的路径`getinfo`我在上面的设置中增加了一个配置条目。
+启用脚脚脚脚脚的路径 `getinfo` 我在上面的设置中增加了一个配置条目。
 
 ```json
  "Analytics":{
@@ -140,7 +140,7 @@ ANALYTICS_WEBSITEID="32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
       - Analytics__WebsiteId=${ANALYTICS_WEBSITEID}
 ```
 
-当您设置网站时, 您可以在 Umami 仪表板上设置网站标识 。 (注意 Umami 服务的默认用户名和密码是 Umami 服务默认用户名和密码 。`admin`和`umami`,你需要改变这些设置后)。
+当你设置网站时,你在Umami仪表板上设置了网站。 (注意 Umami 服务的默认用户名和密码是 `admin` 和 `umami`,你需要改变这些设置后)。
 ![Umami 仪表板](umamiaddwebsite.png)
 
 相关设置 cs 文件 :
@@ -160,7 +160,7 @@ public class AnalyticsSettings : IConfigSection
 builder.Configure<AnalyticsSettings>();
 ```
 
-终于在我的`BaseController.cs` `OnGet`我添加了以下方法来设置分析脚本的路径 :
+终于在我的 `BaseController.cs` `OnGet` 我添加了以下方法来设置分析脚本的路径 :
 
 ```csharp
    public override void OnActionExecuting(ActionExecutingContext filterContext)
@@ -199,4 +199,4 @@ localStorage.setItem("umami.disabled", 1)
 
 ## 结论 结论 结论 结论 结论
 
-这是一个有点虚构的设置, 但我对结果很满意。 我现在有一个自办的解析服务, 它不会将数据传送到谷歌或其他第三方。 设置起来有点麻烦, 但是一旦完成, 它就很容易使用。 我对结果很满意, 并且会推荐给任何寻找自办解析解决方案的人 。
+这是一个有点虚构的设置 但我对结果很满意 我现在有一个自办的分析服务 不将数据传送给谷歌或其他第三方 设置起来有点麻烦 但一旦完成 使用起来就很容易了 我对结果很满意 并且会推荐给任何 寻找自我赞助的 分析解决方案的人

@@ -3,19 +3,19 @@
 <datetime class="hidden">2024-08-01T01:00</datetime>
 
 <!--category-- Docker, ImageSharp -->
-ImageSharp ist eine großartige Bibliothek für die Arbeit mit Bildern in.NET. Es ist schnell, einfach zu bedienen und hat viele Funktionen. In diesem Beitrag werde ich Ihnen zeigen, wie man ImageSharp mit Docker verwenden, um einen einfachen Bildverarbeitungsservice zu erstellen.
+ImageSharp ist eine großartige Bibliothek für die Arbeit mit Bildern in.NET. Es ist schnell, einfach zu bedienen und hat viele Funktionen. In diesem Beitrag werde ich Ihnen zeigen, wie Sie ImageSharp mit Docker verwenden, um einen einfachen Bildverarbeitungsservice zu erstellen.
 
 ## Was ist ImageSharp?
 
 ImageSharp ermöglicht es mir, nahtlos mit Bildern in.NET zu arbeiten. Es ist eine plattformübergreifende Bibliothek, die eine Vielzahl von Bildformaten unterstützt und eine einfache API für die Bildverarbeitung bietet. Es ist schnell, effizient und einfach zu bedienen.
 
-Allerdings gibt es ein Problem in meinem Setup mit Docker und ImageSharp. Wenn ich versuche, ein Bild aus einer Datei zu laden, bekomme ich den folgenden Fehler:
+Allerdings gibt es ein Problem in meinem Setup mit Docker und ImageSharp. Wenn ich versuche, ein Bild aus einer Datei zu laden, bekomme ich folgenden Fehler:
 'Zugriff verweigert auf den Pfad /wwroot/cache/ etc...'
 Dies wird durch Docker ASP.NET Installationen verursacht, die keinen Schreibzugriff auf das Cache-Verzeichnis erlauben ImageSharp verwendet, um temporäre Dateien zu speichern.
 
 ## Lösung
 
-Die Lösung besteht darin, ein Volumen in den Docker-Container einzubinden, das auf ein Verzeichnis auf dem Host-Rechner verweist. So kann die ImageSharp-Bibliothek ohne Probleme in das Cache-Verzeichnis schreiben.
+Die Lösung besteht darin, ein Volumen im Docker-Container zu montieren, das auf ein Verzeichnis auf der Host-Maschine zeigt. Auf diese Weise kann die ImageSharp-Bibliothek ohne Probleme in das Cache-Verzeichnis schreiben.
 
 Hier ist, wie es zu tun:
 

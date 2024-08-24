@@ -5,24 +5,24 @@
 
 ## Einleitung
 
-Markdown ist eine leichte Markup-Sprache, die Sie verwenden können, um Formatierungselemente zu Klartexttextdokumenten hinzuzufügen. Erstellt von John Gruber im Jahr 2004, ist Markdown jetzt eine der weltweit beliebtesten Markup-Sprachen.
+Markdown ist eine leichte Markup-Sprache, die Sie verwenden können, um Formatierungselemente zu Klartexttextdokumenten hinzuzufügen. Markdown wurde 2004 von John Gruber gegründet und ist heute eine der beliebtesten Markup-Sprachen der Welt.
 
-Auf dieser Website benutze ich einen super einfachen Ansatz, um Blogging, versucht und versäumt, einen Blog in der Vergangenheit zu pflegen Ich wollte es so einfach wie möglich zu schreiben und veröffentlichen Beiträge. Ich verwende Markdown, um meine Beiträge zu schreiben und diese Website hat einen einzigen Service mit[Markdig](https://github.com/xoofx/markdig)zum Konvertieren des Markdowns in HTML.
+Auf dieser Seite benutze ich einen super einfachen Ansatz zum Bloggen, nachdem ich versucht und versäumt habe, einen Blog in der Vergangenheit zu pflegen, wollte ich es so einfach wie möglich machen, Beiträge zu schreiben und zu veröffentlichen. Ich benutze Markdown, um meine Beiträge zu schreiben und diese Website hat einen einzigen Dienst mit [Markdig](https://github.com/xoofx/markdig) zum Konvertieren des Markdowns in HTML.
 
 [TOC]
 
 ## Warum nicht ein Static Site Generator?
 
-In einem Wort Einfachheit. Dies wird nicht eine super hohe Traffic-Website sein, Ich benutze ASP.NET OutPutCache, um die Seiten zu verbergen und ich werde nicht zu aktualisieren, dass oft. Ich wollte die Website so einfach wie möglich zu halten und nicht über den Overhead eines statischen Website-Generator sowohl in Bezug auf den Build-Prozess und die Komplexität der Website kümmern.
+In einem Wort Einfachheit. Dies wird nicht eine super hohe Traffic-Site sein, ich benutze ASP.NET OutPutCache, um die Seiten zu verbergen und ich werde es nicht so oft aktualisieren. Ich wollte die Website so einfach wie möglich zu halten und nicht über den Overhead eines statischen Seitengenerators sowohl in Bezug auf den Build-Prozess und die Komplexität der Website kümmern.
 
-Zur Klärung; statische Standortgeneratoren wie[Hugo](https://gohugo.io/) / [Jekyll](https://jekyllrb.com/)etc...kann eine gute Lösung für viele Websites sein, aber für diese wollte ich es so einfach halten*für mich*Ich bin ein 25-jähriger ASP.NET Veteran, also verstehen Sie es innerhalb und außerhalb. Diese Website-Design fügt Komplexität; Ich habe Ansichten, Dienste, Controller und eine große Menge von manuellen HTML & CSS, aber ich fühle mich damit wohl.
+Zur Klärung; statische Standortgeneratoren wie [Hugo](https://gohugo.io/) / [Jekyll](https://jekyllrb.com/) etc...kann eine gute Lösung für viele Websites sein, aber für diese wollte ich es so einfach halten *für mich* ............................................................................................................................................................................................................................................................... Ich bin ein 25-jähriger ASP.NET-Veteran, also verstehen Sie es innen und außen. Diese Website-Design fügt Komplexität; Ich habe Ansichten, Dienste, Controller und eine große Menge von manuellen HTML & CSS, aber ich fühle mich damit wohl.
 
 ## Warum nicht eine Datenbank?
 
-1. Simplicty of design; Datenbanken sind leistungsfähige Systeme zum Speichern von Daten (und ich werde eine für Kommentare in Kürze hinzufügen), aber sie fügen auch Komplexität hinzu.*korrekt*Datenbanken vor allem in einer ASP.NET Anwendung verwenden, fügen Sie eine LOT Code, egal ob Sie verwenden[EF-Kern](https://learn.microsoft.com/en-us/ef/core/), [Dapper](https://github.com/DapperLib/Dapper)oder roh SQL mit ADO.NET. Ich wollte die Website so einfach wie möglich halten*zu Beginn mit*.
-2. Diese Website soll zeigen, wie einfach Docker & Docker Compose sein kann, um eine Website zu betreiben. Ich kann die Website aktualisieren, indem ich neuen Code (einschließlich Inhalt) auf GitHub einchecke, die Aktion läuft, baut das Bild dann die Watchtower-Methode in meinem Docker komponiere Datei aktualisiert das Site-Image automatisch. Dies ist eine sehr einfache Weise, eine Website zu aktualisieren, und ich wollte es so halten.
-3. Duplikate ausführen; da ich ZERO-Daten habe, die nicht im Docker-Image enthalten sind, bedeutet das, dass ich EASILY genaue Duplikate lokal ausführen kann (auf meinem kleinen Ubuntu-Cluster hier zu Hause).[wenn ich die ImageSharp-Änderungen vorgenommen habe](/blog/imagesharpwithdocker)) vor dem Einsatz auf der Live-Site.
-4. Weil ich nicht wollte! Ich wollte sehen, wie weit ich mit einem einfachen Website-Design zu bekommen und so weit bin ich ziemlich glücklich mit ihm.
+1. Einfachheit des Designs; Datenbanken sind leistungsfähige Systeme für die Speicherung von Daten (und ich werde eine für Kommentare in Kürze hinzufügen), aber sie fügen auch Komplexität hinzu. Zu *korrekt* Datenbanken vor allem in einer ASP.NET Anwendung verwenden, fügen Sie eine LOT Code, egal ob Sie verwenden [EF-Kern](https://learn.microsoft.com/en-us/ef/core/), [Dapper](https://github.com/DapperLib/Dapper) oder roh SQL mit ADO.NET. Ich wollte die Website so einfach wie möglich halten *zu Beginn mit*.
+2. Einfache Aktualisierung und Bereitstellung. Diese Seite soll zeigen, wie einfach Docker & Docker Compose sein kann, um eine Website zu betreiben. Ich kann die Seite aktualisieren, indem ich neuen Code (einschließlich Inhalt) auf GitHub einchecke, die Aktion läuft, das Bild erstellt, dann die Wachtturm-Methode in meinem Docker komponiere Datei aktualisiert das Site-Image automatisch. Dies ist ein sehr einfacher Weg, um eine Website zu aktualisieren, und ich wollte es so zu halten.
+3. Duplikate ausführen; da ich ZERO-Daten habe, die nicht im Docker-Image enthalten sind, kann ich EASILY exakte Duplikate lokal ausführen (auf meinem kleinen Ubuntu-Cluster hier zu Hause). Dies ist ein guter Weg, um Änderungen mit docker (z.B., [wenn ich die ImageSharp-Änderungen vorgenommen habe](/blog/imagesharpwithdocker) ) vor dem Einsatz auf der Live-Site.
+4. Weil ich es nicht wollte! Ich wollte sehen, wie weit ich mit einem einfachen Website-Design kommen konnte und bin bisher ziemlich zufrieden damit.
 
 ## Wie schreiben Sie Ihre Beiträge?
 
@@ -41,13 +41,13 @@ flowchart LR
 
 ## Wie fügen Sie Bilder hinzu?
 
-Da ich gerade das Bild hier hinzugefügt habe, werde ich Ihnen zeigen, wie ich es gemacht habe. Ich habe das Bild einfach in den Ordner wwwroot/articleimages eingefügt und in der Markdown-Datei wie folgt referenziert:
+Da ich gerade das Bild hier hinzugefügt habe, werde ich Ihnen zeigen, wie ich es gemacht habe. Ich habe das Bild einfach zum Ordner wwwroot/articleimages hinzugefügt und in der Markdown-Datei wie folgt referenziert:
 
 ```markdown
 ![setascontent.png](setascontent.png)
 ```
 
-Ich füge dann eine Erweiterung zu meiner Markdig Pipeline hinzu, die diese auf die korrekte URL umschreibt (alles über Einfachheit).[Siehe hier für den Quellcode für die Erweiterung.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
+Ich füge dann eine Erweiterung zu meiner Markdig Pipeline hinzu, die diese auf die korrekte URL umschreibt (alles über Einfachheit). [Siehe hier für den Quellcode für die Erweiterung.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
 
 ```csharp
 using Markdig;
@@ -81,11 +81,10 @@ public class ImgExtension : IMarkdownExtension
 
 Der BlogService ist ein einfacher Dienst, der die Markdown-Dateien aus dem Markdown-Ordner liest und mit Markdig in HTML konvertiert.
 
-Die vollständige Quelle dafür ist unten und[Hierher](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/BlogService.cs).
+Die vollständige Quelle dafür ist unten und [Hierher](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/BlogService.cs).
 
 <details>
 <summary>Click to see the source code for the BlogService</summary>
-
 ```csharp
 
 using System.Globalization;
@@ -310,7 +309,7 @@ Der Code, um die Markdown-Dateien in HTML zu verarbeiten, ist ziemlich einfach, 
 Die GetPage-Methode wird verwendet, um den Inhalt der Markdown-Datei zu extrahieren, es hat ein paar Schritte:
 
 1. Den Titel extrahieren
-   Durch Konvention verwende ich die erste Zeile der Markdown-Datei als Titel des Posts. So kann ich einfach tun:
+   Durch Konvention verwende ich die erste Zeile der Markdown-Datei als Titel des Posts. So kann ich es einfach tun:
 
 ```csharp
         var lines = File.ReadAllLines(page);
@@ -448,7 +447,7 @@ public (string title, string slug, DateTime publishDate, string processed, strin
 ```
 
 </details>
-Der Code unten zeigt, wie ich die Liste der Blog-Posts zu generieren, es verwendet die`GetPage(page, false)`Methode zum Extrahieren des Titels, der Kategorien, des veröffentlichten Datums und des verarbeiteten Inhalts.
+Der Code unten zeigt, wie ich die Liste der Blog-Posts zu generieren, es verwendet die `GetPage(page, false)` Methode zum Extrahieren des Titels, der Kategorien, des veröffentlichten Datums und des verarbeiteten Inhalts.
 
 ```csharp
      public List<PostListModel> GetPosts(string[] pages)

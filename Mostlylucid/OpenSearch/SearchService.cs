@@ -10,27 +10,46 @@ public class SearchService(OpenSearchClient client, ILogger<SearchService> logge
     {
         var indexName = GetBlogIndexName(language);
         var searchResponse = await client.SearchAsync<BlogIndexModel>(s => s
-                .Index(indexName)  // Match index pattern
-                .Query(q => q
-                    .Bool(b => b
-                        .Must(m => m
-                            .MultiMatch(mm => mm
-                                .Query(query)
-                                .Fields(f => f
-                                    .Field(p => p.Title, boost: 2.0) 
-                                    .Field(p => p.Categories, boost: 1.5) 
-                                    .Field(p => p.Content)
-                                )
-                                .Type(TextQueryType.BestFields)
-                                .Fuzziness(Fuzziness.Auto)
+            .Index(indexName)
+            .Source(src => src
+                .Includes(i => i
+                    .Fields(f => f.Title, f => f.Categories, f => f.Slug)
+                )
+            )
+            .Skip((page-1) * pageSize)  
+            .Size(pageSize) 
+            .Query(q => q
+                .Bool(b => b
+                    .Should(
+                        sh => sh.MultiMatch(mm => mm
+                            .Query(query)
+                            .Fields(f => f
+                                    .Field(p => p.Title, 2.0)  // Boost title
+                                    .Field(p => p.Categories, 2.5)  // Boost categories
+                                    .Field(p => p.Content)  // No boost for content
                             )
+                            .Type(TextQueryType.BestFields)
+                            .Fuzziness(Fuzziness.Auto)
+                        ),
+                        sh => sh.Prefix(pf => pf
+                            .Field(p => p.Content)
+                            .Value(query)
+                       
+                        ),
+                        sh => sh.Prefix(pf => pf
+                            .Field(p => p.Title)
+                            .Value(query)
+                            .Boost(2.0)
+                        ),
+                        sh => sh.Prefix(pf => pf
+                            .Field(p => p.Categories)
+                            .Value(query)
+                            .Boost(2.5)
                         )
                     )
                 )
-                .Skip((page -1) * pageSize)  // Skip the first n results (adjust as needed)
-                .Size(pageSize)  // Limit the number of results (adjust as needed)
+            )
         );
-
         if(!searchResponse.IsValid)
         {
             logger.LogError("Failed to search index {IndexName}: {Error}", indexName, searchResponse.DebugInformation);

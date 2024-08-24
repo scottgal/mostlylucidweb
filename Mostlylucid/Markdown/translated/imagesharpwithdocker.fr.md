@@ -7,7 +7,7 @@ ImageSharp est une excellente bibliothèque pour travailler avec des images dans
 
 ## Qu'est-ce que ImageSharp?
 
-ImageSharp me permet de travailler parfaitement avec les images dans.NET. C'est une bibliothèque multiplateforme qui prend en charge une large gamme de formats d'image et fournit une API simple pour le traitement d'image. C'est rapide, efficace et facile à utiliser.
+ImageSharp me permet de travailler parfaitement avec les images en.NET. Il s'agit d'une bibliothèque multiplateforme qui prend en charge une large gamme de formats d'images et fournit une API simple pour le traitement d'images. C'est rapide, efficace et facile à utiliser.
 
 Cependant, il y a un problème dans ma configuration en utilisant docker et ImageSharp. Lorsque j'essaie de charger une image à partir d'un fichier, j'obtiens l'erreur suivante:
 'Accès refusé au chemin /wwroot/cache/ etc...'
@@ -15,7 +15,7 @@ Ceci est causé par les installations Docker ASP.NET ne permettant pas l'accès 
 
 ## Solution
 
-La solution est de monter un volume dans le conteneur docker qui pointe vers un répertoire sur la machine hôte. Ainsi, la bibliothèque ImageSharp peut écrire dans le répertoire cache sans aucun problème.
+La solution est de monter un volume dans le conteneur docker qui pointe vers un répertoire sur la machine hôte. De cette façon, la bibliothèque ImageSharp peut écrire dans le répertoire cache sans aucun problème.
 
 Voici comment le faire :
 
@@ -26,7 +26,7 @@ volumes:
 - /mnt/imagecache:/app/wwwroot/cache
 ```
 
-Ici, vous voyez que je map le fichier /app/wwwroot/cache dans un répertoire local sur ma machine hôte. De cette façon, ImageSharp peut écrire dans le répertoire cache sans aucun problème.
+Ici, vous voyez que je map le fichier /app/wwwroot/cache vers un répertoire local sur ma machine hôte. De cette façon, ImageSharp peut écrire dans le répertoire cache sans aucun problème.
 
 Sur ma machine Ubuntu, j'ai créé un répertoire /mnt/imagecache puis lancé la commande folowing pour la rendre lisible (par n'importe qui, je sais que ce n'est pas sécurisé mais je ne suis pas un gourou Linux :)
 

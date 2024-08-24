@@ -3,7 +3,7 @@
 <datetime class="hidden">2024-07-30T13:30</datetime>
 
 <!--category-- Docker -->
-Docker Compose ist ein Tool zum Definieren und Ausführen von Multi-Container Docker-Anwendungen. Mit Compose verwenden Sie eine YAML-Datei, um die Dienste Ihrer Anwendung zu konfigurieren. Dann erstellen und starten Sie mit einem einzigen Befehl alle Dienste aus Ihrer Konfiguration.
+Docker Compose ist ein Tool zur Definition und Ausführung von Multi-Container Docker-Anwendungen. Mit Compose konfigurieren Sie die Dienste Ihrer Anwendung mit einer YAML-Datei. Dann erstellen und starten Sie mit einem einzigen Befehl alle Dienste aus Ihrer Konfiguration.
 
 Im Moment benutze ich Docker Compose, um ein paar Dienste auf meinem Server auszuführen.
 
@@ -11,7 +11,7 @@ Im Moment benutze ich Docker Compose, um ein paar Dienste auf meinem Server ausz
 - Cloudflared - ein Dienst, der den Datenverkehr zu meinem Server tunnelt
 - Der Wachtturm - ein Dienst, der auf Updates in meinen Containern überprüft und sie bei Bedarf neu startet.
 
-Hier ist die`docker-compose.yml`Datei, die ich benutze, um diese Dienste auszuführen:
+Hier ist die `docker-compose.yml` Datei, die ich benutze, um diese Dienste auszuführen:
 
 ```yaml
 services:

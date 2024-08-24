@@ -3,13 +3,13 @@
 <datetime class="hidden">2024-08-07T00:30</datetime>
 
 <!--category-- ASP.NET, FluentEmail -->
-Este es un artículo bastante simple, pero cubrirá algo de la odness de usar[FluentEmail](https://github.com/lukencode/FluentEmail)en ASP.NET Core para enviar correos HTML que no he visto en otra parte.
+Este es un artículo bastante simple, pero cubrirá algo de la odness de usar [FluentEmail](https://github.com/lukencode/FluentEmail) en ASP.NET Core para enviar correos HTML que no he visto en otra parte.
 
 ## El problema
 
 Enviar correos HTML es en sí mismo un poco simple con SmtpClient, pero no es muy flexible y no soporta cosas como plantillas o adjuntos. FluentEmail es una gran biblioteca para esto, pero no siempre está claro cómo usarlo en ASP.NET Core.
 
-FluentEmail con Razorlight (está integrado) te permite plantillar tus emails usando la sintaxis de Razor. Esto es genial ya que te permite usar todo el poder de Razor para crear tus emails.
+FluentEmail con Razorlight (está integrado) te permite plantillar tus emails usando la sintaxis de Razor. Esto es genial, ya que le permite utilizar todo el poder de Razor para crear sus correos electrónicos.
 
 ## La solución
 
@@ -55,7 +55,7 @@ public static class Setup
 
 Configuración ##SMTP
 
-Como verás, también utilicé el método IConfigSection mencionado en mi[Artículo anterior](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco)para obtener la configuración SMTP.
+Como verás, también utilicé el método IConfigSection mencionado en mi [Artículo anterior](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco) para obtener la configuración SMTP.
 
 ```csharp
   var smtpSettings = services.ConfigurePOCO<SmtpSettings>(config.GetSection(SmtpSettings.Section));
@@ -83,7 +83,7 @@ Esto viene del archivo appsettings.json:
 
 ## GMAIL / Google SMTP
 
-Nota: Para Google SMTP si utiliza MFA (que usted**¿En serio?*Si necesitas hacer un[contraseña de aplicación para tu cuenta](https://myaccount.google.com/apppasswords).
+Nota: Para Google SMTP si utiliza MFA (que usted **¿En serio?* Si necesitas hacer un [contraseña de aplicación para tu cuenta](https://myaccount.google.com/apppasswords).
 
 Para dev local, puede añadir esto a su archivo secrets.json:
 
@@ -112,7 +112,7 @@ services:
       - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
 ```
 
-Tome una nota del espaciado, ya que esto puede realmente lío con docker componer. Para comprobar lo que se inyecta se puede utilizar
+Tome una nota de la separación, ya que esto puede realmente lío con docker componer. Para comprobar lo que se inyecta se puede utilizar
 
 ```bash
 docker compose config
@@ -120,11 +120,40 @@ docker compose config
 
 Para mostrarte cómo se ve el archivo con estos inyectados.
 
+## Incomodidades de FluentEmail
+
+Un problema con Fluent Email es que usted necesita agregar esto a su csproj
+
+```xml
+  <PropertyGroup>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
+```
+
+Esto es porque FluentEmail utiliza RazorLight que necesita esto para funcionar.
+
+Para los archivos de plantilla, puede incluirlos en su proyecto como archivos de contenido o como lo hago en el contenedor Docker, copiar los archivos a la imagen final
+
+```yaml
+FROM build AS publish
+RUN dotnet publish "Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+
+COPY --from=publish /app/publish .
+# Copy the Markdown directory
+COPY ./Mostlylucid/Markdown /app/Markdown
+COPY ./Mostlylucid/Email/Templates /app/Email/Templates
+# Switch to a non-root user
+USER $APP_UID
+```
+
 ## Servicio de correo electrónico
 
 ¡De acuerdo, de vuelta al código!
 
-Ahora lo tenemos todo configurado podemos agregar el Servicio de Email. Este es un servicio simple que toma una plantilla y envía un correo electrónico:
+Ahora lo tenemos todo configurado podemos agregar el servicio de correo electrónico. Este es un servicio simple que toma una plantilla y envía un correo electrónico:
 
 ```csharp
 public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
@@ -169,7 +198,7 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 }
 ```
 
-Como se puede ver aquí tenemos dos métodos, uno para los comentarios y otro para el formulario de contacto ([¡Envíame un correo!](/contact)En esta aplicación te hago iniciar sesión para que pueda obtener el correo del que es (y para evitar el spam).
+Como se puede ver aquí tenemos dos métodos, uno para los comentarios y otro para el formulario de contacto ([¡Envíame un correo!](/contact) ). En esta aplicación te hago iniciar sesión para que pueda obtener el correo que es de (y para evitar el spam).
 
 Realmente la mayor parte del trabajo se hace aquí:
 
@@ -208,7 +237,7 @@ Aquí abrimos un archivo de plantilla, añadimos el modelo que contiene el conte
 </html>
 ```
 
-Estos se almacenan como archivos.template en la carpeta Email/Templates. Puede utilizar archivos.cshtml pero causa un problema con la etiqueta @Raw en la plantilla (es una cosa de luz de afeitar).
+Estos se almacenan como archivos.template en la carpeta Email/Templates. Usted puede utilizar archivos.cshtml pero causa un problema con la etiqueta @Raw en la plantilla (es una cosa de luz de afeitar).
 
 ## El Contralor
 

@@ -5,11 +5,11 @@
 
 ## Puestos pequeños FTW
 
-Solución pequeña pero potencialmente útil a un problema que estaba teniendo. Es decir, cómo generar un GUID a partir de una entrada de cadena donde el Guid es siempre válido pero único para cualquier cadena de entrada dada.
+Pequeña pero potencialmente útil solución a un problema que estaba teniendo. Es decir, cómo generar un GUID a partir de una entrada de cadena donde el Guid es siempre válido pero único para cualquier cadena de entrada dada.
 
-Necesitaba esto para mi[Generador de alimentación RSS](/blog/addinganrssfilewithaspnetcore)donde quería generar una GUIA para cada elemento en la fuente que era repetible pero único para cada elemento.
+Necesitaba esto para mi [Generador de alimentación RSS](/blog/addinganrssfilewithaspnetcore) donde quería generar una GUIA para cada elemento en la fuente que era repetible pero único para cada elemento.
 
-Resulta que la`XxHash128`es un poco perfecto para esto, ya que siempre da un hash de 128 bits (o 16 bytes). Esto significa que se puede utilizar para generar un GUID a partir de una entrada de cadena sin 'Array'.
+Resulta que la `XxHash128` es un poco perfecto para esto, ya que siempre da un hachís de 128 bits (o 16 bytes). Esto significa que se puede utilizar para generar un GUID a partir de una entrada de cadena sin 'Array'.Copiar tonterías.
 
 ```csharp
      public  static string ToGuid(this string  name)
@@ -22,8 +22,8 @@ Resulta que la`XxHash128`es un poco perfecto para esto, ya que siempre da un has
     }
 ```
 
-Este es un método de extensión simple que toma una entrada de cadena y devuelve una GUID.`XxHash128`es de la`System.IO.Hashing`espacio de nombres.
+Este es un método de extensión simple que toma una entrada de cadena y devuelve una GUID. Los `XxHash128` es de la `System.IO.Hashing` espacio de nombres.
 
-Por supuesto, puede utilizar cualquier algoritmo de hashing que da un hash de 128 bit.`XxHash128`es sólo una buena opción, ya que es rápido y da una buena distribución de valores de hash.
+Usted puede, por supuesto, utilizar cualquier algoritmo de hashing que da un hash de 128 bits. Los `XxHash128` es sólo una buena opción, ya que es rápido y da una buena distribución de valores de hash.
 
-También podría devolver un`new Guid(<string>)`de esto para obtener un Guid real que se puede utilizar en una base de datos u otros casos de uso específicos de GUID.
+También podría devolver un `new Guid(<string>)` de esto para obtener un Guid real que se puede utilizar en una base de datos u otros casos de uso específicos de GUID.

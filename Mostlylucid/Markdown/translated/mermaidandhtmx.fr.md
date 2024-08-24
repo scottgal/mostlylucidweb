@@ -5,8 +5,8 @@
 
 ## Présentation
 
-Mermaid est un format de diagramme simple qui prend des entrées texte et génère des diagrammes au format SVG. C'est un excellent outil pour créer des diagrammes de flux, des diagrammes de séquence, des diagrammes de Gantt, et plus encore. Dans ce tutoriel, nous allons explorer comment utiliser Mermaid avec htmx pour créer des diagrammes interactifs qui se mettent à jour dynamiquement sans recharge de page.
-Le site de Sirmaid est[Ici.](https://mermaid.js.org/)et a beaucoup plus d'informations que je peux fournir ici.
+La sirène est un simple format de diagramme qui prend des entrées texte et génère des diagrammes au format SVG. C'est un excellent outil pour créer des diagrammes de flux, des diagrammes de séquence, des diagrammes de Gantt, et plus encore. Dans ce tutoriel, nous allons explorer comment utiliser Sirmaid avec htmx pour créer des diagrammes interactifs qui mettent à jour dynamiquement sans recharger de page.
+Le site de Sirmaid est [Ici.](https://mermaid.js.org/) et a beaucoup plus d'informations que je peux fournir ici.
 
 [TOC]
 
@@ -63,7 +63,7 @@ pie title NETFLIX
 ```
 
 - Des planches à roulettes.
-Les diagrammes de flux peuvent spécifier la direction, p.ex. LR (de gauche à droite), RL (de droite à gauche), TB (de haut en bas), BT (de bas en haut).
+Les diagrammes de flux peuvent spécifier la direction, par exemple. LR (de gauche à droite), RL (de droite à gauche), TB (de haut en bas), BT (de bas en haut).
 
 ```mermaid
 flowchart LR
@@ -118,18 +118,18 @@ journey
         Sit down: 5: Me
 ```
 
-etc...Voir cette page pour plus de la MYRIAD de diagrammes que vous pouvez créer avec Mermaid[Ici.](https://mermaid.js.org/syntax/examples.html)
+etc...Voir cette page pour plus de la MYRIAD de diagrammes que vous pouvez créer avec Mermaid [Ici.](https://mermaid.js.org/syntax/examples.html)
 
 ## Commencer avec Sirmaid et htmx
 
-Vous devez d'abord inclure la bibliothèque Sirmaid dans votre fichier HTML. Vous pouvez le faire en ajoutant la balise de script suivante à votre document :
+D'abord, vous devez inclure la bibliothèque Sirmaid dans votre fichier HTML. Vous pouvez le faire en ajoutant la balise de script suivante à votre document :
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js
 "></script>
 ```
 
-Suivant dans votre_Fichier Layout.cshtml vous devez ajouter la balise de script suivante pour initialiser Mermaid (vous le faites normalement en bas du fichier)
+Suivant dans votre _Fichier Layout.cshtml vous devez ajouter la balise de script suivante pour initialiser Mermaid (vous le faites normalement en bas du fichier)
 
 ```html
 <script>
@@ -146,5 +146,5 @@ Suivant dans votre_Fichier Layout.cshtml vous devez ajouter la balise de script 
 
 Cela fait deux choses;
 
-1. Il initialise la sirène lorsque la page se charge; donc si vous naviguez directement vers une page avec un diagramme de sirène (p. ex.[/blog/mermaidandhtmx](/blog/mermaidandhtmx)) il rendra correctement.
-2. Si vous utilisez htmx comme dans notre[tutoriel précédent](/blog/htmxwithaspnetcore)il renverra le diagramme de Sirène après la mise à jour de la page (l'événement htmx:afterswap).
+1. Il initialise la sirène lorsque la page se charge; donc si vous naviguez directement vers une page avec un diagramme de sirène (p. ex. [/blog/mermaidandhtmx](/blog/mermaidandhtmx) ) il rendra correctement.
+2. Si vous utilisez htmx comme dans notre [tutoriel précédent](/blog/htmxwithaspnetcore) il renverra le diagramme de Sirène après la mise à jour de la page (l'événement htmx:afterswap).

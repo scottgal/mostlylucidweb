@@ -3,13 +3,13 @@
 <datetime class="hidden">2024-08-07T00:30</datetime>
 
 <!--category-- ASP.NET, FluentEmail -->
-Questo è un articolo abbastanza semplice ma coprirà alcune delle odness di usare[FluentEmail](https://github.com/lukencode/FluentEmail)in ASP.NET Core per inviare email HTML che non ho visto altrove.
+Questo è un articolo abbastanza semplice ma coprirà alcune delle odness di usare [FluentEmail](https://github.com/lukencode/FluentEmail) in ASP.NET Core per inviare email HTML che non ho visto altrove.
 
 ## Il problema
 
-L'invio di messaggi HTML è di per sé un po' semplice con SmtpClient, ma non è molto flessibile e non supporta le cose come modelli o allegati. FluentEmail è un'ottima libreria per questo, ma non è sempre chiaro come usarlo in ASP.NET Core.
+L'invio di messaggi HTML è un po' semplice con SmtpClient, ma non è molto flessibile e non supporta cose come template o allegati. FluentEmail è un'ottima libreria per questo, ma non è sempre chiaro come usarlo in ASP.NET Core.
 
-FluentEmail con Razorlight (è integrato) consente di modellare le tue email utilizzando la sintassi Razor. Questo è ottimo in quanto consente di utilizzare tutta la potenza di Razor per creare le tue email.
+FluentEmail con Razorlight (è integrato) consente di modellare le tue email utilizzando la sintassi Razor. Questo è grande in quanto consente di utilizzare il pieno potere di Rasoio per creare le tue email.
 
 ## La soluzione
 
@@ -55,7 +55,7 @@ public static class Setup
 
 ##Impostazioni SMTP
 
-Come vedrete ho anche usato il metodo IConfigSection menzionato nel mio[Articolo precedente](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco)per ottenere le impostazioni SMTP.
+Come vedrete ho anche usato il metodo IConfigSection menzionato nel mio [Articolo precedente](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco) per ottenere le impostazioni SMTP.
 
 ```csharp
   var smtpSettings = services.ConfigurePOCO<SmtpSettings>(config.GetSection(SmtpSettings.Section));
@@ -83,7 +83,7 @@ Questo viene dal file appsettings.json:
 
 ## GMAIL / Google SMTP
 
-Nota: per Google SMTP se si utilizza MFA (che si**davvero*se hai bisogno di fare un[app password per il tuo account](https://myaccount.google.com/apppasswords).
+Nota: per Google SMTP se si utilizza MFA (che si **davvero* se hai bisogno di fare un [app password per il tuo account](https://myaccount.google.com/apppasswords).
 
 Per dev locale, puoi aggiungerlo al tuo file secrets.json:
 
@@ -112,7 +112,7 @@ services:
       - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
 ```
 
-Prendere nota della spaziatura in quanto questo può davvero incasinare con docker comporre. Per controllare ciò che viene iniettato è possibile utilizzare
+Prendi nota della spaziatura come questo può davvero incasinare con docker comporre. Per controllare che cosa viene iniettato si può usare
 
 ```bash
 docker compose config
@@ -153,7 +153,7 @@ USER $APP_UID
 
 Ok, torniamo al codice!
 
-Ora abbiamo tutto impostato possiamo aggiungere il servizio di posta elettronica. Questo è un servizio semplice che prende un modello e invia una e-mail:
+Ora abbiamo tutto impostato possiamo aggiungere il Servizio Email. Questo è un servizio semplice che prende un modello e invia una e-mail:
 
 ```csharp
 public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
@@ -198,7 +198,7 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 }
 ```
 
-Come potete vedere qui abbiamo due metodi, uno per i commenti e uno per il modulo di contatto ([Mandami una posta!](/contact)). In questa applicazione ti faccio accedere in modo da poter ottenere la posta da (e per evitare lo spam).
+Come potete vedere qui abbiamo due metodi, uno per i commenti e uno per il modulo di contatto ([Mandami una posta!](/contact) ). In questa applicazione ti faccio accedere in modo da poter ottenere la posta da (e per evitare lo spam).
 
 Davvero la maggior parte del lavoro è fatto qui:
 
@@ -212,7 +212,7 @@ Davvero la maggior parte del lavoro è fatto qui:
             .SendAsync();
 ```
 
-Qui apriamo un file modello, aggiungiamo il modello contenente il contenuto per l'email, lo carichiamo in FluentEmail e poi lo inviiamo. Il modello è un semplice file Razor:
+Qui si apre un file modello, si aggiunge il modello contenente il contenuto per l'email, lo si carica in FluentEmail e poi lo si invia. Il modello è un semplice file Razor:
 
 ```razor
 @model Mostlylucid.Email.Models.ContactEmailModel

@@ -5,30 +5,30 @@
 
 ## 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
-Markdown 是一种轻量级标记语言, 您可以用来将格式化元素添加到纯文本文档中。 由 John Gruber 于 2004 年创建, Markdown 现在是世界上最受欢迎的标记语言之一 。
+标记 标记 是一种轻量级标记语言,您可以用它来将格式化元素添加到普通文本文档中。 马克唐(Markdown)于2004年由约翰·格鲁伯(John Gruber)创立,
 
-过去我曾尝试并未能维持博客, 希望能尽可能方便地写作和发表文章。 我使用标记来写文章,[Markdig 马克式](https://github.com/xoofx/markdig)将标记减法转换为 HTML。
+过去我曾尝试过也未能维持博客, 希望能尽量方便地写作和发表文章。 我用标记记分写我的文章, [Markdig 马克式](https://github.com/xoofx/markdig) 将标记减法转换为 HTML。
 
 [技选委
 
 ## 为什么不是静态站点发电机?
 
-简言之, 这不是一个超级高流量的站点, 我使用 ASP. NET OutPutCache 来隐藏页面, 我也不会经常更新。 我想让站点尽可能简单,
+一字简单。 我用ASP.NET OutPutPutCache来隐藏页面, 我不会经常更新。 我本想尽量简化网站, 不必担心静态网站发电机在建设过程和复杂程度方面的管理。
 
-澄清;静态现场发电机等[雨雨雨](https://gohugo.io/) / [头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头](https://jekyllrb.com/)等等... 可能是一个对很多网站的好解决方案... 但对于这个,我想保持简单*对我来说*我是一个25年的ASP.NET老兵, 来来来去去去去去去去去去去去了解它。这个网站的设计确实增加了复杂性; 我有观点、服务、控制器和大量手动的HTML & CSS, 但我对此很满意。
+澄清;静态现场发电机等 [雨雨雨](https://gohugo.io/) / [头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头 头](https://jekyllrb.com/) 等等... 可能是一个对很多网站的好解决方案... 但对于这个,我想保持简单 *对我来说* 尽可能。 我是ASP.NET25年的老兵 所以要了解它的内涵和外涵 此站点设计确实增加了复杂性; 我有视图、 服务、 控制器和手动 HTML 和 CSS 的LOT, 但我对此很满意 。
 
 ## 为什么不是数据库呢?
 
-1. 设计简便; 数据库是数据储存的强大系统(我将很快补充一个系统供评论),但它们也增加了复杂性。*正确正确*使用数据库,特别是在 ASP.NET 应用程序中使用数据库。[EF 核心核心](https://learn.microsoft.com/en-us/ef/core/), [顶顶顶端](https://github.com/DapperLib/Dapper)或使用 ADO.NET 原始 SQL 。 我想让网站尽可能简单*开始于*.
-2. 更新和部署的方便度 。 此站点旨在演示 Docker & Docker Compose 是如何简单的运行一个站点 。 我可以通过检查新代码( 包括内容) 更新站点到行动运行的 GitHub, 建立图像, 然后在我的站点编组文件中使用观察器方法自动更新站点图像 。 这是更新站点的非常简单的方法, 我想保持这个方式 。
-3. 正在运行重复数据; 因为我有ZERO数据, 数据不在 docker 图像中, 这意味着我可以在本地( 在家里的我的小 Ubuntu 群集) 运行精确的重复数据 。 这是用 docker 测试更改的好方法( 例如,, ) 。[当我修改图像时](/blog/imagesharpwithdocker))在将其部署到现场之前。
-4. 因为我不想! 我想看看我可以用一个简单的网站设计 来达到什么程度。 到目前为止,我对它非常满意。
+1. 设计简便; 数据库是数据储存的强大系统(我将很快补充一个系统供评论), 但是它们也增加了复杂性。 将 to *正确正确* 使用数据库,特别是在 ASP.NET 应用程序中使用数据库。 [EF 核心核心](https://learn.microsoft.com/en-us/ef/core/), [顶顶顶端](https://github.com/DapperLib/Dapper) 或带 ADO.NET 的原始 SQL。 我想让网站尽可能简单 *开始于*.
+2. 随时更新和部署。 此站点旨在展示多克 & 多克作曲是如何运行一个站点的简单 。 我可以通过检查新代码(包括内容)更新网站到GitHub, “行动”运行, 建立图像, 这是更新网站的一个非常简单的方法,我想保持这样。
+3. 正在运行重复数据; 因为我有ZERO数据, 数据不在 docker 图像中, 这意味着我可以在本地(在我家的小 Ubuntu 群集上) 运行精确的重复数据 。 这是用 docker 测试变化的好方法(例如, [当我修改图像时](/blog/imagesharpwithdocker) )在将其部署到现场之前。
+4. 因为我不想! 我想看看我可以用一个简单的网站设计 达到什么程度,到目前为止,我对它非常满意。
 
 ## 您如何撰写文章?
 
 我只是把一个新的.md文件放入 Markdown 文件夹, 网站会把它捡起来, 并把它制作成( 当我记得把它当作内容, 这样就能确保它可以在输出文件中被保存! )!
 
-当我在GitHub检查网站时,Action运行,网站更新。简单!
+当我在GitHub检查网站时, 简单!
 
 ```mermaid
 flowchart LR
@@ -41,13 +41,13 @@ flowchart LR
 
 ## 您如何添加图像?
 
-由于我刚刚在这里添加了图像, 我将展示我是如何完成的。 我只是将图像添加到 wwwroot/ artimages 文件夹中, 并在此标记文件中引用 :
+既然我刚刚在这里添加了图像, 我会告诉你我是如何做到的。 我只是将图像添加到 wwwroot/ articleimages 文件夹中,
 
 ```markdown
 ![setascontent.png](setascontent.png)
 ```
 
-然后,我为我的Markdig输油管添加一个扩展,将这些重写到正确的 URL (所有关于简单) 。[参见此扩展的源代码 。](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
+然后,我为我的Markdig输油管添加一个扩展,将这些重写到正确的 URL (所有关于简单) 。 [参见此扩展的源代码 。](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
 
 ```csharp
 using Markdig;
@@ -81,11 +81,10 @@ public class ImgExtension : IMarkdownExtension
 
 博客服务是一个简单的服务, 从 Markdown 文件夹读取标记下载文件, 并使用 Markdig 将其转换为 HTML 。
 
-其全部来源如下:[在这里](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/BlogService.cs).
+其全部来源如下: [在这里](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/BlogService.cs).
 
 <details>
 <summary>Click to see the source code for the BlogService</summary>
-
 ```csharp
 
 using System.Globalization;
@@ -310,7 +309,7 @@ private const string CacheKey = "Categories";
 GetPage 方法用于提取标记文件的内容, 它有几个步骤 :
 
 1. 摘录标题
-   依据惯例I 使用标记文件的第一行作为该文章的标题。 所以我可以简单地做:
+   使用标记文件的第一行作为该职位的标题。 所以我可以简单做到:
 
 ```csharp
         var lines = File.ReadAllLines(page);
@@ -448,7 +447,7 @@ public (string title, string slug, DateTime publishDate, string processed, strin
 ```
 
 </details>
-下面的代码显示我如何生成博客文章列表,`GetPage(page, false)`用于提取标题、类别、公布日期和处理内容的方法。
+下面的代码显示我如何生成博客文章列表, `GetPage(page, false)` 用于提取标题、类别、公布日期和处理内容的方法。
 
 ```csharp
      public List<PostListModel> GetPosts(string[] pages)

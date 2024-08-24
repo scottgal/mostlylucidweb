@@ -3,13 +3,13 @@
 <datetime class="hidden">2024-08-007:00:30</datetime>
 
 <!--category-- ASP.NET, FluentEmail -->
-这是一项相当简单的条款,但将涵盖使用中的某些现象。[流流电子邮件](https://github.com/lukencode/FluentEmail)在ASP.NET核心 发送 HTML 电子邮件,我还没有看到。
+这是一项相当简单的条款,但将涵盖使用中的某些现象。 [流流电子邮件](https://github.com/lukencode/FluentEmail) 在ASP.NET核心 发送 HTML 电子邮件,我还没有看到。
 
 ## 问题
 
-发送 HTML 邮件本身对 SmtpClient 来说相当简单, 但并不很灵活, 也不支持模板或附件。 流利电子邮件是这方面的一个伟大的库, 但对于 ASP. NET Core 来说, 如何使用它并不十分清楚 。
+发送 HTML 邮件本身在 SmtpClient 上相当简单, 但并不灵活, 不支持模板或附件等内容 。 流利电子邮件是一个很好的图书馆, 但它并不总是很清楚如何在 ASP. NET Core中使用它。
 
-Razorlight (它所建) 的流利电子邮件允许您使用 Razor 语法将邮件模板。 这很棒, 因为它允许您使用 Razor 的全部能力创建电子邮件 。
+Razorlight (它所建) 的流利电子邮件允许您使用 Razor 语法输入邮件模板 。 这是伟大的,因为它允许你 充分利用Razor的力量 创建您的电子邮件。
 
 ## 解决方案
 
@@ -55,7 +55,7 @@ public static class Setup
 
 #### SMTP 设置
 
-正如你将看到,我还使用 ICAFIG 控制方法,我提到,[前一条文前一条文](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco)以获取 SMTP 设置。
+正如你将看到,我还使用 ICAFIG 控制方法,我提到, [前一条文前一条文](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco) 以获取 SMTP 设置。
 
 ```csharp
   var smtpSettings = services.ConfigurePOCO<SmtpSettings>(config.GetSection(SmtpSettings.Section));
@@ -83,7 +83,7 @@ public static class Setup
 
 ## GMAAIL/谷歌 SMTP
 
-注:对于 Google SMTP 来说,如果使用MFA(即您使用MFA)**真的*如果你需要做一个[您账户的密码](https://myaccount.google.com/apppasswords).
+注:对于 Google SMTP 来说,如果使用MFA(即您使用MFA) **真的* 如果你需要做一个 [您账户的密码](https://myaccount.google.com/apppasswords).
 
 对于本地的 Dev, 您可以将此添加到您的机密文件 。 Json 文件 :
 
@@ -112,7 +112,7 @@ services:
       - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
 ```
 
-注意间距, 因为这会用 docker 作曲来搅乱您。 要检查您可以注射什么 。
+注意一下间距,因为这会真的 弄乱你和Docker作曲。 检查你注射了什么可以用
 
 ```bash
 docker compose config
@@ -153,7 +153,7 @@ USER $APP_UID
 
 OK回到代码!
 
-现在我们都设置好了, 我们可以添加电子邮件服务。 这是一个简单的服务, 使用模板并发送电子邮件 :
+现在我们都安排好了 我们可以加上电子邮件服务了 这是一个简单的服务, 使用模板发送电子邮件 :
 
 ```csharp
 public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
@@ -198,7 +198,7 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 }
 ```
 
-从这里可以看到,我们有两种方法,一种是“评论”方法,一种是“联系表”(Contact form)方法。[寄邮件给我!](/contact))在这个应用程序中,我让你登录,以便我能从(并避免垃圾邮件)那里得到邮件。
+从这里可以看到,我们有两种方法,一种是“评论”方法,一种是“联系表”(Contact form)方法。[寄邮件给我!](/contact) ) ) 在此应用程序中, 我让你登录, 这样我就可以从( 并避免垃圾邮件) 获得邮件 。
 
 大部分工作都是在这里完成的:
 
@@ -212,7 +212,7 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
             .SendAsync();
 ```
 
-在此我们打开一个模板文件, 添加包含电子邮件内容的模型, 将其装入流利电子邮件, 然后发送。 模板是一个简单的 Razor 文件 :
+在此我们打开一个模板文件, 添加包含电子邮件内容的模型, 将其装入流利电子邮件, 然后发送 。 模板是一个简单的 Razor 文件 :
 
 ```razor
 @model Mostlylucid.Email.Models.ContactEmailModel
@@ -237,7 +237,7 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 </html>
 ```
 
-这些文件作为.template 文件存储在电子邮件/ Templates 文件夹中。 您可以使用. cshtml 文件, 但给模板中的 @ Raw 标记造成问题( 这是剃须灯 ) 。
+这些文件作为.template 文件存储在电子邮件/templates 文件夹中。 您可以使用.cshtml 文件, 但它会给模板中的 @Raw 标记造成问题( 这是剃须刀)。
 
 ## 主计长
 

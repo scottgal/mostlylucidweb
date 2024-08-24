@@ -5,30 +5,30 @@
 
 ## Introducción
 
-Markdown es un lenguaje de marcado ligero que puedes usar para añadir elementos de formato a documentos de texto plano. Creado por John Gruber en 2004, Markdown es ahora uno de los lenguajes de marcado más populares del mundo.
+Markdown es un lenguaje de marcado ligero que puede utilizar para añadir elementos de formato a los documentos de texto de texto plano. Creado por John Gruber en 2004, Markdown es ahora uno de los idiomas de marcado más populares del mundo.
 
-En este sitio utilizo un enfoque súper simple para bloguear, habiendo intentado y fallado mantener un blog en el pasado quería que fuera lo más fácil posible escribir y publicar posts. Utilizo markdown para escribir mis posts y este sitio tiene un solo servicio usando[Markdig](https://github.com/xoofx/markdig)para convertir la marca a HTML.
+En este sitio utilizo un enfoque súper simple para bloguear, habiendo intentado y fallado mantener un blog en el pasado quería hacer lo más fácil posible escribir y publicar posts. Uso Markdown para escribir mis posts y este sitio tiene un solo servicio usando [Markdig](https://github.com/xoofx/markdig) para convertir la marca a HTML.
 
 [TOC]
 
 ## ¿Por qué no un generador de sitio estático?
 
-En una palabra simplicidad. Esto no va a ser un sitio de tráfico super alto, yo uso ASP.NET OutPutCache para guardar en caché las páginas y no voy a estar actualizando que a menudo. Quería mantener el sitio tan simple como fuera posible y no tener que preocuparse por el exceso de un generador de sitio estático tanto en términos del proceso de construcción y la complejidad del sitio.
+En una palabra simplicidad. Esto no va a ser un sitio de tráfico super alto, yo uso ASP.NET OutPutCache para guardar en caché las páginas y no voy a actualizarlo tan a menudo. Quería mantener el sitio tan simple como fuera posible y no tener que preocuparse por la sobrecarga de un generador de sitio estático tanto en términos del proceso de construcción y la complejidad del sitio.
 
-Para aclarar; generadores de sitio estático como[Hugo](https://gohugo.io/) / [Jekyll](https://jekyllrb.com/)etc... puede ser una buena solución para muchos sitios, pero para este quería mantenerlo como simple*para mí*Soy un veterano de 25 años de ASP.NET así que entiéndelo por dentro y por fuera. Este diseño del sitio añade complejidad; tengo vistas, servicios, controladores y un montón de HTML manual y CSS, pero estoy cómodo con eso.
+Para aclarar; generadores de sitio estático como [Hugo](https://gohugo.io/) / [Jekyll](https://jekyllrb.com/) etc... puede ser una buena solución para muchos sitios, pero para este quería mantenerlo como simple *para mí* lo más posible. Soy un veterano de 25 años de ASP.NET así que entiéndelo por dentro y por fuera. Este diseño de sitio añade complejidad; Tengo vistas, servicios, controladores y un montón de HTML manual & CSS, pero estoy cómodo con eso.
 
 ## ¿Por qué no una base de datos?
 
-1. Simplicidad de diseño; Las bases de datos son sistemas potentes para almacenar datos (y añadiré uno para comentarios en breve), sin embargo, también añaden complejidad.*correctamente*use bases de datos especialmente en una aplicación ASP.NET que añada un montón de código, no importa si está usando[Núcleo básico de la FE](https://learn.microsoft.com/en-us/ef/core/), [Dapper](https://github.com/DapperLib/Dapper)o SQL crudo con ADO.NET. Quería mantener el sitio lo más simple posible*para empezar con*.
-2. Facilidad de actualización e implementación. Este sitio está destinado a demostrar cómo Docker & Docker Compose simple puede ser para ejecutar un sitio. Puedo actualizar el sitio comprobando en nuevo código (incluyendo contenido) a GitHub, la acción se ejecuta, construye la imagen entonces el método Watchtower en mi docker componer archivo actualiza la imagen del sitio automáticamente. Esta es una manera muy simple de actualizar un sitio y quería mantenerlo de esa manera.
-3. Ejecutando duplicados; como tengo datos de ZERO que no están dentro de la imagen Docker significa que puedo EASILY ejecutar duplicados exactos localmente (en mi pequeño clúster de Ubuntu aquí en casa). Esta es una gran manera de probar los cambios con docker (por ejemplo,[cuando hice los cambios ImageSharp](/blog/imagesharpwithdocker)) antes de desplegarlos en el sitio en vivo.
-4. Porque no quería! Quería ver lo lejos que podía llegar con un diseño de sitio simple y hasta ahora estoy bastante feliz con él.
+1. Simplicidad de diseño; Las bases de datos son sistemas potentes para almacenar datos (y añadiré uno para comentarios en breve), sin embargo, también añaden complejidad. A *correctamente* use bases de datos especialmente en una aplicación ASP.NET que añada un montón de código, no importa si está usando [Núcleo básico de la FE](https://learn.microsoft.com/en-us/ef/core/), [Dapper](https://github.com/DapperLib/Dapper) o SQL crudo con ADO.NET. Quería mantener el sitio tan simple como fuera posible *para empezar con*.
+2. Facilidad de actualización y despliegue. Este sitio está destinado a demostrar cómo Docker & Docker Compose simple puede ser para ejecutar un sitio. Puedo actualizar el sitio comprobando en nuevo código (incluyendo contenido) a GitHub, la acción se ejecuta, construye la imagen entonces el método Watchtower en mi docker componer archivo actualiza la imagen del sitio automáticamente. Esta es una manera muy simple de actualizar un sitio y quería mantenerlo de esa manera.
+3. Ejecutando duplicados; como tengo datos de ZERO que no están dentro de la imagen Docker, significa que puedo EASILY ejecutar duplicados exactos localmente (en mi pequeño cluster de Ubuntu aquí en casa). Esta es una gran manera de probar los cambios con docker (por ejemplo, [cuando hice los cambios ImageSharp](/blog/imagesharpwithdocker) ) antes de desplegarlos en el sitio en vivo.
+4. ¡Porque no quería! Quería ver hasta dónde podía llegar con un simple diseño de sitio y hasta ahora estoy bastante contento con él.
 
 ## ¿Cómo escribes tus posts?
 
 Simplemente dejo caer un nuevo archivo.md en la carpeta Markdown y el sitio lo recoge y lo renderiza (cuando recuerdo a aet como contenido, esto asegura que es disponible en los archivos de salida! )
 
-A continuación, cuando checkin el sitio a GitHub la acción se ejecuta y el sitio se actualiza. Simple!
+Luego, cuando checkin el sitio a GitHub la acción se ejecuta y el sitio se actualiza. ¡Simple!
 
 ```mermaid
 flowchart LR
@@ -41,13 +41,13 @@ flowchart LR
 
 ## ¿Cómo se agregan imágenes?
 
-Ya que acabo de añadir la imagen aquí, te mostraré cómo lo hice. Simplemente añadí la imagen a la carpeta wwwroot/articleimages y la hice referencia en el archivo Markdown así:
+Ya que acabo de añadir la imagen aquí, te mostraré cómo lo hice. Simplemente añadí la imagen a la carpeta wwwroot/articleimages y la hice referencia en el archivo Markdown de esta manera:
 
 ```markdown
 ![setascontent.png](setascontent.png)
 ```
 
-A continuación, añado una extensión a mi tubería de Markdig que reescribe estos a la URL correcta (todo acerca de la simplicidad).[Vea aquí el código fuente de la extensión.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
+A continuación, añado una extensión a mi tubería de Markdig que reescribe estos a la URL correcta (todo acerca de la simplicidad). [Vea aquí el código fuente de la extensión.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
 
 ```csharp
 using Markdig;
@@ -81,11 +81,10 @@ public class ImgExtension : IMarkdownExtension
 
 El BlogService es un servicio sencillo que lee los archivos Markdown desde la carpeta Markdown y los convierte a HTML usando Markdig.
 
-La fuente completa para esto es a continuación y[aquí](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/BlogService.cs).
+La fuente completa para esto es a continuación y [aquí](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/BlogService.cs).
 
 <details>
 <summary>Click to see the source code for the BlogService</summary>
-
 ```csharp
 
 using System.Globalization;
@@ -448,7 +447,7 @@ public (string title, string slug, DateTime publishDate, string processed, strin
 ```
 
 </details>
-El siguiente código muestra cómo puedo generar la lista de entradas de blog, que utiliza el`GetPage(page, false)`método para extraer el título, las categorías, la fecha de publicación y el contenido procesado.
+El siguiente código muestra cómo puedo generar la lista de entradas de blog, que utiliza el `GetPage(page, false)` método para extraer el título, las categorías, la fecha de publicación y el contenido procesado.
 
 ```csharp
      public List<PostListModel> GetPosts(string[] pages)

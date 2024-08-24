@@ -5,7 +5,7 @@
 
 ## Einleitung
 
-Eines der Dinge, die mich über mein aktuelles Setup verärgerte war, Google Analytics verwenden zu müssen, um Besucherdaten zu erhalten (welches wenig gibt es davon???). Also wollte ich etwas finden, das ich selbst-hosten konnte, das keine Daten an Google oder andere Dritte weitergegeben hat.[Umami](https://umami.is/)das ist eine einfache, selbst gehostete Web-Analyse-Lösung. Es ist eine großartige Alternative zu Google Analytics und ist (relativ) einfach einzurichten.
+Eines der Dinge, die mich über mein aktuelles Setup ärgerten, war, Google Analytics verwenden zu müssen, um Besucherdaten zu erhalten (welches wenig gibt es davon???). Also wollte ich etwas finden, das ich selbst hosten konnte, das keine Daten an Google oder andere Dritte weitergegeben hat. Ich hab's gefunden. [Umami](https://umami.is/) Das ist eine einfache, selbst gehostete Web-Analyse-Lösung. Es ist eine großartige Alternative zu Google Analytics und ist (relativ) einfach einzurichten.
 
 [TOC]
 
@@ -15,7 +15,7 @@ Installation ist PRETTY einfach, aber nahm ein bisschen fummeln, um wirklich los
 
 ### Docker-Komposition
 
-Da ich Umami zu meinem aktuellen Docker-Kompose-Setup hinzufügen wollte, musste ich einen neuen Service zu meinem`docker-compose.yml`file. Ich habe am Ende der Datei Folgendes hinzugefügt:
+Da ich Umami zu meinem aktuellen Docker-Kompose-Setup hinzufügen wollte, musste ich einen neuen Service zu meinem `docker-compose.yml` .............................................................................................................................. Ich habe am Ende der Datei Folgendes hinzugefügt:
 
 ```yaml
   umami:
@@ -63,8 +63,8 @@ Da ich Umami zu meinem aktuellen Docker-Kompose-Setup hinzufügen wollte, musste
 
 Diese docker-compose.yml-Datei enthält die folgende Einrichtung:
 
-1. Ein neuer Dienst namens`umami`die die`ghcr.io/umami-software/umami:postgresql-latest`image. Dieser Dienst wird verwendet, um den Umami-Analytics-Dienst zu betreiben.
-2. Ein neuer Dienst namens`db`die die`postgres:16-alpine`image. Dieser Dienst wird verwendet, um die Postgres-Datenbank, die Umami verwendet, um seine Daten zu speichern laufen.
+1. Ein neuer Dienst namens `umami` die die `ghcr.io/umami-software/umami:postgresql-latest` Bild. Dieser Dienst wird verwendet, um den Dienst Umami analytics zu betreiben.
+2. Ein neuer Dienst namens `db` die die `postgres:16-alpine` Bild. Dieser Dienst wird verwendet, um die Postgres-Datenbank zu betreiben, mit der Umami seine Daten speichert.
    Hinweis für diesen Dienst Ich werde ihn in ein Verzeichnis auf meinem Server gemappt, so dass die Daten zwischen den Neustarts bestehen bleiben.
 
 ```yaml
@@ -72,17 +72,17 @@ Diese docker-compose.yml-Datei enthält die folgende Einrichtung:
       - /mnt/umami/postgres:/var/lib/postgresql/data
 ```
 
-Sie brauchen diesen Direktor zu existieren und beschreibbar sein von der Docker-Benutzer auf Ihrem Server (wieder nicht ein Linux-Experte so 777 ist wahrscheinlich überkill hier!).
+Sie brauchen diesen Direktor zu existieren und beschreibbar sein von der Docker-Benutzer auf Ihrem Server (wieder nicht ein Linux-Experte so 777 ist wahrscheinlich zu töten hier!)== Einzelnachweise ==
 
 ```shell
 chmod 777 /mnt/umami/postgres
 ```
 
-3. Ein neuer Dienst namens`cloudflaredumami`die die`cloudflare/cloudflared:latest`Bild. Dieser Dienst wird verwendet, um den Umami-Dienst über Cloudflare zu tunneln, damit er über das Internet abgerufen werden kann.
+3. Ein neuer Dienst namens `cloudflaredumami` die die `cloudflare/cloudflared:latest` Bild. Dieser Dienst dient dazu, den Umami-Dienst über Cloudflare zu tunneln, damit er über das Internet abgerufen werden kann.
 
 ### Env-Datei
 
-Um dies zu unterstützen, aktualisierte ich auch meine`.env`Datei, die Folgendes enthalten soll:
+Um dies zu unterstützen, aktualisierte ich auch meine `.env` Datei, die Folgendes enthalten soll:
 
 ```shell
 CLOUDFLARED_UMAMI_TOKEN=<cloudflaretoken>
@@ -100,7 +100,7 @@ UMAMI_PASS=${POSTGRES_PASSWORD}
 DATABASE_URL=postgresql://${UMAMI_USER}:${UMAMI_PASS}@db:5432/${POSTGRES_DB}
 ```
 
-Dies setzt die Konfiguration für die docker komponieren (die`<>`Elemeten müssen offensichtlich durch eigene Werte ersetzt werden.`cloudflaredumami`Der Dienst wird verwendet, um den Umami-Dienst über Cloudflare zu tunneln, damit er über das Internet abgerufen werden kann. Es ist POSSIBLE, um einen BASE_PATH zu verwenden, aber für Umami braucht es ärgerlicherweise einen Wiederaufbau, um den Basispfad zu ändern, also habe ich ihn als Wurzelpfad für jetzt verlassen.
+Dies setzt die Konfiguration für die docker komponieren (die `<>` Elemeten müssen offensichtlich durch eigene Werte ersetzt werden). Das `cloudflaredumami` Der Dienst dient dazu, den Umami-Dienst über Cloudflare zu tunneln, damit er über das Internet abgerufen werden kann. Es ist MÖGLICH, einen BASE_PATH zu verwenden, aber für Umami braucht es ärgerlicherweise einen Wiederaufbau, um den Basispfad zu ändern, also habe ich ihn als Wurzelpfad für jetzt verlassen.
 
 ### Cloudflare-Tunnel
 
@@ -108,11 +108,11 @@ Um den Cloudflare-Tunnel dafür einzurichten (der als Pfad für die js-Datei die
 
 ![Cloudflare-Tunnel](umamisetup.png)
 
-Dies stellt den Tunnel zum Umami-Service auf und ermöglicht den Zugriff aus dem Internet. Beachten Sie, Ich weise dies auf die`umami`service in der docker-compose-Datei (da es sich im selben Netzwerk wie der cloudflared Tunnel befindet, ist es ein gültiger Name).
+Dadurch wird der Tunnel zum Umami-Service aufgebaut und der Zugang über das Internet ermöglicht. Ich bemerke, dass ich dies auf die `umami` service in der docker-compose-Datei (da es sich im selben Netzwerk wie der cloudflared Tunnel befindet, ist es ein gültiger Name).
 
 ### Umami Setup auf der Seite
 
-So aktivieren Sie den Pfad für das Skript (genannt`getinfo`in meinem Setup oben) Ich habe einen Config-Eintrag zu meinen Appsettings hinzugefügt
+So aktivieren Sie den Pfad für das Skript (genannt `getinfo` in meinem Setup oben) Ich habe einen Config-Eintrag zu meinen Appsettings hinzugefügt
 
 ```json
  "Analytics":{
@@ -140,7 +140,7 @@ ANALYTICS_WEBSITEID="32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
       - Analytics__WebsiteId=${ANALYTICS_WEBSITEID}
 ```
 
-Sie haben die WebsiteId im Umami-Dashboard eingerichtet, wenn Sie die Website einrichten. (Beachten Sie den Standard-Benutzernamen und das Passwort für den Umami-Dienst ist`admin`und`umami`, müssen Sie diese nach dem Setup ändern).
+Sie richten die WebsiteId im Umami Dashboard ein, wenn Sie die Website einrichten. (Beachten Sie den Standard-Benutzernamen und das Passwort für den Umami-Dienst ist `admin` und `umami`, müssen Sie diese nach dem Setup ändern).
 ![Umami Dashboard](umamiaddwebsite.png)
 
 Mit den zugehörigen Einstellungen cs-Datei:
@@ -160,7 +160,7 @@ Stellen Sie es in meinem programm.cs:
 builder.Configure<AnalyticsSettings>();
 ```
 
-Und schließlich in meinem`BaseController.cs` `OnGet`Methode Ich habe das folgende hinzugefügt, um den Pfad für das Analyse-Skript festzulegen:
+Und schließlich in meinem `BaseController.cs` `OnGet` Methode Ich habe das folgende hinzugefügt, um den Pfad für das Analyse-Skript festzulegen:
 
 ```csharp
    public override void OnActionExecuting(ActionExecutingContext filterContext)
@@ -199,4 +199,4 @@ localStorage.setItem("umami.disabled", 1)
 
 ## Schlußfolgerung
 
-Ich habe jetzt einen selbst gehosteten Analytics-Dienst, der keine Daten an Google oder andere Dritte weitergibt. Es ist ein bisschen Schmerz, aber sobald es getan ist, ist es ziemlich einfach zu bedienen. Ich bin mit dem Ergebnis zufrieden und würde es jedem empfehlen, der nach einer selbst gehosteten Analytics-Lösung sucht.
+Das war ein bisschen faff, aber ich bin mit dem Ergebnis zufrieden. Ich habe jetzt einen selbst gehosteten Analytics-Dienst, der keine Daten an Google oder andere Dritte weitergibt. Es ist ein bisschen schmerzhaft, es einzurichten, aber wenn es fertig ist, ist es ziemlich einfach zu bedienen. Ich bin mit dem Ergebnis zufrieden und würde es jedem empfehlen, der eine selbst gehostete Analyselösung sucht.

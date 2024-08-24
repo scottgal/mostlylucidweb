@@ -5,11 +5,11 @@
 
 ## Petits postes FTW
 
-Solution petite mais potentiellement utile à un problème que j'ai eu. C'est-à-dire, comment générer un GUID à partir d'une entrée de chaîne où la Guid est toujours valide mais unique pour toute chaîne d'entrée donnée.
+Une solution petite mais potentiellement utile à un problème que j'avais. À savoir, comment générer un GUID à partir d'une entrée de chaîne où la Guid est toujours valide mais unique pour toute chaîne d'entrée donnée.
 
-J'avais besoin de ça pour mon[Générateur de flux RSS](/blog/addinganrssfilewithaspnetcore)où je voulais générer un GUID pour chaque élément du flux qui était répétable mais unique pour chaque élément.
+J'avais besoin de ça pour mon [Générateur de flux RSS](/blog/addinganrssfilewithaspnetcore) où je voulais générer un GUID pour chaque élément du flux qui était répétable mais unique pour chaque élément.
 
-Il s'avère que les`XxHash128`est un peu parfait pour cela car il donne toujours un hachage de 128 bits (ou 16 octets). Cela signifie qu'il peut être utilisé pour générer un GUID à partir d'une entrée de chaîne sans 'Array'.
+Il s'avère que les `XxHash128` est un peu parfait pour cela car il donne toujours un hachage de 128 bits (ou 16 octets). Cela signifie qu'il peut être utilisé pour générer un GUID à partir d'une entrée de chaîne sans 'Array'.
 
 ```csharp
      public  static string ToGuid(this string  name)
@@ -22,8 +22,8 @@ Il s'avère que les`XxHash128`est un peu parfait pour cela car il donne toujours
     }
 ```
 
-Il s'agit d'une méthode d'extension simple qui prend une entrée de chaîne et renvoie un GUID.`XxHash128`est de la`System.IO.Hashing`Espace de noms.
+Il s'agit d'une méthode d'extension simple qui prend une entrée de chaîne et renvoie un GUID. Les `XxHash128` est de la `System.IO.Hashing` Espace de noms.
 
-Vous pouvez bien sûr utiliser n'importe quel algorithme de hachage qui donne un hachage 128 bits.`XxHash128`est juste un bon choix car il est rapide et donne une bonne distribution des valeurs de hachage.
+Vous pouvez bien sûr utiliser n'importe quel algorithme de hachage qui donne un hachage 128 bits. Les `XxHash128` est juste un bon choix car il est rapide et donne une bonne distribution des valeurs de hachage.
 
-Vous pourriez aussi retourner un`new Guid(<string>)`à partir de cela pour obtenir un Guid réel qui peut être utilisé dans une base de données ou d'autres cas d'utilisation spécifiques GUID.
+Vous pourriez aussi retourner un `new Guid(<string>)` à partir de cela pour obtenir un Guid réel qui peut être utilisé dans une base de données ou d'autres cas d'utilisation spécifiques GUID.

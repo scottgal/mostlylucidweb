@@ -11,7 +11,7 @@ Al momento uso Docker Compose per eseguire alcuni servizi sul mio server.
 - Cloudflared - un servizio che tunnel il traffico al mio server
 - Torre di Controllo - un servizio che controlla gli aggiornamenti ai miei contenitori e li riavvia se necessario.
 
-Qui c'è il`docker-compose.yml`file che uso per eseguire questi servizi:
+Qui c'è il `docker-compose.yml` file che uso per eseguire questi servizi:
 
 ```yaml
 services:

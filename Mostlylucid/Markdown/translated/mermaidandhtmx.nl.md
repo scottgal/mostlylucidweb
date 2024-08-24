@@ -5,8 +5,8 @@
 
 ## Inleiding
 
-Mermaid is een eenvoudig diagramformaat dat tekst-gebaseerde invoer neemt en diagrammen genereert in SVG-formaat. Het is een geweldig hulpmiddel voor het maken van stroomschema's, volgordediagrammen, Gantt-diagrammen, en nog veel meer. In deze tutorial zullen we onderzoeken hoe Mermaid met htmx te gebruiken om interactieve diagrammen te maken die dynamisch bijwerken zonder pagina-herladen.
-De Mermaid site is[Hier.](https://mermaid.js.org/)en heeft veel meer informatie dan ik hier kan geven.
+Mermaid is een eenvoudig diagramformaat dat tekst-gebaseerde invoer neemt en diagrammen genereert in SVG-formaat. Het is een geweldig hulpmiddel voor het maken van stroomschema's, volgordediagrammen, Gantt grafieken, en nog veel meer. In deze tutorial zullen we onderzoeken hoe Mermaid met htmx gebruikt kan worden om interactieve diagrammen te maken die dynamisch updaten zonder pagina's opnieuw te laden.
+De Mermaid site is [Hier.](https://mermaid.js.org/) en heeft veel meer informatie dan ik hier kan geven.
 
 [TOC]
 
@@ -63,7 +63,7 @@ pie title NETFLIX
 ```
 
 -Flowcharts:
-Flowcharts kunnen richting specificeren, bijvoorbeeld LR (van links naar rechts), RL (van rechts naar links), TB (van boven naar beneden), BT (van onder naar boven).
+Flowcharts kunnen richting specificeren, bijvoorbeeld. LR (van links naar rechts), RL (van rechts naar links), TB (van boven naar beneden), BT (van onder naar boven).
 
 ```mermaid
 flowchart LR
@@ -118,18 +118,18 @@ journey
         Sit down: 5: Me
 ```
 
-Zie deze pagina voor meer van de MYRIAD van diagrammen die je kunt maken met Mermaid[Hier.](https://mermaid.js.org/syntax/examples.html)
+Zie deze pagina voor meer van de MYRIAD van diagrammen die je kunt maken met Mermaid [Hier.](https://mermaid.js.org/syntax/examples.html)
 
 ## Aan de slag met Mermaid en htmx
 
-Eerst moet u de Mermaid-bibliotheek in uw HTML-bestand opnemen. U kunt dit doen door de volgende scripttag aan uw document toe te voegen:
+Eerst moet je de Mermaid-bibliotheek in je HTML-bestand opnemen. U kunt dit doen door de volgende scripttag aan uw document toe te voegen:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js
 "></script>
 ```
 
-Volgende in je_Layout.cshtml-bestand dat u nodig hebt om de volgende script tag toe te voegen om Mermaid te initialiseren (u doet dit normaal gesproken onderaan het bestand)
+Volgende in je _Layout.cshtml-bestand dat u nodig hebt om de volgende script tag toe te voegen om Mermaid te initialiseren (u doet dit normaal gesproken onderaan het bestand)
 
 ```html
 <script>
@@ -146,5 +146,5 @@ Volgende in je_Layout.cshtml-bestand dat u nodig hebt om de volgende script tag 
 
 Dit doet twee dingen:
 
-1. Het initialiseert Mermaid wanneer de pagina wordt geladen; dus als je direct navigeert naar een pagina met een Mermaid diagram (bijv.[/blog/mermaidandhtmx](/blog/mermaidandhtmx)) zal het correct renderen.
-2. Als u htmx gebruikt zoals in onze[vorige tutorial](/blog/htmxwithaspnetcore)het zal het Mermaid diagram opnieuw uitvoeren nadat de pagina is bijgewerkt (de htmx:afterswap event).
+1. Het initialiseert Mermaid wanneer de pagina wordt geladen; dus als je direct navigeert naar een pagina met een Mermaid diagram (bijv. [/blog/mermaidandhtmx](/blog/mermaidandhtmx) ) zal het correct renderen.
+2. Als u htmx gebruikt zoals in onze [vorige tutorial](/blog/htmxwithaspnetcore) het zal het Mermaid diagram opnieuw uitvoeren nadat de pagina is bijgewerkt (de htmx:afterswap event).

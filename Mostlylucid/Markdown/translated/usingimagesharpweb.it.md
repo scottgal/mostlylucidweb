@@ -5,7 +5,7 @@
 <!--category-- ASP.NET, ImageSharp -->
 ## Introduzione
 
-[Condivisione immagini](https://docs.sixlabors.com/index.html)è una potente libreria di elaborazione delle immagini che consente di manipolare le immagini in vari modi. ImageSharp.Web è un'estensione di ImageSharp che fornisce funzionalità aggiuntive per lavorare con le immagini nelle applicazioni ASP.NET Core. In questo tutorial, esploreremo come usare ImageSharp.Web per ridimensionare, ritagliare e formattare le immagini in questa applicazione.
+[Condivisione immagini](https://docs.sixlabors.com/index.html) è una potente libreria di elaborazione delle immagini che consente di manipolare le immagini in una varietà di modi. ImageSharp.Web è un'estensione di ImageSharp che fornisce funzionalità aggiuntive per lavorare con le immagini nelle applicazioni ASP.NET Core. In questo tutorial, esploreremo come usare ImageSharp.Web per ridimensionare, ritagliare e formattare le immagini in questa applicazione.
 
 [TOC]
 
@@ -20,7 +20,7 @@ dotnet add package SixLabors.ImageSharp.Web
 
 ## Configurazione Web di ImageSharp
 
-Nel nostro file Program.cs abbiamo quindi impostato ImageSharp.Web. Nel nostro caso ci riferiamo e archiviamo le nostre immagini in una cartella chiamata "immagini" nel wwwroot del nostro progetto. Poi abbiamo impostato il middleware ImageSharp.Web per utilizzare questa cartella come fonte delle nostre immagini.
+Nel nostro file Program.cs abbiamo quindi impostato ImageSharp.Web. Nel nostro caso ci stiamo riferendo e archiviando le nostre immagini in una cartella chiamata "immagini" nel wwwroot del nostro progetto. Abbiamo quindi impostato il middleware ImageSharp.Web per utilizzare questa cartella come fonte delle nostre immagini.
 
 ImageSharp.Web utilizza anche una cartella 'cache' per memorizzare i file elaborati (questo impedisce di riporre i file ogni volta).
 
@@ -32,7 +32,7 @@ Queste cartelle sono relative al wwwroot quindi abbiamo la seguente struttura:
 
 ![Struttura cartella](/cachefolder.png)
 
-ImageSharp.Web ha più opzioni per memorizzare i file e la cache (vedi qui per tutti i dettagli:[https://docs.sixlabors.com/articles/imagesharp.web/imageproviders.html?tabs=tabid-1%2Ctabid-1a](https://docs.sixlabors.com/articles/imagesharp.web/imageproviders.html?tabs=tabid-1%2Ctabid-1a))
+ImageSharp.Web ha più opzioni per memorizzare i file e la cache (vedi qui per tutti i dettagli: [https://docs.sixlabors.com/articles/imagesharp.web/imageproviders.html?tabs=tabid-1%2Ctabid-1a](https://docs.sixlabors.com/articles/imagesharp.web/imageproviders.html?tabs=tabid-1%2Ctabid-1a))
 
 Per esempio per memorizzare le immagini in un contenitore blob Azure (utile per scalare) si userebbe il Provider Azure con AzureBlobCacheOpzioni:
 
@@ -57,7 +57,7 @@ dotnet add SixLabors.ImageSharp.Web.Providers.Azure
 
 ## Uso Web di ImageSharp
 
-Ora che abbiamo questo set up è davvero semplice da usare all'interno della nostra applicazione. Ad esempio, se vogliamo servire un'immagine ridimensionata potremmo fare uno o l'altro uso[il tagHelper](https://sixlabors.com/posts/announcing-imagesharp-web-300/#imagetaghelper)o specificare direttamente l'URL.
+Ora che abbiamo questo set up è davvero semplice da usare all'interno della nostra applicazione. Per esempio, se vogliamo servire un'immagine ridimensionata potremmo usare entrambi [il tagHelper](https://sixlabors.com/posts/announcing-imagesharp-web-300/#imagetaghelper) o specificare direttamente l'URL.
 
 TagHelper:
 
@@ -73,7 +73,7 @@ TagHelper:
 
 Si noti che con questo stiamo ridimensionando l'immagine, impostando la larghezza e l'altezza, e anche impostando il ResizeMode e ricolorando l'immagine.
 
-In questa applicazione andiamo nel modo più semplice e basta utilizzare i parametri querystring. Per il markdown utilizziamo un'estensione che ci permette di specificare le dimensioni dell'immagine e il formato.
+In questa applicazione andiamo il modo più semplice e basta utilizzare querystring parametri. Per il markdown utilizziamo un'estensione che ci permette di specificare la dimensione e il formato dell'immagine.
 
 ```csharp
     public void ChangeImgPath(MarkdownDocument document)
@@ -100,9 +100,14 @@ Questo ci dà la felicità di specificare questi nei post come
 ![image](/image.jpg?format=webp&quality=50)
 ```
 
-Da dove verrà questa immagine`wwwroot/articleimages/image.jpg`ed essere ridimensionato al 50% di qualità e in formato webp.
+Da dove verrà questa immagine `wwwroot/articleimages/image.jpg` ed essere ridimensionato al 50% di qualità e in formato webp.
 
 Oppure possiamo semplicemente usare l'immagine così com'è e sarà ridimensionata e formattata come specificato nella stringa di query.
+
+## DockerCity name (optional, probably does not need a translation)
+
+Notare la `cache` Forlder Ho usato sopra deve essere scrivibile dall'applicazione. Se stai usando Docker, devi assicurarti che sia cosi'.
+Vedi [il mio post precedente](/blog/imagesharpwithdocker) per come lo gestisco usando un volume mappato.
 
 ## Conclusione
 

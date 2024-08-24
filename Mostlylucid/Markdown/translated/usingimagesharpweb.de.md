@@ -5,7 +5,7 @@
 <!--category-- ASP.NET, ImageSharp -->
 ## Einleitung
 
-[ImageSharp](https://docs.sixlabors.com/index.html)ist eine leistungsstarke Bildverarbeitungsbibliothek, die es Ihnen ermöglicht, Bilder auf verschiedene Arten zu manipulieren. ImageSharp.Web ist eine Erweiterung von ImageSharp, die zusätzliche Funktionen für die Arbeit mit Bildern in ASP.NET Core-Anwendungen bietet. In diesem Tutorial werden wir untersuchen, wie Sie ImageSharp.Web verwenden, um Bilder in dieser Anwendung zu formatieren, zu schneiden und zu formatieren.
+[ImageSharp](https://docs.sixlabors.com/index.html) ist eine leistungsstarke Bildverarbeitungsbibliothek, die es Ihnen ermöglicht, Bilder auf verschiedene Weise zu manipulieren. ImageSharp.Web ist eine Erweiterung von ImageSharp, die zusätzliche Funktionalität für das Arbeiten mit Bildern in ASP.NET Core-Anwendungen bietet. In diesem Tutorial werden wir untersuchen, wie Sie ImageSharp.Web verwenden, um Bilder in dieser Anwendung zu formatieren, zu schneiden und zu formatieren.
 
 [TOC]
 
@@ -20,7 +20,7 @@ dotnet add package SixLabors.ImageSharp.Web
 
 ## ImageSharp.Web-Konfiguration
 
-In unserer Datei Program.cs richten wir dann ImageSharp.Web ein. In unserem Fall beziehen wir uns auf und speichern unsere Bilder in einem Ordner namens "images" im wwwroot unseres Projekts. Anschließend richten wir die ImageSharp.Web Middleware ein, um diesen Ordner als Quelle unserer Bilder zu verwenden.
+In unserer Program.cs Datei richten wir dann ImageSharp.Web ein. In unserem Fall beziehen wir uns auf und speichern unsere Bilder in einem Ordner namens "Bilder" im wwwroot unseres Projekts. Anschließend richten wir die ImageSharp.Web Middleware ein, um diesen Ordner als Quelle unserer Bilder zu verwenden.
 
 ImageSharp.Web verwendet auch einen 'Cache'-Ordner, um verarbeitete Dateien zu speichern (dadurch wird verhindert, dass Dateien jedes Mal wieder rückgängig gemacht werden).
 
@@ -32,7 +32,7 @@ Diese Ordner sind relativ zum wwwroot, so dass wir die folgende Struktur haben:
 
 ![Ordnerstruktur](/cachefolder.png)
 
-ImageSharp.Web hat mehrere Optionen, wo Sie Ihre Dateien und Caching speichern (siehe hier für alle Details:[Veröffentlichungen der Europäischen Gemeinschaften, 2001.](https://docs.sixlabors.com/articles/imagesharp.web/imageproviders.html?tabs=tabid-1%2Ctabid-1a))
+ImageSharp.Web hat mehrere Optionen, wo Sie Ihre Dateien und Caching speichern (siehe hier für alle Details: [Veröffentlichungen der Europäischen Gemeinschaften, 2001.](https://docs.sixlabors.com/articles/imagesharp.web/imageproviders.html?tabs=tabid-1%2Ctabid-1a))
 
 Zum Beispiel, um Ihre Bilder in einem Azure-Blob-Container zu speichern (handlich zur Skalierung) würden Sie den Azure-Provider mit AzureBlobCacheOptionen verwenden:
 
@@ -57,7 +57,7 @@ dotnet add SixLabors.ImageSharp.Web.Providers.Azure
 
 ## ImageSharp.Web-Nutzung
 
-Jetzt, da wir diese Einrichtung haben, ist es wirklich einfach, es in unserer Anwendung zu verwenden. Zum Beispiel, wenn wir ein vergrößertes Bild dienen möchten, könnten wir entweder[der TagHelper](https://sixlabors.com/posts/announcing-imagesharp-web-300/#imagetaghelper)oder die URL direkt angeben.
+Jetzt, da wir diese Einrichtung haben, ist es wirklich einfach, es in unserer Anwendung zu verwenden. Zum Beispiel, wenn wir ein vergrößertes Bild dienen wollen, könnten wir entweder [der TagHelper](https://sixlabors.com/posts/announcing-imagesharp-web-300/#imagetaghelper) oder die URL direkt angeben.
 
 TagHelper:
 
@@ -100,10 +100,15 @@ Dies gibt uns die Möglichkeit, entweder diese in den Stellen wie
 ![image](/image.jpg?format=webp&quality=50)
 ```
 
-Wo dieses Bild herkommt`wwwroot/articleimages/image.jpg`und auf 50% Qualität und im Webp-Format verkleinert werden.
+Wo dieses Bild herkommt `wwwroot/articleimages/image.jpg` und auf 50% Qualität und im Webp-Format verkleinert werden.
 
 Oder wir können einfach das Bild so verwenden, wie es ist und es wird wie im Querystring angegeben verkleinert und formatiert werden.
 
+## Schwanzlutscher
+
+Bemerken Sie die `cache` forlder Ich habe oben verwendet, muss durch die Anwendung beschreibbar sein. Wenn Sie Docker verwenden, müssen Sie sicherstellen, dass dies der Fall ist.
+Siehe [mein früherer Beitrag](/blog/imagesharpwithdocker) für wie ich dies mit einem kartierten Volumen zu verwalten.
+
 ## Schlußfolgerung
 
-Wie Sie gesehen haben ImageSharp.Web gibt uns eine große Fähigkeit, die Größe und Formatierung von Bildern in unseren ASP.NET Core-Anwendungen. Es ist einfach einzurichten und zu verwenden und bietet eine Menge Flexibilität in, wie wir Bilder in unseren Anwendungen manipulieren können.
+Wie Sie gesehen haben ImageSharp.Web gibt uns eine große Fähigkeit, die Größe und Formatierung von Bildern in unseren ASP.NET Core-Anwendungen. Es ist einfach einzurichten und zu verwenden und bietet viel Flexibilität, wie wir Bilder in unseren Anwendungen manipulieren können.

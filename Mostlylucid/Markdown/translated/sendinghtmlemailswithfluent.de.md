@@ -3,11 +3,11 @@
 <datetime class="hidden">2024-08-07T00:30</datetime>
 
 <!--category-- ASP.NET, FluentEmail -->
-Dies ist ein ziemlich einfacher Artikel, aber wird einige der odness der Verwendung[FluentEmail](https://github.com/lukencode/FluentEmail)in ASP.NET Core, um HTML-E-Mails zu senden, die ich anderswo nicht gesehen habe.
+Dies ist ein ziemlich einfacher Artikel, aber wird einige der odness der Verwendung [FluentEmail](https://github.com/lukencode/FluentEmail) in ASP.NET Core, um HTML-E-Mails zu senden, die ich anderswo nicht gesehen habe.
 
 ## Das Problem
 
-Das Senden von HTML-Mails ist mit SmtpClient selbst ziemlich einfach, aber es ist nicht sehr flexibel und unterstützt Dinge wie Vorlagen oder Anhänge nicht. FluentEmail ist eine großartige Bibliothek dafür, aber es ist nicht immer klar, wie man es in ASP.NET Core verwendet.
+Mit SmtpClient ist das Senden von HTML-Mails selbst ziemlich einfach, aber es ist nicht sehr flexibel und unterstützt Dinge wie Vorlagen oder Anhänge nicht. FluentEmail ist eine großartige Bibliothek dafür, aber es ist nicht immer klar, wie man sie in ASP.NET Core verwendet.
 
 FluentEmail mit Razorlight (es ist eingebaut) ermöglicht es Ihnen, Ihre E-Mails mit Hilfe der Razor-Syntax zu templatieren. Dies ist großartig, da es Ihnen erlaubt, die volle Leistung von Razor verwenden, um Ihre E-Mails zu erstellen.
 
@@ -55,7 +55,7 @@ public static class Setup
 
 ##SMTP-Einstellungen
 
-Wie Sie sehen werden, habe ich auch die IConfigSection Methode verwendet, die in meinem[vorheriger Artikel](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco)um die SMTP-Einstellungen zu erhalten.
+Wie Sie sehen werden, habe ich auch die IConfigSection Methode verwendet, die in meinem [vorheriger Artikel](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco) um die SMTP-Einstellungen zu erhalten.
 
 ```csharp
   var smtpSettings = services.ConfigurePOCO<SmtpSettings>(config.GetSection(SmtpSettings.Section));
@@ -83,7 +83,7 @@ Dies kommt von der Datei appsettings.json:
 
 ## GMAIL / Google SMTP
 
-Hinweis: Für Google SMTP, wenn Sie MFA (die Sie**wirklich*wenn Sie müssen, um eine[App-Passwort für Ihr Konto](https://myaccount.google.com/apppasswords).
+Hinweis: Für Google SMTP, wenn Sie MFA (die Sie **wirklich* wenn Sie müssen, um eine [App-Passwort für Ihr Konto](https://myaccount.google.com/apppasswords).
 
 Für lokale dev können Sie dies Ihrer Secrets.json-Datei hinzufügen:
 
@@ -112,7 +112,7 @@ services:
       - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
 ```
 
-Nehmen Sie eine Notiz vom Abstand, da dies kann wirklich verwirren Sie mit docker komponieren. Um zu überprüfen, was injiziert wird, können Sie verwenden
+Nehmen Sie eine Notiz vom Abstand, da dies kann wirklich verwirren Sie mit docker komponieren. Um zu überprüfen, was injiziert wird, können Sie
 
 ```bash
 docker compose config
@@ -120,11 +120,40 @@ docker compose config
 
 Um Ihnen zu zeigen, wie die Datei mit diesen injiziert aussieht.
 
+## FluentEmail-Anfechtungen
+
+Ein Problem mit Fluent Email ist, dass Sie dies Ihrem csproj hinzufügen müssen
+
+```xml
+  <PropertyGroup>
+    <PreserveCompilationContext>true</PreserveCompilationContext>
+  </PropertyGroup>
+```
+
+Dies liegt daran, dass FluentEmail RazorLight verwendet, die dies benötigt, um zu funktionieren.
+
+Für die Template-Dateien können Sie sie entweder als Content-Dateien in Ihr Projekt aufnehmen oder wie ich es im Docker-Container tue, die Dateien in das endgültige Bild kopieren
+
+```yaml
+FROM build AS publish
+RUN dotnet publish "Mostlylucid.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+
+COPY --from=publish /app/publish .
+# Copy the Markdown directory
+COPY ./Mostlylucid/Markdown /app/Markdown
+COPY ./Mostlylucid/Email/Templates /app/Email/Templates
+# Switch to a non-root user
+USER $APP_UID
+```
+
 ## E-Mail-Dienst
 
 Okay, zurück zum Code!
 
-Jetzt haben wir alles eingerichtet können wir den E-Mail-Service hinzufügen. Dies ist ein einfacher Dienst, der eine Vorlage nimmt und eine E-Mail sendet:
+Jetzt haben wir alles vorbereitet können wir den E-Mail-Service hinzufügen. Dies ist ein einfacher Dienst, der eine Vorlage nimmt und eine E-Mail sendet:
 
 ```csharp
 public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
@@ -169,7 +198,7 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 }
 ```
 
-Wie Sie hier sehen können, haben wir zwei Methoden, eine für Kommentare und eine für das Kontaktformular ([Schicken Sie mir eine Post!](/contact)In dieser App melde ich mich an, damit ich die Mail bekommen kann, von der sie kommt (und Spam vermeiden).
+Wie Sie hier sehen können, haben wir zwei Methoden, eine für Kommentare und eine für das Kontaktformular ([Schicken Sie mir eine Post!](/contact) )== Einzelnachweise == In dieser App melde ich mich an, damit ich die Mail bekommen kann, von der es ist (und Spam zu vermeiden).
 
 Die meiste Arbeit wird hier geleistet:
 
@@ -183,7 +212,7 @@ Die meiste Arbeit wird hier geleistet:
             .SendAsync();
 ```
 
-Hier öffnen wir eine Vorlagendatei, fügen das Modell mit dem Inhalt für die E-Mail hinzu, laden es in FluentEmail und senden es dann. Die Vorlage ist eine einfache Razor-Datei:
+Hier öffnen wir eine Template-Datei, fügen das Modell mit dem Inhalt für die E-Mail hinzu, laden es in FluentEmail und senden es dann. Die Vorlage ist eine einfache Razor-Datei:
 
 ```razor
 @model Mostlylucid.Email.Models.ContactEmailModel
@@ -208,7 +237,7 @@ Hier öffnen wir eine Vorlagendatei, fügen das Modell mit dem Inhalt für die E
 </html>
 ```
 
-Diese werden als.template-Dateien im E-Mail/Templates-Ordner gespeichert. Sie können.cshtml-Dateien verwenden, aber es verursacht ein Problem mit dem @Raw-Tag in der Vorlage (es ist eine Rasiererscheinung Sache).
+Diese werden als.template-Dateien im Ordner E-Mail/Templates gespeichert. Sie können.cshtml-Dateien verwenden, aber es verursacht ein Problem mit dem @Raw-Tag in der Vorlage (es ist eine Rasiererlicht Sache).
 
 ## Der Controller
 

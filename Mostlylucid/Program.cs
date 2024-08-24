@@ -32,7 +32,7 @@ services.SetupUmamiClient(config);
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 services.SetupTranslateService();
-//services.SetupOpenSearch(config);
+services.SetupOpenSearch(config);
 services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
 services.SetupEmail(builder.Configuration);
 services.SetupRSS();
@@ -75,7 +75,7 @@ services
 var app = builder.Build();
 app.UseSerilogRequestLogging();
 
-//await app.SetupOpenSearchIndex();
+await app.SetupOpenSearchIndex();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

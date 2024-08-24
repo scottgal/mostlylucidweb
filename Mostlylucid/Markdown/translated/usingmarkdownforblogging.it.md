@@ -5,24 +5,24 @@
 
 ## Introduzione
 
-Markdown è un linguaggio di markup leggero che è possibile utilizzare per aggiungere elementi di formattazione ai documenti di testo in chiaro. Creato da John Gruber nel 2004, Markdown è ora uno dei linguaggi di markup più popolari del mondo.
+Markdown è un linguaggio di markup leggero che è possibile utilizzare per aggiungere elementi di formattazione ai documenti di testo in chiaro. Creato da John Gruber nel 2004, Markdown è ora una delle lingue di markup più popolari al mondo.
 
-Su questo sito uso un approccio super semplice al blogging, avendo provato e non riuscito a mantenere un blog in passato ho voluto rendere il più facile possibile per scrivere e pubblicare i post. Uso markdown per scrivere i miei post e questo sito ha un unico servizio utilizzando[MarkdigCity name (optional, probably does not need a translation)](https://github.com/xoofx/markdig)per convertire il markdown in HTML.
+Su questo sito uso un approccio super semplice al blogging, avendo provato e non riuscito a mantenere un blog in passato ho voluto rendere il più facile possibile per scrivere e pubblicare i post. Uso markdown per scrivere i miei post e questo sito ha un unico servizio utilizzando [MarkdigCity name (optional, probably does not need a translation)](https://github.com/xoofx/markdig) per convertire il markdown in HTML.
 
 [TOC]
 
 ## Perché non un generatore statico del sito?
 
-In una parola semplicità. Questo non sarà un sito super alto traffico, io uso ASP.NET OutPutCache per nascondere le pagine e non ho intenzione di aggiornarlo che spesso. Ho voluto mantenere il sito il più semplice possibile e non devono preoccuparsi per la testata di un generatore di sito statico sia in termini di processo di costruzione e la complessità del sito.
+In una parola semplicità. Questo non sarà un sito super ad alto traffico, io uso ASP.NET OutPutCache per nascondere le pagine e non ho intenzione di aggiornarlo che spesso. Volevo mantenere il sito il più semplice possibile e non dovevo preoccuparmi dell'overhead di un generatore di sito statico sia in termini di processo di costruzione che di complessità del sito.
 
-Per chiarire; generatori di sito statici come[HugoCity name (optional, probably does not need a translation)](https://gohugo.io/) / [JekyllCity name (optional, probably does not need a translation)](https://jekyllrb.com/)ecc... può essere una buona soluzione per molti siti, ma per questo ho voluto mantenere come semplice*per me*Come possibile. Sono un veterano ASP.NET 25 anni in modo da capire dentro e fuori. Questo design del sito aggiunge complessità; Ho punti di vista, servizi, controller e un sacco di HTML manuale & CSS, ma sono a mio agio con questo.
+Per chiarire; generatori di sito statici come [HugoCity name (optional, probably does not need a translation)](https://gohugo.io/) / [JekyllCity name (optional, probably does not need a translation)](https://jekyllrb.com/) ecc... può essere una buona soluzione per molti siti, ma per questo ho voluto mantenere come semplice *per me* Il piu' possibile. Sono un veterano dell'ASP.NET da 25 anni, quindi capiscilo dentro e fuori. Questo design del sito aggiunge complessità; ho punti di vista, servizi, controller e un sacco di HTML manuale & CSS, ma sono a mio agio con questo.
 
 ## Perche' non un database?
 
-1. Semplicità di progettazione; I database sono sistemi potenti per la memorizzazione dei dati (e ne aggiungo uno per i commenti a breve) ma aggiungono anche complessità.*correttamente*utilizzare i database soprattutto in un'applicazione ASP.NET si aggiunge un sacco di codice, non importa se si sta utilizzando[Centrale EF](https://learn.microsoft.com/en-us/ef/core/), [DapperCity name (optional, probably does not need a translation)](https://github.com/DapperLib/Dapper)o SQL grezzo con ADO.NET. Volevo mantenere il sito il più semplice possibile*per iniziare con*.
-2. Facilità di aggiornamento e distribuzione. Questo sito ha lo scopo di dimostrare come Docker & Docker Compose può essere semplice per eseguire un sito. Posso aggiornare il sito controllando il nuovo codice (compreso il contenuto) a GitHub, l'azione funziona, costruisce l'immagine poi il metodo Watchtower nel mio docker comporre l'immagine del sito automaticamente. Questo è un modo molto semplice per aggiornare un sito e volevo mantenerlo in questo modo.
-3. Eseguire duplicati; poiché ho dati ZERO che non sono all'interno dell'immagine docker significa che posso eseguire esattamente duplicati localmente (sul mio piccolo cluster Ubuntu qui a casa). Questo è un ottimo modo per testare i cambiamenti con docker (ad esempio,[quando ho fatto le modifiche ImageSharp](/blog/imagesharpwithdocker)== Altri progetti ==== Collegamenti esterni ==
-4. Perché non volevo! Volevo vedere fino a che punto potevo arrivare con un semplice design del sito e finora sono abbastanza felice con esso.
+1. Semplicità di progettazione; I database sono sistemi potenti per la memorizzazione dei dati (e ne aggiungo uno per i commenti a breve) ma aggiungono anche complessità. A *correttamente* utilizzare i database soprattutto in un'applicazione ASP.NET si aggiunge un sacco di codice, non importa se si sta utilizzando [Centrale EF](https://learn.microsoft.com/en-us/ef/core/), [DapperCity name (optional, probably does not need a translation)](https://github.com/DapperLib/Dapper) o SQL grezzo con ADO.NET. Volevo mantenere il sito il più semplice possibile *per iniziare con*.
+2. Facilità di aggiornamento e distribuzione. Questo sito ha lo scopo di dimostrare come Docker & Docker Compose può essere semplice per eseguire un sito. Posso aggiornare il sito controllando il nuovo codice (compreso il contenuto) a GitHub, l'azione funziona, costruisce l'immagine poi il metodo Watchtower nel mio docker comporre file aggiorna automaticamente l'immagine del sito. Questo è un modo molto semplice per aggiornare un sito e volevo tenerlo in questo modo.
+3. Eseguire duplicati; poiché ho dati ZERO che non sono all'interno dell'immagine docker significa che posso eseguire esattamente duplicati localmente (sul mio piccolo cluster Ubuntu qui a casa). Questo è un ottimo modo per testare i cambiamenti con docker (ad esempio, [quando ho fatto le modifiche ImageSharp](/blog/imagesharpwithdocker) == Altri progetti ==== Collegamenti esterni ==
+4. Perche' non volevo! Volevo vedere fino a che punto potevo arrivare con un semplice design del sito e finora sono abbastanza felice con esso.
 
 ## Come scrivi i tuoi post?
 
@@ -41,13 +41,13 @@ flowchart LR
 
 ## Come si aggiungono le immagini?
 
-Dal momento che ho appena aggiunto l'immagine qui, vi mostrerò come ho fatto. Ho semplicemente aggiunto l'immagine alla cartella wwwroot/articleimages e l'ho fatto riferimento nel file markdown in questo modo:
+Dato che ho appena aggiunto l'immagine qui, vi mostrerò come ho fatto. Ho semplicemente aggiunto l'immagine alla cartella wwwroot/articleimages e l'ho fatto riferimento nel file markdown in questo modo:
 
 ```markdown
 ![setascontent.png](setascontent.png)
 ```
 
-Poi aggiungo un'estensione alla mia pipeline di Markdig che le riscrive all'URL corretto (tutto sulla semplicità).[Vedere qui per il codice sorgente per l'estensione.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
+Poi aggiungo un'estensione alla mia pipeline di Markdig che le riscrive all'URL corretto (tutto sulla semplicità). [Vedere qui per il codice sorgente per l'estensione.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
 
 ```csharp
 using Markdig;
@@ -81,11 +81,10 @@ public class ImgExtension : IMarkdownExtension
 
 Il BlogService è un servizio semplice che legge i file markdown dalla cartella Markdown e li converte in HTML utilizzando Markdig.
 
-La fonte completa per questo è di seguito e[qui](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/BlogService.cs).
+La fonte completa per questo è di seguito e [qui](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/BlogService.cs).
 
 <details>
 <summary>Click to see the source code for the BlogService</summary>
-
 ```csharp
 
 using System.Globalization;
@@ -448,7 +447,7 @@ public (string title, string slug, DateTime publishDate, string processed, strin
 ```
 
 </details>
-Il codice qui sotto mostra come generare l'elenco dei post del blog, si utilizza il`GetPage(page, false)`metodo per estrarre il titolo, le categorie, la data di pubblicazione e il contenuto trattato.
+Il codice qui sotto mostra come generare l'elenco dei post del blog, si utilizza il `GetPage(page, false)` metodo per estrarre il titolo, le categorie, la data di pubblicazione e il contenuto trattato.
 
 ```csharp
      public List<PostListModel> GetPosts(string[] pages)

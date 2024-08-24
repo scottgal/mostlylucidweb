@@ -1,24 +1,26 @@
 # Coilwind CSS & ASP.NET Core
 
 <datetime class="hidden">2024-07-30T13:30</datetime>
-Tailwind CSS es un framework CSS de primera utilidad para la construcción rápida de diseños personalizados. Es un framework CSS altamente personalizable y de bajo nivel que le da todos los bloques de construcción que necesita para construir diseños a medida sin estilos de opinión molestos que tiene que luchar para anular.
 
-Uno de los grandes beneficios de Tailwind sobre los marcos CSS 'tradicionales' como Bootstrap es que Tailwind incluye un 'escáner' y un paso de construcción, por lo que solo incluye el CSS que realmente usas en tu proyecto. Esto significa que puedes incluir toda la biblioteca CSS de Tailwind en tu proyecto y no te preocupes por el tamaño del archivo CSS.
+<!--category-- ASP.NET, Tailwind -->
+Tailwind CSS es un framework CSS de primera utilidad para la construcción rápida de diseños personalizados. Es un marco CSS altamente personalizable, de bajo nivel que le da todos los bloques de construcción que necesita para construir diseños a medida sin estilos molestos de opinión que tiene que luchar para anular.
+
+Uno de los grandes beneficios de Tailwind sobre los marcos CSS 'tradicionales' como Bootstrap es que Tailwind incluye un 'escáner' y un paso de construcción por lo que sólo incluye el CSS que realmente utiliza en su proyecto. Esto significa que puede incluir toda la biblioteca CSS de Tailwind en su proyecto y no preocuparse por el tamaño del archivo CSS.
 
 ## Instalación
 
-Un gran inconveniente en comparación con Bootstrap es que Tailwind no es un archivo CSS 'drop in'. Es necesario instalarlo utilizando npm o hilo (sección posterior es de[esto](https://tailwindcss.com/docs/installation)).
+Un gran inconveniente en comparación con Bootstrap es que Tailwind no es un archivo CSS 'drop in'. Usted necesita instalarlo usando npm o hilo (sección posterior es de [esto](https://tailwindcss.com/docs/installation)).
 
 ```bash
 npm install -D tailwindcss
 npx tailwindcss init
 ```
 
-Esto instalará Tailwind CSS y creará un[`tailwind.config.js` ](#tailwindconfigjs)archivo en la raíz de su proyecto. Este archivo se utiliza para configurar Coilwind CSS.
+Esto instalará Tailwind CSS y creará un [`tailwind.config.js` ](#tailwindconfigjs) archivo en la raíz de su proyecto. Este archivo se utiliza para configurar Tailwind CSS.
 
 ### Paquete.json
 
-Si usted mira a la[fuente de este proyecto](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid)Ya verás que tengo un`package.json`archivo que incluye las siguientes definiciones de'script' y 'devDependencias':
+Si usted mira a la [fuente de este proyecto](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid) Ya verás que tengo un `package.json` archivo que incluye las siguientes definiciones de'script' y 'devDependencias':
 
 ```json
 {
@@ -51,13 +53,13 @@ Si usted mira a la[fuente de este proyecto](https://github.com/scottgal/mostlylu
 }
 ```
 
-Estos son los'scripts' que utilizo para construir el archivo CSS de Tailwind.`dev`script es el que utilizo para construir el archivo CSS para el desarrollo.`watch`script es el que utilizo para ver el archivo CSS para los cambios y reconstruirlo.`build`script es el que utilizo para construir el archivo CSS para la producción.
+Estos son los'scripts' que utilizo para construir el archivo CSS de Tailwind. Los `dev` script es el que utilizo para construir el archivo CSS para el desarrollo. Los `watch` script es el que utilizo para ver el archivo CSS para los cambios y reconstruirlo. Los `build` script es el que utilizo para construir el archivo CSS para la producción.
 
-La sección devDependencias es como sus paquetes de nuget para sus proyectos.NET. Son los paquetes que se utilizan para construir el archivo CSS.
+La sección devDependencias es como tus paquetes de nuget para tus proyectos.NET. Son los paquetes que se utilizan para construir el archivo CSS.
 
 ### Tailwind.config.js
 
-Estos se utilizan junto con el`tailwind.config.js`archivo que está en la raíz del proyecto. Este archivo se utiliza para configurar Tailwind CSS. Aquí está el`tailwind.config.js`archivo que utilizo:
+Estos se utilizan junto con el `tailwind.config.js` archivo que está en la raíz del proyecto. Este archivo se utiliza para configurar Tailwind CSS. Aquí está el `tailwind.config.js` archivo que utilizo:
 
 ```javascript
 // tailwind.config.js
@@ -87,16 +89,16 @@ module.exports = {
 };
 ```
 
-Este archivo se utiliza para configurar Tailwind CSS.`content`sección se utiliza para decirle a Tailwind CSS dónde buscar las clases CSS que está utilizando en su proyecto. En ASP.NET Core esto generalmente incluirá la`Pages`, `Components`, y`Views`Esto también se notará en archivos 'cshtml'.
-Una 'ganada' para el viento de cola es que usted puede nooe para incluir` <div class="hidden></div> `secciones para asegurarse de que incluye todas las clases de css necesarias en la 'construcción' que no tiene en su marcado (por ejemplo, añadido usando código).
+Este archivo se utiliza para configurar Tailwind CSS. Los `content` sección se utiliza para decirle a Tailwind CSS dónde buscar las clases CSS que está utilizando en su proyecto. En ASP.NET Core esto generalmente incluirá el `Pages`, `Components`, y `Views` carpetas. Notará esto también puede archivos 'cshtml'.
+Una 'ganada' para el viento de cola es que usted puede nooe para incluir ` <div class="hidden></div> ` secciones para asegurarse de que incluye todas las clases de css necesarias en la 'construcción' que no tiene en su marcado (por ejemplo, añadido usando código).
 
-Los`safelist`sección se utiliza para decirle a Tailwind CSS qué clases para incluir en el archivo CSS.`darkMode`sección se utiliza para decirle a Tailwind CSS que utilice las clases de modo oscuro.`theme`sección se utiliza para configurar el tema de Coilwind CSS.`plugins`sección se utiliza para incluir los plugins que está utilizando en su proyecto. Esto es utilizado por Tailwind para compilar el archivo CSS como sepcificado en:
+Los `safelist` sección se utiliza para decirle a Tailwind CSS qué clases incluir en el archivo CSS. Los `darkMode` sección se utiliza para decirle a Tailwind CSS que utilice las clases de modo oscuro. Los `theme` sección se utiliza para configurar el tema de Coilwind CSS. Los `plugins` sección se utiliza para incluir los plugins que está utilizando en su proyecto. Esto es usado por Tailwind para compilar el archivo CSS como sepcificado en:
 
 "construir:tw": "npx railwindcss -i./src/css/main.css -o./wwwroot/css/dist/main.css --minify"
 
 ### CSPROJ
 
-La parte final de esto está en el propio archivo CSProj. Esto incluye una sección justo antes del cierre`<Project> `etiqueta:
+La parte final de esto está en el archivo CSProj en sí mismo. Esto incluye una sección justo antes del cierre  `<Project> ` etiqueta:
 
 ```xml
 

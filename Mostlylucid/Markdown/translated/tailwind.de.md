@@ -1,24 +1,26 @@
 # Endwind CSS & ASP.NET Core
 
 <datetime class="hidden">2024-07-30T13:30</datetime>
-Tailwind CSS ist ein Utility-First CSS-Framework für den schnellen Aufbau von benutzerdefinierten Designs. Es ist ein sehr anpassbares, Low-Level CSS-Framework, das Ihnen alle Bausteine, die Sie brauchen, um maßgeschneiderte Designs ohne lästige Meinungen Stile, die Sie kämpfen müssen, um zu überschreiben bauen.
 
-Einer der großen Vorteile von Tailwind gegenüber 'traditionellen' CSS-Frameworks wie Bootstrap ist, dass Tailwind einen 'Scanning' und einen Bauschritt enthält, also nur den CSS, den Sie tatsächlich in Ihrem Projekt verwenden. Dies bedeutet, dass Sie die gesamte Tailwind CSS-Bibliothek in Ihr Projekt integrieren können und sich keine Sorgen über die Größe der CSS-Datei machen.
+<!--category-- ASP.NET, Tailwind -->
+Tailwind CSS ist ein Utility-First CSS-Framework zum schnellen Erstellen von benutzerdefinierten Designs. Es ist ein sehr anpassbares, Low-Level CSS-Framework, das Ihnen alle Bausteine gibt, die Sie brauchen, um maßgeschneiderte Designs ohne lästige opinionierte Stile zu bauen, die Sie kämpfen müssen, um zu überschreiben.
+
+Einer der großen Vorteile von Tailwind über 'traditionelle' CSS-Frameworks wie Bootstrap ist, dass Tailwind einen 'Scanning' und einen Bauschritt enthält, also nur den CSS, den Sie tatsächlich in Ihrem Projekt verwenden. Das bedeutet, dass Sie die gesamte Tailwind CSS-Bibliothek in Ihr Projekt integrieren können und sich keine Sorgen über die Größe der CSS-Datei machen.
 
 ## Installation
 
-Ein großer Nachteil im Vergleich zu Bootstrap ist, dass Tailwind ist kein 'drop in' CSS-Datei. Sie müssen es mit npm oder Garn installieren (nachfolgende Abschnitt ist von[diese](https://tailwindcss.com/docs/installation)).
+Ein großer Nachteil im Vergleich zu Bootstrap ist, dass Tailwind keine 'drop in' CSS-Datei ist. Sie müssen es mit npm oder Garn installieren (nachfolgender Abschnitt ist von [diese](https://tailwindcss.com/docs/installation)).
 
 ```bash
 npm install -D tailwindcss
 npx tailwindcss init
 ```
 
-Dies wird Tailwind CSS installieren und eine[`tailwind.config.js` ](#tailwindconfigjs)filein the root of your project. Diese Datei wird verwendet, um Tailwind CSS zu konfigurieren.
+Dies wird Tailwind CSS installieren und eine [`tailwind.config.js` ](#tailwindconfigjs) filein der Wurzel Ihres Projekts. Diese Datei wird verwendet, um Tailwind CSS zu konfigurieren.
 
 ### Paket.json
 
-Wenn Sie sich die[Quelle dieses Projekts](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid)Sie werden sehen, dass ich eine`package.json`Datei, die die folgenden Definitionen'script' und 'devDependencies' enthält:
+Wenn Sie sich die [Quelle dieses Projekts](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid) Sie werden sehen, dass ich eine `package.json` Datei, die die folgenden Definitionen'script' und 'devDependencies' enthält:
 
 ```json
 {
@@ -51,13 +53,13 @@ Wenn Sie sich die[Quelle dieses Projekts](https://github.com/scottgal/mostlyluci
 }
 ```
 
-Dies sind die 'Skripte', die ich benutze, um die Tailwind CSS-Datei zu erstellen.`dev`script ist das, das ich benutze, um die CSS-Datei für die Entwicklung zu bauen.`watch`script ist das, das ich benutze, um die CSS-Datei auf Änderungen zu sehen und sie neu aufzubauen.`build`script ist das, das ich benutze, um die CSS-Datei für die Produktion zu erstellen.
+Dies sind die 'Skripte' die ich zum Erstellen der Tailwind CSS-Datei verwende. Das `dev` script ist das, mit dem ich die CSS-Datei für die Entwicklung baue. Das `watch` Skript ist das, das ich benutze, um die CSS-Datei auf Änderungen zu sehen und sie neu aufzubauen. Das `build` script ist das, das ich benutze, um die CSS-Datei für die Produktion zu erstellen.
 
-Der Abschnitt devDependencies ist wie Ihre Nuget-Pakete für Ihre.NET-Projekte. Sie sind die Pakete, die verwendet werden, um die CSS-Datei zu erstellen.
+Der Abschnitt devDependencies ist wie Ihre Nuget-Pakete für Ihre.NET-Projekte. Sie sind die Pakete, die verwendet werden, um die CSS-Datei zu bauen.
 
 ### Endwind.config.js
 
-Diese werden zusammen mit der`tailwind.config.js`Datei, die in der Wurzel des Projekts ist. Diese Datei wird verwendet, um Tailwind CSS zu konfigurieren. Hier ist die`tailwind.config.js`Datei, die ich benutze:
+Diese werden zusammen mit der `tailwind.config.js` Datei, die in der Wurzel des Projekts ist. Diese Datei wird verwendet, um Tailwind CSS zu konfigurieren. Hier ist die `tailwind.config.js` Datei, die ich benutze:
 
 ```javascript
 // tailwind.config.js
@@ -87,16 +89,16 @@ module.exports = {
 };
 ```
 
-Diese Datei wird verwendet, um Tailwind CSS zu konfigurieren.`content`Abschnitt wird verwendet, um Tailwind CSS zu sagen, wo Sie nach den CSS-Klassen suchen, die Sie in Ihrem Projekt verwenden. In ASP.NET Core wird dies in der Regel die`Pages`, `Components`, und`Views`Ordner. Sie werden feststellen, dass dies auch 'cshtml'-Dateien.
-Ein "gotcha" für Rückenwind ist, dass Sie nicht mitmachen können` <div class="hidden></div> `Abschnitte, um sicherzustellen, dass Sie alle erforderlichen css-Klassen in das 'build' aufnehmen, das Sie nicht in Ihrem Markup haben (z.B. mit Code hinzugefügt).
+Diese Datei wird verwendet, um Tailwind CSS zu konfigurieren. Das `content` Abschnitt wird verwendet, um Tailwind CSS zu sagen, wo Sie nach den CSS-Klassen suchen, die Sie in Ihrem Projekt verwenden. In ASP.NET Core wird dies in der Regel die `Pages`, `Components`, und `Views` Ordner. Sie werden auch diese Dosen 'cshtml' Dateien beachten.
+Ein "gotcha" für Rückenwind ist, dass Sie nicht mitmachen können ` <div class="hidden></div> ` Abschnitte, um sicherzustellen, dass Sie alle erforderlichen css-Klassen in das 'build' aufnehmen, das Sie nicht in Ihrem Markup haben (z.B. mit Code hinzugefügt).
 
-Das`safelist`Abschnitt wird verwendet, um Tailwind CSS zu sagen, welche Klassen in die CSS-Datei aufzunehmen sind.`darkMode`Abschnitt wird verwendet, um Tailwind CSS zu sagen, die dunklen Modus-Klassen zu verwenden.`theme`Abschnitt wird verwendet, um das Thema von Tailwind CSS zu konfigurieren.`plugins`Abschnitt wird verwendet, um die Plugins, die Sie in Ihrem Projekt verwenden. Dieser wird dann von Tailwind verwendet, um die CSS-Datei als sepcified in kompilieren:
+Das `safelist` Abschnitt wird verwendet, um Tailwind CSS zu sagen, welche Klassen in die CSS-Datei aufgenommen werden sollen. Das `darkMode` Abschnitt wird verwendet, um Tailwind CSS zu sagen, um die Dunkelmodus-Klassen zu verwenden. Das `theme` Abschnitt wird verwendet, um das Thema von Tailwind CSS zu konfigurieren. Das `plugins` Abschnitt wird verwendet, um die Plugins, die Sie in Ihrem Projekt verwenden. Dies wird dann von Tailwind verwendet, um die CSS-Datei als sepcified in zu kompilieren:
 
 "build:tw": "npx tailwindcss -i./src/css/main.css -o./wwwroot/css/dist/main.css --minify"
 
 ### CSPROJJ
 
-Der letzte Teil davon ist in der CSProj-Datei selbst. Dies beinhaltet einen Abschnitt direkt vor dem Schließen`<Project> `Tag:
+Der letzte Teil davon ist in der CSProj-Datei selbst. Dies beinhaltet einen Abschnitt direkt vor dem Abschluss  `<Project> ` Tag:
 
 ```xml
 

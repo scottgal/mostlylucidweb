@@ -93,5 +93,3 @@ Dit houdt ook uw pagina in overeenstemming met uw gekozen lay-out en ontwerp.
 ## Conclusie
 
 Dit is een eenvoudige manier om fouten te verwerken in een ASP.NET Core applicatie. Het biedt een goede gebruikerservaring en stelt ons in staat om fouten bij te houden. Het is een goed idee om fouten in te loggen bij een logservice zodat je ze kunt bijhouden en repareren voordat ze een probleem worden.
-
-

@@ -5,30 +5,30 @@
 
 ## Présentation
 
-Markdown est un langage de balisage léger que vous pouvez utiliser pour ajouter des éléments de formatage aux documents texte. Créé par John Gruber en 2004, Markdown est maintenant l'un des langages de balisage les plus populaires au monde.
+Markdown est un langage de balisage léger que vous pouvez utiliser pour ajouter des éléments de formatage aux documents texte. Créé par John Gruber en 2004, Markdown est maintenant l'une des langues de balisage les plus populaires au monde.
 
-Sur ce site, j'utilise une approche super simple de blogging, après avoir essayé et échoué à maintenir un blog dans le passé, je voulais le rendre aussi facile que possible d'écrire et de publier des messages. J'utilise markdown pour écrire mes messages et ce site a un service unique en utilisant[Marqueur](https://github.com/xoofx/markdig)pour convertir le balisage en HTML.
+Sur ce site, j'utilise une approche super simple de blogging, après avoir essayé et échoué à maintenir un blog dans le passé, je voulais le rendre aussi facile que possible d'écrire et de publier des messages. J'utilise balisage pour écrire mes messages et ce site a un seul service en utilisant [Marqueur](https://github.com/xoofx/markdig) pour convertir le balisage en HTML.
 
 [TOC]
 
 ## Pourquoi pas un générateur de site statique?
 
-En un mot simplicité. Cela ne va pas être un site de trafic super élevé, j'utilise ASP.NET OutPutCache pour mettre en cache les pages et je ne vais pas le mettre à jour que souvent. Je voulais garder le site aussi simple que possible et ne pas avoir à s'inquiéter des frais généraux d'un générateur de site statique à la fois en termes de processus de construction et de la complexité du site.
+En un mot de simplicité. Ce ne sera pas un site de très haut trafic, j'utilise ASP.NET OutPutCache pour mettre en cache les pages et je ne vais pas le mettre à jour si souvent. Je voulais garder le site aussi simple que possible et ne pas avoir à m'inquiéter des frais généraux d'un générateur de site statique tant en ce qui concerne le processus de construction que la complexité du site.
 
-Pour clarifier; générateurs de site statiques comme[Hugo](https://gohugo.io/) / [Jekyll](https://jekyllrb.com/)etc... peut être une bonne solution pour de nombreux sites mais pour celui-ci je voulais le garder aussi simple*pour moi*Je suis un vétéran de 25 ans ASP.NET donc comprenez-le à l'intérieur et à l'extérieur. Cette conception de site ajoute de la complexité; j'ai des vues, des services, des contrôleurs et un LOT de HTML et CSS manuel, mais je suis à l'aise avec cela.
+Pour clarifier; générateurs de site statiques comme [Hugo](https://gohugo.io/) / [Jekyll](https://jekyllrb.com/) etc... peut être une bonne solution pour de nombreux sites mais pour celui-ci je voulais le garder aussi simple *pour moi* autant que possible. Je suis un vétéran de 25 ans ASP.NET donc comprenez-le à l'intérieur et à l'extérieur. Cette conception de site ajoute de la complexité; j'ai des vues, des services, des contrôleurs et un LOT de HTML et CSS manuel, mais je suis à l'aise avec cela.
 
 ## Pourquoi pas une base de données?
 
-1. Simplicité de la conception; Les bases de données sont des systèmes puissants pour le stockage des données (et j'en ajouterai un pour les commentaires sous peu) mais elles ajoutent aussi de la complexité.*correctement*utiliser des bases de données en particulier dans une application ASP.NET vous ajoutez un LOT de code, peu importe si vous utilisez[EF Noyau](https://learn.microsoft.com/en-us/ef/core/), [Détonateur](https://github.com/DapperLib/Dapper)ou SQL brut avec ADO.NET. Je voulais garder le site aussi simple que possible*pour commencer par*.
-2. Facilité de mise à jour et de déploiement. Ce site est destiné à démontrer comment simple Docker & Docker Compose peut être d'exécuter un site. Je peux mettre à jour le site en vérifiant le nouveau code (y compris le contenu) à GitHub, l'Action exécute, construit l'image puis la méthode de La Tour de Garde dans mon docker compose la mise à jour de fichier l'image du site automatiquement. C'est une façon très simple de mettre à jour un site et je voulais le garder de cette façon.
-3. Exécuter des duplicates; comme j'ai des données ZERO qui ne sont pas dans l'image de docker, cela signifie que je peux exécuter des duplicates exacts localement (sur mon petit cluster Ubuntu ici à la maison). C'est une excellente façon de tester les changements avec docker (par exemple,[quand j'ai fait les changements ImageSharp](/blog/imagesharpwithdocker)) avant de les déployer sur le site en direct.
+1. Simplicité de la conception; Les bases de données sont des systèmes puissants pour le stockage des données (et j'en ajouterai un pour les commentaires sous peu) mais elles ajoutent aussi de la complexité. Pour *correctement* utiliser des bases de données en particulier dans une application ASP.NET vous ajoutez un LOT de code, peu importe si vous utilisez [EF Noyau](https://learn.microsoft.com/en-us/ef/core/), [Détonateur](https://github.com/DapperLib/Dapper) ou SQL brut avec ADO.NET. Je voulais garder le site aussi simple que possible *pour commencer par*.
+2. Facilité de mise à jour et de déploiement. Ce site est destiné à démontrer comment simple Docker & Docker Compose peut être d'exécuter un site. Je peux mettre à jour le site en vérifiant le nouveau code (y compris le contenu) de GitHub, l'Action exécute, construit l'image puis la méthode de La Tour de Garde dans mon docker compose le fichier met à jour l'image du site automatiquement. C'est une façon très simple de mettre à jour un site et je voulais le garder de cette façon.
+3. Exécuter des doublons; comme j'ai des données ZERO qui ne sont pas dans l'image de la docker, cela signifie que je peux exécuter des doublons exacts localement (sur mon petit cluster Ubuntu ici à la maison). C'est une excellente façon de tester les changements avec le docker (p. ex., [quand j'ai fait les changements ImageSharp](/blog/imagesharpwithdocker) ) avant de les déployer sur le site en direct.
 4. Parce que je ne voulais pas! Je voulais voir jusqu'où je pouvais aller avec un simple design de site et jusqu'à présent je suis plutôt heureux avec elle.
 
 ## Comment écrivez-vous vos messages?
 
 Je dépose simplement un nouveau fichier.md dans le dossier Markdown et le site le récupère et le rend (lorsque je me souviens de le mettre sous forme de contenu, cela garantit qu'il est disponible dans les fichiers de sortie! )
 
-Puis, lorsque je vérifie le site à GitHub, l'action tourne et le site est mis à jour. Simple!
+Puis, lorsque je vérifie le site à GitHub, l'action tourne et le site est mis à jour. C'est simple!
 
 ```mermaid
 flowchart LR
@@ -47,7 +47,7 @@ Puisque je viens d'ajouter l'image ici, je vais vous montrer comment je l'ai fai
 ![setascontent.png](setascontent.png)
 ```
 
-J'ajoute ensuite une extension à mon pipeline Markdig qui les réécrit à l'URL correcte (tout au sujet de la simplicité).[Voir ici le code source pour l'extension.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
+J'ajoute ensuite une extension à mon pipeline Markdig qui les réécrit à l'URL correcte (tout au sujet de la simplicité). [Voir ici le code source pour l'extension.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/MarkDigExtensions/ImgExtension.cs)
 
 ```csharp
 using Markdig;
@@ -81,7 +81,7 @@ public class ImgExtension : IMarkdownExtension
 
 Le BlogService est un service simple qui lit les fichiers de balisage à partir du dossier Markdown et les convertit en HTML à l'aide de Markdig.
 
-La source complète pour cela est ci-dessous et[Ici.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/BlogService.cs).
+La source complète pour cela est ci-dessous et [Ici.](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/BlogService.cs).
 
 <details>
 <summary>Click to see the source code for the BlogService</summary>
@@ -309,7 +309,7 @@ Le code pour traiter les fichiers de balisage en HTML est assez simple, j'utilis
 La méthode GetPage est utilisée pour extraire le contenu du fichier balisage, il a quelques étapes:
 
 1. Extrait du titre
-   Par convention, j'utilise la première ligne du fichier balisage comme titre du message. Je peux donc simplement faire:
+   Par convention, j'utilise la première ligne du fichier balisage comme titre du message. Donc je peux simplement faire:
 
 ```csharp
         var lines = File.ReadAllLines(page);
@@ -404,7 +404,6 @@ La méthode GetCategories utilise une expression régulière pour extraire les c
 
 <details>
 <summary> The GetPage Method</summary>
-
 ```csharp
 public (string title, string slug, DateTime publishDate, string processed, string[] categories, string
         restOfTheLines) GetPage(string page, bool html)
@@ -448,8 +447,7 @@ public (string title, string slug, DateTime publishDate, string processed, strin
 ```
 
 </details>
-
-Le code ci-dessous montre comment je génère la liste des messages de blog, il utilise le`GetPage(page, false)`méthode pour extraire le titre, les catégories, la date de publication et le contenu traité.
+Le code ci-dessous montre comment je génère la liste des messages de blog, il utilise le `GetPage(page, false)` méthode pour extraire le titre, les catégories, la date de publication et le contenu traité.
 
 ```csharp
      public List<PostListModel> GetPosts(string[] pages)

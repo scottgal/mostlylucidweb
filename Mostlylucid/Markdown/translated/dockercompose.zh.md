@@ -3,7 +3,7 @@
 <datetime class="hidden">2024-07-30-13:30</datetime>
 
 <!--category-- Docker -->
-Docker Compose 是一个定义和运行多容器 Docker 应用程序的工具。 有了 Commpte, 您可以使用 YAML 文件来配置应用程序的服务。 然后, 如果有一个单项命令, 您可以从配置中创建和启动所有服务 。
+Docker Compose 是定义和运行多容器 Docker 应用程序的工具 。 使用 Compe, 您将使用 YAML 文件来配置应用程序的服务 。 然后,只要有一个单项命令,你就从配置中创建并启动所有服务。
 
 此时此刻,我使用多克·康波斯 在我的服务器上运行一些服务。
 
@@ -11,7 +11,7 @@ Docker Compose 是一个定义和运行多容器 Docker 应用程序的工具。
 - Cloudflared - 一种服务 隧道通到我的服务器
 - 监视器 - 一种服务 检查我的集装箱的更新情况 必要时重新启动
 
-这儿就是`docker-compose.yml`我用文件运行这些服务 :
+这儿就是 `docker-compose.yml` 我用文件运行这些服务 :
 
 ```yaml
 services:

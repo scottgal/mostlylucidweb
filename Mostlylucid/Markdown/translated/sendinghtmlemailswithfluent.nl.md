@@ -3,13 +3,13 @@
 <datetime class="hidden">2024-08-07T00:30</datetime>
 
 <!--category-- ASP.NET, FluentEmail -->
-Dit is een vrij eenvoudig artikel, maar zal betrekking hebben op een deel van de ziekte van het gebruik[FluentEmail](https://github.com/lukencode/FluentEmail)in ASP.NET Core om HTML e-mails te versturen die ik elders niet heb gezien.
+Dit is een vrij eenvoudig artikel, maar zal betrekking hebben op een deel van de ziekte van het gebruik [FluentEmail](https://github.com/lukencode/FluentEmail) in ASP.NET Core om HTML e-mails te versturen die ik elders niet heb gezien.
 
 ## Het probleem
 
-Het versturen van HTML mails is zelf een beetje eenvoudig met SmtpClient, maar het is niet erg flexibel en ondersteunt geen dingen zoals sjablonen of bijlagen. FluentEmail is hiervoor een geweldige bibliotheek, maar het is niet altijd duidelijk hoe het te gebruiken in ASP.NET Core.
+Het versturen van HTML mails is zelf vrij eenvoudig met SmtpClient, maar het is niet erg flexibel en ondersteunt geen dingen zoals sjablonen of bijlagen. FluentEmail is hiervoor een geweldige bibliotheek, maar het is niet altijd duidelijk hoe het te gebruiken in ASP.NET Core.
 
-FluentEmail met Razorlight (het is ingebouwd) kunt u sjabloon uw e-mails met behulp van Razor syntax. Dit is geweldig als het kunt u de volledige kracht van Razor gebruiken om uw e-mails te maken.
+FluentEmail met Razorlight (het is ingebouwd) kunt u sjabloon uw e-mails met behulp van Razor syntax. Dit is geweldig als het u toelaat om de volledige kracht van Razor te gebruiken om uw e-mails te maken.
 
 ## De oplossing
 
@@ -55,7 +55,7 @@ public static class Setup
 
 ##SMTP Instellingen
 
-Zoals u zult zien heb ik ook de IConfigSectie methode gebruikt die in mijn[vorig artikel](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco)om de SMTP-instellingen te krijgen.
+Zoals u zult zien heb ik ook de IConfigSectie methode gebruikt die in mijn [vorig artikel](blog/addingidentityfreegoogleauth#configuring-google-auth-with-poco) om de SMTP-instellingen te krijgen.
 
 ```csharp
   var smtpSettings = services.ConfigurePOCO<SmtpSettings>(config.GetSection(SmtpSettings.Section));
@@ -83,7 +83,7 @@ Dit komt uit het appsettings.json bestand:
 
 ## GMAIL / Google SMTP
 
-Opmerking: Voor Google SMTP als u gebruik maakt van MFA (die u**Echt waar.*moet je een[app-wachtwoord voor uw account](https://myaccount.google.com/apppasswords).
+Opmerking: Voor Google SMTP als u gebruik maakt van MFA (die u **Echt waar.* moet je een [app-wachtwoord voor uw account](https://myaccount.google.com/apppasswords).
 
 Voor lokale dev kunt u dit toevoegen aan uw secrets.json bestand:
 
@@ -112,7 +112,7 @@ services:
       - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
 ```
 
-Neem een notitie van de afstand, want dit kan je echt verknoeien met docker componeren. Om te controleren wat geïnjecteerd u kunt gebruiken
+Neem een notitie van de afstand, want dit kan je echt verpesten met sukkel componeren. Om te controleren wat er geïnjecteerd is kunt u gebruiken
 
 ```bash
 docker compose config
@@ -153,7 +153,7 @@ USER $APP_UID
 
 Oké, terug naar de code.
 
-Nu hebben we het allemaal opgezet kunnen we de e-maildienst toevoegen. Dit is een eenvoudige dienst die een sjabloon neemt en een e-mail stuurt:
+Nu hebben we het allemaal opgezet kunnen we de Email Service toevoegen. Dit is een eenvoudige service die een sjabloon neemt en een e-mail stuurt:
 
 ```csharp
 public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
@@ -198,7 +198,7 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 }
 ```
 
-Zoals u hier kunt zien hebben we twee methoden, een voor Reacties en een voor het Contactformulier ([Stuur me een mail!](/contact)). In deze app laat ik je inloggen zodat ik de mail kan krijgen waar het vandaan komt (en om spam te vermijden).
+Zoals u hier kunt zien hebben we twee methoden, een voor Reacties en een voor het Contactformulier ([Stuur me een mail!](/contact) ). In deze app laat ik je inloggen zodat ik de mail kan krijgen waar het vandaan komt (en om spam te vermijden).
 
 Echt het grootste deel van het werk wordt hier gedaan:
 
@@ -237,7 +237,7 @@ Hier openen we een sjabloonbestand, voegen het model met de inhoud voor de e-mai
 </html>
 ```
 
-Deze worden opgeslagen als.template bestanden in de map E-mail/Templates. U kunt.cshtml bestanden gebruiken, maar het veroorzaakt een probleem met de @Raw tag in het sjabloon (het is een scheermes ding).
+Deze worden opgeslagen als.template bestanden in de map E-mail/Templates. Je kunt.cshtml bestanden gebruiken, maar het veroorzaakt een probleem met de @Raw tag in de sjabloon (het is een scheermes ding).
 
 ## De controller
 

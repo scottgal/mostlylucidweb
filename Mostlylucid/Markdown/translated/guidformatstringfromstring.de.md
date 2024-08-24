@@ -5,11 +5,11 @@
 
 ## Kleine Posts FTW
 
-Kleine, aber potenziell nützliche Lösung für ein Problem, das ich hatte. Nämlich, wie man eine GUID aus einem String-Input generiert, bei dem der Guid immer gültig ist, aber für jeden angegebenen Eingabestring einzigartig ist.
+Kleine, aber potenziell nützliche Lösung für ein Problem, das ich hatte. Nämlich, wie man eine GUID aus einem String-Eingang generiert, bei dem der Guid immer gültig ist, aber für einen beliebigen Input-String eindeutig ist.
 
-Ich brauchte das für meine[RSS-Feed-Generator](/blog/addinganrssfilewithaspnetcore)wo ich für jedes Element im Feed eine GUID generieren wollte, die aber für jedes Element wiederholbar war.
+Ich brauchte das für meine [RSS-Feed-Generator](/blog/addinganrssfilewithaspnetcore) wo ich für jedes Element im Feed eine GUID generieren wollte, die aber für jedes Element wiederholbar war.
 
-Es stellt sich heraus, dass die`XxHash128`ist für diese Art perfekt, da es immer einen 128 Bit (oder 16 Byte) Hash gibt. Dies bedeutet, dass es verwendet werden kann, um eine GUID aus einem String-Eingang ohne 'Array' zu generieren.Kopieren Sie Unsinn.
+Es stellt sich heraus, dass die `XxHash128` ist irgendwie perfekt dafür, da es immer ein 128 bit (oder 16 Byte) Hash gibt. Dies bedeutet, dass es verwendet werden kann, um eine GUID aus einem String-Eingang ohne 'Array' zu generieren.Kopieren Sie Unsinn.
 
 ```csharp
      public  static string ToGuid(this string  name)
@@ -22,8 +22,8 @@ Es stellt sich heraus, dass die`XxHash128`ist für diese Art perfekt, da es imme
     }
 ```
 
-Dies ist eine einfache Erweiterungsmethode, die eine String-Eingabe benötigt und eine GUID zurückgibt.`XxHash128`ist aus der`System.IO.Hashing`Namespace.
+Dies ist eine einfache Erweiterungsmethode, die eine String-Eingabe benötigt und eine GUID zurückgibt. Das `XxHash128` ist aus der `System.IO.Hashing` Namespace.
 
-Sie können natürlich jeden Hashing-Algorithmus verwenden, der einen 128 bit Hash gibt.`XxHash128`ist nur eine gute Wahl, da es schnell ist und gibt eine gute Verteilung der Hash-Werte.
+Sie können natürlich jeden Hashing-Algorithmus verwenden, der einen 128 Bit Hash gibt. Das `XxHash128` ist nur eine gute Wahl, da es schnell ist und gibt eine gute Verteilung der Hash-Werte.
 
-Sie könnten auch eine`new Guid(<string>)`aus diesem, um eine tatsächliche Guid zu erhalten, die in einer Datenbank oder anderen GUID spezifischen Anwendungsfällen verwendet werden kann.
+Sie könnten auch eine `new Guid(<string>)` aus diesem, um eine tatsächliche Guid zu erhalten, die in einer Datenbank oder anderen GUID spezifischen Anwendungsfällen verwendet werden kann.

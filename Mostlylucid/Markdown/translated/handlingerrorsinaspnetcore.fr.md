@@ -93,5 +93,3 @@ Cela maintient également votre page conformément à votre mise en page et conc
 ## En conclusion
 
 C'est une façon simple de gérer les erreurs dans une application ASP.NET Core. Il fournit une bonne expérience utilisateur et nous permet de garder une trace des erreurs. C'est une bonne idée d'enregistrer les erreurs à un service d'enregistrement afin que vous puissiez les suivre et les corriger avant qu'elles ne deviennent un problème.
-
-
