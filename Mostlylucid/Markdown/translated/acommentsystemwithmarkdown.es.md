@@ -5,16 +5,16 @@
 
 NOTA: TRABAJO EN PROGRESOS
 
-He estado buscando un sistema de comentarios simple para mi blog que utiliza Markdown. No pude encontrar uno que me gustara, así que decidí escribir el mío propio. Este es un sistema de comentarios simple que usa Markdown para formatear. La segunda parte de esto agregará notificaciones de correo electrónico al sistema que me enviará un correo electrónico con un enlace al comentario, permitiéndome 'aprobar' antes de que se muestre en el sitio.
+He estado buscando un simple sistema de comentarios para mi blog que utiliza Markdown. No pude encontrar uno que me gustara, así que decidí escribir el mío. Este es un simple sistema de comentarios que usa Markdown para formatear. La segunda parte de esto añadirá notificaciones de correo electrónico al sistema que me enviará un correo electrónico con un enlace al comentario, permitiéndome 'aprobar' antes de que se muestre en el sitio.
 
 Una vez más para un sistema de producción esto normalmente utilizaría una base de datos, pero para este ejemplo sólo voy a utilizar Markdown.
 
 ## El sistema de comentarios
 
-El sistema de comentarios es increíblemente simple. Sólo tengo un archivo Markdown que se guarda para cada comentario con el nombre del usuario, correo electrónico y comentarios. Los comentarios se muestran en la página en el orden en que fueron recibidos.
+El sistema de comentarios es increíblemente simple. Sólo tengo un archivo Markdown que se guarda para cada comentario con el nombre del usuario, correo electrónico y comentario. Los comentarios se muestran en la página en el orden en que fueron recibidos.
 
 Para introducir el comentario uso SimpleMDE, un editor Markdown basado en Javascript.
-Esto está incluido en mi_Layout.cshtml de la siguiente manera:
+Esto está incluido en mi _Layout.cshtml de la siguiente manera:
 
 ```html
 <!-- Include the SimpleMDE CSS, here I use a dark theme -->
@@ -47,7 +47,7 @@ A continuación, inicializo el editor SimpleMDE en carga de página y carga HTMX
     });
 ```
 
-Aquí especifico que mi área de texto de comentario se llama 'comentario' y sólo inicializar una vez que se detecta. Aquí envuelvo el formulario en un 'IsAuthenticated' (que paso en el modelo de vista). Esto significa que puedo asegurar que sólo aquellos que han iniciado sesión (en la actualidad con Google) pueden añadir comentarios.
+Aquí especifico que mi área de texto de comentario se llama 'comentario' y sólo inicializar una vez que se detecta. Aquí envuelvo la forma en un 'IsAuthenticated' (que paso en el modelo de vista). Esto significa que puedo asegurar que solo aquellos que han iniciado sesión (en la actualidad con Google) pueden agregar comentarios.
 
 ```razor
 @if (Model.Authenticated)
@@ -66,7 +66,7 @@ Aquí especifico que mi área de texto de comentario se llama 'comentario' y só
     }
 ```
 
-También notarás que uso HTMX aquí para la publicación de comentarios. Donde uso el atributo hx-vals y una llamada JS para obtener el valor del comentario. Esto se publica en el controlador de Blog con la acción 'Comentario'. Esto se intercambia con el nuevo comentario.
+También notarás que uso HTMX aquí para la publicación de comentarios. Donde uso el atributo hx-vals y una llamada JS para obtener el valor del comentario. Esto se publica luego en el controlador del Blog con la acción 'Comentario'. Esto se intercambia entonces con el nuevo comentario.
 
 ```csharp
     [HttpPost]

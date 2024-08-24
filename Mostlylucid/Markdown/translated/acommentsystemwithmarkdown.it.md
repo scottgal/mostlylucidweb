@@ -5,16 +5,16 @@
 
 NOTA: LAVORI IN CORSO
 
-Ho cercato un semplice sistema di commenti per il mio blog che utilizza Markdown. Non ho trovato quello che mi piaceva, così ho deciso di scrivere il mio. Questo è un semplice sistema di commenti che utilizza Markdown per la formattazione. La seconda parte di questo aggiungerà notifiche di posta elettronica al sistema che mi invierà una e-mail con un link al commento, permettendomi di 'approvare' prima che venga visualizzato sul sito.
+Ho cercato un semplice sistema di commenti per il mio blog che utilizza Markdown. Non riuscivo a trovarne uno che mi piacesse, cosi' ho deciso di scriverne uno mio. Questo è un semplice sistema di commenti che utilizza Markdown per la formattazione. La seconda parte di questo aggiungerà notifiche e-mail al sistema che mi invierà una e-mail con un link al commento, permettendomi di 'approvare' prima che venga visualizzato sul sito.
 
 Di nuovo per un sistema di produzione questo normalmente userebbe un database, ma per questo esempio sto solo andando usare markdown.
 
 ## Il sistema dei commenti
 
-Il sistema di commenti è incredibilmente semplice. Ho solo un file markdown che viene salvato per ogni commento con il nome, l'email e il commento dell'utente. I commenti vengono poi visualizzati sulla pagina nell'ordine in cui sono stati ricevuti.
+Il sistema dei commenti è incredibilmente semplice. Ho solo un file markdown che viene salvato per ogni commento con il nome, e-mail e commento dell'utente. I commenti vengono poi visualizzati sulla pagina nell'ordine in cui sono stati ricevuti.
 
 Per inserire il commento uso SimpleMDE, un editor basato su Javascript Markdown.
-Questo è incluso nel mio_Layout.cshtml come segue:
+Questo è incluso nel mio _Layout.cshtml come segue:
 
 ```html
 <!-- Include the SimpleMDE CSS, here I use a dark theme -->
@@ -47,7 +47,7 @@ Quindi inizializzo l'editor SimpleMDE sia sul carico pagina che su quello HTMX:
     });
 ```
 
-Qui dico che l'area di testo del mio commento è chiamata 'commento' e inizializzo solo una volta che viene rilevata. Qui avvolgo il modulo in un 'IsAutenticated' (che passo nel ViewModel). Ciò significa che posso garantire che solo coloro che hanno effettuato l'accesso (attualmente con Google) possano aggiungere commenti.
+Qui dico che l'area di testo del mio commento è chiamata 'commento' e inizializzo solo una volta che viene rilevata. Qui avvolgo la forma in un 'IsAutenticated' (che passo nel ViewModel). Questo significa che posso garantire che solo coloro che hanno effettuato l'accesso (attualmente con Google) possono aggiungere commenti.
 
 ```razor
 @if (Model.Authenticated)
@@ -66,7 +66,7 @@ Qui dico che l'area di testo del mio commento è chiamata 'commento' e inizializ
     }
 ```
 
-Si noterà anche che uso HTMX qui per il commento. Dove uso l'attributo hx-vals e una chiamata JS per ottenere il valore per il commento. Questo viene poi inviato al controller del blog con l'azione 'Commento'. Questo viene poi scambiato con il nuovo commento.
+Noterai anche che uso HTMX qui per il commento. Dove uso l'attributo hx-vals e una chiamata JS per ottenere il valore per il commento. Questo viene poi inviato al controller del blog con l'azione 'Commento'. Questo viene poi scambiato con il nuovo commento.
 
 ```csharp
     [HttpPost]

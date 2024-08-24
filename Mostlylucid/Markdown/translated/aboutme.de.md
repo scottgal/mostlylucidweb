@@ -1,11 +1,12 @@
 # Über mich
 
-<datetime class="hidden">2024-07-30T13:30</datetime>
-
 ## Scott Galloway.NET Entwickler & CTO führen
 
 <!--category-- resume , introduction -->
-Vielseitiger und kompetenter Lead.NET Entwickler mit über 25 Jahren Erfahrung in der Softwareentwicklung, der technischen Führung und dem Teammanagement. Proficient in C#, ASP.NET und modernen Web-Frameworks, mit umfangreicher Erfahrung in Cloud Computing, DevOps und Datenbank-Management. Bewährte Erfolgsbilanz erfolgreicher Entwicklungsprojekte in verschiedenen Branchen, von Technologiegiganten bis hin zu innovativen Startups.
+Ich bin ein vielseitiger und kompetenter Entwickler und führen mit einem über 25-jährigen Track-Record-Building-Teams und Plattformen und revitalisierende Startups.
+Proficient in C#, ASP.NET und moderne Web-Frameworks, mit umfangreicher Erfahrung in Cloud Computing, DevOps, Datenbankmanagement und Suchtechnologien. Bewährte Erfolgsbilanz erfolgreicher Entwicklungsprojekte in verschiedenen Branchen, von Technologiegiganten bis hin zu innovativen Startups.
+
+Brauchen Sie Hilfe, um Ihr nächstes Projekt zu bauen? [Kontaktieren Sie mich](mailto:scott.galloway@gmail.com)
 
 [TOC]
 

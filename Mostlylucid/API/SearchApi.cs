@@ -1,15 +1,29 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Mostlylucid.Blog;
 using Mostlylucid.EntityFramework;
+using Mostlylucid.OpenSearch;
 using NpgsqlTypes;
 
 namespace Mostlylucid.API;
 
 [ApiController]
 [Route("api")]
-public class SearchApi(MostlylucidDbContext context) : ControllerBase
+public class SearchApi(MostlylucidDbContext context, SearchService indexService) : ControllerBase
 {
+    [HttpGet]
+    [Route("osearch/{query}")]
+   // [ValidateAntiForgeryToken]
+    public async Task<JsonHttpResult<List<SearchResults>>> OpenSearch(string query, string language = MarkdownBaseService.EnglishLanguage)
+    {
+        var results = await indexService.GetSearchResults(language, query);
+        
+        var host = Request.Host.Value;
+        var output = results.Select(x => new SearchResults(x.Title.Trim(), x.Slug, @Url.ActionLink("Show", "Blog", new{ x.Slug}, protocol:"https", host:host) )).ToList();
+        return TypedResults.Json(output);
+    }
+    
     [HttpGet]
     [Route("search/{query}")]
     [ValidateAntiForgeryToken]
@@ -76,5 +90,6 @@ public class SearchApi(MostlylucidDbContext context) : ControllerBase
     }
     
     public record SearchResults(string Title, string Slug, string Url);
+    
     
 }

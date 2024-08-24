@@ -10,6 +10,7 @@ public static class BlogPostMapper
     {
         return new BlogPostViewModel()
         {
+            Id = postEntity.Id.ToString(),
             Categories = postEntity.Categories.Select(x => x.Name).ToArray(),
             Title = postEntity.Title,
             HtmlContent = postEntity.HtmlContent,

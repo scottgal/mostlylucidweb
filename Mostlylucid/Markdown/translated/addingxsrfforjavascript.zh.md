@@ -86,5 +86,3 @@ console.log(token);
 ## 在结论结论中
 
 在你的 JavaScript 添加 XSRF 保护比较简单。 这是一个关键的安全特征 应该在你的表格和API端点上加进
-
-

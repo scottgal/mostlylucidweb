@@ -5,9 +5,9 @@
 
 ##Introduction
 
-Dans mon post précédent, j'ai détaillé comment envoyer des emails en utilisant FluentEmail et le client SMTP. Cependant, un problème avec cela est le retard dans l'envoi des emails. Les serveurs SMTP ont tendance à être lents et peuvent prendre un certain temps pour envoyer des emails. Cela peut être ennuyeux pour les utilisateurs et se sentir comme un logjam dans votre application.
+Dans mon post précédent, j'ai expliqué comment envoyer des courriels en utilisant FluentEmail et le client SMTP. Cependant, un problème avec cela est le retard dans l'envoi des courriels. Les serveurs SMTP ont tendance à être lents et peuvent prendre un certain temps pour envoyer des courriels. Cela peut être ennuyeux pour les utilisateurs et se sentir comme un logjam dans votre application.
 
-Une façon de contourner cela est d'envoyer des e-mails en arrière-plan. De cette façon, l'utilisateur peut continuer à utiliser l'application sans avoir à attendre que l'e-mail à envoyer. Il s'agit d'un modèle commun dans les applications Web et peut être réalisé à l'aide d'un travail de fond.
+Une façon de contourner cela est d'envoyer des courriels en arrière-plan. De cette façon, l'utilisateur peut continuer à utiliser l'application sans avoir à attendre l'envoi de l'e-mail. Il s'agit d'un modèle commun dans les applications Web et peut être réalisé à l'aide d'un travail d'arrière-plan.
 
 [TOC]
 
@@ -16,7 +16,7 @@ Une façon de contourner cela est d'envoyer des e-mails en arrière-plan. De cet
 Dans ASP.NET Core, vous avez deux options principales (en plus d'options plus avancées comme Hangfire / Quartz)
 
 - IHostedService - cette option vous donne une gestion de base du cycle de vie pour vos tâches de fond. Vous pouvez démarrer et arrêter le service et il fonctionnera en arrière-plan.
-- IHostedLifetime - cette option vous donne plus de contrôle sur le cycle de vie de vos tâches d'arrière-plan. Vous pouvez également démarrer et arrêter le service et il fonctionnera en arrière-plan, mais vous avez plus de contrôle sur le démarrage, l'arrêt, le démarrage, l'arrêt etc...
+- IHostedLifetime - cette option vous donne plus de contrôle sur le cycle de vie de vos tâches de fond. Vous pouvez également démarrer et arrêter le service et il fonctionnera en arrière-plan, mais vous avez plus de contrôle sur le démarrage, l'arrêt, le démarrage, l'arrêt etc...
 
 Dans cet exemple, je vais utiliser un simple IHostedService pour envoyer des courriels en arrière-plan.
 
@@ -163,7 +163,7 @@ Par exemple, pour le formulaire de contact, nous le faisons.
             await sender.SendEmailAsync(contactModel);
 ```
 
-Dans le code ci-dessus, ceci ajoute ce message à notre`BufferBlock<BaseEmailModel>` _mailMessages et la tâche d'arrière-plan vont la récupérer et envoyer l'email.
+Dans le code ci-dessus, ceci ajoute ce message à notre `BufferBlock<BaseEmailModel>` _mailMessages et la tâche d'arrière-plan vont la récupérer et envoyer l'email.
 
 ```csharp
    private async Task DeliverAsync(CancellationToken token)

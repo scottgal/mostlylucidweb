@@ -5,14 +5,14 @@
 
 ## Présentation
 
-C'est un format XML simple qui peut être consommé par un large éventail de lecteurs de flux. Dans ce billet, je vais vous montrer comment ajouter un flux RSS à votre application ASP.NET Core.
+RSS (et Atom) est toujours le seul format largement adopté pour syndiquer le contenu. C'est un format XML simple qui peut être consommé par un large éventail de lecteurs de flux. Dans ce billet, je vais vous montrer comment ajouter un flux RSS à votre application ASP.NET Core.
 
 [TOC]
 
 ## Création de l'alimentation
 
 Vraiment le cœur de cela est de créer le document XML pour le flux RSS.
-Le code ci-dessous prend une liste de`RssFeedItem`objets et génère le XML pour le flux.`RssFeedItem`classe est une classe simple qui représente un élément dans le flux. Il a des propriétés pour le titre, le lien, la description, la date de publication et les catégories.
+Le code ci-dessous prend une liste de `RssFeedItem` objets et génère le XML pour le flux. Les `RssFeedItem` classe est une classe simple qui représente un élément dans l'alimentation. Il possède des propriétés pour le titre, le lien, la description, la date de publication et les catégories.
 
 ```csharp
     public string GenerateFeed(IEnumerable<RssFeedItem> items, string categoryName = "")
@@ -61,7 +61,7 @@ Le code ci-dessous prend une liste de`RssFeedItem`objets et génère le XML pour
 ```
 
 Points à noter dans le code ci-dessus:
-Nous devons créer l'espace de noms Atom et l'injecter dans le document XML pour prendre en charge le`atom:link`élément.
+Nous devons créer l'espace de noms Atom et l'injecter dans le document XML pour prendre en charge le `atom:link` élément.
 
 ```csharp
      XNamespace atom = "http://www.w3.org/2005/Atom";
@@ -72,7 +72,7 @@ Nous devons créer l'espace de noms Atom et l'injecter dans le document XML pour
 
 ### Encodage UTF-8
 
-Bien que nous spécifions`utf-8`ASP.NET Core ignore que...parce que c'est spécial. Au lieu de cela, nous devons nous assurer que les chaînes générées dans le document sont en fait UTF-8, j'avais pensé que
+Bien que nous spécifions `utf-8` ASP.NET Core ignore ça... parce que c'est spécial. Au lieu de cela, nous devons nous assurer que les chaînes générées dans le document sont en fait UTF-8, j'avais pensé que
 
 ```csharp
    var settings = new XmlWriterSettings
@@ -99,7 +99,7 @@ De cette façon, il produit en fait un document XML avec un encodage utf-8.
 
 ## Le contrôleur
 
-De là, c'est assez simple dans le RSSController, nous avons une méthode qui accepte`category`et`startdate`(actuellement une fonctionnalité super secrète??) et retourne le flux.
+De là, c'est assez simple dans le RSSController, nous avons une méthode qui accepte `category` et `startdate` (actuellement une caractéristique super secrète??) et retourne le flux.
 
 ```csharp
     [HttpGet]

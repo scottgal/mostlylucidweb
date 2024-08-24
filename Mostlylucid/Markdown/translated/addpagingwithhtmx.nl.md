@@ -9,16 +9,16 @@ Nu dat ik heb een heleboel blog posts de homepage was het krijgen van nogal leng
 
 Dit gaat samen met het toevoegen van volledige caching voor blog berichten om dit een snelle en efficiënte site.
 
-Zie de[Blog Service bron](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/Markdown/MarkdownBlogService.cs)voor hoe dit wordt geïmplementeerd; het is echt vrij eenvoudig met behulp van de IMemoryCache.
+Zie de [Blog Service bron](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/Markdown/MarkdownBlogService.cs) voor hoe dit wordt geïmplementeerd; het is echt vrij eenvoudig met behulp van de IMemoryCache.
 
 [TOC]
 
 ### TagHelper
 
-Ik besloot om een TagHelper te gebruiken om het paging mechanisme uit te voeren. Dit is een geweldige manier om de paging logica te inkapselen en herbruikbaar te maken.
-Dit maakt gebruik van de[pagination taghelper van Darrel O'Neill](https://github.com/darrel-oneil/PaginationTagHelper)Dit is opgenomen in het project als een nuget pakket.
+Ik besloot een TagHelper te gebruiken om het paging mechanisme te implementeren. Dit is een geweldige manier om de paging logica te inkapselen en herbruikbaar te maken.
+Dit maakt gebruik van de [pagination taghelper van Darrel O'Neill ](https://github.com/darrel-oneil/PaginationTagHelper) Dit is opgenomen in het project als een nuget pakket.
 
-Dit wordt vervolgens toegevoegd aan de_ViewImports.cshtml-bestand zodat het beschikbaar is voor alle weergaven.
+Dit wordt vervolgens toegevoegd aan de _ViewImports.cshtml-bestand zodat het beschikbaar is voor alle weergaven.
 
 ```razor
 @addTagHelper *,PaginationTagHelper.AspNetCore
@@ -26,7 +26,7 @@ Dit wordt vervolgens toegevoegd aan de_ViewImports.cshtml-bestand zodat het besc
 
 ### De TagHelper
 
-In de_BlogSummaryList.cshtml gedeeltelijke weergave Ik heb de volgende code toegevoegd om het paging mechanisme te renderen.
+In de _BlogSummaryList.cshtml gedeeltelijke weergave Ik heb de volgende code toegevoegd om het paging mechanisme te renderen.
 
 ```razor
 <pager link-url="@Model.LinkUrl"
@@ -41,7 +41,7 @@ In de_BlogSummaryList.cshtml gedeeltelijke weergave Ik heb de volgende code toeg
 
 Een paar opmerkelijke dingen hier:
 
-1. `link-url`Dit stelt de taghelper in staat om de juiste url voor de paging links te genereren. In de HomeController Index methode is dit ingesteld op die actie.
+1. `link-url` Dit staat de taghelper toe om de juiste url voor de paging links te genereren. In de HomeController Index methode is dit ingesteld op die actie.
 
 ```csharp
    var posts = blogService.GetPostsForFiles(page, pageSize);
@@ -67,11 +67,11 @@ En in de Blog controller
     }
 ```
 
-Dit is ingesteld op die URl. Dit zorgt ervoor dat de pagination helper kan werken voor beide top level methode.
+Dit is ingesteld op die Url. Dit zorgt ervoor dat de pagination helper kan werken voor beide top level methode.
 
 ### HTMX-eigenschappen
 
-`hx-boost`, `hx-push-url`, `hx-target`, `hx-swap`Dit zijn allemaal HTMX eigenschappen die het mogelijk maken om de paging te werken met HTMX.
+`hx-boost`, `hx-push-url`, `hx-target`, `hx-swap` Dit zijn allemaal HTMX eigenschappen die het mogelijk maken om de paging te werken met HTMX.
 
 ```razor
      hx-boost="true"
@@ -80,13 +80,13 @@ Dit is ingesteld op die URl. Dit zorgt ervoor dat de pagination helper kan werke
        hx-swap="show:none"
 ```
 
-Hier gebruiken we`hx-boost="true"`Hiermee kan de pagination taghelper geen aanpassingen nodig hebben door de normale URL-generatie te onderscheppen en de huidige URL te gebruiken.
+Hier gebruiken we `hx-boost="true"` Hiermee kan de pagination taghelper geen aanpassingen nodig hebben door de normale URL-generatie te onderscheppen en de huidige URL te gebruiken.
 
-`hx-push-url="true"`om ervoor te zorgen dat de URL wordt geruild in de URL-geschiedenis van de browser (waardoor direct naar pagina's kan worden gelinkt).
+`hx-push-url="true"` om ervoor te zorgen dat de URL wordt geruild in de URL-geschiedenis van de browser (waardoor direct naar pagina's kan worden gelinkt).
 
-`hx-target="#content"`Dit is het doel div dat zal worden vervangen door de nieuwe inhoud.
+`hx-target="#content"` Dit is het doel div dat zal worden vervangen door de nieuwe inhoud.
 
-`hx-swap="show:none"`Dit is het swapeffect dat zal worden gebruikt wanneer de inhoud wordt vervangen. In dit geval voorkomt het het normale 'jump' effect dat HTMX gebruikt op swapping inhoud.
+`hx-swap="show:none"` Dit is het swapeffect dat zal worden gebruikt wanneer de inhoud wordt vervangen. In dit geval voorkomt het het normale 'jump' effect dat HTMX gebruikt op swapping content.
 
 #### CSS
 
@@ -117,7 +117,7 @@ Ik heb ook stijlen toegevoegd aan de main.css in mijn /src directory zodat ik de
 
 ### Controller
 
-`page`, `page-size`, `total-items`zijn de eigenschappen die de pagination taghelper gebruikt om de paging links te genereren.
+`page`, `page-size`, `total-items` zijn de eigenschappen die de pagination taghelper gebruikt om de paging links te genereren.
 Deze worden via de controller in het gedeeltelijke zicht doorgegeven.
 
 ```csharp
@@ -145,4 +145,4 @@ Hier krijgen we gewoon de berichten uit de cache, bestellen ze op datum en dan o
 
 ### Conclusie
 
-Dit was een eenvoudige toevoeging aan de site, maar het maakt het veel bruikbaarder. De HTMX integratie maakt de site meer responsief voelen terwijl niet meer JavaScript toe te voegen aan de site.
+Dit was een eenvoudige toevoeging aan de site, maar het maakt het veel bruikbaarder. De HTMX integratie maakt de site meer responsief en voegt niet meer JavaScript toe aan de site.

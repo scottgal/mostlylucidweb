@@ -5,9 +5,9 @@
 
 #Einführung
 
-In meinem vorherigen Beitrag habe ich detailliert, wie E-Mails mit FluentEmail und dem SMTP Client zu senden. Allerdings ist ein Problem mit diesem ist die Verzögerung beim Senden von E-Mails. SMTP-Server neigen dazu, langsam zu sein und kann eine Weile dauern, um E-Mails zu senden.
+In meinem vorherigen Beitrag habe ich detailliert, wie E-Mails mit FluentEmail und dem SMTP Client zu senden. Ein Problem dabei ist jedoch die Verzögerung beim Versenden von E-Mails. SMTP-Server neigen dazu, langsam zu sein und können eine Weile dauern, um E-Mails zu senden. Dies kann für Benutzer ärgerlich sein und sich wie ein Logjam in Ihrer Anwendung fühlen.
 
-Eine Möglichkeit, dies zu umgehen, ist E-Mails im Hintergrund zu senden. So kann der Benutzer die Anwendung weiter verwenden, ohne warten zu müssen, bis die E-Mail gesendet wird. Dies ist ein gängiges Muster in Web-Anwendungen und kann mit einem Hintergrundjob erreicht werden.
+Eine Möglichkeit, dies zu umgehen, ist E-Mails im Hintergrund zu senden. Auf diese Weise kann der Benutzer die Anwendung weiter verwenden, ohne warten zu müssen, bis die E-Mail gesendet wird. Dies ist ein gängiges Muster in Web-Anwendungen und kann mit einem Hintergrund-Job erreicht werden.
 
 [TOC]
 
@@ -163,7 +163,7 @@ z.B. für das Kontaktformular tun wir dies.
             await sender.SendEmailAsync(contactModel);
 ```
 
-Im obigen Code fügt dies diese Botschaft zu unserer`BufferBlock<BaseEmailModel>` _mailNachrichten und die Hintergrundaufgabe werden sie abholen und die E-Mail senden.
+Im obigen Code fügt dies diese Botschaft zu unserer `BufferBlock<BaseEmailModel>` _mailNachrichten und die Hintergrundaufgabe werden sie abholen und die E-Mail senden.
 
 ```csharp
    private async Task DeliverAsync(CancellationToken token)

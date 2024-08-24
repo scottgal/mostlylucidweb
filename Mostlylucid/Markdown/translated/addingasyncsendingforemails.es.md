@@ -5,9 +5,9 @@
 
 ## Introducción
 
-En mi post anterior detallé cómo enviar correos electrónicos usando FluentEmail y el cliente SMTP. Sin embargo, un problema con esto es el retraso en el envío de correos electrónicos. Los servidores SMTP tienden a ser lentos y pueden tardar un tiempo en enviar correos electrónicos. Esto puede ser molesto para los usuarios y sentirse como un logjam en su aplicación.
+En mi post anterior detallé cómo enviar correos electrónicos usando FluentEmail y el Cliente SMTP. Sin embargo, un problema con esto es el retraso en el envío de correos electrónicos. Los servidores SMTP tienden a ser lentos y pueden tardar un tiempo en enviar correos electrónicos. Esto puede ser molesto para los usuarios y sentirse como un logjam en su aplicación.
 
-Una manera de evitar esto es enviar correos electrónicos en segundo plano. De esta manera el usuario puede continuar usando la aplicación sin tener que esperar a que el correo electrónico se envíe. Este es un patrón común en las aplicaciones web y se puede lograr utilizando un trabajo de fondo.
+Una manera de evitar esto es enviar correos electrónicos en segundo plano. De esta manera el usuario puede continuar utilizando la aplicación sin tener que esperar a que el correo electrónico se envíe. Este es un patrón común en las aplicaciones web y se puede lograr usando un trabajo de fondo.
 
 [TOC]
 
@@ -15,7 +15,7 @@ Una manera de evitar esto es enviar correos electrónicos en segundo plano. De e
 
 En ASP.NET Core tienes dos opciones principales (además de opciones más avanzadas como Hangfire / Cuarzo)
 
-- IHostedService - esta opción le da gestión básica del ciclo de vida para sus tareas de fondo. Puede iniciar y detener el servicio y se ejecutará en segundo plano.
+- IHostedService - esta opción le ofrece una gestión básica del ciclo de vida para sus tareas de fondo. Usted puede comenzar y detener el servicio y se ejecutará en el fondo.
 - IHostedLifetime - esta opción le da más control sobre el ciclo de vida de sus tareas de fondo. También puede iniciar y detener el servicio y se ejecutará en segundo plano, pero tiene más control aroundn de inicio, parada, inicio, parada, etc...
 
 En este ejemplo usaré un simple IHostedService para enviar correos electrónicos en segundo plano.
@@ -26,7 +26,6 @@ La fuente completa para esto es abajo.
 
 <details>
 <summary>Background Email Service</summary>
-
 ```csharp
 using System.Threading.Tasks.Dataflow;
 using Mostlylucid.Email.Models;
@@ -164,7 +163,7 @@ Por ejemplo, para el formulario de contacto hacemos esto.
             await sender.SendEmailAsync(contactModel);
 ```
 
-En el código anterior esto añade este mensaje a nuestro`BufferBlock<BaseEmailModel>` _mailMessages y la tarea de fondo lo recogerá y enviará el correo electrónico.
+En el código anterior esto añade este mensaje a nuestro `BufferBlock<BaseEmailModel>` _mailMessages y la tarea de fondo lo recogerá y enviará el correo electrónico.
 
 ```csharp
    private async Task DeliverAsync(CancellationToken token)

@@ -5,9 +5,9 @@
 
 Introductie
 
-In mijn vorige bericht heb ik gedetailleerd hoe om e-mails te versturen met behulp van FluentEmail en de SMTP Client. Echter een probleem met dit is de vertraging in het verzenden van e-mails. SMTP servers hebben de neiging om langzaam en kan een tijdje duren om e-mails te versturen. Dit kan vervelend zijn voor gebruikers en voelen als een logjam in uw toepassing.
+In mijn vorige bericht heb ik gedetailleerd hoe e-mails te versturen met behulp van FluentEmail en de SMTP Client. Echter een probleem met dit is de vertraging in het verzenden van e-mails. SMTP servers hebben de neiging om langzaam en kan een tijdje duren om e-mails te versturen. Dit kan vervelend zijn voor gebruikers en voelt als een logjam in uw toepassing.
 
-Een manier om dit te omzeilen is om e-mails op de achtergrond te versturen. Op deze manier kan de gebruiker doorgaan met het gebruik van de toepassing zonder te hoeven wachten op de e-mail om te versturen. Dit is een veel voorkomend patroon in webtoepassingen en kan worden bereikt met behulp van een achtergrondtaak.
+Een manier om dit te omzeilen is om e-mails op de achtergrond te versturen. Op deze manier kan de gebruiker doorgaan met het gebruik van de applicatie zonder te hoeven wachten tot de e-mail te versturen. Dit is een veel voorkomend patroon in webapplicaties en kan worden bereikt met behulp van een achtergrondtaak.
 
 [TOC]
 
@@ -15,8 +15,8 @@ Een manier om dit te omzeilen is om e-mails op de achtergrond te versturen. Op d
 
 In ASP.NET Core heb je twee hoofdopties (naast meer geavanceerde opties zoals Hangfire / Quartz)
 
-- IHostedService - deze optie geeft u basis lifecycle management voor uw achtergrond taken. U kunt starten en stoppen van de dienst en het zal draaien op de achtergrond.
-- IHostedLifetime - deze optie geeft u meer controle over de levenscyclus van uw achtergrondtaken. U kunt ook starten en stoppen van de dienst en het zal draaien op de achtergrond, maar je hebt meer controle aroudn starten, stoppen, gestart, gestopt enz...
+- IHostedService - deze optie geeft u basis lifecycle management voor uw achtergrondtaken. U kunt beginnen en stoppen met de service en het zal draaien op de achtergrond.
+- IHostedLifetime - deze optie geeft u meer controle over de levenscyclus van uw achtergrondtaken. U kunt ook starten en stoppen van de service en het zal draaien op de achtergrond, maar je hebt meer controle aroudn starten, stoppen, gestart, gestopt enz...
 
 In dit voorbeeld zal ik een eenvoudige IHostedService gebruiken om e-mails op de achtergrond te versturen.
 
@@ -163,7 +163,7 @@ b.v. voor het contactformulier doen we dit.
             await sender.SendEmailAsync(contactModel);
 ```
 
-In de bovenstaande code voegt dit dit bericht toe aan onze`BufferBlock<BaseEmailModel>` _mailBerichten en de achtergrondtaak zal het ophalen en versturen van de e-mail.
+In de bovenstaande code voegt dit dit bericht toe aan onze `BufferBlock<BaseEmailModel>` _mailBerichten en de achtergrondtaak zal het ophalen en versturen van de e-mail.
 
 ```csharp
    private async Task DeliverAsync(CancellationToken token)

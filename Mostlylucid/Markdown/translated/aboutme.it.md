@@ -1,11 +1,12 @@
 # Informazioni su di me
 
-<datetime class="hidden">2024-07-30T13:30</datetime>
-
 ## Scott Galloway | Sviluppatore.NET di piombo & CTO
 
 <!--category-- resume , introduction -->
-Sviluppatore.NET versatile e realizzato con oltre 25 anni di esperienza nello sviluppo di software, leadership tecnica e gestione del team. Abile in C#, ASP.NET, e framework web moderni, con una vasta esperienza nel cloud computing, DevOps, e gestione del database. Dimostrato track record di importanti progetti di sviluppo di successo in diversi settori, dai giganti tecnologici alle startup innovative.
+Sono uno sviluppatore versatile e completo e sono leader con un record di oltre 25 anni track building team e piattaforme e rivitalizzare le startup.
+Abile in C#, ASP.NET, e framework web moderni, con una vasta esperienza nel cloud computing, DevOps, gestione database e tecnologie di ricerca. Traccia comprovata di importanti progetti di sviluppo di successo in diverse industrie, dai giganti tecnologici alle startup innovative.
+
+Hai bisogno di aiuto per costruire il tuo prossimo progetto? [Contattami](mailto:scott.galloway@gmail.com)
 
 [TOC]
 

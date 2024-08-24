@@ -5,7 +5,7 @@
 
 ## Inleiding
 
-In deze app wilde ik een simple mechanisme van het toestaan van login om opmerkingen (en sommige admin taken) toe te voegen aan de app. Ik wilde Google Auth gebruiken voor dit doel. Ik wilde de ASP.NET Identity database niet gebruiken voor dit doel. Ik wilde de app zo eenvoudig mogelijk houden voor zo lang mogelijk.
+In deze app wilde ik een simple mechanisme van het toestaan van login om opmerkingen (en sommige admin taken) toe te voegen aan de app. Ik wilde Google Auth hiervoor gebruiken. Ik wilde hiervoor de ASP.NET Identity database niet gebruiken. Ik wilde de app zo eenvoudig mogelijk houden voor zo lang mogelijk.
 
 Databanken zijn een krachtig onderdeel van elke toepassing, maar ze voegen ook complexiteit toe. Ik wilde die complexiteit vermijden totdat ik het echt nodig had.
 
@@ -13,7 +13,7 @@ Databanken zijn een krachtig onderdeel van elke toepassing, maar ze voegen ook c
 
 ## Stappen
 
-Eerst moet u Google Auth instellen in de Google Developer Console. U kunt de stappen volgen in deze[link](https://developers.google.com/identity/gsi/web/guides/overview)om uw gegevens voor u in te stellen Google Client ID en Secret.
+Eerst moet je Google Auth instellen in de Google Developer Console. U kunt de stappen volgen in deze [link](https://developers.google.com/identity/gsi/web/guides/overview) om uw gegevens voor u in te stellen Google Client ID en Secret.
 
 Zodra u uw Google Client ID en Secret, kunt u ze toevoegen aan uw appsettings.json bestand.
 
@@ -24,7 +24,7 @@ Zodra u uw Google Client ID en Secret, kunt u ze toevoegen aan uw appsettings.js
 }
 ```
 
-Hoe dan ook moet u deze niet in te checken om de bron te controleren. In plaats daarvan voor lokale ontwikkeling kunt u het Geheimenbestand gebruiken:
+Hoe dan ook moet u deze niet in te checken om de bron controle. In plaats daarvan voor lokale ontwikkeling kunt u het Geheimenbestand gebruiken:
 
 ![secrets.png](secrets.png)
 
@@ -46,7 +46,6 @@ In de mijne doe ik dit waardoor ik de sectienaam van de klas zelf kan krijgen:
 
 <details>
 <summary>Click to expand</summary>
-
 ```csharp
 
 
@@ -174,7 +173,7 @@ Dit zorgt ervoor dat de Google Auth alleen kan worden gebruikt vanuit de domeine
 
 ## Google Auth In Razor
 
-In mijn_Layout.cshtml Ik heb dit Javascript, dit is waar ik mijn Google Buttons heb ingesteld en een callback heb geactiveerd die de ASP.NET app logt.
+In mijn _Layout.cshtml Ik heb dit Javascript, dit is waar ik mijn Google Buttons heb ingesteld en een callback heb geactiveerd die de ASP.NET app logt.
 
 # Google JS
 
@@ -241,7 +240,7 @@ Dit is de laag voor de code hieronder
 
 ```
 
-Hier kunt u zien dat ik maximaal twee div-elementen in de pagina heb met de id google_knop en google_button2. Dit zijn de elementen waarin de Google JS de knoppen zal renderen.
+Hier zie je dat ik tot twee div elementen in de pagina heb met de id google_button en google_button2. Dit zijn de elementen waarin de Google JS de knoppen zal maken.
 
 TIP: Als u Tailwind gebruikt, kunt u de knop div shinken om correct te werken in de donkere modus (anders geeft het een witte achtergrond rond de knop)
 

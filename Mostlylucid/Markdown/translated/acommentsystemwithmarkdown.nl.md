@@ -5,16 +5,16 @@
 
 OPMERKING: WERKZAAMHEDEN IN VOORUITGANG
 
-Ik ben op zoek naar een eenvoudig commentaarsysteem voor mijn blog dat Markdown gebruikt. Ik kon er geen vinden die ik leuk vond, dus ik heb besloten om mijn eigen te schrijven. Dit is een eenvoudig commentaarsysteem dat Markdown gebruikt voor het formatteren. Het tweede deel van dit zal e-mailmeldingen toevoegen aan het systeem dat mij een e-mail zal sturen met een link naar het commentaar, zodat ik het kan 'aanpassen' voordat het wordt weergegeven op de site.
+Ik ben op zoek naar een eenvoudig commentaarsysteem voor mijn blog dat Markdown gebruikt. Ik kon er geen vinden die ik leuk vond, dus besloot ik mijn eigen te schrijven. Dit is een eenvoudig commentaarsysteem dat Markdown gebruikt voor het formatteren. Het tweede deel van dit zal e-mail notificaties toevoegen aan het systeem dat mij een e-mail zal sturen met een link naar het commentaar, zodat ik het kan 'aannemen' voordat het wordt weergegeven op de site.
 
 Nogmaals voor een productiesysteem zou dit normaal gesproken een database gebruiken, maar voor dit voorbeeld ga ik gewoon markdown gebruiken.
 
 ## Het commentaarsysteem
 
-Het commentaar systeem is ongelooflijk eenvoudig. Ik heb alleen een markdown bestand wordt opgeslagen voor elke reactie met de naam van de gebruiker, e-mail en commentaar. De opmerkingen worden vervolgens weergegeven op de pagina in de volgorde die ze werden ontvangen.
+Het commentaarsysteem is ongelooflijk eenvoudig. Ik heb alleen een markdown bestand wordt opgeslagen voor elke reactie met de naam van de gebruiker, e-mail en commentaar. De reacties worden vervolgens weergegeven op de pagina in de volgorde die ze werden ontvangen.
 
 Om het commentaar in te voeren gebruik ik SimpleMDE, een Javascript gebaseerde Markdown editor.
-Dit is opgenomen in mijn_Layout.cshtml als volgt:
+Dit is opgenomen in mijn _Layout.cshtml als volgt:
 
 ```html
 <!-- Include the SimpleMDE CSS, here I use a dark theme -->
@@ -47,7 +47,7 @@ Vervolgens initialiseer ik de SimpleMDE editor op zowel pagina laden als HTMX la
     });
 ```
 
-Hier geef ik aan dat mijn commentaar tekstgebied 'commentaar' heet en pas initialiseer zodra het gedetecteerd is. Hier wikkel ik het formulier in een 'IsAuthenticated' (die ik doorgeef in de ViewModel). Dit betekent dat ik ervoor kan zorgen dat alleen degenen die ingelogd zijn (op dit moment met Google) opmerkingen kunnen toevoegen.
+Hier geef ik aan dat mijn commentaar tekstgebied wordt genoemd 'commentaar' en pas initialiseren zodra het is gedetecteerd. Hier wikkel ik het formulier in een 'IsAuthenticated' (die ik doorgeef in de ViewModel). Dit betekent dat ik er zeker van kan zijn dat alleen degenen die zijn ingelogd (op dit moment met Google) opmerkingen kunnen toevoegen.
 
 ```razor
 @if (Model.Authenticated)
@@ -66,7 +66,7 @@ Hier geef ik aan dat mijn commentaar tekstgebied 'commentaar' heet en pas initia
     }
 ```
 
-U zult ook merken dat ik gebruik HTMX hier voor het posten van commentaar. Waar ik gebruik van de hx-vals attribuut en een JS call om de waarde voor het commentaar te krijgen. Dit wordt vervolgens gepost naar de blog controller met de 'Comment' actie. Dit wordt vervolgens verwisseld met de nieuwe reactie.
+Je zult ook merken dat ik gebruik HTMX hier voor de commentaar posting. Waar ik gebruik van de hx-vals attribuut en een JS call om de waarde voor het commentaar te krijgen. Dit wordt vervolgens gepost naar de Blog controller met de 'Comment' actie. Dit wordt dan omgewisseld met het nieuwe commentaar.
 
 ```csharp
     [HttpPost]

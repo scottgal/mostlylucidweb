@@ -3,7 +3,10 @@
 ## Scott Galloway Lead.NET Developer & CTO
 
 <!--category-- resume , introduction -->
-Veelzijdig en succesvol Lead.NET Developer met meer dan 25 jaar expertise in softwareontwikkeling, technisch leiderschap en teammanagement. Bekwaam in C#, ASP.NET, en moderne web frameworks, met uitgebreide ervaring in cloud computing, DevOps, en database management. Bewezen track record van toonaangevende succesvolle ontwikkelingsprojecten in diverse industrieën, van technologiegiganten tot innovatieve startups.
+Ik ben een veelzijdige en succesvolle ontwikkelaar en leiden met een meer dan 25 jaar track record bouwen teams en platforms en het revitaliseren van startups.
+Bekwaam in C#, ASP.NET, en moderne web frameworks, met uitgebreide ervaring in cloud computing, DevOps, database management en zoektechnologieën. Bewezen track record van toonaangevende succesvolle ontwikkelingsprojecten in diverse industrieën, van technologiegiganten tot innovatieve startups.
+
+Hulp nodig om uw volgende project te bouwen? [Neem contact met me op.](mailto:scott.galloway@gmail.com)
 
 [TOC]
 

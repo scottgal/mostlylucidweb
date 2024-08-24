@@ -48,18 +48,8 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
     public async Task<bool> EntryChanged(string slug, string language, string hash)
     {
         string fileName = "";
-        var originalFileName = fileName = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");
-        var fileChanged = await originalFileName.IsFileChanged(MarkdownConfig.MarkdownTranslatedPath);
-        if (language == EnglishLanguage)
-        {
-            fileName = originalFileName;
-        }
-        else
-        {
-            Path.Combine(MarkdownConfig.MarkdownTranslatedPath, $"{slug}.{language}.md");
-        }
-
-        if (!File.Exists(fileName)) return true;
+        var originalFileName = Path.Combine(MarkdownConfig.MarkdownPath, slug + ".md");
+        var fileChanged = await originalFileName.IsFileChanged(MarkdownConfig.MarkdownTranslatedPath, language);
         return fileChanged;
     }
 

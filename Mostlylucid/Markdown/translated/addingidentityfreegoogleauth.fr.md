@@ -5,7 +5,7 @@
 
 ## Présentation
 
-Dans cette application, je voulais ajouter un mécanisme simple permettant de connecter pour ajouter des commentaires (et quelques tâches d'administration) à l'application. Je voulais utiliser Google Auth à cette fin. Je ne voulais pas utiliser la base de données ASP.NET Identité à cette fin. Je voulais garder l'application aussi simple que possible pour le plus longtemps possible.
+Dans cette application, j'ai voulu ajouter un mécanisme simple permettant à login d'ajouter des commentaires (et quelques tâches d'administration) à l'application. Je voulais utiliser Google Auth à cette fin. Je ne voulais pas utiliser la base de données ASP.NET Identity à cette fin. Je voulais garder l'application aussi simple que possible pour le plus longtemps possible.
 
 Les bases de données sont un composant puissant de toute application, mais elles ajoutent aussi de la complexité. Je voulais éviter cette complexité jusqu'à ce que j'en ai vraiment besoin.
 
@@ -13,7 +13,7 @@ Les bases de données sont un composant puissant de toute application, mais elle
 
 ## Étapes
 
-Vous devez d'abord configurer Google Auth dans la console Google Developer. Vous pouvez suivre les étapes de cette[lien](https://developers.google.com/identity/gsi/web/guides/overview)pour obtenir vos détails configurés pour vous Google Client ID et Secret.
+D'abord, vous devez configurer Google Auth dans la console Google Developer. Vous pouvez suivre les étapes de cette [lien](https://developers.google.com/identity/gsi/web/guides/overview) pour obtenir vos détails configurés pour vous Google Client ID et Secret.
 
 Une fois que vous avez votre identifiant Google Client et Secret, vous pouvez les ajouter à votre fichier appsettings.json.
 
@@ -24,7 +24,7 @@ Une fois que vous avez votre identifiant Google Client et Secret, vous pouvez le
 }
 ```
 
-HOWEVER vous ne devriez pas les vérifier dans le contrôle source. Au lieu de cela, pour le développement local, vous pouvez utiliser le fichier Secrets:
+HOWEVER vous ne devriez pas les vérifier pour le contrôle de la source. Pour le développement local, vous pouvez utiliser le fichier Secrets :
 
 ![secrets.png](secrets.png)
 
@@ -173,7 +173,7 @@ Cela garantit que Google Auth ne peut être utilisé que depuis les domaines que
 
 ## Google Auth In Razor
 
-Dans mon_Layout.cshtml J'ai ce Javascript, c'est là que j'ai configuré mes boutons Google et déclenché un callback qui enregistre l'application ASP.NET.
+Dans mon _Layout.cshtml J'ai ce Javascript, c'est là que j'ai configuré mes boutons Google et déclenché un callback qui enregistre l'application ASP.NET.
 
 # Google JS
 
@@ -240,7 +240,7 @@ C'est la lunette pour le code ci-dessous
 
 ```
 
-Ici vous pouvez voir que j'ai jusqu'à deux éléments de div dans la page avec l'id google_button et google_button2. Ce sont les éléments dans lesquels Google JS va rendre les boutons.
+Ici vous pouvez voir que j'ai jusqu'à deux éléments de div dans la page avec l'id google_button et google_button2. Ce sont les éléments dans lesquels le Google JS rendra les boutons.
 
 CONSEIL: Si vous utilisez Tailwind, vous pouvez basculer le bouton div pour fonctionner correctement en mode sombre (autrement, il rend un fond blanc autour du bouton)
 
@@ -251,7 +251,7 @@ CONSEIL: Si vous utilisez Tailwind, vous pouvez basculer le bouton div pour fonc
 </div>
 ```
 
-Dans le JavaScript ci-dessus, je l'affiche à une action de contrôleur appelée Login. C'est là que je gère Google Auth.
+Dans le JavaScript ci-dessus, j'affiche ce retour à une action de contrôleur appelée Login. C'est ici que je m'occupe du Google Auth.
 
 ```javascript
       const xhr = new XMLHttpRequest();

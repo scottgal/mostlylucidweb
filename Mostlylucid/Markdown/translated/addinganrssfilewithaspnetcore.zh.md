@@ -5,14 +5,14 @@
 
 ## 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
-RSS (和Atom) 仍然是唯一被广泛采纳的合成内容格式。 它是一个简单的 XML 格式, 可供广泛的种子阅读者使用。 在此文章中, 我将展示您如何在 ASP. NET 核心应用程序中添加 RSS 种子 。
+RSS(和Atom)仍然是唯一被广泛采用的内容合成格式。 这是一个简单的 XML 格式, 可以被广泛的种子阅读器使用。 我将教你们如何在 ASP. NET 核心应用程序中添加 RSS 种子。
 
 [技选委
 
 ## 创建种子
 
 其核心其实是为 RSS 种子创建 XML 文档 。
-下面的代码列表`RssFeedItem`为种子生成 XML 对象。`RssFeedItem`类是指在种子中代表项目的简单类。它具有标题、链接、描述、发布日期和分类的属性。
+下面的代码列表 `RssFeedItem` 为种子生成 XML 对象。 缩略 `RssFeedItem` 类是指在种子中代表项目的简单类。 它具有标题、链接、描述、公布日期和类别等属性。
 
 ```csharp
     public string GenerateFeed(IEnumerable<RssFeedItem> items, string categoryName = "")
@@ -61,7 +61,7 @@ RSS (和Atom) 仍然是唯一被广泛采纳的合成内容格式。 它是一�
 ```
 
 上述代码中值得注意的一点是:
-我们需要创建 Atoom 命名空间并将其注入 XML 文档以支持`atom:link`元素。
+我们需要创建 Atoom 命名空间并将其注入 XML 文档以支持 `atom:link` 元素。
 
 ```csharp
      XNamespace atom = "http://www.w3.org/2005/Atom";
@@ -72,7 +72,7 @@ RSS (和Atom) 仍然是唯一被广泛采纳的合成内容格式。 它是一�
 
 ### UTF-8 编码
 
-虽然我们具体说明`utf-8`ASP.NET Core忽略了这一点... 因为它很特别。相反,我们需要确保 文件中生成的字符串其实是UTF -8,
+虽然我们具体说明 `utf-8` 这里ASP.NET核心忽略了这一点... 因为它很特别 相反,我们需要确保文件中生成的字符串实际上是UTF-8,我本以为
 
 ```csharp
    var settings = new XmlWriterSettings
@@ -99,7 +99,7 @@ RSS (和Atom) 仍然是唯一被广泛采纳的合成内容格式。 它是一�
 
 ## 控制器
 
-从那里,在RSS中,我们非常简单, 我们有一个方法可以接受`category`和`startdate`(目前是一个超级秘密特征??? ) 并返回种子。
+从那里,在RSS中,我们非常简单, 我们有一个方法可以接受 `category` 和 `startdate` (目前是一个超级秘密特征? ) 返回 feed。
 
 ```csharp
     [HttpGet]

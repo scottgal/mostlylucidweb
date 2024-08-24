@@ -86,5 +86,3 @@ Come potete vedere questo ottiene il valore del token dal campo di input e lo ag
 ## In conclusione
 
 È relativamente semplice aggiungere protezione XSRF al tuo JavaScript. Si tratta di una funzione di sicurezza critica che dovrebbe essere aggiunto a tutti i moduli e gli endpoint API.
-
-

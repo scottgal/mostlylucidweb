@@ -5,16 +5,16 @@
 
 HINWEIS: PROGRESSARBEITEN
 
-Ich habe nach einem einfachen Kommentar-System für meinen Blog gesucht, das Markdown verwendet. Ich konnte nicht finden, dass ich mochte, so entschied ich mich, mein eigenes zu schreiben. Dies ist ein einfaches Kommentar-System, das Markdown für die Formatierung verwendet. Der zweite Teil dieses wird E-Mail-Benachrichtigungen zum System hinzufügen, die mir eine E-Mail mit einem Link zu dem Kommentar senden, so dass ich es 'approve', bevor es auf der Website angezeigt wird.
+Ich habe nach einem einfachen Kommentarsystem für meinen Blog gesucht, das Markdown verwendet. Ich konnte keine finden, die ich mochte, also beschloss ich, meine eigene zu schreiben. Dies ist ein einfaches Kommentarsystem, das Markdown für die Formatierung verwendet. Der zweite Teil von diesem fügt E-Mail-Benachrichtigungen an das System, das mir eine E-Mail mit einem Link zu dem Kommentar senden wird, so dass ich es 'approve', bevor es auf der Website angezeigt wird.
 
 Wieder für ein Produktionssystem würde dies normalerweise eine Datenbank verwenden, aber für dieses Beispiel werde ich nur Markdown verwenden.
 
 ## Das Kommentarsystem
 
-Das Kommentarsystem ist unglaublich einfach. Ich habe nur eine Markdown-Datei gespeichert für jeden Kommentar mit dem Namen des Benutzers, E-Mail und Kommentar. Die Kommentare werden dann auf der Seite in der Reihenfolge, die sie empfangen wurden angezeigt.
+Das Kommentarsystem ist unglaublich einfach. Ich habe nur eine Markdown-Datei gespeichert für jeden Kommentar mit dem Namen des Benutzers, E-Mail und Kommentar. Die Kommentare werden dann auf der Seite in der Reihenfolge angezeigt, in der sie eingegangen sind.
 
 Um den Kommentar einzugeben, benutze ich SimpleMDE, einen Javascript-basierten Markdown-Editor.
-Dies ist in meinem_Layout.cshtml wie folgt:
+Dies ist in meinem _Layout.cshtml wie folgt:
 
 ```html
 <!-- Include the SimpleMDE CSS, here I use a dark theme -->
@@ -47,7 +47,7 @@ Ich initiiere dann den SimpleMDE Editor auf beiden Seiten laden und HTMX laden:
     });
 ```
 
-Hier gebe ich an, dass mein Kommentartextbereich als 'Kommentar' bezeichnet wird und erst dann initialisiert wird, wenn er erkannt wurde. Hier wickle ich das Formular in ein 'IsAuthenticated' (das ich in das ViewModel übergebe). Das heißt, ich kann sicherstellen, dass nur diejenigen, die sich angemeldet haben (gegenwärtig bei Google) Kommentare hinzufügen können.
+Hier gebe ich an, dass mein Kommentartextbereich "Kommentar" genannt wird und erst dann initialisiert wird, wenn er erkannt wurde. Hier wickle ich die Form in ein 'IsAuthenticated' (das ich in das ViewModel übergebe). Dies bedeutet, dass ich sicherstellen kann, dass nur diejenigen, die sich eingeloggt haben (zur Zeit bei Google) Kommentare hinzufügen können.
 
 ```razor
 @if (Model.Authenticated)
@@ -66,7 +66,7 @@ Hier gebe ich an, dass mein Kommentartextbereich als 'Kommentar' bezeichnet wird
     }
 ```
 
-Sie werden auch bemerken, dass ich HTMX hier für den Kommentar-Posting verwende. Wo ich das hx-vals-Attribut und einen JS-Aufruf benutze, um den Wert für den Kommentar zu erhalten. Dies wird dann mit der Aktion 'Comment' an den Blog-Controller gepostet.
+Sie werden auch bemerken, dass ich HTMX hier für die Kommentierung verwende. Wo ich das hx-vals-Attribut und einen JS-Aufruf benutze, um den Wert für den Kommentar zu erhalten. Diese wird dann mit der Aktion 'Kommentar' an den Blog-Controller gepostet. Dies wird dann mit dem neuen Kommentar ausgetauscht.
 
 ```csharp
     [HttpPost]

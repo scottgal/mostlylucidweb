@@ -262,6 +262,6 @@ public class StatsRequest : BaseRequest
 
 Et construisez la chaîne de requête à partir des paramètres. Si la demande est acceptée, nous renvoyons le contenu en tant que `UmamiResult` objet. Si la requête échoue avec un code d'état 401, nous appelons le `LoginAsync` méthode et réessayer la demande. Cela garantit que nous nous occupons 'élégamment' de l'expiration du jeton.
 
-## Conclusion
+## Le présent règlement entre en vigueur le vingtième jour suivant celui de sa publication au Journal officiel de l'Union européenne.
 
 C'est un exemple simple de la façon de créer un client C# pour l'API Umami. Vous pouvez l'utiliser comme point de départ pour construire des clients plus complexes ou intégrer l'API dans vos propres applications.

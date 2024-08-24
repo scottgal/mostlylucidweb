@@ -5,9 +5,9 @@
 
 ##Introduzione
 
-Nel mio post precedente ho dettagliato come inviare le email utilizzando FluentEmail e il client SMTP. Tuttavia un problema con questo è il ritardo nell'invio di e-mail. I server SMTP tendono ad essere lenti e possono richiedere un po 'di tempo per inviare e-mail. Questo può essere fastidioso per gli utenti e sentirsi come un logjam nella vostra applicazione.
+Nel mio post precedente ho spiegato come inviare email utilizzando FluentEmail e il client SMTP. Tuttavia un problema con questo è il ritardo nell'invio di email. I server SMTP tendono ad essere lenti e possono richiedere un po' di tempo per inviare email. Questo può essere fastidioso per gli utenti e sentirsi come un logjam nella vostra applicazione.
 
-Un modo per aggirare questo è quello di inviare e-mail in background. In questo modo l'utente può continuare a utilizzare l'applicazione senza dover aspettare che l'e-mail da inviare. Questo è un modello comune nelle applicazioni web e può essere raggiunto utilizzando un lavoro di background.
+Un modo per aggirare questo è quello di inviare e-mail in background. In questo modo l'utente può continuare a utilizzare l'applicazione senza dover attendere che l'email da inviare. Questo è un modello comune nelle applicazioni web e può essere raggiunto utilizzando un lavoro di background.
 
 [TOC]
 
@@ -15,8 +15,8 @@ Un modo per aggirare questo è quello di inviare e-mail in background. In questo
 
 In ASP.NET Core hai due opzioni principali (oltre a opzioni più avanzate come Hangfire / Quartz)
 
-- IHostedService - questa opzione vi dà la gestione del ciclo di vita di base per le vostre attività di sfondo. È possibile avviare e interrompere il servizio e verrà eseguito in background.
-- IHostedLifetime - questa opzione ti dà più controllo sul ciclo di vita delle tue attività di background. Puoi anche iniziare e fermare il servizio e verrà eseguito in background, ma hai più controllo roudn inizio, arresto, iniziato, fermato ecc...
+- IHostedService - questa opzione ti offre la gestione del ciclo di vita di base per le tue attività di background. È possibile avviare e interrompere il servizio e verrà eseguito in background.
+- IHostedLifetime - questa opzione ti dà più controllo sul ciclo di vita delle tue attività di sfondo. È anche possibile avviare e fermare il servizio e verrà eseguito in background, ma si dispone di più controllo aroudn inizio, fermarsi, avviato, fermato ecc...
 
 In questo esempio userò un semplice IHostedService per inviare email in background.
 
@@ -163,7 +163,7 @@ Per esempio, per il modulo di contatto che facciamo.
             await sender.SendEmailAsync(contactModel);
 ```
 
-Nel codice qui sopra questo aggiunge questo messaggio al nostro`BufferBlock<BaseEmailModel>` _mailMessaggi e l'attività di sfondo lo raccoglieranno e invieranno l'email.
+Nel codice qui sopra questo aggiunge questo messaggio al nostro `BufferBlock<BaseEmailModel>` _mailMessaggi e l'attività di sfondo lo raccoglieranno e invieranno l'email.
 
 ```csharp
    private async Task DeliverAsync(CancellationToken token)

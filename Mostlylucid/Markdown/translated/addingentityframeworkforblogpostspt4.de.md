@@ -76,21 +76,21 @@ Wir rufen dann in unsere `EnsureCategoriesAndPosts` Methode, die sicherstellt, d
         IEnumerable<BlogPostViewModel> posts,
         List<LanguageEntity> languageEntities)
     {
-        var existingCategories = await Context.Categories.Select(x => x.Name).ToListAsync();
-
         var languages = languageEntities.ToDictionary(x => x.Name, x => x);
-        var categories = new List<CategoryEntity>();
-
+        var currentPosts = await PostsQuery().ToListAsync();
         foreach (var post in posts)
         {
+            var existingCategories = Context.Categories.Local.ToList();
             var currentPost =
-                await PostsQuery().FirstOrDefaultAsync(x => x.Slug == post.Slug && x.LanguageEntity.Name == post.Language);
-            await AddCategoriesToContext(post.Categories, existingCategories, categories);
-            await AddBlogPostToContext(post, languages[post.Language], categories, currentPost);
+                currentPosts.FirstOrDefault(x => x.Slug == post.Slug && x.LanguageEntity.Name == post.Language);
+            await AddCategoriesToContext(post.Categories, existingCategories);
+            existingCategories = Context.Categories.Local.ToList();
+            await AddBlogPostToContext(post, languages[post.Language], existingCategories, currentPost);
         }
     }
 ```
 
+Hier verwenden wir die Context.Categories.Lokal, um die Kategorien zu verfolgen, die derzeit zum Context hinzugefügt wurden (sie werden in der Datenbank während der `SaveAsync` Anrufen).
 Sie können sehen, dass wir in die `PostsQuery` Methode unserer Basisklasse, die eine einfache Methode ist, die eine abfragebare der `BlogPostEntity` so können wir die Datenbank für die Beiträge abfragen.
 
 ```csharp
@@ -106,18 +106,15 @@ Wir rufen dann in die `AddCategoriesToContext` Methode, die sicherstellt, dass s
 ```csharp
     private async Task AddCategoriesToContext(
         IEnumerable<string> categoryList,
-        List<string> existingCategories,
-        List<CategoryEntity> categories)
+        List<CategoryEntity> existingCategories)
     {
         foreach (var category in categoryList)
         {
-            if (categories.Any(x => x.Name == category)) continue;
+            if (existingCategories.Any(x => x.Name == category)) continue;
 
             var cat = new CategoryEntity { Name = category };
 
-            if (!existingCategories.Contains(category)) await Context.Categories.AddAsync(cat);
-
-            categories.Add(cat);
+             await Context.Categories.AddAsync(cat);
         }
     }
 
@@ -127,15 +124,38 @@ Auch dies überprüft, ob die Kategorie existiert und wenn nicht, fügt sie der 
 
 #### Hinzufügen der Blog-Posts
 
-Wir rufen dann in die `AddBlogPostToContext` Methode, die sicherstellt, dass alle Beiträge in der Datenbank sind. Dies ist etwas komplexer, da wir sicherstellen müssen, dass die Post in der Datenbank ist, und dann müssen wir sicherstellen, dass die Kategorien in der Datenbank sind.
+Wir rufen dann in die `AddBlogPostToContext` Methode, dies ruft dann in die `EFBaseService` um den Post in die Datenbank zu speichern.
 
 ```csharp
-  private async Task AddBlogPostToContext(
+    private async Task AddBlogPostToContext(
         BlogPostViewModel post,
         LanguageEntity postLanguageEntity,
         List<CategoryEntity> categories,
         BlogPostEntity? currentPost)
     {
+        await SavePost(post, currentPost, categories, new List<LanguageEntity> { postLanguageEntity });
+    }
+```
+
+Wir tun dies, indem wir die `SavePost` Methode, die eine Methode ist, die den Post in die Datenbank speichert. Diese Methode ist etwas komplex, da sie prüfen muss, ob sich der Beitrag geändert hat und wenn ja, den Beitrag in der Datenbank aktualisieren.
+
+```csharp
+
+   public async Task<BlogPostEntity?> SavePost(BlogPostViewModel post, BlogPostEntity? currentPost =null ,
+        List<CategoryEntity>? categories = null,
+        List<LanguageEntity>? languages = null)
+    {
+        if (languages == null)
+            languages = await Context.Languages.ToListAsync();
+
+    var postLanguageEntity = languages.FirstOrDefault(x => x.Name == post.Language);
+        if (postLanguageEntity == null)
+        {
+            Logger.LogError("Language {Language} not found", post.Language);
+            return null;
+        }
+        categories ??= await Context.Categories.Where(x => post.Categories.Contains(x.Name)).ToListAsync();
+         currentPost ??= await PostsQuery().Where(x=>x.Slug == post.Slug).FirstOrDefaultAsync();
         try
         {
             var hash = post.HtmlContent.ContentHash();
@@ -145,46 +165,48 @@ Wir rufen dann in die `AddBlogPostToContext` Methode, die sicherstellt, dass all
                 !post.Categories.All(currentCategoryNames.Contains))
             {
                 categoriesChanged = true;
-                _logger.LogInformation("Categories have changed for post {Post}", post.Slug);
+                Logger.LogInformation("Categories have changed for post {Post}", post.Slug);
             }
 
             var dateChanged = currentPost?.PublishedDate.UtcDateTime.Date != post.PublishedDate.ToUniversalTime().Date;
             var titleChanged = currentPost?.Title != post.Title;
             if (!titleChanged && !dateChanged && hash == currentPost?.ContentHash && !categoriesChanged)
             {
-                _logger.LogInformation("Post {Post} has not changed", post.Slug);
-                return;
+                Logger.LogInformation("Post {Post} has not changed", post.Slug);
+                return currentPost;
             }
 
-            var blogPost = new BlogPostEntity
-            {
-                Title = post.Title,
-                Slug = post.Slug,
-                HtmlContent = post.HtmlContent,
-                PlainTextContent = post.PlainTextContent,
-                ContentHash = hash,
-                PublishedDate = post.PublishedDate,
-                LanguageEntity = postLanguageEntity,
-                LanguageId = postLanguageEntity.Id,
-                Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList()
-            };
-
+            
+            var blogPost = currentPost ?? new BlogPostEntity();
+            
+            blogPost.Title = post.Title;
+            blogPost.Slug = post.Slug;
+            blogPost.OriginalMarkdown = post.OriginalMarkdown;
+            blogPost.HtmlContent = post.HtmlContent;
+            blogPost.PlainTextContent = post.PlainTextContent;
+            blogPost.ContentHash = hash;
+            blogPost.PublishedDate = post.PublishedDate;
+            blogPost.LanguageEntity = postLanguageEntity;
+            blogPost.Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList();
 
             if (currentPost != null)
             {
-                _logger.LogInformation("Updating post {Post}", post.Slug);
-                Context.BlogPosts.Update(blogPost);
+                Logger.LogInformation("Updating post {Post}", post.Slug);
+                Context.BlogPosts.Update(blogPost); // Update the existing post
             }
             else
             {
-                _logger.LogInformation("Adding post {Post}", post.Slug);
-                await Context.BlogPosts.AddAsync(blogPost);
+                Logger.LogInformation("Adding new post {Post}", post.Slug);
+                Context.BlogPosts.Add(blogPost); // Add a new post
             }
+            return blogPost;
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Error adding post {Post}", post.Slug);
+            Logger.LogError(e, "Error adding post {Post}", post.Slug);
         }
+
+        return null;
     }
 
 ```

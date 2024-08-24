@@ -9,16 +9,16 @@
 
 并增加博客文章的完整封存, 使这个网站迅速高效,
 
-见[博客服务源](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/Markdown/MarkdownBlogService.cs)使用 IMemoryCache 执行此操作的方法; 使用 IMemoryCache 的操作非常简单 。
+见 [博客服务源](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/Markdown/MarkdownBlogService.cs) 使用 IMemoryCache 执行此操作的方法; 使用 IMemoryCache 的操作非常简单 。
 
 [技选委
 
 ### 标签辅助工具
 
-我决定使用“标签帮助”来实施传呼机制。这是封装传呼逻辑并使其重新使用的绝佳方法。
-此处使用[来自Darrel O'Neill的抛射标记助手](https://github.com/darrel-oneil/PaginationTagHelper)包含在项目中,作为金字塔包。
+我决定使用标签求助器来实施传呼机制。 这是封装传呼逻辑并使其可重新使用的绝佳方法。
+此处使用 [来自Darrel O'Neill的抛射标记助手 ](https://github.com/darrel-oneil/PaginationTagHelper) 包含在项目中,作为金字塔包。
 
-然后将此添加到_查看imports.cshtml 文件, 以便所有视图都可用 。
+然后将此添加到 _查看imports.cshtml 文件, 以便所有视图都可用 。
 
 ```razor
 @addTagHelper *,PaginationTagHelper.AspNetCore
@@ -26,7 +26,7 @@
 
 ### 标签帮助者
 
-在_BlogSummaryList. cshtml 部分观点我添加了以下代码,
+在 _BlogSummaryList. cshtml 部分观点我添加了以下代码,
 
 ```razor
 <pager link-url="@Model.LinkUrl"
@@ -41,7 +41,7 @@
 
 以下是一些值得注意的事情:
 
-1. `link-url`此选项允许标签助手为调用链接生成正确的 URL 。 在“ 主控器索引” 方法中, 此选项设定为此动作 。
+1. `link-url` 允许标签助手为调用链接生成正确的 URL 。 在主控器索引方法中,这是为这一行动设定的。
 
 ```csharp
    var posts = blogService.GetPostsForFiles(page, pageSize);
@@ -67,11 +67,11 @@
     }
 ```
 
-此设置为 URL 。 这样可以确保 月球助手可以使用 任何顶级方法 。
+这是设定到URL。 这确保了上层辅助人员能够采用最高一级方法。
 
 ### HTMX 属性
 
-`hx-boost`, `hx-push-url`, `hx-target`, `hx-swap`这些都是 HTMX 特性, 使该呼叫能够使用 HTMX 工作 。
+`hx-boost`, `hx-push-url`, `hx-target`, `hx-swap` 这些都是 HTMX 特性, 使该呼叫能够使用 HTMX 工作 。
 
 ```razor
      hx-boost="true"
@@ -80,13 +80,13 @@
        hx-swap="show:none"
 ```
 
-我们在这里使用`hx-boost="true"`这样可以让页码标记助手通过拦截正常的 URL 生成和使用当前 URL 来不需修改 。
+我们在这里使用 `hx-boost="true"` 这样可以让页码标记助手通过拦截正常的 URL 生成和使用当前 URL 来不需修改 。
 
-`hx-push-url="true"`以确保在浏览器的 URL 历史中将 URL 替换( 它允许直接链接到页面) 。
+`hx-push-url="true"` 以确保在浏览器的 URL 历史中将 URL 替换( 它允许直接链接到页面) 。
 
-`hx-target="#content"`这是将替换为新内容的目标 div 。
+`hx-target="#content"` 这是将替换为新内容的目标 div 。
 
-`hx-swap="show:none"`这是当内容被替换时将使用的互换效果。 在这种情况下, 它会防止HTMX在互换内容时使用的正常“ 跳” 效果 。
+`hx-swap="show:none"` 这是当内容被替换时将使用的互换效果 。 在这种情况下,它防止了HTMX在互换内容时使用的正常“跳”效应。
 
 #### CSS 安保部
 
@@ -117,7 +117,7 @@
 
 ### 主计长
 
-`page`, `page-size`, `total-items`是页码标记助手用来生成传呼链接的属性。
+`page`, `page-size`, `total-items` 是页码标记助手用来生成传呼链接的属性。
 这些通过控制器的部分视图。
 
 ```csharp
@@ -145,4 +145,4 @@
 
 ### 结论 结论 结论 结论 结论
 
-这是对网站的简单补充,但它使网站更便于使用。 HTMX集成使网站感到反应更灵敏,同时又不给网站添加更多的JavaScript。
+这是对网站的一个简单补充,但它使网站更便于使用。 HTMX集成使网站感到反应更加灵敏,而不会给网站增加更多的JavaScript。

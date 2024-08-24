@@ -19,6 +19,7 @@ public static class Setup
 
         services.AddScoped<PostIndexer>();
         services.AddScoped<IndexService>();
+        services.AddScoped<SearchService>();
 
 
     }

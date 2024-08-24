@@ -9,16 +9,16 @@ Nun, da ich eine Reihe von Blog-Posts die Homepage war immer eher Länge, so das
 
 Dies geht zusammen mit dem Hinzufügen voller Caching für Blog-Beiträge, um dies eine schnelle und effiziente Website zu machen.
 
-Siehe[Quelle des Blog-Services](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/Markdown/MarkdownBlogService.cs)für wie dies umgesetzt wird; es ist wirklich ziemlich einfach mit dem IMemoryCache.
+Siehe [Quelle des Blog-Services](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/Services/Markdown/MarkdownBlogService.cs) für wie dies umgesetzt wird; es ist wirklich ziemlich einfach mit dem IMemoryCache.
 
 [TOC]
 
 ### TagHelper
 
-Ich beschloss, einen TagHelper zu verwenden, um den Paging-Mechanismus zu implementieren. Dies ist eine großartige Möglichkeit, die Paging-Logik zu verkapseln und wiederverwendbar zu machen.
-Dabei wird die[Pagination Taghelper von Darrel O'Neill](https://github.com/darrel-oneil/PaginationTagHelper)Dies ist im Projekt als Nuget-Paket enthalten.
+Ich beschloss, einen TagHelper zu verwenden, um den Paging-Mechanismus zu implementieren. Dies ist ein großartiger Weg, um die Logik zu verkapseln und wiederverwendbar zu machen.
+Dabei wird die [Pagination Taghelper von Darrel O'Neill ](https://github.com/darrel-oneil/PaginationTagHelper) Dies ist im Projekt als Nuget-Paket enthalten.
 
-Dies wird dann zu den_ViewImports.cshtml-Datei, so dass es für alle Ansichten zur Verfügung steht.
+Dies wird dann zu den _ViewImports.cshtml-Datei, so dass es für alle Ansichten zur Verfügung steht.
 
 ```razor
 @addTagHelper *,PaginationTagHelper.AspNetCore
@@ -26,7 +26,7 @@ Dies wird dann zu den_ViewImports.cshtml-Datei, so dass es für alle Ansichten z
 
 ### Der TagHelper
 
-In der_BlogSummaryList.cshtml Teilansicht Ich habe den folgenden Code hinzugefügt, um den Paging-Mechanismus zu rendern.
+In der _BlogSummaryList.cshtml Teilansicht Ich habe den folgenden Code hinzugefügt, um den Paging-Mechanismus zu rendern.
 
 ```razor
 <pager link-url="@Model.LinkUrl"
@@ -41,7 +41,7 @@ In der_BlogSummaryList.cshtml Teilansicht Ich habe den folgenden Code hinzugefü
 
 Ein paar bemerkenswerte Dinge hier:
 
-1. `link-url`Dies ermöglicht es dem Taghelper, die korrekte URL für die Paging-Links zu generieren. In der HomeController Index-Methode ist dies auf diese Aktion eingestellt.
+1. `link-url` Dies ermöglicht es dem Taghelper, die richtige URL für die Paging-Links zu generieren. In der HomeController Index Methode ist dies auf diese Aktion eingestellt.
 
 ```csharp
    var posts = blogService.GetPostsForFiles(page, pageSize);
@@ -67,11 +67,11 @@ Und im Blog Controller
     }
 ```
 
-Dies ist auf das URl eingestellt. Dadurch wird sichergestellt, dass der Paginationshelfer für beide Top-Level-Methoden arbeiten kann.
+Das ist auf diesen Url eingestellt. Dadurch wird sichergestellt, dass der Paginationshelfer für beide Top-Level-Methoden arbeiten kann.
 
 ### HTMX-Eigenschaften
 
-`hx-boost`, `hx-push-url`, `hx-target`, `hx-swap`Dies sind alle HTMX-Eigenschaften, die es dem Server ermöglichen, mit HTMX zu arbeiten.
+`hx-boost`, `hx-push-url`, `hx-target`, `hx-swap` Dies sind alle HTMX-Eigenschaften, die es dem Server ermöglichen, mit HTMX zu arbeiten.
 
 ```razor
      hx-boost="true"
@@ -80,13 +80,13 @@ Dies ist auf das URl eingestellt. Dadurch wird sichergestellt, dass der Paginati
        hx-swap="show:none"
 ```
 
-Hier benutzen wir`hx-boost="true"`Dies ermöglicht es dem Pagination Taghelper, keine Änderungen zu benötigen, indem es die normale URL-Generierung abfängt und die aktuelle URL verwendet.
+Hier benutzen wir `hx-boost="true"` Dies ermöglicht es dem Pagination Taghelper, keine Änderungen zu benötigen, indem es die normale URL-Generierung abfängt und die aktuelle URL verwendet.
 
-`hx-push-url="true"`um sicherzustellen, dass die URL im URL-Verlauf des Browsers ausgetauscht wird (was eine direkte Verknüpfung mit Seiten ermöglicht).
+`hx-push-url="true"` um sicherzustellen, dass die URL im URL-Verlauf des Browsers ausgetauscht wird (was eine direkte Verknüpfung mit Seiten ermöglicht).
 
-`hx-target="#content"`Dies ist der Ziel-div, der durch den neuen Inhalt ersetzt wird.
+`hx-target="#content"` Dies ist der Ziel-div, der durch den neuen Inhalt ersetzt wird.
 
-`hx-swap="show:none"`Dies ist der Swap-Effekt, der verwendet wird, wenn der Inhalt ersetzt wird. In diesem Fall verhindert er den normalen 'Sprung'-Effekt, den HTMX beim Swap-Inhalt verwendet.
+`hx-swap="show:none"` Dies ist der Swap-Effekt, der verwendet wird, wenn der Inhalt ersetzt wird. In diesem Fall verhindert es den normalen 'Sprung'-Effekt, den HTMX beim Austausch von Inhalten nutzt.
 
 #### CSS
 
@@ -117,7 +117,7 @@ Ich habe auch Stile zu den main.css in meinem /src-Verzeichnis hinzugefügt, so 
 
 ### Steuergerät
 
-`page`, `page-size`, `total-items`sind die Eigenschaften, die der Pagination Taghelper verwendet, um die Paging-Links zu generieren.
+`page`, `page-size`, `total-items` sind die Eigenschaften, die der Pagination Taghelper verwendet, um die Paging-Links zu generieren.
 Diese werden vom Controller in die Teilansicht überführt.
 
 ```csharp
@@ -145,4 +145,4 @@ Hier bekommen wir einfach die Beiträge aus dem Cache, bestellen sie nach Datum 
 
 ### Schlußfolgerung
 
-Dies war eine einfache Ergänzung der Website, aber es macht es viel mehr nutzbar. Die HTMX-Integration macht die Website fühlen sich mehr reagieren, während nicht mehr JavaScript auf der Website.
+Dies war eine einfache Ergänzung der Website, aber es macht es viel mehr nutzbar. Die Integration von HTMX macht die Website reaktionsfreudiger und fügt nicht mehr JavaScript zu der Website hinzu.

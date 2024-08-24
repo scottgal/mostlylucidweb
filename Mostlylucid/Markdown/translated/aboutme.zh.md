@@ -1,11 +1,12 @@
 # 关于我
 
-<datetime class="hidden">2024-07-30-13:30</datetime>
-
 ## Scott Galloway 领航.NET 开发者和 CTO
 
 <!--category-- resume , introduction -->
-在软件开发、技术领导和团队管理方面拥有25年以上专门知识的超常和成就领先的.NET开发者。精通C#、ASP.NET和现代网络框架,在云计算、DevOps和数据库管理方面具有丰富经验。
+我是一个多才多艺、成就卓著的开发者 拥有超过25年的创纪录 创纪录的团队和平台 并振兴初创企业
+精通C#、ASP.NET和现代网络框架,在云计算、DevOps、数据库管理和搜索技术方面经验丰富。 从技术巨头到创新初创企业等不同行业成功发展项目的领先记录已经得到证明。
+
+需要帮助来建立您的下一个项目吗? [联系我,联系我](mailto:scott.galloway@gmail.com)
 
 [技选委
 

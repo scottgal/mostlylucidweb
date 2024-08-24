@@ -86,5 +86,3 @@ Wie Sie sehen können, erhält dies den Wert des Tokens aus dem Eingabefeld und 
 ## Schlussfolgerung
 
 Es ist relativ einfach, XSRF-Schutz zu Ihrem JavaScript hinzuzufügen. Es ist eine kritische Sicherheitsfunktion, die zu allen Formularen und API-Endpunkten hinzugefügt werden sollte.
-
-

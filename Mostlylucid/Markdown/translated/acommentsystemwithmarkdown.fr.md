@@ -5,16 +5,16 @@
 
 NOTE: TRAVAUX EN PROGRÈS
 
-J'ai été à la recherche d'un simple système de commentaires pour mon blog qui utilise Markdown. Je n'ai pas trouvé celui que j'ai aimé, donc j'ai décidé d'écrire le mien. Il s'agit d'un système de commentaires simple qui utilise Markdown pour le formatage. La deuxième partie de cela ajoutera des notifications par e-mail au système qui m'enverrai un courriel avec un lien vers le commentaire, me permettant de 'approuver' avant qu'il ne soit affiché sur le site.
+J'ai été à la recherche d'un simple système de commentaires pour mon blog qui utilise Markdown. Je n'en ai pas trouvé une que j'aimais, alors j'ai décidé d'écrire la mienne. Il s'agit d'un simple système de commentaires qui utilise Markdown pour le formatage. La deuxième partie ajoutera des notifications par e-mail au système qui m'enverrai un email avec un lien vers le commentaire, me permettant de l'approuver avant qu'il ne soit affiché sur le site.
 
 Encore une fois pour un système de production qui utiliserait normalement une base de données, mais pour cet exemple je vais simplement utiliser balisage.
 
 ## Le système de commentaires
 
-Le système de commentaires est incroyablement simple. J'ai juste un fichier de balisage en cours d'enregistrement pour chaque commentaire avec le nom de l'utilisateur, le courriel et le commentaire. Les commentaires sont ensuite affichés sur la page dans l'ordre où ils ont été reçus.
+Le système de commentaires est incroyablement simple. J'ai juste un fichier de balisage en cours d'enregistrement pour chaque commentaire avec le nom de l'utilisateur, l'e-mail et le commentaire. Les commentaires sont ensuite affichés sur la page dans l'ordre où ils ont été reçus.
 
 Pour entrer le commentaire J'utilise SimpleMDE, un éditeur de Markdown basé sur Javascript.
-Ceci est inclus dans mon_Layout.cshtml comme suit:
+Ceci est inclus dans mon _Layout.cshtml comme suit:
 
 ```html
 <!-- Include the SimpleMDE CSS, here I use a dark theme -->
@@ -47,7 +47,7 @@ J'initialise ensuite l'éditeur SimpleMDE sur la charge de page et la charge HTM
     });
 ```
 
-Ici, je précise que ma zone de texte de commentaire est appelée 'comment' et initialise seulement une fois qu'elle est détectée. Ici, je enveloppe le formulaire dans un 'IsAuthenticated' (que je passe dans le ViewModel). Cela signifie que je peux assurer que seuls ceux qui se sont connectés (actuellement avec Google) peuvent ajouter des commentaires.
+Ici, je précise que ma zone de texte de commentaire s'appelle "comment" et n'initialise qu'une fois qu'elle est détectée. Ici, j'enroule le formulaire dans un 'IsAuthenticated' (que je passe dans le ViewModel). Cela signifie que je peux m'assurer que seuls ceux qui se sont connectés (actuellement avec Google) peuvent ajouter des commentaires.
 
 ```razor
 @if (Model.Authenticated)
@@ -66,7 +66,7 @@ Ici, je précise que ma zone de texte de commentaire est appelée 'comment' et i
     }
 ```
 
-Vous remarquerez également que j'utilise HTMX ici pour l'affichage des commentaires. Lorsque j'utilise l'attribut hx-vals et un appel JS pour obtenir la valeur pour le commentaire. Ceci est ensuite posté au contrôleur du blog avec l'action 'Commentaire'. Ceci est ensuite échangé avec le nouveau commentaire.
+Vous remarquerez également que j'utilise HTMX ici pour l'affichage des commentaires. Où j'utilise l'attribut hx-vals et un appel JS pour obtenir la valeur pour le commentaire. Ceci est ensuite affiché sur le contrôleur de blog avec l'action 'Commentaire'. Ceci est ensuite échangé avec le nouveau commentaire.
 
 ```csharp
     [HttpPost]

@@ -4,6 +4,7 @@ namespace Mostlylucid.Models.Blog;
 
 public class BlogPostViewModel : BaseViewModel
 {
+    public string Id { get; set; }
     public string[] Categories { get; set; } = Array.Empty<string>();
     
     public string Title { get; set; }= string.Empty;

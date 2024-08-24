@@ -282,7 +282,7 @@ public class BackgroundTranslateService(
     {
         var fileBlogService = scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>();
         var entryExists = await fileBlogService.EntryExists(slug, translateModel.Language);
-        var entryChanged = await fileBlogService.EntryChanged(slug, MarkdownBaseService.EnglishLanguage,
+        var entryChanged = await fileBlogService.EntryChanged(slug, translateModel.Language,
             translateModel.OriginalMarkdown.ContentHash());
         return !entryExists || entryChanged;
     }

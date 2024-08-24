@@ -26,9 +26,9 @@ public static class LanguageConverter
         { "es", "spanish" },
         { "fr", "french" },
         { "de", "german" },
-        { "it", "italian)" },
+        { "it", "italian" },
         { "zh", "chinese" },  // Chinese (Simplified)
-        { "nl", "dutch)" },
+        { "nl", "dutch" },
         { "hi", "hindi"  },  // Hindi
         { "ar", "arabic" },  // Arabic
         { "uk", "ukrainian" },  // Ukrainian
