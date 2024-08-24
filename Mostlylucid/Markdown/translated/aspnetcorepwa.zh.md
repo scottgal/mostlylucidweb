@@ -23,7 +23,7 @@ dotnet add package WebEssentials.AspNetCore.PWA
 builder.Services.AddProgressiveWebApp();
 ```
 
-然后创建一些与下面大小相匹配的飞行要量[在这里](https://realfavicongenerator.net/)是一个工具, 您可以用来创建它们。 这些可以是任何图标( 我使用了 emoji \ \ \ \ )
+然后创建一些与下面大小相匹配的飞行要量 [在这里](https://realfavicongenerator.net/) 是一个可以用来创建它们的工具。 这些真的可以是任何图标( 我使用了 emoji {} @ {} )
 
 Save these in your wwrroot folder as android-chrome-192x192.png and android-chrome-512x512.png (in the example below)
 

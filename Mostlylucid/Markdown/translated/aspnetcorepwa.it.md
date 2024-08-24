@@ -23,7 +23,7 @@ Nel vostro programma.cs aggiungere:
 builder.Services.AddProgressiveWebApp();
 ```
 
-Poi creare alcuni favicon che corrispondono alle dimensioni qui sotto[qui](https://realfavicongenerator.net/)è uno strumento che puoi usare per crearli. Questi possono essere davvero qualsiasi icona (ho usato un emoji)
+Poi creare alcuni favicon che corrispondono alle dimensioni qui sotto [qui](https://realfavicongenerator.net/) è uno strumento che puoi usare per crearli. Questi possono davvero essere qualsiasi icona (Ho usato un emoji)
 
 Save these in your wwrroot folder as android-chrome-192x192.png and android-chrome-512x512.png (in the example below)
 
