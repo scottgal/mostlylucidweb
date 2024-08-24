@@ -9,6 +9,15 @@ I de tidigare delarna av denna serie introducerade vi begreppet fulltextsökning
 
 I denna del kommer vi att täcka hur du får OpenSearch igång; i nästa del kommer jag att täcka hur du får data i opensearch och fråga det.
 
+Tidigare delar i denna serie:
+
+- [Fullständig textsökning med postgres](/blog/textsearchingpt1)
+- [Sökruta med postgres](/blog/textsearchingpt11)
+
+Nästa delar i denna serie:
+
+- [Opensearch med C#](/blog/textsearchingpt3)
+
 [TOC]
 
 ## Vad är OpenSearch?

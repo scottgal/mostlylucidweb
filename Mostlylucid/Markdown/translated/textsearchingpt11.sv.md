@@ -7,6 +7,15 @@
 
 I och med att [förra artikeln](/blog/textsearchingpt1) Jag visade dig hur du konfigurerar en fulltextsökning med hjälp av Postgres inbyggda sökfunktioner i fulltext. Medan jag avslöjade en sökning api jag inte hade ett sätt att faktiskt använda det så... det var lite av en retas. I den här artikeln ska jag visa dig hur du använder sökapi för att söka efter text i din databas.
 
+Tidigare delar i denna serie:
+
+- [Fullständig textsökning med postgres](/blog/textsearchingpt1)
+
+Nästa delar i denna serie:
+
+- [Introduktion till OpenSearch](/blog/textsearchingpt2)
+- [Opensearch med C#](/blog/textsearchingpt3)
+
 Detta kommer att lägga till en liten sökruta till rubriken på webbplatsen som gör det möjligt för användare att söka efter text i blogginlägg.
 
 ![Sök](searchbox.png?format=webp&quality=25)

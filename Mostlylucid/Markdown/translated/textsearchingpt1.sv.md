@@ -7,6 +7,12 @@
 
 Söka efter innehåll är en kritisk del av något innehåll tung webbplats. Det förbättrar upptäckbarheten och användarupplevelsen. I det här inlägget ska jag täcka hur jag lagt till fulltext söker efter denna webbplats
 
+Nästa delar i denna serie:
+
+- [Sökruta med postgres](/blog/textsearchingpt11)
+- [Introduktion till OpenSearch](/blog/textsearchingpt2)
+- [Opensearch med C#](/blog/textsearchingpt3)
+
 [TOC]
 
 # Inflygningar

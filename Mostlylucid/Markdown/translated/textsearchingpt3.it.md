@@ -11,7 +11,7 @@ Parti precedenti:
 
 - [Ricerca di testo completo con Postgres](/blog/textsearchingpt1)
 - [Casella di ricerca con Postgres](/blog/textsearchingpt11)
-- [Introduzione alla ricerca aperta](/blog/textsearchingpt3)
+- [Introduzione alla ricerca aperta](/blog/textsearchingpt2)
 
 In questa parte ci occuperemo di come iniziare a usare la nuova istanza OpenSearch con ASP.NET Core.
 

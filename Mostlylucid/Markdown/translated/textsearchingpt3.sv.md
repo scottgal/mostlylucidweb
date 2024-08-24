@@ -11,7 +11,7 @@ Tidigare delar:
 
 - [Fullständig textsökning med postgres](/blog/textsearchingpt1)
 - [Sökruta med postgres](/blog/textsearchingpt11)
-- [Introduktion till OpenSearch](/blog/textsearchingpt3)
+- [Introduktion till OpenSearch](/blog/textsearchingpt2)
 
 I denna del kommer vi att täcka hur du börjar använda dig nya glänsande OpenSearch instans med ASP.NET Core.
 

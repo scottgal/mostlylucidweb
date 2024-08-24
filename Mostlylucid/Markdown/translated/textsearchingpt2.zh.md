@@ -9,6 +9,15 @@
 
 在这一部分,我们将报道如何启动和运行 OpenSearch; 在下一部分,我将报道如何将数据输入公开搜索并查询。
 
+本序列的先前部分 :
+
+- [使用 Postgres 搜索完整文本](/blog/textsearchingpt1)
+- [带有海报的搜索框](/blog/textsearchingpt11)
+
+本系列的下一部分:
+
+- [用 C # 打开搜索](/blog/textsearchingpt3)
+
 [技选委
 
 ## 什么是OpenSearch号?

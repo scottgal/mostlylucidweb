@@ -7,6 +7,15 @@
 
 在 [最后一条](/blog/textsearchingpt1) 我教过你如何使用 Postgres 的全文本搜索能力 设置完整的文本搜索 虽然我揭发了一个搜索提示......我没有办法真正使用它......所以... 在本篇文章中,我将教你如何使用搜索信头在数据库中搜索文本。
 
+本序列的先前部分 :
+
+- [使用 Postgres 搜索完整文本](/blog/textsearchingpt1)
+
+本系列的下一部分:
+
+- [OpenSearch 介绍介绍](/blog/textsearchingpt2)
+- [用 C # 打开搜索](/blog/textsearchingpt3)
+
 这将在网站页眉上添加一个小搜索框, 让用户可以搜索博客文章中的文字。
 
 ![搜索搜索](searchbox.png?format=webp&quality=25)

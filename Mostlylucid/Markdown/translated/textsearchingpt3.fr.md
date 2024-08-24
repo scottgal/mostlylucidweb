@@ -11,7 +11,7 @@ Pièces précédentes:
 
 - [Recherche de texte complet avec Postgres](/blog/textsearchingpt1)
 - [Boîte de recherche avec Postgres](/blog/textsearchingpt11)
-- [Introduction à OpenSearch](/blog/textsearchingpt3)
+- [Introduction à OpenSearch](/blog/textsearchingpt2)
 
 Dans cette partie, nous aborderons comment commencer à utiliser votre nouvelle instance OpenSearch brillante avec ASP.NET Core.
 

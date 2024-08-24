@@ -9,6 +9,15 @@ Nelle parti precedenti di questa serie abbiamo introdotto il concetto di ricerca
 
 In questa parte copriremo come ottenere OpenSearch in esecuzione; nella parte successiva coprirò come ottenere i dati in opensearch e interrogarlo.
 
+Parti precedenti di questa serie:
+
+- [Ricerca di testo completo con Postgres](/blog/textsearchingpt1)
+- [Casella di ricerca con Postgres](/blog/textsearchingpt11)
+
+Prossime parti di questa serie:
+
+- [Opensearch con C#](/blog/textsearchingpt3)
+
 [TOC]
 
 ## Che cos'è OpenSearch?

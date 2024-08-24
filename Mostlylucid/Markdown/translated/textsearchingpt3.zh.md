@@ -11,7 +11,7 @@
 
 - [使用 Postgres 搜索完整文本](/blog/textsearchingpt1)
 - [带有海报的搜索框](/blog/textsearchingpt11)
-- [OpenSearch 介绍介绍](/blog/textsearchingpt3)
+- [OpenSearch 介绍介绍](/blog/textsearchingpt2)
 
 在这部分,我们将报道如何开始使用你 与ASP.NET核心的新光亮的 OpenSearch 实例。
 

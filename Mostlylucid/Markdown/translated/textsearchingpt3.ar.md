@@ -11,7 +11,7 @@
 
 - [جاري البحث مع الموضعات](/blog/textsearchingpt1)
 - [مربع البحث مع الموضع](/blog/textsearchingpt11)
-- [مقدمة إلى OpenSearch](/blog/textsearchingpt3)
+- [مقدمة إلى OpenSearch](/blog/textsearchingpt2)
 
 في هذا الجزء سوف نقوم بتغطية كيفية البدء في استخدام لكم جديدة لامعة OpenSearch حالة مع ASP.net الأساسية.
 

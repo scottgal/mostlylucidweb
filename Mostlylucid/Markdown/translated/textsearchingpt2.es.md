@@ -9,6 +9,15 @@ En las partes anteriores de esta serie introdujimos el concepto de búsqueda de 
 
 En esta parte cubriremos cómo obtener OpenSearch y en funcionamiento; en la siguiente parte cubriré cómo obtener datos en opensearch y consultarlo.
 
+Las partes anteriores de esta serie:
+
+- [Búsqueda de texto completo con Postgres](/blog/textsearchingpt1)
+- [Buzón de búsqueda con Postgres](/blog/textsearchingpt11)
+
+Las siguientes partes de esta serie:
+
+- [Búsqueda abierta con C#](/blog/textsearchingpt3)
+
 [TOC]
 
 ## ¿Qué es OpenSearch?

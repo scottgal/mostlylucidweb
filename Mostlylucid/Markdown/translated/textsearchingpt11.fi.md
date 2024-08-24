@@ -7,13 +7,22 @@
 
 • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • [viimeinen artikkeli](/blog/textsearchingpt1) Näytin sinulle, miten pystytät koko tekstihaun käyttäen Postgresin koko tekstihakukykyä. Kun paljastin hakuapin, en voinut käyttää sitä, joten se oli kiusallista. Tässä artikkelissa näytän, miten hakuapin avulla voit hakea tekstiä tietokannastasi.
 
+Aikaisemmat osat tässä sarjassa:
+
+- [Täydellinen tekstihaku postinjakajilla](/blog/textsearchingpt1)
+
+Seuraavat osat tässä sarjassa:
+
+- [Johdatus avoimeen hakuun](/blog/textsearchingpt2)
+- [Avaa haku C#:llä](/blog/textsearchingpt3)
+
 Tämä lisää sivuston otsikkoon pienen hakulaatikon, jonka avulla käyttäjät voivat hakea tekstiä blogikirjoituksista.
 
 ![Etsi](searchbox.png?format=webp&quality=25)
 
 **Huomaa: Norsu huoneessa on, että en pidä sitä parhaana tapana. Monikielisyyden tukeminen on superkompleksista (tarvitsen eri palstan kieltä kohti) ja minun pitäisi käsitellä juurruttavia ja muita kielikohtaisia asioita. Jätän tämän toistaiseksi huomiotta ja keskityn vain englantiin. Myöhemmin näytämme, miten tämä hoidetaan OpenSearchissa.**
 
-[TÄYTÄNTÖÖNPANO
+[TOC]
 
 ## Haetaan tekstiä
 

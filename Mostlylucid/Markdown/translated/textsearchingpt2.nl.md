@@ -9,6 +9,15 @@ In de vorige delen van deze serie introduceerden we het concept van full text se
 
 In dit deel zullen we behandelen hoe OpenSearch aan de gang te krijgen; in het volgende deel zal ik behandelen hoe om gegevens te krijgen in opensearch en query it.
 
+Vorige delen in deze serie:
+
+- [Volledige tekst zoeken met Postgres](/blog/textsearchingpt1)
+- [Zoekvak met Postgres](/blog/textsearchingpt11)
+
+Volgende delen in deze serie:
+
+- [Open zoeken met C#](/blog/textsearchingpt3)
+
 [TOC]
 
 ## Wat is OpenSearch?

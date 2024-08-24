@@ -7,6 +7,15 @@
 
 Dans le [dernier article](/blog/textsearchingpt1) Je vous ai montré comment configurer une recherche texte complète en utilisant les capacités de recherche texte intégrées de Postgres. Alors que j'ai exposé un api de recherche, je n'avais pas un moyen de l'utiliser vraiment donc... c'était un peu un tracas. Dans cet article, je vais vous montrer comment utiliser la recherche api pour rechercher du texte dans votre base de données.
 
+Pièces précédentes de cette série:
+
+- [Recherche de texte complet avec Postgres](/blog/textsearchingpt1)
+
+Les prochaines parties de cette série:
+
+- [Introduction à OpenSearch](/blog/textsearchingpt2)
+- [Ouvrir la recherche avec C#](/blog/textsearchingpt3)
+
 Cela ajoutera une petite boîte de recherche à l'en-tête du site qui permettra aux utilisateurs de rechercher du texte dans les messages de blog.
 
 ![Rechercher](searchbox.png?format=webp&quality=25)

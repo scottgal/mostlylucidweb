@@ -11,7 +11,7 @@
 
 - [Повне пошук тексту за допомогою Postgres](/blog/textsearchingpt1)
 - [Панель пошуку з Postgres](/blog/textsearchingpt11)
-- [Вступ до OpenSearch](/blog/textsearchingpt3)
+- [Вступ до OpenSearch](/blog/textsearchingpt2)
 
 У цій частині ми поговоримо про те, як почати використовувати новий блискучий екземпляр OpenSearch з ядром ASP.NET.
 

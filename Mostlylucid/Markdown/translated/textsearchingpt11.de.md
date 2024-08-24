@@ -7,6 +7,15 @@
 
 In der [letzter Artikel](/blog/textsearchingpt1) Ich habe Ihnen gezeigt, wie Sie eine Volltextsuche mit Hilfe der integrierten Volltextsuche von Postgres einrichten können. Während ich ein Suchapi entlarvte, hatte ich keine Möglichkeit, es tatsächlich zu benutzen, also... es war ein bisschen necken. In diesem Artikel werde ich Ihnen zeigen, wie Sie die Suche api verwenden, um nach Text in Ihrer Datenbank zu suchen.
 
+Frühere Teile dieser Serie:
+
+- [Volltextsuche mit Postgres](/blog/textsearchingpt1)
+
+Nächste Teile dieser Serie:
+
+- [Einführung in OpenSearch](/blog/textsearchingpt2)
+- [Offene Suche mit C#](/blog/textsearchingpt3)
+
 Dies wird ein kleines Suchfeld zum Header der Website hinzufügen, das Benutzern erlaubt, nach Text in den Blog-Beiträgen zu suchen.
 
 ![Suchen](searchbox.png?format=webp&quality=25)

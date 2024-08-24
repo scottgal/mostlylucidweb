@@ -11,7 +11,7 @@ Aiemmat osat:
 
 - [Täydellinen tekstihaku postinjakajilla](/blog/textsearchingpt1)
 - [Hakulaatikko, jossa postgres](/blog/textsearchingpt11)
-- [Johdatus avoimeen hakuun](/blog/textsearchingpt3)
+- [Johdatus avoimeen hakuun](/blog/textsearchingpt2)
 
 Tässä osassa kerromme, miten voit alkaa käyttää uutta kiiltävää OpenSearch-instanssia ASP.NET Corella.
 

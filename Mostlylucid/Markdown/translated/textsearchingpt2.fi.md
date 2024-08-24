@@ -9,7 +9,17 @@ Sarjan edellisissä osissa esitimme täydellisen tekstinhaun konseptin ja sen, m
 
 Tässä osassa kerromme, miten OpenSearch saadaan käyntiin, seuraavassa osassa selvitän, miten data saadaan avoimeen hakuun ja tiedustelen sitä.
 
-[TÄYTÄNTÖÖNPANO
+Aikaisemmat osat tässä sarjassa:
+
+- [Täydellinen tekstihaku postinjakajilla](/blog/textsearchingpt1)
+- [Hakulaatikko, jossa postgres](/blog/textsearchingpt11)
+
+Seuraavat osat tässä sarjassa:
+
+- [Avaa haku C#:llä](/blog/textsearchingpt3)
+
+
+[TOC]
 
 ## Mikä on OpenSearch?
 
