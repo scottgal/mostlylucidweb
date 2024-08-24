@@ -1,5 +1,5 @@
 # Full Text Searching (Pt 3 - OpenSearch with ASP.NET Core)
-<!--category-- OpenSearch -->
+<!--category-- OpenSearch, ASP.NET -->
 <datetime class="hidden">2024-08-24T06:40</datetime>
 
 ## Introduction

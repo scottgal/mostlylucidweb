@@ -7,7 +7,7 @@
 
 Välimuisti on tärkeä tekniikka, jolla voidaan sekä parantaa käyttökokemusta lastaamalla sisältöä nopeammin että vähentää palvelimen kuormitusta. Tässä artikkelissa näytän, miten ASP.NET Coren sisäänrakennettuja välimuistiominaisuuksia käytetään HTMX:n avulla sisällön kätkössä asiakaspuolella.
 
-[TOC]
+[TÄYTÄNTÖÖNPANO
 
 ## Asetukset
 
