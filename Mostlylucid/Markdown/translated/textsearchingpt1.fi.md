@@ -135,7 +135,7 @@ K채ytt채채ksemme n채it채 (tulevaisuudessa) voimme luoda yksinkertaisen WebAPI-p�
 ```csharp
 [ApiController]
 [Route("api/[controller]")]
-public class SearchApi(MostlylucidDbContext context) : ControllerBase
+public class SearchApi(IMostlylucidDbContext context) : ControllerBase
 {
     [HttpGet]
     public async Task<JsonHttpResult<List<SearchResults>>> Search(string query)

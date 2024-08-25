@@ -135,7 +135,7 @@ För att använda dessa (i framtiden) kan vi skapa en enkel WebAPI endpoint som 
 ```csharp
 [ApiController]
 [Route("api/[controller]")]
-public class SearchApi(MostlylucidDbContext context) : ControllerBase
+public class SearchApi(IMostlylucidDbContext context) : ControllerBase
 {
     [HttpGet]
     public async Task<JsonHttpResult<List<SearchResults>>> Search(string query)
