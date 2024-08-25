@@ -29,14 +29,22 @@
                 <th>
                     @Html.DisplayNameFor(model => model[0].TotalMilliseconds)
                 </th>
+                <th>
+                    @Html.DisplayNameFor(model => model[0].StartTime)
+                </th>
                 </thead>
                 @foreach (var item in Model)
                 {
+      
                     <tr>
                         <td>  <a href="#" x-on:click.prevent="window.mostlylucid.translations.viewTranslation('@item.TaskId')">View</a></td>
                         <td>@if (item.Completed)
                             {
                                 <i class='bx bx-check text-green'></i>
+                            }
+                            else if (item.Failed)
+                            {
+                                <i class='bx bx-x text-red'></i>
                             }
                             else
                             {
@@ -51,6 +59,7 @@
 
                         </td>
                         <td>@(TimeSpan.FromMilliseconds(item.TotalMilliseconds).Humanize())</td>
+                        <td> @item.StartTime.Humanize(dateToCompareAgainst:DateTime.Now)</td>
                     </tr>
                 }
             </table>

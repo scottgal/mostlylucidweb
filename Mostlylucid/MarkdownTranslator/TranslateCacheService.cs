@@ -23,10 +23,18 @@ public class TranslateCacheService(IMemoryCache memoryCache)
         
         if (memoryCache.TryGetValue(userId, out CachedTasks? tasks))
         {
-          var absoluteExpiration = DateTime.Now.AddHours(6);
           tasks ??= CachedTasks();
-            
-            tasks.Tasks.Add(task);
+
+         var currentTasks = tasks.Tasks;
+             
+             currentTasks= currentTasks.OrderByDescending(x => x.StartTime).ToList();
+          if (currentTasks.Count >= 5)
+          {
+              currentTasks.RemoveAt(0);
+          }
+
+          currentTasks.Add(task);
+            tasks.Tasks = currentTasks;
             memoryCache.Set(userId, tasks, new MemoryCacheEntryOptions
             {
                 AbsoluteExpiration = tasks.AbsoluteExpiration,

@@ -25,15 +25,15 @@ public class TranslateResultTask
         TaskId = task.TaskId;
         StartTime = task.StartTime;
         Language = task.Language;
-        Completed = task.Task?.Result.Complete == true;
-        if (Completed && task.Task?.Result != null)
+        Completed = task.Task?.IsCompleted == true;
+        if (Completed)
         {
             var endTime = task.Task.Result.EndTime;
             TotalMilliseconds = (int)((endTime - task.StartTime)!).Value.TotalMilliseconds;
             EndTime = endTime;
             Failed = false;
         }
-        else if (!Completed && task.Task is { Result: not null })
+        else if (!Completed)
         {
             Completed = false;
             Failed = false;
@@ -44,10 +44,12 @@ public class TranslateResultTask
             Failed = true;
         }
 
-        if (includeMarkdown)
+        if  (Completed && includeMarkdown)
         {
-            OriginalMarkdown = task.Task?.Result?.OriginalMarkdown;
-            TranslatedMarkdown = task.Task?.Result?.TranslatedMarkdown;
+            var result = task.Task?.Result;
+            if(result == null) return;
+            OriginalMarkdown = result.OriginalMarkdown;
+            TranslatedMarkdown = result.TranslatedMarkdown;
         }
         
     }
