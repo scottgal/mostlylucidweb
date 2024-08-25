@@ -379,7 +379,7 @@ window.codeEditorInit = function(){
         categories.forEach(function(category) {
             // Create the span element
             let span = document.createElement('span');
-            span.className = 'inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white'; // Apply the style class
+            span.className = 'inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white mr-2'; // Apply the style class
             span.textContent = category;
 
             // Append the span to the categories div
