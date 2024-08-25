@@ -5,6 +5,7 @@ using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Helpers;
 using Mostlylucid.MarkdownTranslator;
+using Mostlylucid.MarkdownTranslator.Models;
 using Mostlylucid.Models.Blog;
 using Mostlylucid.Models.Editor;
 
@@ -16,7 +17,6 @@ public class EditorController(
     AuthSettings authSettings,
     AnalyticsSettings analyticsSettings,
     TranslateCacheService translateCacheService,
-    BackgroundTranslateService backgroundTranslateService,
     TranslateServiceConfig translateServiceConfig,
     ILogger<EditorController> logger) : BaseController(authSettings,
     analyticsSettings, blogService, logger)
@@ -28,17 +28,26 @@ public class EditorController(
     public async Task<IActionResult> Edit(string? slug = null, string language = "")
     {
  
+        var userId = Request.GetUserId(Response);
+        var tasks = translateCacheService.GetTasks(userId);
+        var translations = tasks.Select(x=> new TranslateResultTask(x, false)).ToList();
         var userInRole = GetUserInfo();
-        var editorModel = new EditorModel();
-        editorModel.Languages= translateServiceConfig.Languages.ToList();
-        editorModel.Name = userInRole.Name;
-        editorModel.Authenticated = userInRole.LoggedIn;
-       editorModel.IsAdmin = userInRole.IsAdmin;
-        editorModel.AvatarUrl = userInRole.AvatarUrl;
+        var editorModel = new EditorModel
+        {
+            Languages = translateServiceConfig.Languages.ToList(),
+            Name = userInRole.Name,
+            Authenticated = userInRole.LoggedIn,
+            IsAdmin = userInRole.IsAdmin,
+            AvatarUrl = userInRole.AvatarUrl,
+            UserSessionId = Request.GetUserId(Response),
+            TranslationTasks = translations
+        };
 
-        editorModel.UserSessionId = Request.GetUserId(Response);
+        
+
         if (slug == null)
         {
+            editorModel.IsNew = true;
             return View("Editor", editorModel);
         }
 
@@ -59,7 +68,7 @@ public class EditorController(
     {
         var userId = Request.GetUserId(Response);
         var tasks = translateCacheService.GetTasks(userId);
-        var translations = tasks;
+        var translations = tasks.Select(x=> new TranslateResultTask(x, false)).ToList();
         return PartialView("_GetTranslations", translations);
     }
     

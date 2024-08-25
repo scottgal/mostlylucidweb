@@ -19,15 +19,15 @@ public class EFBlogPopulator : EFBaseService, IBlogPopulator
 
     }
 
-    public async Task Populate()
+    public async Task Populate(CancellationToken cancellationToken)
     {
         var posts = await _markdownBlogService.GetPages();
         var languages = _markdownBlogService.LanguageList();
 
         var languageEntities = await EnsureLanguages(languages);
-        await EnsureCategoriesAndPosts(posts, languageEntities);
+        await EnsureCategoriesAndPosts(posts, languageEntities, cancellationToken);
 
-        await Context.SaveChangesAsync();
+        await Context.SaveChangesAsync(cancellationToken);
     }
 
 private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List<string>> languages)
@@ -86,12 +86,13 @@ private async Task<List<LanguageEntity>> EnsureLanguages(Dictionary<string, List
 
     private async Task EnsureCategoriesAndPosts(
         IEnumerable<BlogPostViewModel> posts,
-        List<LanguageEntity> languageEntities)
+        List<LanguageEntity> languageEntities, CancellationToken cancellationToken)
     {
         var languages = languageEntities.ToDictionary(x => x.Name, x => x);
-        var currentPosts = await PostsQuery().ToListAsync();
+        var currentPosts = await PostsQuery().ToListAsync(cancellationToken);
         foreach (var post in posts)
         {
+            if(cancellationToken.IsCancellationRequested) return;
             var existingCategories = Context.Categories.Local.ToList();
             var currentPost =
                 currentPosts.FirstOrDefault(x => x.Slug == post.Slug && x.LanguageEntity.Name == post.Language);

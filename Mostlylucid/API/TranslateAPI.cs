@@ -2,19 +2,24 @@
 using Microsoft.AspNetCore.Mvc;
 using Mostlylucid.Helpers;
 using Mostlylucid.MarkdownTranslator;
+using Mostlylucid.MarkdownTranslator.Models;
 
 namespace Mostlylucid.API;
 
 [ApiController]
-[Route("api/[controller]")]
-public class TranslateController(
+[Route("api/translate")]
+public class TranslateAPI(
     BackgroundTranslateService backgroundTranslateService,
     TranslateCacheService translateCacheService) : ControllerBase
 {
     [HttpPost("start-translation")]
-    [ValidateAntiForgeryToken]
+   // [ValidateAntiForgeryToken]
     public async Task<Results<Ok<string>, BadRequest<string>>> StartTranslation([FromBody] MarkdownTranslationModel model)
     {
+        if(ModelState.IsValid == false)
+        {
+            return TypedResults.BadRequest("Invalid model");
+        }
         if(!backgroundTranslateService.TranslationServiceUp)
         {
             return TypedResults.BadRequest("Translation service is down");
@@ -67,18 +72,15 @@ public class TranslateController(
     
     [HttpGet]
     [Route("get-translation/{taskId}")]
-    public Results<JsonHttpResult<TaskCompletion>, BadRequest<string>> GetTranslation(string taskId)
+    public Results<JsonHttpResult<TranslateResultTask>, BadRequest<string>> GetTranslation(string taskId)
     {
         var userId = Request.GetUserId(Response);
         var tasks = translateCacheService.GetTasks(userId);
         var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
-        if(translationTask?.Task?.Status != System.Threading.Tasks.TaskStatus.RanToCompletion)
-        {
-            return TypedResults.BadRequest<string>("Task not completed");
-        }
-        return TypedResults.Json(translationTask.Task.Result);
+        if (translationTask == null) return TypedResults.BadRequest("Task not found");
+        var result = new TranslateResultTask(translationTask, true);
+        return TypedResults.Json(result);
     }
-
 }
 
 public record TaskStatus(string Status, string? Error = "");

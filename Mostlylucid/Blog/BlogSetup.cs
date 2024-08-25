@@ -48,19 +48,20 @@ public static class BlogSetup
         await using var scope = app.Services.CreateAsyncScope();
     
         var config = scope.ServiceProvider.GetRequiredService<BlogConfig>();
+        var cancellationToken = scope.ServiceProvider.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
         if(config.Mode == BlogMode.Database)
         {
         
            var blogContext = scope.ServiceProvider.GetRequiredService<MostlylucidDbContext>();
            Log.Information("Migrating database");
          
-           await blogContext.Database.MigrateAsync();
+           await blogContext.Database.MigrateAsync(cancellationToken);
         }
 
         if (config.Mode == BlogMode.File)
         {
             var context = scope.ServiceProvider.GetRequiredService<IBlogPopulator>();
-            await context.Populate();
+            await context.Populate(cancellationToken);
         }
      
     }

@@ -1,11 +1,60 @@
-﻿@model List<Mostlylucid.MarkdownTranslator.TranslateTask>
+﻿@using Humanizer
+@using Mostlylucid.Helpers
+@model List<Mostlylucid.MarkdownTranslator.Models.TranslateResultTask>
 
-@foreach (var item in Model)
-{
-    <tr>
-        <td>@item.TaskId</td>
-        <td>@item.Task?.Status</td>
-        <td>@item.language</td>
-  
-    </tr>
+@{
+    var allCompleted = Model.All(x => x.Completed);
+    var noTranslations = Model.Count == 0;
+    var trigger = allCompleted ? "none" : "every 5s";
+    if (noTranslations)
+    {
+        <div class="alert alert-info" role="alert">
+            No translations have been requested yet.
+        </div>
+    }
+    else
+    {
+        <div class="translationpoller" hx-controller="Editor" hx-action="GetTranslations" hx-get hx-swap="outerHTML" hx-trigger="@trigger">
+            <table class="table">
+                <thead>
+                <th>
+                  
+                    @Html.DisplayNameFor(model => model[0].TaskId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model[0].Completed)
+                </th>
+                <th >
+                    @Html.DisplayNameFor(model => model[0].Language)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model[0].TotalMilliseconds)
+                </th>
+                </thead>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>  <a href="#" x-on:click.prevent="window.mostlylucid.translations.viewTranslation('@item.TaskId')">View</a></td>
+                        <td>@if (item.Completed)
+                            {
+                                <i class='bx bx-check text-green'></i>
+                            }
+                            else
+                            {
+                                <i class='bx bx-loader-alt animate-spin dark:text-white text-black'></i>
+                            }
+                            </td>
+                        <td>
+                            <p class="flex items-center">
+                                <img src="/img/flags/@(item.Language).svg" asp-append-version="true" class="ml-2 h-4 w-4 mr-4 rounded outline outline-1 outline-green-dark dark:outline-white" alt="@item.Language">
+                                @item.Language.ConvertCodeToLanguage()
+                            </p>
+
+                        </td>
+                        <td>@(TimeSpan.FromMilliseconds(item.TotalMilliseconds).Humanize())</td>
+                    </tr>
+                }
+            </table>
+        </div>
+    }
 }

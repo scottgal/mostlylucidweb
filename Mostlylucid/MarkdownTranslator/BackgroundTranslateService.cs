@@ -248,7 +248,7 @@ public class BackgroundTranslateService(
             else
             {
                 logger.LogInformation("Entry {Slug} has not changed, skipping translation", slug);
-                tcs.SetResult(new TaskCompletion(null, translateModel.Language, true, DateTime.Now));
+                tcs.SetResult(new TaskCompletion(null, translateModel.OriginalMarkdown, translateModel.Language, true, DateTime.Now));
                 return;
             }
         }
@@ -267,13 +267,14 @@ public class BackgroundTranslateService(
             {
                 await PersistTranslation(scope, slug, translateModel, translatedMarkdown);
             }
-
-            tcs.SetResult(new TaskCompletion(translatedMarkdown, translateModel.Language, true, DateTime.Now));
+            
+            tcs.SetResult(new TaskCompletion(translatedMarkdown, translateModel.OriginalMarkdown, translateModel.Language, true, DateTime.Now));
         }
         catch (Exception e)
         {
             logger.LogError(e, "Error translating {File} to {Language}", translateModel.OriginalFileName,
                 translateModel.Language);
+            
             tcs.SetException(e);
         }
     }
@@ -297,4 +298,4 @@ public class BackgroundTranslateService(
     }
 }
 
-public record TaskCompletion(string? TranslatedMarkdown, string Language, bool Complete, DateTime? EndTime);
+public record TaskCompletion(string? TranslatedMarkdown, string OriginalMarkdown, string Language, bool Complete, DateTime? EndTime);

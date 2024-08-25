@@ -15,22 +15,24 @@ public class MarkdownBlogPopulator(MarkdownConfig markdownConfig, MarkdownRender
     /// <summary>
     ///     The method to preload the cache with pages and Languages.
     /// </summary>
-    public async Task Populate()
+    public async Task Populate(CancellationToken token)
     {
-        await PopulatePages();
+        await PopulatePages(token);
     }
 
-    private async Task PopulatePages()
+    private async Task PopulatePages(CancellationToken token)
     {
         if (GetPageCache() is { Count: > 0 }) return;
         Dictionary<(string slug, string lang), BlogPostViewModel> pageCache = new();
         var pages = await GetPages();
         foreach (var page in pages)
         {
+            if (token.IsCancellationRequested) break;
             pageCache.TryAdd((page.Slug, page.Language), page);
             
            
         }
+        if(token.IsCancellationRequested) return;
         SetPageCache(pageCache);
     }
 

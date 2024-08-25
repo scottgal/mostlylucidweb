@@ -1,11 +1,9 @@
-﻿@using Mostlylucid.Blog.Markdown
-@using MarkdownBaseService = Mostlylucid.Blog.MarkdownBaseService
+﻿@using MarkdownBaseService = Mostlylucid.Blog.MarkdownBaseService
 @model Mostlylucid.Models.Editor.EditorModel
 
 <div class="min-h-screen bg-gray-100">
     @if (!string.IsNullOrEmpty(Model.PostViewModel.Slug))
     {
-
         @if (Model.PostViewModel.Language != MarkdownBaseService.EnglishLanguage)
         {
             <a asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.PostViewModel.Slug" asp-route-language="@Model.PostViewModel.Language" class="text-green-dark dark:text-green"><i class="bx bx-chevron-left"></i> Back to "@Model.PostViewModel.Title"</a>
@@ -16,10 +14,10 @@
         }
     }
 
- 
+
     <p class="text-blue-dark dark:text-blue-light">This is a viewer only at the moment <a asp-action="Show" asp-controller="Blog" asp-route-slug="markdownprevieweditor" class="text-green-dark dark:text-green"> see the article</a> on how this works.</p>
     <div class="container mx-auto p-0">
- 
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Column 1 -->
             <div class="bg-white dark:bg-custom-dark-bg  p-0 rounded shadow-md">
@@ -31,24 +29,41 @@
             <!-- Column 2 -->
             <div class="bg-white dark:bg-custom-dark-bg p-0 rounded shadow-md">
                 <p class="text-blue-dark dark:text-blue-light">This is a preview from the server running through my markdig pipeline</p>
-                <p class="text-blue-dark dark:text-blue-light inline-block"><span class="pr-2">Translate:</span>   <partial name="_LanguageDropDown" for="Languages"/> </p>
-                <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2" id="categories">
-                    @foreach (var category in Model.PostViewModel.Categories)
-                    {
-                        <span
-                            class="inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">@category</span>
-
-                    }
-                </div>
-                <h2 class="pb-2 block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-3xl md:text-3xl" id="title">@Model.PostViewModel.Title</h2>
-                <date id="publishedDate" class="py-2">@Model.PostViewModel.PublishedDate.ToString("D")</date>
-                <div class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2" id="renderedcontent">
-                    @Html.Raw(Model.PostViewModel.HtmlContent)
+                @if (Model.IsNew)
+                {
+                    var translationHidden = Model.TranslationTasks.Any() ? "" : "hidden";
+              
+                    <p class="text-blue-dark dark:text-blue-light inline-flex  items-center justify-center space-x-2">
+                        <partial name="_LanguageDropDown" for="Languages"/>
+                        <button class="btn btn-outline btn-sm mt-1" x-on:click="window.mostlylucid.translations.submitTranslation"><i class='bx bx-send'></i>Translate</button>
+                    </p>
+                    <div id="translations" class="@translationHidden">
+                        <partial name="_GetTranslations" model="Model.TranslationTasks" />
+                    </div>
+                    <div id="translatedcontent" class="hidden">
+                        <textarea class="hidden" id="translatedcontentarea"></textarea>
+                    </div>
+                }
+                <div id="htmlcontent">
+                    <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2" id="categories">
+                        @foreach (var category in Model.PostViewModel.Categories)
+                        {
+                            <span
+                                class="inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">
+                                @category
+                            </span>
+                        }
+                    </div>
+                    <h2 class="pb-2 block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-3xl md:text-3xl" id="title">@Model.PostViewModel?.Title</h2>
+                    <date id="publishedDate" class="py-2">@(Model.PostViewModel?.PublishedDate  > default(DateTime) ? Model.PostViewModel?.PublishedDate.ToString("D")  : "")</date>
+                    <div class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2" id="renderedcontent">
+                        @Html.Raw(Model.PostViewModel?.HtmlContent)
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-   
+
 </div>
 
 @section Scripts

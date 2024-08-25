@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace Mostlylucid.MarkdownTranslator;
 
 public class PageTranslationModel : MarkdownTranslationModel
@@ -9,6 +11,8 @@ public class PageTranslationModel : MarkdownTranslationModel
 
 public class MarkdownTranslationModel
 {
+    [Required]
     public required string OriginalMarkdown { get; set; }
-    public  string Language { get; set; } = "";
+
+    [Required] public string Language { get; set; } = "";
 }
