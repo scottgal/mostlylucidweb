@@ -16,7 +16,9 @@ Here we add a little tool which submits backround jobs to the service we detaile
 
 [TOC]
 
-![Translation](translatetool.png?width=800&format=webp&quality=40)
+This adds functionality where when selecting a 'new' document you can translate it.
+
+![Editor](neweditor.gif?a)
 
 ## Translation Submitter
 On our Markdown editor page I added some code which contains a little drop down (in `_LanguageDropDown.cshtml`) which allows you to select the language you want to translate to. 
