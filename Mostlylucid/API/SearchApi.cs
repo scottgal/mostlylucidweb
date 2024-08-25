@@ -10,7 +10,7 @@ namespace Mostlylucid.API;
 
 [ApiController]
 [Route("api")]
-public class SearchApi(MostlylucidDbContext context, SearchService indexService) : ControllerBase
+public class SearchApi(IMostlylucidDBContext context, SearchService indexService) : ControllerBase
 {
     [HttpGet]
     [Route("osearch/{query}")]

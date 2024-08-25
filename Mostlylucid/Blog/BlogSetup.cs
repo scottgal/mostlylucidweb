@@ -24,7 +24,7 @@ public static class BlogSetup
                 break;
             case BlogMode.Database:
                 Log.Information("Using Database based blog");
-                services.AddDbContext<MostlylucidDbContext>(options =>
+                services.AddDbContext<IMostlylucidDBContext, MostlylucidDbContext>(options =>
                 {
                     if (env.IsDevelopment())
                     {
@@ -52,7 +52,7 @@ public static class BlogSetup
         if(config.Mode == BlogMode.Database)
         {
         
-           var blogContext = scope.ServiceProvider.GetRequiredService<MostlylucidDbContext>();
+           var blogContext = scope.ServiceProvider.GetRequiredService<IMostlylucidDBContext>();
            Log.Information("Migrating database");
          
            await blogContext.Database.MigrateAsync(cancellationToken);

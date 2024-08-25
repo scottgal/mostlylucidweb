@@ -31,6 +31,7 @@ public class MarkdownRenderingService : MarkdownBaseService
         // Get the title from the first line
         var title = lines.Length > 0 ? Markdig.Markdown.ToPlainText(lines[0].Trim()) : string.Empty;
 
+        title = title.Trim();
         // Concatenate the rest of the lines with newline characters
         var restOfTheLines = string.Join(Environment.NewLine, lines.Skip(1));
 

@@ -8,7 +8,7 @@ using Mostlylucid.Models.Blog;
 namespace Mostlylucid.Blog.EntityFramework;
 
 public class EFBlogService(
-    MostlylucidDbContext context,
+    IMostlylucidDBContext context,
     MarkdownRenderingService markdownRenderingService,
     ILogger<EFBlogService> logger)
     : EFBaseService(context, logger), IBlogService
@@ -20,14 +20,7 @@ public class EFBlogService(
         
         var posts = await NoTrackingQuery().ToListAsync();
         Logger.LogInformation("Getting posts");
-        return posts.Select(p => new BlogPostViewModel
-        {
-            Title = p.Title,
-            Slug = p.Slug,
-            HtmlContent = p.HtmlContent,
-            PlainTextContent = p.PlainTextContent,
-            PublishedDate = p.PublishedDate.DateTime
-        }).ToList();
+        return posts.Select(p => p.ToPostModel()).ToList();
     }
 
     public async Task<PostListViewModel> GetPostsByCategory(string category, int page = 1, int pageSize = 10,

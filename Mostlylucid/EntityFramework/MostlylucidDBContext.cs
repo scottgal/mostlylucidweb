@@ -4,7 +4,7 @@ using Mostlylucid.EntityFramework.Models;
 
 namespace Mostlylucid.EntityFramework;
 
-public class MostlylucidDbContext : DbContext
+public class MostlylucidDbContext : DbContext, IMostlylucidDBContext
 {
     public MostlylucidDbContext(DbContextOptions<MostlylucidDbContext> contextOptions) : base(contextOptions)
     {

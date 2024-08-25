@@ -12,7 +12,7 @@ public class EFBlogPopulator : EFBaseService, IBlogPopulator
     private readonly IMarkdownBlogService _markdownBlogService;
 
     public EFBlogPopulator(IMarkdownBlogService markdownBlogService,
-        MostlylucidDbContext context,
+        IMostlylucidDBContext context,
         ILogger<EFBlogPopulator> logger) : base(context, logger)
     {
         _markdownBlogService = markdownBlogService;

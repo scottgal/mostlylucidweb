@@ -6,7 +6,7 @@ using Mostlylucid.EntityFramework.Models;
 
 namespace Mostlylucid.Blog.EntityFramework;
 
-public class EFCommentService(MostlylucidDbContext context,  ILogger<EFCommentService> logger)
+public class EFCommentService(IMostlylucidDBContext context,  ILogger<EFCommentService> logger)
 {
     public async Task AddComment(string slug, BaseController.LoginData userInformation, string markdown)
     {

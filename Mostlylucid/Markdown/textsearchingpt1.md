@@ -125,7 +125,7 @@ To use these (in future) we can create a simple WebAPI endpoint that takes a que
 ```csharp
 [ApiController]
 [Route("api/[controller]")]
-public class SearchApi(MostlylucidDbContext context) : ControllerBase
+public class SearchApi(IMostlylucidDbContext context) : ControllerBase
 {
     [HttpGet]
     public async Task<JsonHttpResult<List<SearchResults>>> Search(string query)
