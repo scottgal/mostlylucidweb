@@ -45,11 +45,11 @@
                     </div>
                 }
                 <div id="htmlcontent">
-                    <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2" id="categories">
+                    <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2 " id="categories">
                         @foreach (var category in Model.PostViewModel.Categories)
                         {
                             <span
-                                class="inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">
+                                class="inline-block rounded-full dark bg-blue-dark px-2 py-1 mr-2 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">
                                 @category
                             </span>
                         }
