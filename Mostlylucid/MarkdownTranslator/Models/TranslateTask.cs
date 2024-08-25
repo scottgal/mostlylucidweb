@@ -63,7 +63,7 @@ public class TranslateResultTask
     public DateTime? EndTime { get; set; }
     [Display(Name = "Start Time")]
     public DateTime StartTime { get; set; }
-    [Display(Name = "Total Milliseconds")]
+    [Display(Name = "Time Taken")]
     public int TotalMilliseconds { get; set; } 
     [Display(Name = "Language")]
     public string Language { get; set; }
