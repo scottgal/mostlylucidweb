@@ -135,7 +135,7 @@ Pour les utiliser (à l'avenir), nous pouvons créer un simple paramètre WebAPI
 ```csharp
 [ApiController]
 [Route("api/[controller]")]
-public class SearchApi(MostlylucidDbContext context) : ControllerBase
+public class SearchApi(IMostlylucidDbContext context) : ControllerBase
 {
     [HttpGet]
     public async Task<JsonHttpResult<List<SearchResults>>> Search(string query)

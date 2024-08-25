@@ -24,6 +24,7 @@ WORKDIR /src
 COPY *.sln ./
 COPY ["Mostlylucid/Mostlylucid.csproj", "Mostlylucid/"]
 COPY ["Umami.Net/Umami.Net.csproj", "Umami.Net/"]
+COPY ["Mostlylucid.Test/Mostlylucid.Test.csproj", "Mostlylucid.Test/"]
 
 # Restore dependencies for all projects in the solution
 RUN dotnet restore
