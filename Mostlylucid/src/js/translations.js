@@ -75,6 +75,8 @@ export function viewTranslation(taskId) {
             textArea.classList.remove('hidden');
             textArea.value = data.originalMarkdown;
             simplemde.value(data.translatedMarkdown);
+            window.codeEditorInit();
+            window.updateContent();
         })  // Log the successful response data
         .catch(error => console.error('Error:', error));  // Handle any errors
 }

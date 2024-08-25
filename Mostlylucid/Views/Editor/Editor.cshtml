@@ -27,7 +27,7 @@
             </div>
 
             <!-- Column 2 -->
-            <div class="bg-white dark:bg-custom-dark-bg p-0 rounded shadow-md">
+            <div class="bg-white dark:bg-custom-dark-bg dark:text-white text-black p-0 rounded shadow-md">
                 <p class="text-blue-dark dark:text-blue-light">This is a preview from the server running through my markdig pipeline</p>
                 @if (Model.IsNew)
                 {
@@ -41,7 +41,7 @@
                         <partial name="_GetTranslations" model="Model.TranslationTasks" />
                     </div>
                     <div id="translatedcontent" class="hidden">
-                        <textarea class="hidden w-full h-84" id="translatedcontentarea"></textarea>
+                        <textarea class="hidden w-full h-44 dark:bg-custom-dark-bg bg-white text-black dark:text-white" id="translatedcontentarea"></textarea>
                     </div>
                 }
                 <div id="htmlcontent">
