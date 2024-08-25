@@ -190,6 +190,15 @@ function initializeSimpleMDE() {
             },
             "|",
             {
+                name :"update",
+                action: function(){
+                    updateContent();
+                },
+                className: "bx bx-refresh",
+                title: "Update"
+            },
+            "|",
+            {
                 name: "insert-datetime",
                 action: function(editor) {
                     // Get current datetime in the format YYYY-MM-DDTHH:MM
