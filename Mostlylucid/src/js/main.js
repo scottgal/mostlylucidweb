@@ -164,12 +164,9 @@ function initializeSimpleMDE() {
                     var params = new URLSearchParams(window.location.search);
                     var slug = params.get("slug");
                     var language = params.get("language");
-
-                    // Check if the values exist
-                    if (!slug || !language) {
-                        console.error("Missing slug or language in the URL");
-                        return;
-                    }
+                    
+                    if(language === null) language = "en";
+                   
 
                     saveContentToDisk(editor.value(), slug, language);
                 },
