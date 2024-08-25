@@ -11,19 +11,16 @@ public class MarkdownRenderingService : MarkdownBaseService
         @"<datetime class=""hidden"">(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})</datetime>",
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
 
-    private static readonly Regex CategoryRegex = new(@"<!--\s*category\s*--\s*([^,]+?)\s*(?:,\s*([^,]+?)\s*)?-->",
-        RegexOptions.Compiled | RegexOptions.Singleline);
+    private static readonly Regex CategoryRegex = new(@"<!--\s*category\s*--\s*(.+?)\s*-->", RegexOptions.Compiled);
+
+    
     
     private static string[] GetCategories(string markdownText)
     {
-        var matches = CategoryRegex.Matches(markdownText);
-        var categories = matches
-            .SelectMany(match => match.Groups.Cast<Group>()
-                .Skip(1) // Skip the entire match group
-                .Where(group => group.Success) // Ensure the group matched
-                .Select(group => group.Value.Trim()))
-            .ToArray();
-        return categories;
+        var matches = CategoryRegex.Match(markdownText);
+        if(matches.Success)
+            return matches.Groups[1].Value.Split(',').Select(x => x.Trim()).ToArray();
+        return Array.Empty<string>();
     }
 
     private Regex SplitRegex => new(@"\r\n|\r|\n", RegexOptions.Compiled);
