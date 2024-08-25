@@ -1,24 +1,28 @@
-# Bakgrundsöversättningar Pt. I enlighet med artikel 3 i förordning (EU) nr 1307/2013 ska kommissionen, i enlighet med artikel 3 i förordning (EU) nr 1307/2013, anta delegerade akter i enlighet med artikel 4 i förordning (EU) nr 1307/2013, med avseende på följande:
+# Bakgrundsöversättningar Pt. 3
 
 <datetime class="hidden">2024-08-25T03:20</datetime>
 
-<!--category-- EasyNMT, ASP.NET -->
-## Inledning
+<!--category-- EasyNMT, ASP.NET, WebAPI, Alpine, HTMX -->
+# Inledning
 
 I tidigare artiklar har vi diskuterat betydelsen av översättning i samband med webbapplikationer. Vi har också undersökt användningen av EasyNMT-biblioteket för att utföra översättningar i en ASP.NET Core-applikation. I det här inlägget ska jag täcka hur jag lagt till en bakgrundstjänst till ansökan så att du kan skicka översättningsförfrågan~~~s som behandlas i bakgrunden.
 
 Återigen, du kan se alla källkoden för detta på min [GitHub Ordförande](https://github.com/scottgal/mostlylucidweb) sida.
 
-### Tidigare artiklar
+## Tidigare artiklar
 
-- [Bakgrundsöversättningar Pt. Denna förordning träder i kraft den tjugonde dagen efter det att den har offentliggjorts i Europeiska unionens officiella tidning.](/blog/backgroundtranslationspt1)
-- [Bakgrundsöversättningar Pt. I artikel 2 ska punkt 2 ersättas med följande:](/blog/backgroundtranslationspt2)
+- [Bakgrundsöversättningar Pt. 1](/blog/backgroundtranslationspt1)
+- [Bakgrundsöversättningar Pt. 2](/blog/backgroundtranslationspt2)
 
 Här lägger vi till ett litet verktyg som lämnar backroundjobb till den tjänst vi beskrev i del 2. Detta verktyg är ett enkelt formulär som gör att du kan skicka en översättning begäran till tjänsten. Den är sedan cachad och läggs till i en kö som ger dig information om status för översättningen.
 
 [TOC]
 
-![Översättning](translatetool.png?width=800&format=webp&quality=40)
+Detta lägger till funktionalitet där du kan översätta ett "nytt" dokument när du väljer det.
+
+![Redaktör](neweditor.gif?a)
+
+# Översättningskoden
 
 ## Översättningslämnare
 
@@ -42,6 +46,55 @@ På vår Markdown editor sida lade jag till lite kod som innehåller en liten dr
                 }
 ```
 
+#### _SpråkDropDown
+
+Våra `_LanguageDropDown` partiell vy är en enkel dropdown som låter dig välja det språk du vill översätta till. Detta är befolkat från en lista över språk i `Languages` Modellens egendom.
+
+Du kan se att det använder Alpine.js för att hantera dropdown och att ställa in det valda språket och flaggan för att visa i huvudvalsdelen. Den anger också den korta koden för det språk som används vid ingivandet av översättningsbegäran.
+
+Att använda Alping innebär att vi håller minimalt, lokalt refererat JavaScript i våra vyer. Detta är ett bra sätt att hålla dina vyer rena och lätta att läsa.
+
+```razor
+@using Mostlylucid.Helpers
+@model List<string>
+
+<div id="LanguageDropDown" x-data="{ 
+    open: false, 
+    selectedLanguage: 'Select Language', 
+    selectedFlag: '' ,
+    selectedShortCode:''
+}" class="relative inline-block mt-3">
+    <!-- Dropdown Button -->
+    <button x-on:click="open = !open" class="btn btn-sm btn-outline flex items-center space-x-2">
+        <!-- Dynamically Show the Flag Icon -->
+        <template x-if="selectedFlag">
+            <img :src="selectedFlag" class="h-4 w-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="Selected Language Flag">
+        </template>
+        <span x-text="selectedLanguage"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div x-show="open" x-on:click.away="open = false"
+         class="absolute left-0 mt-2 w-64 rounded-md shadow-lg dark:bg-custom-dark-bg bg-white ring-1 ring-black ring-opacity-5 z-50">
+        <ul class="p-2">
+            @foreach (var language in Model)
+            {
+            <li>
+                <a href="#"
+                   x-on:click.prevent="selectedLanguage = '@(language.ConvertCodeToLanguage())'; selectedFlag = '/img/flags/@(language).svg'; selectedShortCode='@language'; open = false"
+                   class="flex dark:text-white text-black items-center p-2 hover:bg-gray-100">
+                    <img src="/img/flags/@(language).svg" asp-append-version="true" class="ml-2 h-4 w-4 mr-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="@language"> @language.ConvertCodeToLanguage()
+                </a>
+            </li>
+            }
+        </ul>
+    </div>
+</div>
+```
+
 ### Skicka översättning
 
 Du kommer att se att detta har någon Apline.js kod som kallar in vår `window.mostlylucid.translations.submitTranslation` Funktion. Denna funktion definieras i vår `translations.js` fil som ingår i vår `_Layout.cshtml` En akt.
@@ -50,7 +103,7 @@ Du kommer att se att detta har någon Apline.js kod som kallar in vår `window.m
 export function submitTranslation() {
     const languageDropDown = document.getElementById('LanguageDropDown');
 
-    // Access Alpine.js data using __x.$data (Alpine.js internal structure)
+    // Access Alpine.js data using Apline.$data (Alpine.js internal structure)
     const alpineData = Alpine.$data(languageDropDown);
 const shortCode = alpineData.selectedShortCode;
 const markdown = simplemde.value();
@@ -174,7 +227,7 @@ Detta är en WebAPI controller som tar förfrågningar som innehåller markdown 
 
 ```
 
-### Slutpunkten för att få översättningar
+## Slutpunkten för att få översättningar
 
 Detta begärs med hjälp av HTMX och returnerar översättningarna för den nuvarande användaren. Detta är en enkel endpoint som får översättningar från cache och returnerar dem till klienten.
 
@@ -266,7 +319,7 @@ Detta leder till följande:
 }
 ```
 
-### Funktionen Visa översättning
+## Funktionen Visa översättning
 
 Som du ser i ovanstående vy kallar vi in en liten Alping onclick för att visa översättningen. Detta är en enkel funktion som får översättningen från servern och visar den i en modal dialogruta.
 
@@ -310,7 +363,7 @@ export function viewTranslation(taskId) {
 
 ```
 
-### Hämta översättningens slutpunkt
+## Hämta översättningens slutpunkt
 
 Detta liknar den tidigare metoden för att få en lista över översättningar utom det får en enda översättning med `OriginalMarkdown` och `TranslatedMarkdown` befolkad:
 

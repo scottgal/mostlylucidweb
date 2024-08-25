@@ -8,6 +8,7 @@ public static class BlogPostMapper
 {
     public static BlogPostViewModel ToPostModel(this BlogPostEntity postEntity, List<string>? languages = null)
     {
+        var wordCount = postEntity.PlainTextContent.WordCount();
         return new BlogPostViewModel()
         {
             Id = postEntity.Id.ToString(),
@@ -17,7 +18,7 @@ public static class BlogPostMapper
             PlainTextContent = postEntity.PlainTextContent,
             Slug = postEntity.Slug,
             Language = postEntity.LanguageEntity.Name,
-            WordCount = postEntity.WordCount,
+            WordCount = wordCount,
             UpdatedDate = postEntity.UpdatedDate.DateTime,
             Languages = languages?.OrderBy(x => x).ToArray() ?? Array.Empty<string>(),
             Markdown = postEntity.Markdown,
@@ -29,6 +30,8 @@ public static class BlogPostMapper
     {
         var introductionText = "Introduction\n";
         var summaryText = postEntity.PlainTextContent;
+        var wordCount = summaryText.WordCount();
+        
         if (summaryText.StartsWith(introductionText, StringComparison.OrdinalIgnoreCase))
         {
             summaryText = summaryText.Substring(introductionText.Length);
@@ -43,7 +46,7 @@ public static class BlogPostMapper
             Slug = postEntity.Slug,
             Language = postEntity.LanguageEntity.Name,
             Languages = languages ?? [],
-            WordCount = postEntity.WordCount,
+            WordCount = wordCount,
             PublishedDate = postEntity.PublishedDate.DateTime
         };
     }

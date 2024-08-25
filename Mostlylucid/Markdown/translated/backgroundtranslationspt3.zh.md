@@ -2,14 +2,14 @@
 
 <datetime class="hidden">2024-08-25T03:20</datetime>
 
-<!--category-- EasyNMT, ASP.NET -->
-## 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
+<!--category-- EasyNMT, ASP.NET, WebAPI, Alpine, HTMX -->
+# 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
 在前几篇文章中,我们讨论了网络应用中翻译的重要性。 我们还探索了如何利用“方便NMT”图书馆进行ASP.NET核心应用程序的翻译。 我将介绍我如何在申请中添加背景服务, 以便您能提交翻译请求,
 
 再说一次,你可以看到我所有的源代码 [吉特胡布](https://github.com/scottgal/mostlylucidweb) 页。
 
-### 前一篇文章
+## 前一篇文章
 
 - [背景翻译 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 1, 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1](/blog/backgroundtranslationspt1)
 - [背景翻译 2 2, 2, 2, 2](/blog/backgroundtranslationspt2)
@@ -18,7 +18,11 @@
 
 [技选委
 
-![笔译 笔译](translatetool.png?width=800&format=webp&quality=40)
+这将添加功能, 当选择“ 新” 文档时您可以翻译它 。
+
+![编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑编辑](neweditor.gif?a)
+
+# 《翻译法典》
 
 ## 翻译翻译提交器
 
@@ -42,6 +46,55 @@
                 }
 ```
 
+#### _向下拼放语言
+
+我们的 `_LanguageDropDown` 部分视图是一个简单的下调视图,允许您选择要翻译的语言。 使用语言列表中输入的语种列表 。 `Languages` 模型属性。
+
+您可以看到它使用 Alpine.js 来处理下调, 并设置选定语言和旗帜, 在主选择部分显示 。 它还规定了提交翻译请求时所用语文的简短代号。
+
+使用 Alping 意味着我们保持最低, 本地引用 JavaScript 在我们的观点中。 这是一种很好的方式 保持你的观点 干净和容易阅读。
+
+```razor
+@using Mostlylucid.Helpers
+@model List<string>
+
+<div id="LanguageDropDown" x-data="{ 
+    open: false, 
+    selectedLanguage: 'Select Language', 
+    selectedFlag: '' ,
+    selectedShortCode:''
+}" class="relative inline-block mt-3">
+    <!-- Dropdown Button -->
+    <button x-on:click="open = !open" class="btn btn-sm btn-outline flex items-center space-x-2">
+        <!-- Dynamically Show the Flag Icon -->
+        <template x-if="selectedFlag">
+            <img :src="selectedFlag" class="h-4 w-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="Selected Language Flag">
+        </template>
+        <span x-text="selectedLanguage"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div x-show="open" x-on:click.away="open = false"
+         class="absolute left-0 mt-2 w-64 rounded-md shadow-lg dark:bg-custom-dark-bg bg-white ring-1 ring-black ring-opacity-5 z-50">
+        <ul class="p-2">
+            @foreach (var language in Model)
+            {
+            <li>
+                <a href="#"
+                   x-on:click.prevent="selectedLanguage = '@(language.ConvertCodeToLanguage())'; selectedFlag = '/img/flags/@(language).svg'; selectedShortCode='@language'; open = false"
+                   class="flex dark:text-white text-black items-center p-2 hover:bg-gray-100">
+                    <img src="/img/flags/@(language).svg" asp-append-version="true" class="ml-2 h-4 w-4 mr-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="@language"> @language.ConvertCodeToLanguage()
+                </a>
+            </li>
+            }
+        </ul>
+    </div>
+</div>
+```
+
 ### 翻译
 
 你会看到这里有一些Apline.js代码 连接到我们的 `window.mostlylucid.translations.submitTranslation` 函数。 此函数定义于 `translations.js` 包含在 `_Layout.cshtml` 文件。
@@ -50,7 +103,7 @@
 export function submitTranslation() {
     const languageDropDown = document.getElementById('LanguageDropDown');
 
-    // Access Alpine.js data using __x.$data (Alpine.js internal structure)
+    // Access Alpine.js data using Apline.$data (Alpine.js internal structure)
     const alpineData = Alpine.$data(languageDropDown);
 const shortCode = alpineData.selectedShortCode;
 const markdown = simplemde.value();
@@ -174,7 +227,7 @@ sequenceDiagram
 
 ```
 
-### Get Get 翻译结束点
+## Get Get 翻译结束点
 
 请求使用 HTMX 返回当前用户的翻译。 这是一个简单的端点, 从缓存中获取翻译并返回客户端 。
 
@@ -266,7 +319,7 @@ sequenceDiagram
 }
 ```
 
-### 视图翻译函数
+## 视图翻译函数
 
 正如您在以上视图中看到的那样,我们请点击一个小阿尔平来查看翻译。 这是一个简单的函数, 从服务器获取翻译并在模式对话框中显示 。
 
@@ -310,7 +363,7 @@ export function viewTranslation(taskId) {
 
 ```
 
-### GG Get 翻译终点
+## GG Get 翻译终点
 
 此方法类似于先前的获取翻译列表的方法, 但它只能用 `OriginalMarkdown` 和 `TranslatedMarkdown` 人口 :
 

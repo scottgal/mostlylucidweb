@@ -2,14 +2,14 @@
 
 <datetime class="hidden">2024-08-25T03:20</datetime>
 
-<!--category-- EasyNMT, ASP.NET -->
-## Introduzione
+<!--category-- EasyNMT, ASP.NET, WebAPI, Alpine, HTMX -->
+# Introduzione
 
 Negli articoli precedenti, abbiamo discusso l'importanza della traduzione nel contesto delle applicazioni web. Abbiamo anche esplorato l'uso della libreria EasyNMT per eseguire traduzioni in un'applicazione ASP.NET Core. In questo post coprirò come ho aggiunto un servizio di background all'applicazione per consentire di inviare richiesta di traduzione~~~~s che vengono elaborati in background.
 
 Di nuovo, potete vedere tutto il codice sorgente per questo sul mio [GitHubCity name (optional, probably does not need a translation)](https://github.com/scottgal/mostlylucidweb) pagina.
 
-### Articoli precedenti
+## Articoli precedenti
 
 - [Traduzioni di sfondo Pt. 1](/blog/backgroundtranslationspt1)
 - [Traduzioni di sfondo Pt. 2](/blog/backgroundtranslationspt2)
@@ -18,7 +18,11 @@ Qui aggiungiamo un piccolo strumento che invia lavori di backround al servizio c
 
 [TOC]
 
-![Traduzione](translatetool.png?width=800&format=webp&quality=40)
+Questo aggiunge funzionalità in cui quando si seleziona un documento 'nuovo' è possibile tradurlo.
+
+![Editor](neweditor.gif?a)
+
+# Codice di traduzione
 
 ## Submitter di traduzione
 
@@ -42,6 +46,55 @@ Nella nostra pagina dell'editor di Markdown ho aggiunto un codice che contiene u
                 }
 ```
 
+#### _LanguageDropDown
+
+La nostra `_LanguageDropDown` vista parziale è un semplice menu a discesa che consente di selezionare la lingua in cui si desidera tradurre. Questo è popolato da una lista di lingue nel `Languages` proprietà del modello.
+
+Puoi vedere che usa Alpine.js per gestire il menu a discesa e per impostare la lingua e il flag selezionati da mostrare nella parte principale della selezione. Esso stabilisce inoltre il codice breve della lingua utilizzata per la presentazione della richiesta di traduzione.
+
+Usare Alping significa mantenere minimo, localmente di riferimento JavaScript nelle nostre viste. Questo è un ottimo modo per mantenere il vostro punto di vista pulito e facile da leggere.
+
+```razor
+@using Mostlylucid.Helpers
+@model List<string>
+
+<div id="LanguageDropDown" x-data="{ 
+    open: false, 
+    selectedLanguage: 'Select Language', 
+    selectedFlag: '' ,
+    selectedShortCode:''
+}" class="relative inline-block mt-3">
+    <!-- Dropdown Button -->
+    <button x-on:click="open = !open" class="btn btn-sm btn-outline flex items-center space-x-2">
+        <!-- Dynamically Show the Flag Icon -->
+        <template x-if="selectedFlag">
+            <img :src="selectedFlag" class="h-4 w-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="Selected Language Flag">
+        </template>
+        <span x-text="selectedLanguage"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div x-show="open" x-on:click.away="open = false"
+         class="absolute left-0 mt-2 w-64 rounded-md shadow-lg dark:bg-custom-dark-bg bg-white ring-1 ring-black ring-opacity-5 z-50">
+        <ul class="p-2">
+            @foreach (var language in Model)
+            {
+            <li>
+                <a href="#"
+                   x-on:click.prevent="selectedLanguage = '@(language.ConvertCodeToLanguage())'; selectedFlag = '/img/flags/@(language).svg'; selectedShortCode='@language'; open = false"
+                   class="flex dark:text-white text-black items-center p-2 hover:bg-gray-100">
+                    <img src="/img/flags/@(language).svg" asp-append-version="true" class="ml-2 h-4 w-4 mr-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="@language"> @language.ConvertCodeToLanguage()
+                </a>
+            </li>
+            }
+        </ul>
+    </div>
+</div>
+```
+
 ### Invia traduzione
 
 Vedrete che questo ha qualche codice Apline.js che chiama nel nostro `window.mostlylucid.translations.submitTranslation` funzione. Questa funzione è definita nel nostro `translations.js` file che è incluso nel nostro `_Layout.cshtml` Archivio.
@@ -50,7 +103,7 @@ Vedrete che questo ha qualche codice Apline.js che chiama nel nostro `window.mos
 export function submitTranslation() {
     const languageDropDown = document.getElementById('LanguageDropDown');
 
-    // Access Alpine.js data using __x.$data (Alpine.js internal structure)
+    // Access Alpine.js data using Apline.$data (Alpine.js internal structure)
     const alpineData = Alpine.$data(languageDropDown);
 const shortCode = alpineData.selectedShortCode;
 const markdown = simplemde.value();
@@ -174,7 +227,7 @@ Si tratta di un controller WebAPI che richiede richieste contenenti markdown e u
 
 ```
 
-### Il punto finale di Ottieni traduzioni
+## Il punto finale di Ottieni traduzioni
 
 Questo è richiesto utilizzando HTMX e restituisce le traduzioni per l'utente attuale. Questo è un endpoint semplice che ottiene le traduzioni dalla cache e le restituisce al client.
 
@@ -266,7 +319,7 @@ Ciò si traduce in questo punto di vista:
 }
 ```
 
-### La funzione Visualizza traduzione
+## La funzione Visualizza traduzione
 
 Come vedrete nella vista qui sopra chiamiamo in un piccolo Alping onclick per vedere la traduzione. Questa è una funzione semplice che ottiene la traduzione dal server e la visualizza in una finestra modale.
 
@@ -310,7 +363,7 @@ export function viewTranslation(taskId) {
 
 ```
 
-### Ottieni il punto finale della traduzione
+## Ottieni il punto finale della traduzione
 
 Questo è simile al metodo precedente per ottenere una lista delle traduzioni tranne che ottiene una sola traduzione con il `OriginalMarkdown` e `TranslatedMarkdown` popolata:
 

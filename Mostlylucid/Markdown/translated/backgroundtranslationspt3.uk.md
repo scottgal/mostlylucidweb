@@ -2,14 +2,14 @@
 
 <datetime class="hidden">2024- 08- 25T03: 20</datetime>
 
-<!--category-- EasyNMT, ASP.NET -->
-## Вступ
+<!--category-- EasyNMT, ASP.NET, WebAPI, Alpine, HTMX -->
+# Вступ
 
 У попередніх статтях ми обговорювали важливість перекладу в контексті веб-програм. Ми також дослідили використання бібліотеки EasyNMT для перекладу у програмі ASP. NET. У цьому дописі я охоплю, як я додав фонову службу до програми, щоб дозволити вам подавати запит перекладу ~~~~~ ~s, які обробляються у фоні.
 
 Знову ж таки, ви можете побачити всі початкові коди для цього на моєму [GitHub](https://github.com/scottgal/mostlylucidweb) page.
 
-### Попередні статті
+## Попередні статті
 
 - [Тло перекладів Pt. 1](/blog/backgroundtranslationspt1)
 - [Тло перекладів Pt. 2](/blog/backgroundtranslationspt2)
@@ -18,7 +18,11 @@
 
 [TOC]
 
-![Переклад](translatetool.png?width=800&format=webp&quality=40)
+Цей пункт додає функціональні можливості, де під час вибору документа " новий " ви можете його перекласти.
+
+![Редактор](neweditor.gif?a)
+
+# Код перекладу
 
 ## Надсилання перекладів
 
@@ -42,6 +46,55 @@
                 }
 ```
 
+#### _МоваDropDown
+
+Наш `_LanguageDropDown` частковий перегляд є простим спадним списком, за допомогою якого ви можете обрати мову, якою ви бажаєте перекласти. Це заселено зі списку мов у `Languages` Властивість моделі.
+
+Ви можете бачити, що він використовує альпійські. js для керування скиданням, а також встановлює вибрану мову і прапорець для показу у головній частині вибору. Крім того, у ній встановлюється короткий код мови, якою користуються під час перекладу.
+
+Використання Alping означає, що ми зберігаємо мінімальне, локальне посилання на JavaScript у наших видах. Це чудовий спосіб зберігати свої погляди чистими і легко читати.
+
+```razor
+@using Mostlylucid.Helpers
+@model List<string>
+
+<div id="LanguageDropDown" x-data="{ 
+    open: false, 
+    selectedLanguage: 'Select Language', 
+    selectedFlag: '' ,
+    selectedShortCode:''
+}" class="relative inline-block mt-3">
+    <!-- Dropdown Button -->
+    <button x-on:click="open = !open" class="btn btn-sm btn-outline flex items-center space-x-2">
+        <!-- Dynamically Show the Flag Icon -->
+        <template x-if="selectedFlag">
+            <img :src="selectedFlag" class="h-4 w-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="Selected Language Flag">
+        </template>
+        <span x-text="selectedLanguage"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div x-show="open" x-on:click.away="open = false"
+         class="absolute left-0 mt-2 w-64 rounded-md shadow-lg dark:bg-custom-dark-bg bg-white ring-1 ring-black ring-opacity-5 z-50">
+        <ul class="p-2">
+            @foreach (var language in Model)
+            {
+            <li>
+                <a href="#"
+                   x-on:click.prevent="selectedLanguage = '@(language.ConvertCodeToLanguage())'; selectedFlag = '/img/flags/@(language).svg'; selectedShortCode='@language'; open = false"
+                   class="flex dark:text-white text-black items-center p-2 hover:bg-gray-100">
+                    <img src="/img/flags/@(language).svg" asp-append-version="true" class="ml-2 h-4 w-4 mr-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="@language"> @language.ConvertCodeToLanguage()
+                </a>
+            </li>
+            }
+        </ul>
+    </div>
+</div>
+```
+
 ### ExportTranselation
 
 Ви побачите, що тут є якийсь код Apline.js, який викликає в нас `window.mostlylucid.translations.submitTranslation` функція. Ця функція визначена у наших `translations.js` файл, який включено до нашого `_Layout.cshtml` файл.
@@ -50,7 +103,7 @@
 export function submitTranslation() {
     const languageDropDown = document.getElementById('LanguageDropDown');
 
-    // Access Alpine.js data using __x.$data (Alpine.js internal structure)
+    // Access Alpine.js data using Apline.$data (Alpine.js internal structure)
     const alpineData = Alpine.$data(languageDropDown);
 const shortCode = alpineData.selectedShortCode;
 const markdown = simplemde.value();
@@ -174,7 +227,7 @@ sequenceDiagram
 
 ```
 
-### Кінцевий пункт перекладу
+## Кінцевий пункт перекладу
 
 Надійшов запит на використання HTMX і повернення перекладів для поточного користувача. Це проста кінцева точка, яка отримує переклади з кешу і повертає їх до клієнта.
 
@@ -266,7 +319,7 @@ sequenceDiagram
 }
 ```
 
-### Функція перекладу " Перегляд "
+## Функція перекладу " Перегляд "
 
 Як ви бачите з вищесказаного, ми зателефонуємо до маленького Алпінгу на клацання, щоб переглянути переклад. Це проста функція, яка отримує переклад з сервера і показує його у діалоговому вікні модуля.
 
@@ -310,7 +363,7 @@ export function viewTranslation(taskId) {
 
 ```
 
-### Точка закінчення отримання перекладу
+## Точка закінчення отримання перекладу
 
 Цей спосіб подібний до попереднього способу отримання списку перекладів, але він отримує окремий переклад з `OriginalMarkdown` і `TranslatedMarkdown` населений:
 

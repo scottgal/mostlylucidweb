@@ -2,14 +2,14 @@
 
 <datetime class="hidden">2024- 0. 2525टी0: 20</datetime>
 
-<!--category-- EasyNMT, ASP.NET -->
-## परिचय
+<!--category-- EasyNMT, ASP.NET, WebAPI, Alpine, HTMX -->
+# परिचय
 
 पिछले लेखों में हमने वेब अनुप्रयोगों के संदर्भ में अनुवाद की अहमियत के बारे में चर्चा की है । हमने एक ऐसी भाषा में अनुवाद करने के लिए आसानNMBT लाइब्रेरी का भी इस्तेमाल ढूँढ़ निकाला है । इस पोस्ट में मैं कवर करता हूँ कि कैसे मैंने अनुप्रयोग के लिए एक पृष्ठभूमि सेवा जोड़ी...... अनुप्रयोग के लिए आपको अनुवाद निवेदन स्वीकार करने के लिए अनुमति देने के लिए, चलो चलो जाएँ कि पृष्ठभूमि में प्रोसेस कर रहे हैं.
 
 फिर से, आप मेरे इस पर इस के लिए सभी स्रोत कोड देख सकते हैं [GiHh](https://github.com/scottgal/mostlylucidweb) पृष्ठ.
 
-### पिछला आलेख
+## पिछला आलेख
 
 - [पृष्ठभूमि अनुवाद Pt. 1](/blog/backgroundtranslationspt1)
 - [पृष्ठभूमि अनुवाद Pt. 2](/blog/backgroundtranslationspt2)
@@ -18,7 +18,11 @@
 
 [विषय
 
-![अनुवाद](translatetool.png?width=800&format=webp&quality=40)
+जब आप किसी 'नया' दस्तावेज़ को चुनते हैं तो यह प्रकार्य भी जोड़ता है.
+
+![संपादक](neweditor.gif?a)
+
+# अनुवाद कोड
 
 ## अनुवाद जमा करने वाला
 
@@ -42,6 +46,55 @@
                 }
 ```
 
+#### _भाषा- मण्डल- नीचे
+
+हमारा `_LanguageDropDown` आंशिक दृश्य एक सरल ड्रॉपर है जो आपको उस भाषा को चुनने देता है जिसका अनुवाद आप करना चाहते हैं. यह भाषाओं की सूची से जुड़ा हुआ है `Languages` मॉडल का गुण.
+
+आप देख सकते हैं कि यह ड्रॉप डाउन को संभालने और मुख्य चयन भाग में चुनी गई भाषा और फ्लैग को दिखाने के लिए अप्रयोगात्मक उपयोग करता है. यह अनुवाद आग्रह करते समय इस्तेमाल की गयी भाषा के छोटे - छोटे कोड को भी स्थापित करता है ।
+
+एलिंगिंग का प्रयोग करने का अर्थ है कि हम कम से कम, स्थानीय रूप से स्थानीय जावास्क्रिप्ट को अपने दृष्टिकोण में रखते हैं । यह पढ़ने के लिए अपने दृष्टिकोण को स्वच्छ रखने और आसान रखने का एक महान तरीक़ा है ।
+
+```razor
+@using Mostlylucid.Helpers
+@model List<string>
+
+<div id="LanguageDropDown" x-data="{ 
+    open: false, 
+    selectedLanguage: 'Select Language', 
+    selectedFlag: '' ,
+    selectedShortCode:''
+}" class="relative inline-block mt-3">
+    <!-- Dropdown Button -->
+    <button x-on:click="open = !open" class="btn btn-sm btn-outline flex items-center space-x-2">
+        <!-- Dynamically Show the Flag Icon -->
+        <template x-if="selectedFlag">
+            <img :src="selectedFlag" class="h-4 w-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="Selected Language Flag">
+        </template>
+        <span x-text="selectedLanguage"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div x-show="open" x-on:click.away="open = false"
+         class="absolute left-0 mt-2 w-64 rounded-md shadow-lg dark:bg-custom-dark-bg bg-white ring-1 ring-black ring-opacity-5 z-50">
+        <ul class="p-2">
+            @foreach (var language in Model)
+            {
+            <li>
+                <a href="#"
+                   x-on:click.prevent="selectedLanguage = '@(language.ConvertCodeToLanguage())'; selectedFlag = '/img/flags/@(language).svg'; selectedShortCode='@language'; open = false"
+                   class="flex dark:text-white text-black items-center p-2 hover:bg-gray-100">
+                    <img src="/img/flags/@(language).svg" asp-append-version="true" class="ml-2 h-4 w-4 mr-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="@language"> @language.ConvertCodeToLanguage()
+                </a>
+            </li>
+            }
+        </ul>
+    </div>
+</div>
+```
+
 ### जमा किए गएकरण
 
 आप देखेंगे कि इस में कुछ अनुचित कोड है जो हमारे में कॉल करते हैं `window.mostlylucid.translations.submitTranslation` फंक्शन. यह फंक्शन हमारे में पारिभाषित है `translations.js` फ़ाइल जो हमारे में शामिल है `_Layout.cshtml` फ़ाइल.
@@ -50,7 +103,7 @@
 export function submitTranslation() {
     const languageDropDown = document.getElementById('LanguageDropDown');
 
-    // Access Alpine.js data using __x.$data (Alpine.js internal structure)
+    // Access Alpine.js data using Apline.$data (Alpine.js internal structure)
     const alpineData = Alpine.$data(languageDropDown);
 const shortCode = alpineData.selectedShortCode;
 const markdown = simplemde.value();
@@ -174,7 +227,7 @@ sequenceDiagram
 
 ```
 
-### अनुवाद अंत किनारा प्राप्त करें
+## अनुवाद अंत किनारा प्राप्त करें
 
 यह HMAX के उपयोग से निवेदित है और वर्तमान उपयोक्ता के लिए अनुवाद लौटाता है. यह एक सरल अंत बिन्दु है जो कैश से अनुवाद करता है और उन्हें क्लाएंट पर लौटाता है.
 
@@ -266,7 +319,7 @@ sequenceDiagram
 }
 ```
 
-### दृश्य अनुवाद फंक्शन
+## दृश्य अनुवाद फंक्शन
 
 जैसा कि आप ऊपर दिए दृश्य में देखेंगे हम अनुवाद को देखने के लिए क्लिक पर एक छोटे से अलनािंग में कॉल करेंगे. यह एक सादा फंक्शन है जो सर्वर से अनुवाद करता है तथा इसे कार्य संवाद में प्रदर्शित करता है.
 
@@ -310,7 +363,7 @@ export function viewTranslation(taskId) {
 
 ```
 
-### अनुवाद अंत किनारा प्राप्त करें
+## अनुवाद अंत किनारा प्राप्त करें
 
 यह अनुवाद की सूची प्राप्त करने के लिए पहले के तरीके के समान है, सिवाय इसके कि यह एक ही अनुवाद हो जाता है `OriginalMarkdown` और `TranslatedMarkdown` जनसंख्या:
 

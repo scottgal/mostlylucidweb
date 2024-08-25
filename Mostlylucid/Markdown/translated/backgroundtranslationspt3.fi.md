@@ -2,23 +2,27 @@
 
 <datetime class="hidden">2024-08-25T03:20</datetime>
 
-<!--category-- EasyNMT, ASP.NET -->
-## Johdanto
+<!--category-- EasyNMT, ASP.NET, WebAPI, Alpine, HTMX -->
+# Johdanto
 
 Aiemmissa artikkeleissa olemme keskustelleet kääntämisen tärkeydestä verkkosovellusten yhteydessä. Olemme myös tutkineet EasyNMT-kirjaston käyttöä käännösten tekemiseen ASP.NET Core -sovelluksessa. Tässä viestissä selvitän, miten lisäsin hakemuksen taustapalvelun, jotta voit lähettää taustalle käsiteltäviä käännöspyyntöjä.
 
 Jälleen, voit nähdä kaikki lähdekoodin tämän minun [GitHub](https://github.com/scottgal/mostlylucidweb) Sivu.
 
-### Aiemmat artiklat
+## Aiemmat artiklat
 
-- [Taustaa Käännökset Pt. 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1 + 1](/blog/backgroundtranslationspt1)
+- [Taustaa Käännökset Pt. 1](/blog/backgroundtranslationspt1)
 - [Taustaa Käännökset Pt. 2](/blog/backgroundtranslationspt2)
 
 Lisäämme tähän pienen työkalun, joka lähettää backroll-töitä palveluun, jonka kerroimme osassa 2. Tämä työkalu on yksinkertainen lomake, jonka avulla voit lähettää käännöspyynnön palveluun. Sen jälkeen se on välimuistissa ja lisätty jonoon, josta saat tietoa käännöksen tilasta.
 
-[TÄYTÄNTÖÖNPANO
+[TOC]
 
-![Kääntäminen](translatetool.png?width=800&format=webp&quality=40)
+Tämä lisää toiminnallisuutta, jossa "uutta" asiakirjaa valittaessa voi kääntää sen.
+
+![Muokkain](neweditor.gif?a)
+
+# Käännöksen koodi
 
 ## Kääntäjä
 
@@ -42,6 +46,55 @@ Markdown-editorisivulle lisäsin koodin, joka sisältää pienen pudotuksen (in 
                 }
 ```
 
+#### _LanguageDropDown
+
+Meidän `_LanguageDropDown` Osittainen näkymä on yksinkertainen pudotus, jonka avulla voit valita kielen, jolle haluat kääntää. Tässä on luettelo Euroopan unionin virallisista kielistä. `Languages` mallin omaisuutta.
+
+Voit nähdä, että se käyttää Alpine.js-laitteita pudotuksen hoitamiseen ja valitun kielen ja lipun asettamiseen päävalintaosioon. Siinä on myös lyhyt koodi kielestä, jota käytetään käännöspyynnön jättämisessä.
+
+Alpingin käyttö tarkoittaa, että pidämme näköpiirissämme minimaalisen, paikallisesti referoidun JavaScriptin. Tämä on hieno tapa pitää näkemykset puhtaina ja helppolukuisina.
+
+```razor
+@using Mostlylucid.Helpers
+@model List<string>
+
+<div id="LanguageDropDown" x-data="{ 
+    open: false, 
+    selectedLanguage: 'Select Language', 
+    selectedFlag: '' ,
+    selectedShortCode:''
+}" class="relative inline-block mt-3">
+    <!-- Dropdown Button -->
+    <button x-on:click="open = !open" class="btn btn-sm btn-outline flex items-center space-x-2">
+        <!-- Dynamically Show the Flag Icon -->
+        <template x-if="selectedFlag">
+            <img :src="selectedFlag" class="h-4 w-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="Selected Language Flag">
+        </template>
+        <span x-text="selectedLanguage"></span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </button>
+
+    <!-- Dropdown Menu -->
+    <div x-show="open" x-on:click.away="open = false"
+         class="absolute left-0 mt-2 w-64 rounded-md shadow-lg dark:bg-custom-dark-bg bg-white ring-1 ring-black ring-opacity-5 z-50">
+        <ul class="p-2">
+            @foreach (var language in Model)
+            {
+            <li>
+                <a href="#"
+                   x-on:click.prevent="selectedLanguage = '@(language.ConvertCodeToLanguage())'; selectedFlag = '/img/flags/@(language).svg'; selectedShortCode='@language'; open = false"
+                   class="flex dark:text-white text-black items-center p-2 hover:bg-gray-100">
+                    <img src="/img/flags/@(language).svg" asp-append-version="true" class="ml-2 h-4 w-4 mr-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="@language"> @language.ConvertCodeToLanguage()
+                </a>
+            </li>
+            }
+        </ul>
+    </div>
+</div>
+```
+
 ### LähetäKäännös
 
 Huomaat, että tässä on jokin Apline.js-koodi, joka kutsuu meidän `window.mostlylucid.translations.submitTranslation` Funktio. Tämä toiminto on määritelty meidän `translations.js` tiedosto, joka on mukana meidän `_Layout.cshtml` Kansio.
@@ -50,7 +103,7 @@ Huomaat, että tässä on jokin Apline.js-koodi, joka kutsuu meidän `window.mos
 export function submitTranslation() {
     const languageDropDown = document.getElementById('LanguageDropDown');
 
-    // Access Alpine.js data using __x.$data (Alpine.js internal structure)
+    // Access Alpine.js data using Apline.$data (Alpine.js internal structure)
     const alpineData = Alpine.$data(languageDropDown);
 const shortCode = alpineData.selectedShortCode;
 const markdown = simplemde.value();
@@ -174,7 +227,7 @@ Tämä on WebAPI-ohjain, joka ottaa vastaan pyynnöt, jotka sisältävät markow
 
 ```
 
-### Käännösten saamisen päätepiste
+## Käännösten saamisen päätepiste
 
 Tämä pyydetään käyttämällä HTMX:ää ja palauttaa käännökset nykyiselle käyttäjälle. Tämä on yksinkertainen päätetapahtuma, joka saa käännökset välimuistista ja palauttaa ne asiakkaalle.
 
@@ -266,7 +319,7 @@ Tämä johtaa tähän näkemykseen:
 }
 ```
 
-### View Translation -toiminto
+## View Translation -toiminto
 
 Kuten näette yllä olevasta näkymästä, pyydämme pientä Alping-painiketta nähdäksesi käännöksen. Tämä on yksinkertainen toiminto, joka saa käännöksen palvelimelta ja näyttää sen modaaliikkunassa.
 
@@ -310,7 +363,7 @@ export function viewTranslation(taskId) {
 
 ```
 
-### Käännöksen päätelmä
+## Käännöksen päätelmä
 
 Tämä on samanlainen kuin aiempi tapa saada lista käännöksistä, paitsi se saa yhden käännöksen kanssa `OriginalMarkdown` sekä `TranslatedMarkdown` asuttu:
 
