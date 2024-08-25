@@ -7,6 +7,12 @@
 
 Het zoeken naar inhoud is een cruciaal onderdeel van elke inhoud zware website. Het verbetert de ontdekbaarheid en gebruikerservaring. In dit bericht zal ik behandelen hoe ik toegevoegd full text zoeken naar deze site
 
+Volgende delen in deze serie:
+
+- [Zoekvak met Postgres](/blog/textsearchingpt11)
+- [Inleiding tot OpenSearch](/blog/textsearchingpt2)
+- [Open zoeken met C#](/blog/textsearchingpt3)
+
 [TOC]
 
 # Aanpak
@@ -129,7 +135,7 @@ Om deze (in de toekomst) te gebruiken kunnen we een eenvoudig WebAPI-eindpunt ma
 ```csharp
 [ApiController]
 [Route("api/[controller]")]
-public class SearchApi(MostlylucidDbContext context) : ControllerBase
+public class SearchApi(IMostlylucidDbContext context) : ControllerBase
 {
     [HttpGet]
     public async Task<JsonHttpResult<List<SearchResults>>> Search(string query)

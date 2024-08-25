@@ -1,10 +1,11 @@
-# (Simple) Unit Testing The Blog Part 1 - DbContext
+# (Simple) Unit Testing The Blog Part 1 - Services
 
 <datetime class="hidden">2024-08-25T23:00</datetime>
 <!--category-- xUnit, Moq, Unit Testing -->
 
 ## Introduction
 In this post I'll be starting adding Unit Testing for this site. This won't be a full tutorial on Unit Testing, but rather a series of posts on how I'm adding Unit Testing to this site.
+In this post I test some services by mocking DbContext; this is to avoid any DB specific shennanigans. 
 
 [TOC]
 
