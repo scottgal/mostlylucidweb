@@ -42,9 +42,6 @@ public class EditorController(
             UserSessionId = Request.GetUserId(Response),
             TranslationTasks = translations
         };
-
-        
-
         if (slug == null)
         {
             editorModel.IsNew = true;

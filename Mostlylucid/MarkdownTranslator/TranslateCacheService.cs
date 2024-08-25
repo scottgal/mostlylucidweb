@@ -30,10 +30,12 @@ public class TranslateCacheService(IMemoryCache memoryCache)
              currentTasks= currentTasks.OrderByDescending(x => x.StartTime).ToList();
           if (currentTasks.Count >= 5)
           {
-              currentTasks.RemoveAt(0);
+              var lastTask = currentTasks.Last();
+              currentTasks.Remove(lastTask);
           }
 
           currentTasks.Add(task);
+          currentTasks= currentTasks.OrderByDescending(x => x.StartTime).ToList();
             tasks.Tasks = currentTasks;
             memoryCache.Set(userId, tasks, new MemoryCacheEntryOptions
             {
