@@ -50,6 +50,7 @@ window.onload= function () {
 document.body.addEventListener('htmx:afterSwap', function(evt) {
     console.log('HTMX afterSwap triggered', evt);
 
+    if (evt.detail.target.id !== 'contentcontainer') return;
     hljs.highlightAll();
 
     const url = evt.detail.pathInfo.requestPath;
@@ -106,10 +107,6 @@ function initGoogleSignIn() {
     const element = document.getElementById('google_button');
     if (element) {
         renderButton(element);
-    }
-    const secondElement = document.getElementById('google_button2');
-    if (secondElement) {
-        renderButton(secondElement);
     }
 
 }

@@ -75,13 +75,13 @@ export function viewTranslation(taskId) {
             let translatedContentArea = document.getElementById("translatedcontent")
             translatedContentArea.classList.remove("hidden");
             let textArea = document.getElementById('translatedcontentarea');
-            textArea.classList.remove('hidden');
             let originalMde = window.mostlylucid.simplemde.getinstance('translatedcontentarea');
             if(!originalMde)
             {
                 originalMde= window.mostlylucid.simplemde.initialize('translatedcontentarea', true);
-                originalMde.value(data.originalMarkdown)
+             
             }
+            originalMde.value(data.originalMarkdown)
             const mde = window.mostlylucid.simplemde.getinstance(translateEditor);
             mde.value(data.translatedMarkdown);
             window.mostlylucid.simplemde.updateContent(mde);
