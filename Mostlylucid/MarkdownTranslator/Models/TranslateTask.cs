@@ -73,7 +73,7 @@ public class TranslateResultTask
     [Display(Name = "Failed")]
     public bool Failed { get; set; }
     
-    [Display(Name = "Completed")]
+    [Display(Name = "Status")]
     public bool Completed
     {
         get;

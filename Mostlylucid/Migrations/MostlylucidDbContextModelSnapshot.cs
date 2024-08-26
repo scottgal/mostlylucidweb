@@ -130,59 +130,76 @@ namespace Mostlylucid.Migrations
                     b.ToTable("categories", "mostlylucid");
                 });
 
+            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentClosure", b =>
+                {
+                    b.Property<int>("AncestorId")
+                        .HasColumnType("integer")
+                        .HasColumnName("ancestor_id");
+
+                    b.Property<int>("DescendantId")
+                        .HasColumnType("integer")
+                        .HasColumnName("descendant_id");
+
+                    b.Property<int>("Depth")
+                        .HasColumnType("integer")
+                        .HasColumnName("depth");
+
+                    b.HasKey("AncestorId", "DescendantId");
+
+                    b.HasIndex("DescendantId");
+
+                    b.ToTable("comment_closures", "mostlylucid");
+                });
+
             modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Avatar")
-                        .HasColumnType("text")
-                        .HasColumnName("avatar");
-
-                    b.Property<int>("BlogPostId")
-                        .HasColumnType("integer")
-                        .HasColumnName("blog_post_id");
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("author");
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("content");
 
-                    b.Property<DateTimeOffset>("Date")
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("date");
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
+                    b.Property<string>("HtmlContent")
                         .HasColumnType("text")
-                        .HasColumnName("email");
+                        .HasColumnName("html_content");
 
-                    b.Property<bool>("Moderated")
-                        .HasColumnType("boolean")
-                        .HasColumnName("moderated");
+                    b.Property<int?>("ParentCommentId")
+                        .HasColumnType("integer");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
+                    b.Property<int>("PostId")
+                        .HasColumnType("integer")
+                        .HasColumnName("post_id");
 
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("slug");
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BlogPostId");
+                    b.HasIndex("Author");
 
-                    b.HasIndex("Date");
+                    b.HasIndex("ParentCommentId");
 
-                    b.HasIndex("Moderated");
-
-                    b.HasIndex("Slug");
+                    b.HasIndex("PostId");
 
                     b.ToTable("comments", "mostlylucid");
                 });
@@ -232,15 +249,40 @@ namespace Mostlylucid.Migrations
                     b.Navigation("LanguageEntity");
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentEntity", b =>
+            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentClosure", b =>
                 {
-                    b.HasOne("Mostlylucid.EntityFramework.Models.BlogPostEntity", "BlogPostEntity")
-                        .WithMany("Comments")
-                        .HasForeignKey("BlogPostId")
+                    b.HasOne("Mostlylucid.EntityFramework.Models.CommentEntity", "Ancestor")
+                        .WithMany("Descendants")
+                        .HasForeignKey("AncestorId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Mostlylucid.EntityFramework.Models.CommentEntity", "Descendant")
+                        .WithMany("Ancestors")
+                        .HasForeignKey("DescendantId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BlogPostEntity");
+                    b.Navigation("Ancestor");
+
+                    b.Navigation("Descendant");
+                });
+
+            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentEntity", b =>
+                {
+                    b.HasOne("Mostlylucid.EntityFramework.Models.CommentEntity", "ParentComment")
+                        .WithMany()
+                        .HasForeignKey("ParentCommentId");
+
+                    b.HasOne("Mostlylucid.EntityFramework.Models.BlogPostEntity", "Post")
+                        .WithMany("Comments")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ParentComment");
+
+                    b.Navigation("Post");
                 });
 
             modelBuilder.Entity("blogpostcategory", b =>
@@ -261,6 +303,13 @@ namespace Mostlylucid.Migrations
             modelBuilder.Entity("Mostlylucid.EntityFramework.Models.BlogPostEntity", b =>
                 {
                     b.Navigation("Comments");
+                });
+
+            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentEntity", b =>
+                {
+                    b.Navigation("Ancestors");
+
+                    b.Navigation("Descendants");
                 });
 
             modelBuilder.Entity("Mostlylucid.EntityFramework.Models.LanguageEntity", b =>

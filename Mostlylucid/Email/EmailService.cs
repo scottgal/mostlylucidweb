@@ -5,11 +5,10 @@ namespace Mostlylucid.Email;
 
 public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 {
-    public async Task SendCommentEmail(string commenterEmail, string commenterName, string comment, string postSlug)
+    public async Task SendCommentEmail(string commenterEmail, string commenterName, string comment)
     {
         var commentModel = new CommentEmailModel
         {
-            PostSlug = postSlug,
             SenderEmail = commenterEmail,
             SenderName = commenterName,
             Comment = comment
@@ -20,7 +19,7 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
     public async Task SendCommentEmail(CommentEmailModel commentModel)
     {
         // Load the template
-        var templatePath = "Email/Templates/MailTemplate.template";
+        var templatePath = "Email/Templates/CommentMailTemplate.template";
         await SendMail(commentModel, templatePath);
     }
 

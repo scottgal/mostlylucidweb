@@ -11,6 +11,8 @@ public class MostlylucidDbContext : DbContext, IMostlylucidDBContext
     }
 
     public DbSet<CommentEntity> Comments { get; set; }
+    
+    public DbSet<CommentClosure> CommentClosures { get; set; }
     public DbSet<BlogPostEntity> BlogPosts { get; set; }
     public DbSet<CategoryEntity> Categories { get; set; }
 
@@ -43,9 +45,44 @@ public class MostlylucidDbContext : DbContext, IMostlylucidDBContext
             
            entity.HasIndex(b => b.SearchVector)
                 .HasMethod("GIN");
-            entity.HasMany(b => b.Comments)
-                .WithOne(c => c.BlogPostEntity)
-                .HasForeignKey(c => c.BlogPostId);
+           // Configure the CommentClosure entity
+           modelBuilder.Entity<CommentClosure>()
+               .HasKey(cc => new { cc.AncestorId, cc.DescendantId });
+
+           modelBuilder.Entity<CommentClosure>()
+               .HasOne(cc => cc.Ancestor)
+               .WithMany(c => c.Descendants)
+               .HasForeignKey(cc => cc.AncestorId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+           modelBuilder.Entity<CommentClosure>()
+               .HasOne(cc => cc.Descendant)
+               .WithMany(c => c.Ancestors)
+               .HasForeignKey(cc => cc.DescendantId)
+               .OnDelete(DeleteBehavior.Cascade);
+           
+           modelBuilder.Entity<CommentEntity>(entity =>
+           {
+               entity.HasKey(c => c.Id);  // Primary key
+
+               entity.Property(c => c.Content)
+                   .IsRequired()
+                   .HasMaxLength(1000);  // Example constraint on content length
+
+               entity.Property(x=>x.CreatedAt)
+                   .HasDefaultValueSql("CURRENT_TIMESTAMP");
+               entity.Property(x=>x.Author).IsRequired().HasMaxLength(200);
+               entity.Property(c => c.CreatedAt)
+                   .IsRequired();  // Ensure the creation date is required
+
+               // Configure the relationship between Comment and Post (optional)
+               entity.HasOne(c => c.Post)
+                   .WithMany(p => p.Comments)
+                   .HasForeignKey(c => c.PostId)
+                   .OnDelete(DeleteBehavior.Cascade);  // Optional, cascade delete on post deletion
+
+               entity.HasIndex(c => c.Author);
+           });
 
             entity.HasOne(b => b.LanguageEntity)
                 .WithMany(l => l.BlogPosts).HasForeignKey(x => x.LanguageId);
@@ -59,18 +96,7 @@ public class MostlylucidDbContext : DbContext, IMostlylucidDBContext
                 );
         });
 
-        modelBuilder.Entity<CommentEntity>(entity =>
-        {
-            entity.HasIndex(x => x.Slug);
-            entity.HasIndex(x => x.Date);
-            entity.HasIndex(x => x.BlogPostId);
-            entity.HasIndex(x => x.Moderated);
-
-            entity.HasOne(c => c.BlogPostEntity)
-                .WithMany(b => b.Comments)
-                .HasForeignKey(c => c.BlogPostId);
-        });
-        
+     
         modelBuilder.Entity<LanguageEntity>(entity =>
         {
             entity.HasMany(l => l.BlogPosts)

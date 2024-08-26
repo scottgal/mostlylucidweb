@@ -21,6 +21,10 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
         return await Task.FromResult(categories);
     }
 
+    public Task<string> GetSlug(int postId)
+    {
+        throw new NotImplementedException();
+    }
     public Task<List<BlogPostViewModel>> GetAllPosts()
     {
         var posts = GetPageCache().Select(x => x.Value).ToList();

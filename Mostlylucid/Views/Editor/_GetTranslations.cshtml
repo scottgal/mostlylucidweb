@@ -37,7 +37,20 @@
                 {
       
                     <tr>
-                        <td>  <a href="#" x-on:click.prevent="window.mostlylucid.translations.viewTranslation('@item.TaskId')">View</a></td>
+                        <td>@if (item.Completed)
+                            {
+
+                                <a href="#" x-on:click.prevent="window.mostlylucid.translations.viewTranslation('@item.TaskId')">View</a>
+                            }
+                            else if (item.Failed)
+                            {
+                            <text>Failed</text>
+                            }
+                            else
+                            {
+                            <text>Processing</text>
+                            }
+                        </td>
                         <td>@if (item.Completed)
                             {
                                 <i class='bx bx-check text-green'></i>

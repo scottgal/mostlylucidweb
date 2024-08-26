@@ -12,6 +12,10 @@
             class="pb-2 block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-4xl md:text-5xl">
             @Model.Title
         </h2>
+        <div>
+            <a href="#commentsection" class="btn btn-outline btn-sm my-2" > <i class="bx bx-mail-send text-2xl"></i> Comments</a>
+        </div>
+        
         <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2">
             @foreach (var category in Model.Categories)
             {
@@ -53,25 +57,35 @@
         class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2">
         @Html.Raw(Model.HtmlContent)
     </div>
-@if (Model.Authenticated)
-    {
+    <div x-data="{ showNewElement: false }" x-init="
+    document.addEventListener('htmx:afterSwap', (event) => {
+        if (event.detail.target.id === 'contentformarea') {
+            $data.showNewElement = true;  // Use $data to reference Alpine component's state
+        }
+    });
+"  class="pt-6" id="commentsection">
+        <!-- Button that will disappear once showNewElement is true -->
+        <a x-show="!showNewElement"
+           class="btn btm-sm btn-outline mb-6"
+           hx-controller="Comment"
+           hx-action="GetCommentForm"
+           hx-route-postId="@(Int32.Parse(Model.Id))"
+           hx-get
+           hx-target="#contentformarea">
+            <i class='bx bx-message-rounded-add'></i> Add Comment
+        </a>
+
+        <!-- The target for HTMX content swap -->
+        <div id="contentformarea"
+             x-show="showNewElement"
+             class="border border-b-neutral-600 border-1 rounded-xl p-4 mb-4">
+        </div>
+    </div>
+
+    <div id="commentlist">
         
-  
-        <div class=" max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
-            <p class="font-body text-lg font-medium text-primary dark:text-white">Welcome @Model.Name please comment below.</p>
-            <textarea class="markdowneditor hidden"></textarea>
-         <!--   <button class="btn btn-primary" hx-action="Comment" hx-controller="Blog" hx-post hx-vals="js:{comment: simplemde.value()}" hx-route-slug="@Model.Slug" hx-swap="outerHTML" hx-target="#comment" onclick="prepareForSubmission()">Comment</button> -->
-           COMING SOON!
-        </div>
-    }
-    else
-    {
-        <div class=" max-w-none border-b border-grey-lighter py-8 dark:prose-dark sm:py-12">
-            <p class="font-body text-lg font-medium text-primary dark:text-white">Please login to comment</p>
-            <div class="w-[200px] h-[39px] overflow-hidden rounded">
-                <div id="google_button2">
-                </div>
-            </div>
-        </div>
-    }
+    
+        <partial name="_ListComments" for="Comments"/>
+    </div>
+ 
 </div>

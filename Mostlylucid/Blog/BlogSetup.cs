@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AngleSharp.Dom;
+using Microsoft.EntityFrameworkCore;
 using Mostlylucid.Blog.EntityFramework;
 using Mostlylucid.Blog.Markdown;
+using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.EntityFramework;
@@ -33,8 +35,9 @@ public static class BlogSetup
                     options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
                 });
                 services.AddScoped<IBlogService, EFBlogService>();
-            
+                services.AddScoped<ICommentService, EFCommentService>();
                 services.AddScoped<IBlogPopulator, EFBlogPopulator>();
+                services.AddScoped<CommentViewService>();
                 services.AddHostedService<BackgroundEFBlogUpdater>();
                 break;
         }

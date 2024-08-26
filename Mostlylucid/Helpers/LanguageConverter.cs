@@ -21,6 +21,22 @@ public static class LanguageConverter
         { "en", "English" }
     };
     
+    private static readonly Dictionary<string, string> LanguageLocaleMap = new Dictionary<string, string>
+    {
+        { "es", "es-ES" },  // Spanish - Spain
+        { "fr", "fr-FR" },  // French - France
+        { "de", "de-DE" },  // German - Germany
+        { "it", "it-IT" },  // Italian - Italy
+        { "zh", "zh-CN" },  // Chinese (Simplified) - China
+        { "nl", "nl-NL" },  // Dutch - Netherlands
+        { "hi", "hi-IN" },  // Hindi - India
+        { "ar", "ar-SA" },  // Arabic - Saudi Arabia
+        { "uk", "uk-UA" },  // Ukrainian - Ukraine
+        { "fi", "fi-FI" },  // Finnish - Finland
+        { "sv", "sv-SE" },  // Swedish - Sweden
+        { "en", "en-US" }   // English - United States
+    };
+
     private static readonly Dictionary<string, string> LanguageNameMap = new Dictionary<string, string>
     {
         { "es", "spanish" },
@@ -39,6 +55,10 @@ public static class LanguageConverter
 
 
 
+    public static string ConvertCodeToLocale(this string code)
+    {
+        return LanguageLocaleMap.TryGetValue(code.ToLower(), out string locale) ? locale : "en-GB";
+    }
 
     public static string ConvertCodeToLanguage(this string code)
     {

@@ -1,7 +1,7 @@
 ﻿using System.Text.RegularExpressions;
-using Mostlylucid.Blog.Models;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Controllers;
+using Mostlylucid.EntityFramework.Models;
 
 namespace Mostlylucid.Blog.Markdown;
 
@@ -30,28 +30,28 @@ public class CommentService(MarkdownConfig markdownConfig) : Blog.MarkdownBaseSe
     
 
     
-    public List<Comment> GetComments(string slug)
-    {
-        var pipeline = Pipeline();
-        var comments = new List<Comment>();
-        var path = Directory.GetFiles(markdownConfig.MarkdownCommentsPath, $"*{slug}.md");
-        foreach (var file in path)
-        {
-            var dateString = file.Substring(0, file.IndexOf("_", StringComparison.Ordinal));
-            var date =  DateTime.FromFileTimeUtc(Int64.Parse( dateString));
-            
-            var id = file.Substring(file.IndexOf("_", StringComparison.Ordinal) + 1, file.LastIndexOf("_", StringComparison.Ordinal) - file.IndexOf("_", StringComparison.Ordinal) - 1);
-       
-            var comment = File.ReadAllText(file);
-            var name = CommentNameRegex.Match(comment).Groups[1].Value;
-            var avatar = CommentAvaterRegex.Match(comment).Groups[1].Value;
-            var html = Markdig.Markdown.ToHtml(comment, pipeline);
-            var commentModel = new Comment(date, name, avatar, html);
-            comments.Add(commentModel);
-        }
-
-        comments =  comments.OrderByDescending(x=>x.Date).ToList();
-        return comments;
-
-    }
+    // public List<Comment> GetComments(string slug)
+    // {
+    //     var pipeline = Pipeline();
+    //     var comments = new List<Comment>();
+    //     var path = Directory.GetFiles(markdownConfig.MarkdownCommentsPath, $"*{slug}.md");
+    //     foreach (var file in path)
+    //     {
+    //         var dateString = file.Substring(0, file.IndexOf("_", StringComparison.Ordinal));
+    //         var date =  DateTime.FromFileTimeUtc(Int64.Parse( dateString));
+    //         
+    //         var id = file.Substring(file.IndexOf("_", StringComparison.Ordinal) + 1, file.LastIndexOf("_", StringComparison.Ordinal) - file.IndexOf("_", StringComparison.Ordinal) - 1);
+    //    
+    //         var comment = File.ReadAllText(file);
+    //         var name = CommentNameRegex.Match(comment).Groups[1].Value;
+    //         var avatar = CommentAvaterRegex.Match(comment).Groups[1].Value;
+    //         var html = Markdig.Markdown.ToHtml(comment, pipeline);
+    //         var commentModel = new Comment(date, name, CommentStatus.Pending, html);
+    //         comments.Add(commentModel);
+    //     }
+    //
+    //     comments =  comments.OrderByDescending(x=>x.Date).ToList();
+    //     return comments;
+    //
+    // }
 }

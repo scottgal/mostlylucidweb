@@ -1,4 +1,5 @@
 ﻿using Mostlylucid.EntityFramework.Models;
+using Mostlylucid.Models.Comments;
 
 namespace Mostlylucid.Models.Blog;
 
@@ -7,6 +8,7 @@ public class BlogPostViewModel : BaseViewModel
     public string Id { get; set; }
     public string[] Categories { get; set; } = Array.Empty<string>();
     
+    public CommentViewList Comments { get; set; } = new();
     public string Title { get; set; }= string.Empty;
     
     public string Language { get; set; }= string.Empty;

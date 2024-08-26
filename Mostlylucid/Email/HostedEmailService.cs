@@ -1,12 +1,16 @@
 ﻿using System.Threading.Channels;
-using System.Threading.Tasks.Dataflow;
 using Mostlylucid.Email.Models;
 
 namespace Mostlylucid.Email
 {
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
+    {
+        Task SendEmailAsync(BaseEmailModel message);
+      
+    }
 
     public class EmailSenderHostedService(EmailService emailService, ILogger<EmailSenderHostedService> logger)
-        : IHostedService, IDisposable
+        : IEmailSenderHostedService
     {
         private readonly Channel<BaseEmailModel> _mailMessages = Channel.CreateUnbounded<BaseEmailModel>();
         private Task _sendTask = Task.CompletedTask;

@@ -1,0 +1,15 @@
+﻿@model Mostlylucid.Models.Comments.CommentInputModel
+
+
+@{
+    ViewBag.Title = "Comment";
+}
+<div class="p-6 bg-white dark:bg-custom-dark-bg rounded-lg shadow-lg">
+    <h3 class="text-xl font-semibold  text-blue-dark dark:text-white">
+        Thanks @Model.Name
+    </h3>
+    <p class="mt-2 text-blue-dark dark:text-gray-300">Your comment has been sent. I'll take a quick look then you'll see it here!</p>
+    <div class="prose max-w-none border-b border-gray-200 py-2 text-black dark:prose-dark dark:border-gray-700 sm:py-2">
+        @Html.Raw(Model.Content)
+    </div>
+</div>

@@ -1,4 +1,4 @@
-﻿export function typeahead() {
+﻿export  function typeahead() {
     return {
         query: '',
         results: [],

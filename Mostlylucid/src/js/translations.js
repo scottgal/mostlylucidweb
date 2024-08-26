@@ -1,10 +1,11 @@
-﻿export function submitTranslation() {
+﻿
+ export function submitTranslation() {
     const languageDropDown = document.getElementById('LanguageDropDown');
-
+const translateEditor ='markdowneditor';
     // Access Alpine.js data using __x.$data (Alpine.js internal structure)
     const alpineData = Alpine.$data(languageDropDown);
 const shortCode = alpineData.selectedShortCode;
-const markdown = simplemde.value();
+const markdown = window.mostlylucid.simplemde.getinstance(translateEditor).value();
 if (shortCode === '' || markdown === '') return;
     
     // Create the data object that matches your model
@@ -50,6 +51,7 @@ if (shortCode === '' || markdown === '') return;
 }
 
 export function viewTranslation(taskId) {
+
     // Construct the URL with the query parameters
     const url = `/api/translate/get-translation/${taskId}`;
 
@@ -67,16 +69,22 @@ export function viewTranslation(taskId) {
             return response.json();
         })
         .then(data =>
-
+ 
         {
+            const translateEditor = 'markdowneditor';
             let translatedContentArea = document.getElementById("translatedcontent")
             translatedContentArea.classList.remove("hidden");
             let textArea = document.getElementById('translatedcontentarea');
             textArea.classList.remove('hidden');
-            textArea.value = data.originalMarkdown;
-            simplemde.value(data.translatedMarkdown);
-            window.codeEditorInit();
-            window.updateContent();
+            let originalMde = window.mostlylucid.simplemde.getinstance('translatedcontentarea');
+            if(!originalMde)
+            {
+                originalMde= window.mostlylucid.simplemde.initialize('translatedcontentarea', true);
+                originalMde.value(data.originalMarkdown)
+            }
+            const mde = window.mostlylucid.simplemde.getinstance(translateEditor);
+            mde.value(data.translatedMarkdown);
+            window.mostlylucid.simplemde.updateContent(mde);
         })  // Log the successful response data
         .catch(error => console.error('Error:', error));  // Handle any errors
 }

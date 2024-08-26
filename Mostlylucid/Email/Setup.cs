@@ -26,9 +26,8 @@ public static class Setup
         }));
         // Register your EmailService as a scoped service if it uses scoped dependencies
         services.AddSingleton<EmailService>();
-
-        services.AddSingleton<EmailSenderHostedService>();
-        services.AddHostedService(provider => provider.GetRequiredService<EmailSenderHostedService>());
+        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
 
         //T0 test email service
 // await using  var scope = app.Services.CreateAsyncScope();

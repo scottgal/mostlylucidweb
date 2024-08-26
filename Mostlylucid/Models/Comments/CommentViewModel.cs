@@ -1,13 +1,5 @@
-﻿namespace Mostlylucid.Models.Comments;
+﻿using Mostlylucid.EntityFramework.Models;
 
-public class CommentViewModel
-{
-    public DateTime CreatedDate { get; set; }
-    public bool IsModerated { get; set; }
-    
-    public string Email { get; set; }
-    
-    public string Slug { get; set; }
-    
-    public string Comment { get; set; }
-}
+namespace Mostlylucid.Models.Comments;
+
+public  record CommentViewModel(int Id, DateTime Date, string Author, CommentStatus Status, string Content, int BlogPostId, int ParentId=0);

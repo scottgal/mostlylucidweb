@@ -53,6 +53,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Blog\Models\" />
       <Folder Include="Markdown\comments\" />
       <Folder Include="Markdown\notmoderatedcomments\" />
       <Folder Include="Migrations\" />

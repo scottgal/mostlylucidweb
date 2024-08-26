@@ -16,7 +16,7 @@ public class ContactController(
     AnalyticsSettings analyticsSettings,
     IBlogService blogService,
     CommentService commentService,
-    EmailSenderHostedService sender,
+    IEmailSenderHostedService sender,
     ILogger<BaseController> logger) : BaseController(authSettingsSettings, analyticsSettings, blogService, logger)
 {
     [Route("")]
@@ -27,6 +27,11 @@ public class ContactController(
         ViewBag.Title = "Contact";
         ;
         var model = new ContactViewModel();
+        var user = GetUserInfo();
+        model.Authenticated = user.LoggedIn;
+        model.Name = user.Name;
+        model.Email = user.Email;
+        model.AvatarUrl = user.AvatarUrl;
         return View("Contact", model);
     }
 

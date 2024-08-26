@@ -54,6 +54,13 @@ public class EFBlogService(
         return posts.Select(p => p.ToPostModel()).ToList();
     }
     
+    public async Task<string> GetSlug(int postId )
+    {
+        var post = await context.BlogPosts.FindAsync(postId);
+        if (post == null) return "";
+        return post.Slug;
+    }
+    
     public Task<List<PostListModel>> GetPostsForLanguage(DateTime? startDate = null, string category = "",
         string language = MarkdownBaseService.EnglishLanguage)
     {

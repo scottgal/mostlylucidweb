@@ -7,7 +7,9 @@ namespace Mostlylucid.EntityFramework;
 
 public interface IMostlylucidDBContext
 {
-    public DbSet<CommentEntity> Comments { get; set; }
+     DbSet<CommentEntity> Comments { get; set; }
+    
+    public DbSet<CommentClosure> CommentClosures { get; set; }
     public DbSet<BlogPostEntity> BlogPosts { get; set; }
     public DbSet<CategoryEntity> Categories { get; set; }
 

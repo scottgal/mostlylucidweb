@@ -6,15 +6,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Blog;
 using Mostlylucid.Blog.Markdown;
+using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Config;
 using Mostlylucid.Controllers;
+using Mostlylucid.EntityFramework.Models;
+using Mostlylucid.Models.Comments;
 using MarkdownBaseService = Mostlylucid.Blog.MarkdownBaseService;
 
 namespace Mostlylucidblog.Controllers;
 
 [Route("blog")]
 public class BlogController(AuthSettings authSettings, AnalyticsSettings analyticsSettings,
-    IBlogService blogService, CommentService commentService,
+    IBlogService blogService, CommentViewService commentViewService,
     ILogger<BlogController> logger) : BaseController(authSettings,analyticsSettings, blogService, logger)
 {
 
@@ -44,10 +47,26 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
        {
            return NotFound();
        }
+      
        var user = GetUserInfo();
        post.Authenticated = user.LoggedIn;
        post.Name = user.Name;
+       post.Email = user.Email;
        post.AvatarUrl = user.AvatarUrl;
+       var commentViewList = new CommentViewList();
+         commentViewList.PostId = Int32.Parse(post.Id);
+         commentViewList.IsAdmin = user.IsAdmin;
+        
+       if (user.IsAdmin)
+       {
+           commentViewList.Comments   =await commentViewService.GetAllComments(Int32.Parse(post.Id));
+       }
+       else
+       {
+           commentViewList.Comments   =await commentViewService.GetApprovedComments(Int32.Parse(post.Id));
+       }
+  
+       post.Comments = commentViewList;
        if(Request.IsHtmx())
        {
               return PartialView("_PostPartial", post);

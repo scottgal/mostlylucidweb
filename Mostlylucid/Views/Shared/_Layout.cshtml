@@ -26,8 +26,11 @@
         }
     }
 
+    @{
+        var currentUrl = $"https://{Context.Request.Host}/{Context.Request.Path}";
+    }
     <!-- Facebook Meta Tags -->
-    <meta property="og:url" content="https://www.mostlylucid.net" id="metaOgUrl">
+    <meta property="og:url" content="@currentUrl" id="metaOgUrl">
     <meta property="og:type" content="website">
     <meta property="og:title" content="@ViewBag.Title">
     <meta property="og:description" content="Scott Galloway is a lead developer and software engineer with a passion for building web applications.">
@@ -36,7 +39,7 @@
     <!-- Twitter Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
     <meta property="twitter:domain" content="mostlylucid.net">
-    <meta property="twitter:url" content="https://www.mostlylucid.net" id="metaTwitterUrl">
+    <meta property="twitter:url" content="@currentUrl" id="metaTwitterUrl">
     <meta name="twitter:title" content="@ViewBag.Title">
     <meta name="twitter:description" content="Scott Galloway is a lead developer and software engineer with a passion for building web applications.">
     <meta name="twitter:image" content="https://mostlylucid.net/img/social2.jpg">
@@ -93,7 +96,7 @@
 </head>
 
 <body
-    x-data="global()"
+    x-data="globalSetup()"
     x-init="themeInit()"
     :class="isMobileMenuOpen ? 'max-h-screen overflow-hidden relative' : ''"
     class="bg-custom-light-bg dark:bg-custom-dark-bg "
@@ -127,13 +130,15 @@ dark:text-white dark:group-hover:text-secondary"></span>
                             if (Model.Authenticated)
                             {
                             <div class="flex items-center space-x-4">
-                                @if (Model.AvatarUrl != null)
-                                {
-                                <img src="@Model.AvatarUrl" class="h-8 w-8 rounded-full" alt="User Avatar" />
-                                }
-                                <span class="text-xl text-blue-dark dark:text-white">Logged in as @Model.Name</span>
-                                <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-outline btn-sm text-xl text-blue-dark dark:text-white">
-                                    <i class="bx bx-log-out mr-2"></i> Logout
+                               
+                                <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-outline btn-sm  text-blue-dark dark:text-white">
+                                    @if (Model.AvatarUrl != null)
+                                    {
+                                    <img src="@Model.AvatarUrl" class="h-6 w-6 rounded-full" alt="User Avatar" />
+                                    }
+                                <span class="text-body text-blue-dark dark:text-white"> @Model.Name</span>
+                                
+                                    <i class="bx bx-log-out mr-2 text-xl"></i> 
                                 </a>
                             </div>
                             }
