@@ -8,6 +8,8 @@ In a previous post we added a client for fetching [Umami analytics data](/blog/a
 [Umami](https://umami.is/) is a lightweight analytics service that can be self-hosted. It is a great alternative to Google Analytics and is privacy focused.
 However by default it only has a Node client for tracking data (and even then it's not GREAT). So I decided to write a C# client for tracking data.
 
+### <span style="color:red"> **NOTE I updated this just now, I'll update the blog post later - Just now being 26/08/2024**  </span> 
+
 [TOC]
 
 ## Prerequisites
@@ -229,4 +231,11 @@ It depends on a nuget location called 'local' which is defined in the `Nuget.con
 ```
 
 ## In Conclusion
-In future I plan to make this a NuGet pa
+In future I plan to make this a NuGet package. 
+I use this in the blog now, for example to track how long translations take
+
+```csharp
+        var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (translationTask == null) return TypedResults.BadRequest("Task not found");
+        await  umamiClient.Send(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
+```
