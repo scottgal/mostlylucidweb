@@ -52,14 +52,6 @@ public static class BlogSetup
     
         var config = scope.ServiceProvider.GetRequiredService<BlogConfig>();
         var cancellationToken = scope.ServiceProvider.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
-        if(config.Mode == BlogMode.Database)
-        {
-        
-           var blogContext = scope.ServiceProvider.GetRequiredService<IMostlylucidDBContext>();
-           Log.Information("Migrating database");
-         
-           await blogContext.Database.MigrateAsync(cancellationToken);
-        }
 
         if (config.Mode == BlogMode.File)
         {

@@ -1,4 +1,6 @@
-﻿using Mostlylucid.Blog;
+﻿using Microsoft.EntityFrameworkCore;
+using Mostlylucid.Blog;
+using Mostlylucid.EntityFramework;
 
 public class BackgroundEFBlogUpdater(IServiceScopeFactory scopeFactory, ILogger<BackgroundEFBlogUpdater> logger)
     : IHostedService, IDisposable
@@ -6,15 +8,17 @@ public class BackgroundEFBlogUpdater(IServiceScopeFactory scopeFactory, ILogger<
     private Task _backgroundTask;
     private CancellationTokenSource _cancellationTokenSource = new();
 
-    public Task StartAsync(CancellationToken cancellationToken)
+    public  Task StartAsync(CancellationToken cancellationToken)
     {
+       
         logger.LogInformation("Starting EF Blog Updater");
 
         // Start the background task using the internal cancellation token source
         _backgroundTask = Task.Run(() => RunBackgroundTask(_cancellationTokenSource.Token))
                               .ContinueWith(OnTaskCompleted, cancellationToken);
 
-        return Task.CompletedTask; // Non-blocking service start
+        return Task.CompletedTask;
+        
     }
 
     private void OnTaskCompleted(Task task)
