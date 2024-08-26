@@ -18,7 +18,9 @@ public static class LanguageConverter
         { "uk", "Українська (Ukrainian)" },  // Ukrainian
         { "fi", "Suomi (Finnish)"  },  // Finnish
         { "sv", "Svenska (Swedish)" },  // Swedish
-        { "en", "English" }
+        { "en", "English" },
+        { "jap", "日本語 (Japanese)"},
+        {"el", " ελληνικά (Greek_"}
     };
     
     private static readonly Dictionary<string, string> LanguageLocaleMap = new Dictionary<string, string>
@@ -50,7 +52,9 @@ public static class LanguageConverter
         { "uk", "ukrainian" },  // Ukrainian
         { "fi", "finnish"  },  // Finnish
         { "sv", "swedish" },  // Swedish
-        { "en", "english" }
+        { "en", "english" },
+        {"jap", "japanese"},
+        {"el", "greek"}
     };
 
 
