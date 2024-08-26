@@ -3,15 +3,11 @@ export  function globalSetup() {
     const darkStylesheet = document.getElementById('dark-mode');
     const simpleMdeDarkStylesheet = document.getElementById('simplemde-dark');
     const simpleMdeLightStylesheet = document.getElementById('simplemde-light');
-
-
     return {
         isMobileMenuOpen: false,
         isDarkMode: false,
-
         // Function to initialize the theme based on localStorage or system preference
         themeInit() {
-   
             if (
                 localStorage.theme === "dark" ||
                 (!("theme" in localStorage) &&
@@ -67,8 +63,5 @@ export  function globalSetup() {
                 simpleMdeDarkStylesheet.disabled = true;
             }
         }
-      
     };
-
- 
 }
