@@ -147,18 +147,21 @@ namespace Microsoft.Extensions.Hosting
 
 El enfoque de interfaz puede ser más simple dependiendo de su escenario. Aquí añadirías una interfaz que hereda de `IHostedService` y luego añadir un método a esa interfaz que se puede llamar desde el controlador.
 
+**NOTA: Usted todavía necesita agregarlo como un HostedService en ASP.NET para que el servicio se ejecute realmente.**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
 
 Todo lo que necesitamos hacer es registrar esto como un singleton y luego usar esto en nuestro controlador.
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 ASP.NET verá que esta tiene la interfaz correcta decorada y usará este registro para ejecutar el `IHostedService`.
@@ -178,4 +181,4 @@ Así que como ves aquí primero registro mi `IHostedService` (o `IHostedLifeCycl
 
 ## Conclusión
 
-Como siempre hay un par de maneras de despellejar a un gato. El enfoque de interfaz es probablemente la manera más fácil de asegurar que su `IHostedService` es una sola instancia. Pero el método de fábrica enfoque también es una buena manera de asegurar que su servicio es una sola instancia. Depende de ti qué enfoque tomes. Espero que este artículo le haya ayudado a entender cómo asegurarse de que su `IHostedService` es una sola instancia.
+Como siempre hay un par de maneras de despellejar a un gato.  El método de fábrica es también una buena manera de asegurar que su servicio es una sola instancia. Depende de ti qué enfoque tomes. Espero que este artículo le haya ayudado a entender cómo asegurarse de que su `IHostedService` es una sola instancia.

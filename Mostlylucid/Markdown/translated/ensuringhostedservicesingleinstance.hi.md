@@ -147,18 +147,21 @@ namespace Microsoft.Extensions.Hosting
 
 इस बारे में सही - सही जानकारी आपके हालात पर निर्भर कर सकती है । यहाँ पर आप से विरासत में जो इंटरफेस जोड़ते हैं वह भी जोड़ते हैं `IHostedService` और फिर उस इंटरफेस के लिए एक विधि जोड़िए जो आप अपने नियंत्रण से कॉल कर सकते हैं।
 
+**ध्यान दीजिए: आपको अभी भी इसे किसी खास सेवा के रूप में जोड़ने की ज़रूरत है ।**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
 
 तो हमें सब की जरूरत है यह एक टन के रूप में रजिस्टर है और फिर इसे हमारे नियंत्रण में इस्तेमाल करते हैं।
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 एनईएसई.NT यह देखने के लिए कि इसके पास सही इंटरफेस है और इस पंजीकरण का उपयोग इस पंजीकरण को चलाने के लिए करेगा `IHostedService`.
@@ -178,4 +181,4 @@ namespace Microsoft.Extensions.Hosting
 
 ## ऑन्टियम
 
-हमेशा के रूप में वहाँ एक बिल्ली को त्वचा के लिए कुछ तरीके है. इंटरफेस का तरीका शायद सबसे आसान तरीका है, जिससे आप यह तय कर सकते हैं `IHostedService` एक ही उदाहरण है । लेकिन फैक्टरी का तरीक़ा यह निश्‍चित करने का भी एक अच्छा तरीक़ा है कि आपकी सेवा एक ही उदाहरण है । यह आप के पास ले जा रहा है कि आप के लिए ऊपर है. मुझे आशा है कि इस लेख ने आपको यह समझने में मदद दी है कि आपका कैसे भला होगा `IHostedService` एक ही उदाहरण है ।
+हमेशा के रूप में वहाँ एक बिल्ली को त्वचा के लिए कुछ तरीके है.  फैक्टरी का तरीक़ा यह भी है कि आपकी सेवा एक ही उदाहरण है । यह आप के पास ले जा रहा है कि आप के लिए ऊपर है. मुझे आशा है कि इस लेख ने आपको यह समझने में मदद दी है कि आपका कैसे भला होगा `IHostedService` एक ही उदाहरण है ।

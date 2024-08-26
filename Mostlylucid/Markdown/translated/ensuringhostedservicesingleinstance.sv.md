@@ -147,18 +147,21 @@ namespace Microsoft.Extensions.Hosting
 
 Gränssnittet kan vara enklare beroende på ditt scenario. Här skulle du lägga till ett gränssnitt som ärver från `IHostedService` och sedan lägga till en metod till det gränssnittet som du kan ringa från din controller.
 
+**OBS: Du behöver fortfarande lägga till det som en HostedService i ASP.NET för tjänsten att faktiskt köra.**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
 
 Allt vi sedan behöver göra är att registrera detta som en singleton och sedan använda detta i vår kontrollant.
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 ASP.NET kommer att se att detta har rätt gränssnitt dekorerade och kommer att använda denna registrering för att köra `IHostedService`.
@@ -178,4 +181,4 @@ Så som ni ser här registrerar jag först min `IHostedService` (eller `IHostedL
 
 ## Slutsatser
 
-Som vanligt finns det ett par sätt att flå en katt. Gränssnittet tillvägagångssätt är förmodligen det enklaste sättet att se till att din `IHostedService` är en enda instans. Men fabriksmetoden är också ett bra sätt att se till att din tjänst är en enda instans. Det är upp till dig vilket tillvägagångssätt du väljer. Jag hoppas att den här artikeln har hjälpt dig att förstå hur du kan se till att din `IHostedService` är en enda instans.
+Som vanligt finns det ett par sätt att flå en katt.  Fabrikens metod är också ett bra sätt att se till att din tjänst är en enda instans. Det är upp till dig vilket tillvägagångssätt du väljer. Jag hoppas att den här artikeln har hjälpt dig att förstå hur du kan se till att din `IHostedService` är en enda instans.

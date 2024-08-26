@@ -147,18 +147,21 @@ namespace Microsoft.Extensions.Hosting
 
 L'approche Interface pourrait être plus simple selon votre scénario. Ici vous ajouteriez une interface qui hérite de `IHostedService` puis ajouter une méthode à cette interface que vous pouvez appeler depuis votre contrôleur.
 
+**REMARQUE: Vous devez toujours l'ajouter en tant que service hébergé dans ASP.NET pour que le service fonctionne réellement.**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
 
 Tout ce dont nous avons besoin, c'est de l'enregistrer comme un simpleton, puis de l'utiliser dans notre contrôleur.
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 ASP.NET verra que cela a la bonne interface décorée et utilisera cette inscription pour exécuter le `IHostedService`.
@@ -178,4 +181,4 @@ Donc, comme vous le voyez ici, j'inscris d'abord mon `IHostedService` (ou `IHost
 
 ## En conclusion
 
-Comme d'habitude, il y a deux façons de peler un chat. L'approche d'interface est probablement la façon la plus facile de s'assurer que votre `IHostedService` est une seule instance. Mais l'approche de la méthode d'usine est aussi un bon moyen de s'assurer que votre service est une seule instance. C'est à vous de décider de l'approche que vous prenez. J'espère que cet article vous aidera à comprendre comment vous assurer que votre `IHostedService` est une seule instance.
+Comme d'habitude, il y a deux façons de peler un chat.  L'approche de la méthode d'usine est également un bon moyen de s'assurer que votre service est une seule instance. C'est à vous de décider de l'approche que vous prenez. J'espère que cet article vous aidera à comprendre comment vous assurer que votre `IHostedService` est une seule instance.

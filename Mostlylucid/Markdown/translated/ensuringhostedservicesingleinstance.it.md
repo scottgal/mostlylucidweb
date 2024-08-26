@@ -147,18 +147,21 @@ namespace Microsoft.Extensions.Hosting
 
 L'approccio Interface potrebbe essere più semplice a seconda dello scenario. Qui si aggiunge un'interfaccia che eredita da `IHostedService` e poi aggiungere un metodo a quell'interfaccia che è possibile chiamare dal vostro controller.
 
+**NOTA: È ancora necessario aggiungerlo come HostedService in ASP.NET per il servizio di eseguire effettivamente.**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
 
 Tutto quello che dobbiamo fare è registrarlo come singoloton e poi usarlo nel nostro controller.
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 ASP.NET vedrà che questo ha l'interfaccia corretta decorata e userà questa registrazione per eseguire il `IHostedService`.
@@ -178,4 +181,4 @@ Quindi, come vedete qui, prima registro il mio `IHostedService` (o `IHostedLifeC
 
 ## In conclusione
 
-Come al solito ci sono un paio di modi per scuoiare un gatto. L'approccio interfaccia è probabilmente il modo più semplice per garantire che il vostro `IHostedService` è un'unica istanza. Ma l'approccio metodo di fabbrica è anche un buon modo per garantire che il vostro servizio è una singola istanza. Dipende da te quale approccio scegliere. Spero che questo articolo vi ha aiutato a capire come garantire che il vostro `IHostedService` è un'unica istanza.
+Come al solito ci sono un paio di modi per scuoiare un gatto.  Il metodo di fabbrica approccio è anche un buon modo per garantire che il vostro servizio è una singola istanza. Dipende da te quale approccio scegliere. Spero che questo articolo vi ha aiutato a capire come garantire che il vostro `IHostedService` è un'unica istanza.

@@ -140,18 +140,21 @@ namespace Microsoft.Extensions.Hosting
 ### Interface Approach
 The Interface approach might be simpler depending on your scenario. Here you'd add an interface that inherits from `IHostedService` and then add a method to that interface that you can call from your controller.
 
+**NOTE: You still need to add it as a HostedService in ASP.NET for the service to actually run.**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
  
 All we then need do is register this as a singleton and then use this in our controller.
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 ASP.NET will see that this has the correct interface decorated and will use this registration to run the `IHostedService`.
@@ -171,4 +174,4 @@ So as you see here I first register my `IHostedService` (or `IHostedLifeCycleSer
 
 
 ## In Conclusion
-As usual there's a couple of ways to skin a cat. The interface approach is probably the easiest way to ensure that your `IHostedService` is a single instance. But the factory method approach is also a good way to ensure that your service is a single instance. It's up to you which approach you take. I hope this article has helped you understand how to ensure that your `IHostedService` is a single instance.
+As usual there's a couple of ways to skin a cat.  The factory method approach is also a good way to ensure that your service is a single instance. It's up to you which approach you take. I hope this article has helped you understand how to ensure that your `IHostedService` is a single instance.

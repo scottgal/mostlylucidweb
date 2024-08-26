@@ -147,18 +147,21 @@ namespace Microsoft.Extensions.Hosting
 
 接口方法可能比较简单 取决于您的情况。 在这里您会添加一个界面, 从此继承 `IHostedService` 然后在该界面中添加一个方法,您可以从控制器中调用该方法。
 
+**注意: 您仍然需要添加它作为 ASP. NET 中的托管服务, 以便服务实际运行 。**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
 
 我们只需要将它登记为单吨 然后在我们的控制器中使用它
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 ASP.NET 将看到此接口装饰正确, 并将使用此注册来运行 `IHostedService`.
@@ -178,4 +181,4 @@ ASP.NET 将看到此接口装饰正确, 并将使用此注册来运行 `IHostedS
 
 ## 在结论结论中
 
-和往常一样 有几种方法可以剥猫皮 接口法可能是最容易确保 `IHostedService` 是一个实例。 但是,工厂方法方法也是确保您的服务仅举一例的好办法。 由你决定你走哪条路 我希望这篇文章帮助你了解如何确保 `IHostedService` 是一个实例。
+和往常一样 有几种方法可以剥猫皮  工厂方法方法也是确保您服务仅举一例的好办法。 由你决定你走哪条路 我希望这篇文章帮助你了解如何确保 `IHostedService` 是一个实例。

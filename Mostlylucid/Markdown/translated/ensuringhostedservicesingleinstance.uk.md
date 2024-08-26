@@ -147,18 +147,21 @@ namespace Microsoft.Extensions.Hosting
 
 Доступ до інтерфейсу може бути простішим, залежно від вашого сценарію. Тут ви можете додати інтерфейс, від якого успадковується інтерфейс `IHostedService` а потім додайте метод до інтерфейсу, який ви можете викликати від контролера.
 
+**ЗАУВАЖЕННЯ: Вам все ще потрібно додати його як службу HhostedService в ASP.NET, щоб службу було запущено.**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
 
 Все, что нам нужно, это зарегистрировать это в одиночестве, а потом использовать это в инспекторе.
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 ASP.NET побачить, що це має правильний інтерфейс і буде використовувати цю реєстрацію для запуску `IHostedService`.
@@ -178,4 +181,4 @@ ASP.NET побачить, що це має правильний інтерфей
 
 ## Включення
 
-Як завжди, є декілька способів обдерти кішку. Доступ до інтерфейсу, ймовірно, є найпростішим способом переконатися, що ви `IHostedService` є одним прикладом. Але підхід до роботи на заводі - це також хороший спосіб переконатися, що ваша послуга - це єдиний екземпляр. Це залежить від вас, який підхід ви виберете. Надіюсь, що ця стаття допомогла вам зрозуміти, як запевнити вас у цьому. `IHostedService` є одним прикладом.
+Як завжди, є декілька способів обдерти кішку.  Підходь до методів фабрики - це також добрий спосіб переконатися, що ваша послуга - це єдиний екземпляр. Це залежить від вас, який підхід ви виберете. Надіюсь, що ця стаття допомогла вам зрозуміти, як запевнити вас у цьому. `IHostedService` є одним прикладом.

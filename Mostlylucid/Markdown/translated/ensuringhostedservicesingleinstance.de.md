@@ -147,18 +147,21 @@ namespace Microsoft.Extensions.Hosting
 
 Der Interface-Ansatz könnte je nach Szenario einfacher sein. Hier würden Sie eine Schnittstelle hinzufügen, die von erbt `IHostedService` und fügen Sie dann eine Methode zu dieser Schnittstelle hinzu, die Sie von Ihrem Controller aufrufen können.
 
+**HINWEIS: Sie müssen es noch als HostedService in ASP.NET hinzufügen, damit der Dienst tatsächlich ausgeführt wird.**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
 
 Alles was wir dann tun müssen, ist dies als Singleton zu registrieren und dann in unserem Controller zu verwenden.
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 ASP.NET wird sehen, dass dies die richtige Schnittstelle dekoriert hat und wird diese Registrierung verwenden, um die `IHostedService`.
@@ -178,4 +181,4 @@ So wie Sie hier sehen, registriere ich zuerst meine `IHostedService` (oder `IHos
 
 ## Schlussfolgerung
 
-Wie immer gibt es ein paar Möglichkeiten, eine Katze zu häuten. Die Schnittstelle Ansatz ist wahrscheinlich der einfachste Weg, um sicherzustellen, dass Ihre `IHostedService` ist eine einzige Instanz. Aber die Fabrik Methode Ansatz ist auch ein guter Weg, um sicherzustellen, dass Ihr Service ist eine einzige Instanz. Es liegt an Ihnen, welche Annäherung Sie nehmen. Ich hoffe, dieser Artikel hat Ihnen geholfen zu verstehen, wie Sie sicherstellen, dass Ihre `IHostedService` ist eine einzige Instanz.
+Wie immer gibt es ein paar Möglichkeiten, eine Katze zu häuten.  Der Ansatz der Fabrikmethode ist auch ein guter Weg, um sicherzustellen, dass Ihr Service eine einzige Instanz ist. Es liegt an Ihnen, welche Annäherung Sie nehmen. Ich hoffe, dieser Artikel hat Ihnen geholfen zu verstehen, wie Sie sicherstellen, dass Ihre `IHostedService` ist eine einzige Instanz.

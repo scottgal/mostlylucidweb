@@ -147,18 +147,21 @@ namespace Microsoft.Extensions.Hosting
 
 De Interface-benadering kan eenvoudiger zijn afhankelijk van uw scenario. Hier voeg je een interface toe die erft van `IHostedService` en voeg dan een methode toe aan die interface die je vanuit je controller kunt bellen.
 
+**OPMERKING: U moet het nog steeds toevoegen als een HostedService in ASP.NET om de service daadwerkelijk uit te voeren.**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
 
 Alles wat we dan hoeven te doen is dit registreren als een singleton en dan gebruik maken van dit in onze controller.
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 ASP.NET zal zien dat dit de juiste interface gedecoreerd heeft en zal deze registratie gebruiken om de `IHostedService`.
@@ -178,4 +181,4 @@ Dus zoals je hier ziet, registreer ik eerst mijn `IHostedService` (of `IHostedLi
 
 ## Conclusie
 
-Zoals gewoonlijk zijn er een paar manieren om een kat te villen. De interface benadering is waarschijnlijk de gemakkelijkste manier om ervoor te zorgen dat uw `IHostedService` is een enkele instantie. Maar de fabriek methode aanpak is ook een goede manier om ervoor te zorgen dat uw service is een enkele instantie. Het is aan jou welke benadering je neemt. Ik hoop dat dit artikel u heeft geholpen te begrijpen hoe ervoor te zorgen dat uw `IHostedService` is een enkele instantie.
+Zoals gewoonlijk zijn er een paar manieren om een kat te villen.  De fabriek methode aanpak is ook een goede manier om ervoor te zorgen dat uw service is een enkele instantie. Het is aan jou welke benadering je neemt. Ik hoop dat dit artikel u heeft geholpen te begrijpen hoe ervoor te zorgen dat uw `IHostedService` is een enkele instantie.

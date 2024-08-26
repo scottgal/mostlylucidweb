@@ -147,18 +147,21 @@ namespace Microsoft.Extensions.Hosting
 
 Liitännäislähestymistapa voi olla yksinkertaisempi skenaariostasi riippuen. Tähän lisättäisiin rajapinta, joka periytyy `IHostedService` ja lisää sitten rajapintaan menetelmä, jonka voit soittaa ohjaimesta.
 
+**HUOMAUTUS: Sinun täytyy vielä lisätä se HostedServiceksi ASP.NETissä, jotta palvelu todella toimii.**
+
 ```csharp
-    public interface IEmailSenderHostedService : IHostedService
+    public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-        void Dispose();
     }
 ```
 
 Sitten meidän tarvitsee vain rekisteröidä tämä singletoniksi ja sitten käyttää tätä ohjaimessamme.
 
 ```csharp
-        services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+             services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
+        services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
+        
 ```
 
 ASP.NET näkee, että tämä on oikea rajapinta koristeltu ja käyttää tätä rekisteröintiä ajaa `IHostedService`.
@@ -178,4 +181,4 @@ Kuten näette täällä, rekisteröin ensin omani. `IHostedService` (tai `IHoste
 
 ## Johtopäätöksenä
 
-Kuten tavallista, kissan voi nylkeä parilla tavalla. Liitäntä on luultavasti helpoin tapa varmistaa, että `IHostedService` Se on yksittäinen tapaus. Tehdasmenetelmä on kuitenkin myös hyvä tapa varmistaa, että palvelusi on yhtä ainoaa. Se on sinusta kiinni, minkä lähestymistavan valitset. Toivon, että tämä artikkeli on auttanut sinua ymmärtämään, miten varmistaa, että `IHostedService` Se on yksittäinen tapaus.
+Kuten tavallista, kissan voi nylkeä parilla tavalla.  Tehdasmenetelmä on myös hyvä tapa varmistaa, että palvelusi on yhtä ainoaa. Se on sinusta kiinni, minkä lähestymistavan valitset. Toivon, että tämä artikkeli on auttanut sinua ymmärtämään, miten varmistaa, että `IHostedService` Se on yksittäinen tapaus.
