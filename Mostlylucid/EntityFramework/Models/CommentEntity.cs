@@ -32,6 +32,7 @@ public class CommentEntity
     
     public BlogPostEntity Post { get; set; }
 
+    [Column("parent_comment_id")]
     public int? ParentCommentId { get; set; }
     public CommentEntity ParentComment { get; set; } 
     

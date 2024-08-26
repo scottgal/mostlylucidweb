@@ -183,7 +183,8 @@ namespace Mostlylucid.Migrations
                         .HasColumnName("html_content");
 
                     b.Property<int?>("ParentCommentId")
-                        .HasColumnType("integer");
+                        .HasColumnType("integer")
+                        .HasColumnName("parent_comment_id");
 
                     b.Property<int>("PostId")
                         .HasColumnType("integer")
