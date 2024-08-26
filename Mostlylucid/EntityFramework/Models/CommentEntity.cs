@@ -3,30 +3,30 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Mostlylucid.EntityFramework.Models;
 
-[Table("comments")]
+
 public class CommentEntity
 {
     [Key]
-    [Column("id")]
+ 
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int Id { get; set; }
     
-    [Column("status")]
+  
     public CommentStatus Status { get; set; } = CommentStatus.Pending;
     
-    [Column("author")]
+
     public string Author { get; set; }
     
-    [Column("html_content")]
+
     public string? HtmlContent { get; set; }
     
-    [Column("content")]
+
     public string Content { get; set; }
     
-    [Column("created_at")]
+  
     public DateTime CreatedAt { get; set; }
 
-    [Column("post_id")]
+
     // Foreign key for the post this comment belongs to
     public int PostId { get; set; }
     

@@ -41,7 +41,7 @@ public class MostlylucidDbContext : DbContext, IMostlylucidDBContext
             
             
             entity.Property(b => b.SearchVector)
-                .HasComputedColumnSql("to_tsvector('english', coalesce(title, '') || ' ' || coalesce(plain_text_content, ''))", stored: true);
+                .HasComputedColumnSql("to_tsvector('english', coalesce(\"Title\", '') || ' ' || coalesce(\"PlainTextContent\", ''))", stored: true);
             
            entity.HasIndex(b => b.SearchVector)
                 .HasMethod("GIN");
