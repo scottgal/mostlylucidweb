@@ -5,12 +5,14 @@ using Mostlylucid.Blog;
 using Mostlylucid.EntityFramework;
 using Mostlylucid.OpenSearch;
 using NpgsqlTypes;
+using Umami.Net;
+using Umami.Net.Models;
 
 namespace Mostlylucid.API;
 
 [ApiController]
 [Route("api")]
-public class SearchApi(IMostlylucidDBContext context, SearchService indexService) : ControllerBase
+public class SearchApi(IMostlylucidDBContext context,UmamiClient umamiClient, SearchService indexService) : ControllerBase
 {
     [HttpGet]
     [Route("osearch/{query}")]
@@ -38,6 +40,9 @@ public class SearchApi(IMostlylucidDBContext context, SearchService indexService
         {
             posts = await GetSearchResultForQuery(query);
         }
+        var encodedQuery = System.Web.HttpUtility.UrlEncode(query);
+        
+       await  umamiClient.Send(new UmamiPayload(){ Url = "api/search/" + encodedQuery, Name = "searchEvent"}, new UmamiEventData(){{"query", encodedQuery}});
 
         var host = Request.Host.Value;
         var output = posts.Select(x => new SearchResults(x.Title.Trim(), x.Slug, @Url.ActionLink("Show", "Blog", new{ x.Slug}, protocol:"https", host:host) )).ToList();

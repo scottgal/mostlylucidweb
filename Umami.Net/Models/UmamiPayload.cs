@@ -6,14 +6,14 @@ using System.Collections.Generic;
 
 public class UmamiPayload
 {
-    public string Website { get; set; }=string.Empty;
-    public string Hostname { get; set; }=string.Empty;
-    public string Language { get; set; }=string.Empty;
-    public string Referrer { get; set; }=string.Empty;
-    public string Screen { get; set; }=string.Empty;
-    public string Title { get; set; }   =string.Empty;
-    public string Url { get; set; } =string.Empty;
-    public string Name { get; set; } =string.Empty;
+    public  string Website { get; set; }
+    public string? Hostname { get; set; }
+    public string? Language { get; set; }
+    public string? Referrer { get; set; }
+    public string? Screen { get; set; }
+    public string? Title { get; set; }
+    public string? Url { get; set; }
+    public string? Name { get; set; }
     public UmamiEventData? Data { get; set; }
 }
 
