@@ -180,7 +180,7 @@ This is the file that contains the code for switching the themes for Mermaid.
                     count = els.length;
                 if(!els || count ===0 ) resolve ();
                 els.forEach(element => {
-                    element.setAttribute('data-original-code', element.textContent)
+                    element.setAttribute('data-original-code',encodeURIComponent( element.textContent));
                     count--
                     if(count == 0){
                         resolve()
@@ -200,7 +200,7 @@ This is the file that contains the code for switching the themes for Mermaid.
                 els.forEach(element => {
                     if(element.getAttribute('data-original-code') != null){
                         element.removeAttribute('data-processed')
-                        element.textContent = element.getAttribute('data-original-code')
+                        element.textContent =decodeURIComponent( element.getAttribute('data-original-code'));
                     }
                     count--
                     if(count == 0){
@@ -214,14 +214,14 @@ This is the file that contains the code for switching the themes for Mermaid.
     }
 
     const init = ()=>{
-     
+
         saveOriginalData()
             .catch( console.error )
         document.body.addEventListener('dark-theme-set', ()=>{
             resetProcessed()
                 .then(() =>{
                     loadMermaid('dark');
-                console.log("dark theme set")})
+                    console.log("dark theme set")})
                 .catch(console.error)
         })
         document.body.addEventListener('light-theme-set', ()=>{
@@ -231,14 +231,14 @@ This is the file that contains the code for switching the themes for Mermaid.
                     console.log("dark theme set")})
                 .catch(console.error)
         })
-         let isDarkMode = localStorage.theme === 'dark';
+        let isDarkMode = localStorage.theme === 'dark';
         if(isDarkMode) {
             loadMermaid('dark');
-         }
-         else{
-             loadMermaid('default')
-         }
-        
+        }
+        else{
+            loadMermaid('default')
+        }
+
     }
     window.initMermaid = init
 })(window);
@@ -274,7 +274,7 @@ You'll see this just sets up a Promise that loops through all the elements and s
                     count = els.length;
                 if(!els || count ===0 ) resolve ();
                 els.forEach(element => {
-                    element.setAttribute('data-original-code', element.textContent)
+                    element.setAttribute('data-original-code',encodeURIComponent(element.textContent))
                     count--
                     if(count == 0){
                         resolve()
@@ -287,6 +287,7 @@ You'll see this just sets up a Promise that loops through all the elements and s
     }
 ```
 `resetProcessed` is the same except in reverse where it takes the markup from the `data-original-code` attribute and sets it back to the element.
+Note it also `encodeURIComponent` the value as I foud that some strings weren't being stored correctly.
 
 
 ### Init

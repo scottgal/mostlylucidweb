@@ -13,7 +13,7 @@
                     count = els.length;
                 if(!els || count ===0 ) resolve ();
                 els.forEach(element => {
-                    element.setAttribute('data-original-code', element.textContent)
+                    element.setAttribute('data-original-code',encodeURIComponent( element.textContent));
                     count--
                     if(count == 0){
                         resolve()
@@ -33,7 +33,7 @@
                 els.forEach(element => {
                     if(element.getAttribute('data-original-code') != null){
                         element.removeAttribute('data-processed')
-                        element.textContent = element.getAttribute('data-original-code')
+                        element.textContent =decodeURIComponent( element.getAttribute('data-original-code'));
                     }
                     count--
                     if(count == 0){
