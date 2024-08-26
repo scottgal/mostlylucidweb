@@ -4,12 +4,14 @@ export  function globalSetup() {
     const simpleMdeDarkStylesheet = document.getElementById('simplemde-dark');
     const simpleMdeLightStylesheet = document.getElementById('simplemde-light');
 
+
     return {
         isMobileMenuOpen: false,
         isDarkMode: false,
 
         // Function to initialize the theme based on localStorage or system preference
         themeInit() {
+   
             if (
                 localStorage.theme === "dark" ||
                 (!("theme" in localStorage) &&
@@ -19,9 +21,10 @@ export  function globalSetup() {
                 document.documentElement.classList.add("dark");
                 document.documentElement.classList.remove("light");
                 this.isDarkMode = true;
+              
                 this.applyTheme(); // Apply dark theme stylesheets
             } else {
-                localStorage.theme = "light";
+                localStorage.theme = "base";
                 document.documentElement.classList.remove("dark");
                 document.documentElement.classList.add("light");
                 this.isDarkMode = false;
@@ -33,11 +36,13 @@ export  function globalSetup() {
         themeSwitch() {
             if (localStorage.theme === "dark") {
                 localStorage.theme = "light";
+                document.body.dispatchEvent(new CustomEvent('light-theme-set'));
                 document.documentElement.classList.remove("dark");
                 document.documentElement.classList.add("light");
                 this.isDarkMode = false;
             } else {
                 localStorage.theme = "dark";
+                document.body.dispatchEvent(new CustomEvent('dark-theme-set'));
                 document.documentElement.classList.add("dark");
                 document.documentElement.classList.remove("light");
                 this.isDarkMode = true;
@@ -47,6 +52,7 @@ export  function globalSetup() {
 
         // Function to apply the appropriate stylesheets based on isDarkMode
         applyTheme() {
+         
             if (this.isDarkMode) {
                 // Enable dark mode stylesheets
                 lightStylesheet.disabled = true;
@@ -60,6 +66,9 @@ export  function globalSetup() {
                 simpleMdeLightStylesheet.disabled = false;
                 simpleMdeDarkStylesheet.disabled = true;
             }
-        },
+        }
+      
     };
+
+ 
 }

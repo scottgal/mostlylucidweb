@@ -6,6 +6,7 @@ import {simplemde} from  "./simplemde";
 import {setup, setValues} from "./comments";
 import {globalSetup} from "./global";
 window.globalSetup = globalSetup;
+import "./mdeswitch";
 window.mostlylucid = {};
 window.mostlylucid.typeahead = typeahead;
 window.mostlylucid.translations = {};
@@ -31,28 +32,27 @@ function setLogoutLink() {
         logoutLink.href = baseUrl + '?returnUrl=' + encodeURIComponent(currentUrl);
     }
 }
+
 let googleSignInInitialized = false;
-window.onload= function () {
-    console.log('Window loaded');
+addEventListener("DOMContentLoaded", () => {
     // Google Sign-In Initialization
     if (!googleSignInInitialized) {
        initGoogleSignIn();
         googleSignInInitialized = true;  // Set the flag to true after initialization
     }
 
+    window.initMermaid();
     // Highlight.js Initialization
     hljs.highlightAll();
-    
-        mermaid.initialize({ startOnLoad: true });
     updateMetaUrls();
 
-}
+});
 document.body.addEventListener('htmx:afterSwap', function(evt) {
     console.log('HTMX afterSwap triggered', evt);
 
     if (evt.detail.target.id !== 'contentcontainer') return;
+    window.initMermaid();
     hljs.highlightAll();
-
     const url = evt.detail.pathInfo.requestPath;
 
     if (typeof umami !== 'undefined' && url) {
@@ -62,8 +62,7 @@ document.body.addEventListener('htmx:afterSwap', function(evt) {
         console.log('umami is not defined');
     }
     updateMetaUrls();
-    initGoogleSignIn();
-    mermaid.run();
+    //initGoogleSignIn();
     setLogoutLink();
 });
 
