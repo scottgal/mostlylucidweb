@@ -48,6 +48,8 @@
 
     const init = ()=>{
      
+        let mermaidElements = document.querySelectorAll(elementCode);
+        if(mermaidElements.length === 0) return;
         saveOriginalData()
             .catch( console.error )
         document.body.addEventListener('dark-theme-set', ()=>{

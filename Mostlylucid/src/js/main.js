@@ -40,26 +40,28 @@ addEventListener("DOMContentLoaded", () => {
        initGoogleSignIn();
         googleSignInInitialized = true;  // Set the flag to true after initialization
     }
-
-    window.initMermaid();
-    // Highlight.js Initialization
     hljs.highlightAll();
+    try {
+        window.initMermaid();
+    }
+    catch (e) {
+        console.error('Failed to initialize Mermaid:', e);
+    }
+    
+    // Highlight.js Initialization
     updateMetaUrls();
 
 });
 document.body.addEventListener('htmx:afterSwap', function(evt) {
     console.log('HTMX afterSwap triggered', evt);
 
-    if (evt.detail.target.id !== 'contentcontainer') return;
-    window.initMermaid();
+    if (evt.detail.target.id !== 'contentcontainer') return
     hljs.highlightAll();
-    const url = evt.detail.pathInfo.requestPath;
-
-    if (typeof umami !== 'undefined' && url) {
-        console.log('Tracking page view with Umami', url);
-        umami.track(props => ({ ...props, url:url }));
-    } else {
-        console.log('umami is not defined');
+    try {
+        window.initMermaid();
+    }
+    catch (e) {
+        console.error('Failed to initialize Mermaid:', e);
     }
     updateMetaUrls();
     //initGoogleSignIn();

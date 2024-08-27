@@ -17,15 +17,14 @@ export  function globalSetup() {
                 document.documentElement.classList.add("dark");
                 document.documentElement.classList.remove("light");
                 this.isDarkMode = true;
-              
-                this.applyTheme(); // Apply dark theme stylesheets
             } else {
                 localStorage.theme = "base";
                 document.documentElement.classList.remove("dark");
                 document.documentElement.classList.add("light");
                 this.isDarkMode = false;
-                this.applyTheme(); // Apply light theme stylesheets
+                // Apply light theme stylesheets
             }
+            this.applyTheme();
         },
 
         // Function to switch the theme and update the stylesheets accordingly
