@@ -20,7 +20,7 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory,  UmamiClie
     {
         await using var scope = scopeFactory.CreateAsyncScope(); 
         var payloadService = scope.ServiceProvider.GetRequiredService<PayloadService>();
-        var sendPayload = payloadService.PopulateFromPayload(settings.WebsiteId, payload, eventData);
+        var sendPayload = payloadService.PopulateFromPayload( payload, eventData);
         sendPayload.Url = url;
         sendPayload.Title = title;
         await _channel.Writer.WriteAsync(new SendBackgroundPayload("event", sendPayload));
@@ -32,7 +32,7 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory,  UmamiClie
     {
         await using var scope = scopeFactory.CreateAsyncScope(); 
         var payloadService = scope.ServiceProvider.GetRequiredService<PayloadService>();
-        var sendPayload = payloadService.PopulateFromPayload(settings.WebsiteId, payload, eventData);
+        var sendPayload = payloadService.PopulateFromPayload( payload, eventData);
         await _channel.Writer.WriteAsync(new SendBackgroundPayload(eventType, sendPayload));
         logger.LogInformation("Umami background event sent");
     }

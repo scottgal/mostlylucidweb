@@ -1,13 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Umami.Net.Config;
 using Umami.Net.Models;
 
 namespace Umami.Net;
 
-public class PayloadService(IHttpContextAccessor httpContextAccessor)
+public class PayloadService(IHttpContextAccessor httpContextAccessor, UmamiClientSettings settings)
 {
-    public  UmamiPayload PopulateFromPayload(string website, UmamiPayload? payload, UmamiEventData? data)
+    public  UmamiPayload PopulateFromPayload( UmamiPayload? payload, UmamiEventData? data)
     {
-        var newPayload = GetPayload(website, data: data);
+        var newPayload = GetPayload(data: data);
 
         if (payload == null) return newPayload;
 
@@ -38,17 +39,17 @@ public class PayloadService(IHttpContextAccessor httpContextAccessor)
         return newPayload;
     }
 
-    public  UmamiPayload GetPayload(string websiteId, string? url = null, UmamiEventData? data = null)
+    public  UmamiPayload GetPayload(string? url = null, UmamiEventData? data = null)
     {
         var httpContext = httpContextAccessor.HttpContext;
         var request = httpContext?.Request;
 
         var payload = new UmamiPayload
         {
-            Website = websiteId,
+            Website = settings.WebsiteId,
             Data = data,
-            Url = url ?? string.Empty,
-           IpAddress = httpContext?.Connection?.RemoteIpAddress?.ToString(),
+            Url = url ?? httpContext?.Request?.Path.Value,
+            IpAddress = httpContext?.Connection?.RemoteIpAddress?.ToString(),
             UserAgent = request?.Headers["User-Agent"].FirstOrDefault(),
             Referrer = request?.Headers["Referer"].FirstOrDefault(),
            Hostname = request?.Host.Host,

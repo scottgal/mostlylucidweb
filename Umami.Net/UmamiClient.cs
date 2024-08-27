@@ -12,7 +12,6 @@ namespace Umami.Net
    public class UmamiClient(
        HttpClient client,
        PayloadService payloadService,
-
        ILogger<UmamiClient> logger,
        UmamiClientSettings settings)
    {
@@ -24,15 +23,9 @@ namespace Umami.Net
         WriteIndented = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
-
-
-
-
-   
         public async Task<HttpResponseMessage> Send(UmamiPayload? payload=null, UmamiEventData? eventData =null,  string type = "event")
         {
-            var websiteId = settings.WebsiteId;
-             payload = payloadService.PopulateFromPayload(websiteId, payload, eventData);
+             payload = payloadService.PopulateFromPayload( payload, eventData);
             
             var jsonPayload = new { type, payload };
             logger.LogInformation("Sending data to Umami: {Payload}", JsonSerializer.Serialize(jsonPayload, options));
@@ -55,7 +48,7 @@ namespace Umami.Net
 
         public async Task<HttpResponseMessage> TrackPageView(string? url = "", string? title = "", UmamiPayload? payload = null, UmamiEventData? eventData = null)
         {
-            var sendPayload = payloadService.PopulateFromPayload(settings.WebsiteId, payload, eventData);
+            var sendPayload = payloadService.PopulateFromPayload(payload, eventData);
             sendPayload.Url = url;
             sendPayload.Title = title;
             return await Send(sendPayload);
