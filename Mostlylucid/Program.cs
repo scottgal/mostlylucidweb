@@ -12,12 +12,16 @@ using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umami.Net;
-using Umami.Net.Config;
-using Umami.Net.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 builder.Host.UseSerilog((context, configuration) =>
-    configuration.ReadFrom.Configuration(context.Configuration));
+{
+    configuration.ReadFrom.Configuration(context.Configuration);
+    Serilog.Debugging.SelfLog.Enable(Console.Error);
+    Console.WriteLine($"Serilog Minimum Level: {configuration.MinimumLevel.ToString()}");
+});
 
 var config = builder.Configuration;
 builder.Configuration.AddEnvironmentVariables();
