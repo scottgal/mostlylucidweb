@@ -27,7 +27,7 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, UmamiClien
     public Task StartAsync(CancellationToken cancellationToken)
     {
 
-        _sendTask = DeliverAsync(_cancellationTokenSource.Token);
+        _sendTask = SendRequest(_cancellationTokenSource.Token);
         return Task.CompletedTask;
     }
 
@@ -52,7 +52,7 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, UmamiClien
         }
     
 
-    private async Task DeliverAsync(CancellationToken token)
+    private async Task SendRequest(CancellationToken token)
     {
         logger.LogInformation("Umami background delivery started");
 

@@ -6,7 +6,6 @@ namespace Mostlylucid.Email
     public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
         Task SendEmailAsync(BaseEmailModel message);
-      
     }
 
     public class EmailSenderHostedService(EmailService emailService, ILogger<EmailSenderHostedService> logger)
@@ -45,36 +44,44 @@ namespace Mostlylucid.Email
         {
             logger.LogInformation("E-mail background delivery started");
 
-            while (!token.IsCancellationRequested)
+            try
             {
-                BaseEmailModel? message = null;
-                try
+                while (await _mailMessages.Reader.WaitToReadAsync(token))
                 {
-                    message = await _mailMessages.Reader.ReadAsync(token);
-                    switch (message)
+                    BaseEmailModel? message = null;
+                    try
                     {
-                        case ContactEmailModel contactEmailModel:
-                            await emailService.SendContactEmail(contactEmailModel);
-                            break;
-                        case CommentEmailModel commentEmailModel:
-                            await emailService.SendCommentEmail(commentEmailModel);
-                            break;
+                        message = await _mailMessages.Reader.ReadAsync(token);
+                        switch (message)
+                        {
+                            case ContactEmailModel contactEmailModel:
+                                await emailService.SendContactEmail(contactEmailModel);
+                                break;
+                            case CommentEmailModel commentEmailModel:
+                                await emailService.SendCommentEmail(commentEmailModel);
+                                break;
+                        }
+
+                        logger.LogInformation("Email from {SenderEmail} sent", message.SenderEmail);
                     }
-                    logger.LogInformation("Email from {SenderEmail} sent", message.SenderEmail);
-                }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
-                catch (Exception exc)
-                {
-                    logger.LogError(exc, "Couldn't send an e-mail from {SenderEmail}", message?.SenderEmail);
-                    await Task.Delay(1000, token); // Delay and respect the cancellation token
-                    if (message != null)
+                    catch (OperationCanceledException)
                     {
-                        await _mailMessages.Writer.WriteAsync(message, token);
+                        break;
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, "Couldn't send an e-mail from {SenderEmail}", message?.SenderEmail);
+                        await Task.Delay(1000, token); // Delay and respect the cancellation token
+                        if (message != null)
+                        {
+                            await _mailMessages.Writer.WriteAsync(message, token);
+                        }
                     }
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                logger.LogWarning("E-mail background delivery canceled");
             }
 
             logger.LogInformation("E-mail background delivery stopped");
