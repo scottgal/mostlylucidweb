@@ -9,6 +9,8 @@ In een vorige post hebben we een klant toegevoegd voor het ophalen [Umami-analys
 [Umami](https://umami.is/) is een lichtgewicht analytics service die zelf gehost kan worden. Het is een geweldig alternatief voor Google Analytics en is privacygericht.
 Maar standaard heeft het alleen een Knooppunt client voor het bijhouden van gegevens (en zelfs dan is het niet geweldig). Dus besloot ik een C# client te schrijven voor het volgen van data.
 
+### <span style="color:red"> **OPMERKING Ik bijgewerkt dit zojuist, Ik zal update de blog post later - Net nu 26/08/2024**  </span>
+
 [TOC]
 
 ## Vereisten
@@ -239,4 +241,11 @@ Het hangt af van een nuget locatie genaamd 'local' die wordt gedefinieerd in de 
 
 ## Conclusie
 
-In de toekomst ben ik van plan om dit een NuGet pa te maken
+In de toekomst ben ik van plan om dit een NuGet pakket te maken.
+Ik gebruik dit nu in de blog, bijvoorbeeld om bij te houden hoe lang vertalingen duren
+
+```csharp
+        var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (translationTask == null) return TypedResults.BadRequest("Task not found");
+        await  umamiClient.Send(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
+```

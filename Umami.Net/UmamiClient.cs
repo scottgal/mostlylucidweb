@@ -11,6 +11,7 @@ namespace Umami.Net
 {
     public class UmamiClient(
         HttpClient client,
+        UmamiBackgroundSender backgroundSender,
         ILogger<UmamiClient> logger,
         UmamiClientSettings settings)
     {
@@ -21,9 +22,9 @@ namespace Umami.Net
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
         };
 
-        private UmamiPayload PopulateFromPayload(UmamiPayload? payload, UmamiEventData? data)
+        public static UmamiPayload PopulateFromPayload(string webSite, UmamiPayload? payload, UmamiEventData? data)
         {
-            var newPayload = GetPayload(data: data);
+            var newPayload = GetPayload(webSite, data: data);
             
             if(payload==null) return newPayload;
             if(payload.Hostname != null)
@@ -56,11 +57,11 @@ namespace Umami.Net
             
         }
         
-        private UmamiPayload GetPayload(string? url = null, UmamiEventData? data = null)
+        private static UmamiPayload GetPayload(string websiteId, string? url = null, UmamiEventData? data = null)
         {
             var payload = new UmamiPayload
             {
-                Website = settings.WebsiteId,
+            Website = websiteId,
                 Data = data,
                 Url = url ?? string.Empty
             };
@@ -69,9 +70,11 @@ namespace Umami.Net
             return payload;
         }
 
+   
         public async Task<HttpResponseMessage> Send(UmamiPayload? payload=null, UmamiEventData? eventData =null,  string type = "event")
         {
-             payload = PopulateFromPayload(payload, eventData);
+            var websiteId = settings.WebsiteId;
+             payload = PopulateFromPayload(websiteId, payload, eventData);
             
             var jsonPayload = new { type, payload };
             logger.LogInformation("Sending data to Umami: {Payload}", JsonSerializer.Serialize(jsonPayload, options));

@@ -9,6 +9,8 @@
 [ما قبل ما ما قبل ما ما قبل](https://umami.is/) هو خدمة تحليلية خفيفة الوزن والتي يمكن أن تكون ذاتية الإستضافة. إنها بديل عظيم لـ "جوجل" للتحليلات، وهي تركز على الخصوصية.
 على أي حال من الناحية الإفتراضية لديها فقط عقدة عميل لتتبع البيانات (وحتى بعد ذلك فإنه ليس كبيرا). لذا قررت أن أكتب عميل C# لتعقب البيانات.
 
+### <span style="color:red"> **ملاحظة: قمت بتحديث هذا الآن فقط، سأحدث مقال التدوينة لاحقاً - فقط الآن يجري 26/08/2024**  </span>
+
 [رابعاً -
 
 ## النفقات قبل الاحتياجات
@@ -239,4 +241,11 @@ public class UmamiClient(HttpClient client, ILogger<UmamiClient> logger, IHttpCo
 
 ## في الإستنتاج
 
-في المستقبل في المستقبل أخطط لجعل هذا
+في المستقبل أنا أخطط لجعل هذا حزمة نوت غيت.
+استخدم هذا في المدونات الآن، على سبيل المثال لتتبع كم تستغرق الترجمات
+
+```csharp
+        var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (translationTask == null) return TypedResults.BadRequest("Task not found");
+        await  umamiClient.Send(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
+```

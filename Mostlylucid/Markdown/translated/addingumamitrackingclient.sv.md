@@ -9,6 +9,8 @@ I ett tidigare inlägg lade vi till en klient för att hämta [Uppgifter om Umam
 [Umami Ordförande](https://umami.is/) är en lättviktig analystjänst som kan vara självförsörjande. Det är ett bra alternativ till Google Analytics och är integritetsfokuserat.
 Men som standard har den bara en Node-klient för att spåra data (och även då är det inte GREAT). Så jag bestämde mig för att skriva en C#-klient för att spåra data.
 
+### <span style="color:red"> **NOTERa Jag uppdaterade detta just nu, Jag kommer att uppdatera blogginlägget senare - Just nu är 26/08/2024**  </span>
+
 [TOC]
 
 ## Förutsättningar
@@ -239,4 +241,11 @@ Det beror på en nuget plats som kallas "lokal" som definieras i `Nuget.config` 
 
 ## Slutsatser
 
-I framtiden planerar jag att göra detta en NuGet pa
+I framtiden planerar jag att göra detta till ett NuGet-paket.
+Jag använder detta i bloggen nu, till exempel för att spåra hur lång tid översättningar tar
+
+```csharp
+        var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (translationTask == null) return TypedResults.BadRequest("Task not found");
+        await  umamiClient.Send(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
+```

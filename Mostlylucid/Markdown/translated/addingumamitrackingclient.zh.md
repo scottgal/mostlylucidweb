@@ -9,6 +9,8 @@
 [木美](https://umami.is/) 是一种可自行托管的轻量级分析服务。 这是谷歌分析的绝佳替代方法,
 然而,默认情况下,它只有一个节点客户端来跟踪数据(即便如此,它也不伟大)。 于是我决定写一个C#客户端 来追踪数据
 
+### <span style="color:red"> **我刚刚更新了这篇文章, 我稍后将更新博客文章- 刚刚更新为26/08/2024。**  </span>
+
 [技选委
 
 ## 先决条件
@@ -239,4 +241,11 @@ public class UmamiClient(HttpClient client, ILogger<UmamiClient> logger, IHttpCo
 
 ## 在结论结论中
 
-以后我打算做个NuGet派
+今后我打算把这做成一个NuGet包
+我用这个在博客上, 例如追踪翻译需要多久时间,
+
+```csharp
+        var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (translationTask == null) return TypedResults.BadRequest("Task not found");
+        await  umamiClient.Send(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
+```

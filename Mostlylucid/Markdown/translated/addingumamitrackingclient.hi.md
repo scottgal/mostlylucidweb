@@ -9,6 +9,8 @@
 [उममी](https://umami.is/) यह एक हल्का सापूर्ण सेवा है जो आत्म-host किया जा सकता है. इस लेख में नाम बदल दिए गए हैं ।
 लेकिन डिफ़ॉल्ट द्वारा यह सिर्फ एक नोड ग्राहक है डेटा ट्रैक करने के लिए (और तब भी यह महत्वपूर्ण नहीं है). तो मैं ट्रैक डाटा के लिए एक C# ग्राहक लिखने का फैसला किया.
 
+### <span style="color:red"> **अब मैं इस पर टिप्पणी करता हूँ, मैं बाद में ब्लॉग पोस्ट को अद्यतन करूँगा - बस अब 26/08/20 होकर जा रहा हूँ**  </span>
+
 [विषय
 
 ## पूर्वपाराईज़
@@ -239,4 +241,11 @@ public class UmamiClient(HttpClient client, ILogger<UmamiClient> logger, IHttpCo
 
 ## ऑन्टियम
 
-भविष्य में मैं इस एक Nuoo pao ph बनाने की योजना
+भविष्य में मैं इस एक Nuop पैकेज बनाने की योजना.
+मैं इसे ब्लॉग में इस्तेमाल करता हूँ, उदाहरण के लिए कि कब तक अनुवाद किया जाए
+
+```csharp
+        var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (translationTask == null) return TypedResults.BadRequest("Task not found");
+        await  umamiClient.Send(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
+```

@@ -9,6 +9,8 @@ En un post anterior hemos añadido un cliente para buscar [Datos analíticos de 
 [Umami](https://umami.is/) es un servicio de análisis ligero que puede ser alojado por sí mismo. Es una gran alternativa a Google Analytics y se centra en la privacidad.
 Sin embargo, por defecto sólo tiene un cliente de Nodo para el seguimiento de datos (e incluso entonces no es GREAT). Así que decidí escribir un cliente C# para rastrear datos.
 
+### <span style="color:red"> **NOTA He actualizado esto justo ahora, Voy a actualizar la entrada del blog más tarde - Sólo que ahora es 26/08/2024**  </span>
+
 [TOC]
 
 ## Requisitos previos
@@ -239,4 +241,11 @@ Depende de una ubicación nuget llamada 'local' que se define en el `Nuget.confi
 
 ## Conclusión
 
-En el futuro planeo hacer de esto un pa NuGet
+En el futuro planeo hacer de esto un paquete NuGet.
+Utilizo esto en el blog ahora, por ejemplo para rastrear cuánto tiempo tardan las traducciones
+
+```csharp
+        var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (translationTask == null) return TypedResults.BadRequest("Task not found");
+        await  umamiClient.Send(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
+```

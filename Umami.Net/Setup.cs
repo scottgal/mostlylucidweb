@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -29,7 +30,12 @@ public static class Setup
         ;
         #endif
         
+        services.AddSingleton<UmamiBackgroundSender>();
+        
+        services.AddHostedService<UmamiBackgroundSender>(provider => provider.GetRequiredService<UmamiBackgroundSender>());
     }
+    
+ 
     
     static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
     {

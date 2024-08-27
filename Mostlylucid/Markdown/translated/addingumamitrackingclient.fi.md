@@ -9,6 +9,8 @@ Edellisessä viestissä lisäsimme asiakkaan noudettavaksi [Umamin analytiikkati
 [Umami](https://umami.is/) on kevyt analytiikkapalvelu, jota voi isännöidä itse. Se on loistava vaihtoehto Google Analyticsille ja keskittyy yksityisyyteen.
 Sillä on kuitenkin oletuksena vain solmuasiakas tietojen seurantaan (ja silloinkaan se ei ole SUURI). Joten päätin kirjoittaa C#-asiakkaan datan jäljittämiseen.
 
+### <span style="color:red"> **HUOM! Päivitin tämän juuri, päivitän blogikirjoituksen myöhemmin - Juuri nyt ollaan 26/08/2024**  </span>
+
 [TÄYTÄNTÖÖNPANO
 
 ## Edeltävät opinnot
@@ -239,4 +241,11 @@ Se riippuu "paikallisesta" niukasta sijainnista, joka määritellään `Nuget.co
 
 ## Johtopäätöksenä
 
-Tulevaisuudessa aion tehdä tästä NuGet pa
+Tulevaisuudessa aion tehdä tästä NuGet-paketin.
+Käytän tätä blogissa nyt, esimerkiksi seuratakseni, kuinka kauan käännökset kestävät
+
+```csharp
+        var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (translationTask == null) return TypedResults.BadRequest("Task not found");
+        await  umamiClient.Send(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
+```

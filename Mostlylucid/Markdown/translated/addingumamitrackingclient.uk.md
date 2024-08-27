@@ -9,6 +9,8 @@
 [Умаміzambia_ districts. kgm](https://umami.is/) це легка аналітична служба, яка може бути самостійною. Це чудова альтернатива для аналітики Google і зосереджена на приватності.
 Але типово цей клієнт має лише клієнт для стеження за даними (і навіть у такому випадку він не є великим). Так что я решил написать клиента C# для отслеживания данных.
 
+### <span style="color:red"> **ЗАУВАЖЕННЯ Я тільки що оновив це, я оновлю допис блогу пізніше - просто зараз є 26/08/2024**  </span>
+
 [TOC]
 
 ## Передумови
@@ -239,4 +241,11 @@ public class UmamiClient(HttpClient client, ILogger<UmamiClient> logger, IHttpCo
 
 ## Включення
 
-У майбутньому я планую зробити це NUGE pa
+В майбутньому я планую зробити це пакунком NuGet.
+Я використовую це в блозі, наприклад, для того, щоб відстежити тривалість перекладу.
+
+```csharp
+        var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (translationTask == null) return TypedResults.BadRequest("Task not found");
+        await  umamiClient.Send(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
+```

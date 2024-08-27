@@ -13,6 +13,8 @@ using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umami.Net;
 using Umami.Net.Config;
+using Umami.Net.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseSerilog((context, configuration) =>
     configuration.ReadFrom.Configuration(context.Configuration));
@@ -30,7 +32,7 @@ var services = builder.Services;
 services.AddOutputCache(); // Remove duplicate call later in your code
 services.AddControllersWithViews();
 services.AddResponseCaching();
-services.SetupUmamiClient(config);
+
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
 services.SetupTranslateService();
@@ -40,7 +42,7 @@ services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => op
 services.SetupEmail(builder.Configuration);
 services.SetupRSS();
 services.SetupBlog(config, builder.Environment);
-
+services.SetupUmamiClient(config);
 services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN";
@@ -81,7 +83,6 @@ app.UseSerilogRequestLogging();
 using (var scope = app.Services.CreateScope())
 {
     var blogContext = scope.ServiceProvider.GetRequiredService<IMostlylucidDBContext>();
-            
     await blogContext.Database.MigrateAsync();
             
 }
@@ -99,6 +100,17 @@ else
     app.UseHttpsRedirection();
     app.UseHsts();
 }
+
+app.Use( async (context, next) =>
+{
+   var path = context.Request.Path.Value;
+    if (path.EndsWith("RSS", StringComparison.OrdinalIgnoreCase))
+    {
+      var rss = context.RequestServices.GetRequiredService<UmamiBackgroundSender>();
+        await rss.SendBackground(new UmamiPayload(){Url  = path, Name = "RSS Feed"});
+    }
+    await next();
+});
 app.UseOutputCache();
 app.UseResponseCaching();
 app.UseImageSharp();

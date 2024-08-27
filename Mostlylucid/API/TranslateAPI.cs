@@ -12,7 +12,7 @@ namespace Mostlylucid.API;
 [Route("api/translate")]
 public class TranslateAPI(
     BackgroundTranslateService backgroundTranslateService,
-    TranslateCacheService translateCacheService, UmamiClient umamiClient) : ControllerBase
+    TranslateCacheService translateCacheService, UmamiBackgroundSender umamiClient) : ControllerBase
 {
     [HttpPost("start-translation")]
    // [ValidateAntiForgeryToken]
@@ -29,7 +29,7 @@ public class TranslateAPI(
         // Create a unique identifier for this translation task
         var taskId = Guid.NewGuid().ToString("N");
         var userId = Request.GetUserId(Response);
-        await  umamiClient.Send(new UmamiPayload(){  Name = "Start Translate Event"}, new UmamiEventData(){{"text", model.OriginalMarkdown}, {"language", model.Language}});  
+        await  umamiClient.SendBackground(new UmamiPayload(){  Name = "Start Translate Event"}, new UmamiEventData(){{"text", model.OriginalMarkdown}, {"language", model.Language}});  
         
         // Trigger translation and store the associated task
         var translationTask = await backgroundTranslateService.Translate(model);
@@ -81,10 +81,8 @@ public class TranslateAPI(
         var tasks = translateCacheService.GetTasks(userId);
        
         var translationTask = tasks.FirstOrDefault(t => t.TaskId == taskId);
-       
-        
         if (translationTask == null) return TypedResults.BadRequest("Task not found");
-        await  umamiClient.Send(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
+        await  umamiClient.SendBackground(new UmamiPayload(){  Name = "Get Translation"}, new UmamiEventData(){{"timetaken", translationTask.TotalMilliseconds}, {"language",translationTask.Language}});
         var result = new TranslateResultTask(translationTask, true);
         return TypedResults.Json(result);
     }
