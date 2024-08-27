@@ -62,7 +62,7 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, UmamiClien
             {
                 try
                 {
-                    var scope = scopeFactory.CreateScope();
+                   using  var scope = scopeFactory.CreateScope();
                     var client = scope.ServiceProvider.GetRequiredService<UmamiClient>();
                     // Send the event via the client
                     await client.Send(payload.Payload);
