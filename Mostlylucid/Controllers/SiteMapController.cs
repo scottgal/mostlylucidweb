@@ -3,10 +3,11 @@ using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Blog;
+using Umami.Net;
 
 namespace Mostlylucid.Controllers;
 
-public class SiteMapController(IBlogService blogService, IHttpContextAccessor httpContextAccessor, ILogger<SiteMapController> logger) : Controller
+public class SiteMapController(IBlogService blogService,UmamiBackgroundSender backgroundSender, IHttpContextAccessor httpContextAccessor, ILogger<SiteMapController> logger) : Controller
 {
     private string GetSiteUrl()
     {
@@ -24,6 +25,10 @@ public class SiteMapController(IBlogService blogService, IHttpContextAccessor ht
     [OutputCache(Duration = 43200)]
     public async Task<IActionResult> Index()
     {
+        try
+        {
+
+      
         var pages =await  blogService.GetPosts();
 
         List<SiteMapPage> siteMapPages = new();
@@ -48,8 +53,14 @@ public class SiteMapController(IBlogService blogService, IHttpContextAccessor ht
                 )
             )
         );
-
+        await backgroundSender.TrackPageView("/sitemap.xml","Sitemap");
         return Content(feed.ToString(), "text/xml");
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error generating sitemap");
+            return StatusCode(500);
+        }
     }
     
     
