@@ -29,7 +29,9 @@ public static class Setup
         #else
         ;
         #endif
-        
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<PayloadService>();
         services.AddSingleton<UmamiBackgroundSender>();
         
         services.AddHostedService<UmamiBackgroundSender>(provider => provider.GetRequiredService<UmamiBackgroundSender>());

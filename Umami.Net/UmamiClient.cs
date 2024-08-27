@@ -9,72 +9,30 @@ using Umami.Net.Models;
 
 namespace Umami.Net
 {
-    public class UmamiClient(
-        HttpClient client,
-        UmamiBackgroundSender backgroundSender,
-        ILogger<UmamiClient> logger,
-        UmamiClientSettings settings)
+   public class UmamiClient(
+       HttpClient client,
+       PayloadService payloadService,
+
+       ILogger<UmamiClient> logger,
+       UmamiClientSettings settings)
+   {
+
+
+    private static  JsonSerializerOptions options = new JsonSerializerOptions
     {
-        private readonly JsonSerializerOptions options = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = new LowerCaseNamingPolicy(), // Custom naming policy for lower-cased properties
-            WriteIndented = true,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
-        };
+        PropertyNamingPolicy = new LowerCaseNamingPolicy(), // Custom naming policy for lower-cased properties
+        WriteIndented = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+    };
 
-        public static UmamiPayload PopulateFromPayload(string webSite, UmamiPayload? payload, UmamiEventData? data)
-        {
-            var newPayload = GetPayload(webSite, data: data);
-            
-            if(payload==null) return newPayload;
-            if(payload.Hostname != null)
-                newPayload.Hostname = payload.Hostname;
-          
-            if(payload.Language != null)
-                newPayload.Language = payload.Language;
-            
-            if(payload.Referrer != null)
-                newPayload.Referrer = payload.Referrer;
-            
-            if(payload.Screen != null)
-                newPayload.Screen = payload.Screen;
-            
-            if(payload.Title != null)
-                newPayload.Title = payload.Title;
-            
-            if(payload.Url != null)
-                newPayload.Url = payload.Url;
-            
-            if(payload.Name != null)
-                newPayload.Name = payload.Name;
-            
-            if(payload.Data != null)
-                newPayload.Data = payload.Data;
-            
-            return newPayload;
 
-          
-            
-        }
-        
-        private static UmamiPayload GetPayload(string websiteId, string? url = null, UmamiEventData? data = null)
-        {
-            var payload = new UmamiPayload
-            {
-            Website = websiteId,
-                Data = data,
-                Url = url ?? string.Empty
-            };
-            
 
-            return payload;
-        }
 
    
         public async Task<HttpResponseMessage> Send(UmamiPayload? payload=null, UmamiEventData? eventData =null,  string type = "event")
         {
             var websiteId = settings.WebsiteId;
-             payload = PopulateFromPayload(websiteId, payload, eventData);
+             payload = payloadService.PopulateFromPayload(websiteId, payload, eventData);
             
             var jsonPayload = new { type, payload };
             logger.LogInformation("Sending data to Umami: {Payload}", JsonSerializer.Serialize(jsonPayload, options));
@@ -83,9 +41,10 @@ namespace Umami.Net
 
             if (!response.IsSuccessStatusCode)
             {
-                logger.LogError("Failed to send data to Umami: {StatusCode}, {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+                var content = await response.Content.ReadAsStringAsync();
+                logger.LogError("Failed to send data to Umami: {StatusCode}, {ReasonPhrase} , {Content}", response.StatusCode, response.ReasonPhrase, content);
             }
-            else
+            else if(logger.IsEnabled(LogLevel.Information))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 logger.LogInformation("Successfully sent data to Umami: {StatusCode}, {ReasonPhrase}, {Content}", response.StatusCode, response.ReasonPhrase, content);
@@ -94,24 +53,15 @@ namespace Umami.Net
             return response;
         }
 
-        public async Task<HttpResponseMessage> TrackUrl(string? url = "", string? eventName = "event", UmamiEventData? eventData = null)
+        public async Task<HttpResponseMessage> TrackPageView(string? url = "", string? title = "", UmamiPayload? payload = null, UmamiEventData? eventData = null)
         {
-            var payload = GetPayload(url);
-            payload.Name = eventName;
-            return await Track(payload, eventData);
+            var sendPayload = payloadService.PopulateFromPayload(settings.WebsiteId, payload, eventData);
+            sendPayload.Url = url;
+            sendPayload.Title = title;
+            return await Send(sendPayload);
         }
 
-        public async Task<HttpResponseMessage> Track(string eventObj, UmamiEventData? eventData = null)
-        {
-            var payload = new UmamiPayload
-            {
-                Website = settings.WebsiteId,
-                Name = eventObj,
-                Data = eventData ?? new UmamiEventData()
-            };
 
-            return await Send(payload);
-        }
 
         public async Task<HttpResponseMessage> Track(UmamiPayload eventObj, UmamiEventData? eventData = null)
         {

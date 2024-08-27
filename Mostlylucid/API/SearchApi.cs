@@ -42,7 +42,7 @@ public class SearchApi(IMostlylucidDBContext context, UmamiBackgroundSender umam
         }
         var encodedQuery = System.Web.HttpUtility.UrlEncode(query);
         
-       await  umamiBackgroundSender.SendBackground(new UmamiPayload(){ Url = "api/search/" + encodedQuery, Name = "searchEvent"}, new UmamiEventData(){{"query", encodedQuery}});
+       await  umamiBackgroundSender.Send(new UmamiPayload(){ Url = "api/search/" + encodedQuery, Name = "searchEvent"}, new UmamiEventData(){{"query", encodedQuery}});
 
         var host = Request.Host.Value;
         var output = posts.Select(x => new SearchResults(x.Title.Trim(), x.Slug, @Url.ActionLink("Show", "Blog", new{ x.Slug}, protocol:"https", host:host) )).ToList();

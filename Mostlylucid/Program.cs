@@ -107,7 +107,7 @@ app.Use( async (context, next) =>
     if (path.EndsWith("RSS", StringComparison.OrdinalIgnoreCase))
     {
       var rss = context.RequestServices.GetRequiredService<UmamiBackgroundSender>();
-        await rss.SendBackground(new UmamiPayload(){Url  = path, Name = "RSS Feed"});
+        await rss.TrackPageView(path,"RSS Feed");
     }
     await next();
 });

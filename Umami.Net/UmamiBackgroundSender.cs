@@ -7,7 +7,7 @@ using Umami.Net.Models;
 
 namespace Umami.Net;
 
-public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, UmamiClientSettings settings, ILogger<UmamiBackgroundSender> logger) : IHostedService
+public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory,  UmamiClientSettings settings, ILogger<UmamiBackgroundSender> logger) : IHostedService
 {
 
     private  Channel<SendBackgroundPayload> _channel = Channel.CreateUnbounded<SendBackgroundPayload>();
@@ -16,10 +16,23 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, UmamiClien
 
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    public async Task SendBackground(UmamiPayload? payload = null, UmamiEventData? eventData = null,
+    public async Task TrackPageView(string url, string title, UmamiPayload? payload =null, UmamiEventData? eventData = null)
+    {
+        await using var scope = scopeFactory.CreateAsyncScope(); 
+        var payloadService = scope.ServiceProvider.GetRequiredService<PayloadService>();
+        var sendPayload = payloadService.PopulateFromPayload(settings.WebsiteId, payload, eventData);
+        sendPayload.Url = url;
+        sendPayload.Title = title;
+        await _channel.Writer.WriteAsync(new SendBackgroundPayload("event", sendPayload));
+        logger.LogInformation("Umami pageview event sent");
+    }
+    
+    public async Task Send(UmamiPayload? payload = null, UmamiEventData? eventData = null,
         string eventType = "event")
     {
-        var sendPayload = UmamiClient.PopulateFromPayload(settings.WebsiteId, payload, eventData);
+        await using var scope = scopeFactory.CreateAsyncScope(); 
+        var payloadService = scope.ServiceProvider.GetRequiredService<PayloadService>();
+        var sendPayload = payloadService.PopulateFromPayload(settings.WebsiteId, payload, eventData);
         await _channel.Writer.WriteAsync(new SendBackgroundPayload(eventType, sendPayload));
         logger.LogInformation("Umami background event sent");
     }
@@ -65,7 +78,7 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, UmamiClien
                    using  var scope = scopeFactory.CreateScope();
                     var client = scope.ServiceProvider.GetRequiredService<UmamiClient>();
                     // Send the event via the client
-                    await client.Send(payload.Payload);
+                    await client.Send(payload.Payload, type:payload.EventType);
 
                     logger.LogInformation("Umami background event sent: {EventType}", payload.EventType);
                 }
