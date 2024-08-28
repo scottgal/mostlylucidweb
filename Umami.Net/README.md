@@ -31,6 +31,7 @@ This will add the Umami client to the services collection.
 
 You can then use the client in two ways:
 
+## Track
 1. Inject the `UmamiClient` into your class and call the `Track` method:
 
 ```csharp    
@@ -50,6 +51,20 @@ The client will send the event to the Umami API and it will be stored.
 The `UmamiEventData` is a dictionary of key value pairs that will be sent to the Umami API as the event data.
 
 There are additionally more low level methods that can be used to send events to the Umami API.
+
+## Track PageView
+There's also a convenience method to track a page view. This will send an  event to the Umami API with the url set (which counts as a pageview).
+
+```csharp
+  await  umamiBackgroundSender.TrackPageView("api/search/" + encodedQuery, "searchEvent", eventData: new UmamiEventData(){{"query", encodedQuery}});
+  
+   await umamiClient.TrackPageView("api/search/" + encodedQuery, "searchEvent", eventData: new UmamiEventData(){{"query", encodedQuery}});
+```
+
+Here we're setting the url to "api/search/" + encodedQuery and the event type to "searchEvent". We're also passing in a dictionary of key value pairs as the event data.
+
+
+## Raw 'Send' method
 
 On both the `UmamiClient` and `UmamiBackgroundSender` you can call the following method.
 ```csharp
