@@ -42,6 +42,7 @@ window.onload =function(ev) {
     }
     hljs.highlightAll();
     try {
+        console.log("Initializing Mermaid");
         window.initMermaid();
     }
     catch (e) {
@@ -59,11 +60,13 @@ document.body.addEventListener('htmx:afterSwap', function(evt) {
     if (targetId !== 'contentcontainer' && targetId !== 'commentlist') return
     hljs.highlightAll();
     try {
+        console.log("Initializing Mermaid");
         window.initMermaid();
     }
     catch (e) {
         console.error('Failed to initialize Mermaid:', e);
     }
+    
     updateMetaUrls();
     setLogoutLink();
 });

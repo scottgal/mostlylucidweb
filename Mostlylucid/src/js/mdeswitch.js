@@ -4,8 +4,8 @@
     const elementCode = 'div.mermaid';
 
     const loadMermaid = (theme) => {
-        window.mermaid.initialize(theme);
-        window.mermaid.init({ theme }, document.querySelectorAll(elementCode));
+        window.mermaid.initialize({startOnLoad: false,theme: theme});
+        window.mermaid.run({nodes: document.querySelectorAll(elementCode)})
     };
 
     const saveOriginalData = async () => {
