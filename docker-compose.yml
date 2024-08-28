@@ -6,6 +6,8 @@
     restart: always
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
+    env_file:
+      - .env
     environment:
       - Auth__GoogleClientId=${AUTH_GOOGLECLIENTID}
       - Auth__GoogleClientSecret=${AUTH_GOOGLECLIENTSECRET}
@@ -15,6 +17,7 @@
       - Analytics__UmamiPath=${ANALYTICS_UMAMIPATH}
       - Analytics__WebsiteId=${ANALYTICS_WEBSITEID}
       - ConnectionStrings__DefaultConnection=${POSTGRES_CONNECTIONSTRING}
+      - TranslateService__ServiceIPs=${EASYNMT_IPS}
     volumes:
       - /mnt/imagecache:/app/wwwroot/cache
       - /mnt/markdown/comments:/app/Markdown/comments
@@ -30,9 +33,11 @@
     environment:
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_LABEL_ENABLE=true
-    command: --interval 60 # Check for updates every 300 seconds (5 minutes)
+    command: --interval 300 # Check for updates every 300 seconds (5 minutes)
   db:
     image: postgres:16-alpine
+    ports:
+      - 5266:5432
     env_file:
       - .env
     networks:
@@ -79,6 +84,16 @@
     networks:
       - app_network
     restart: always
+  easynmt:
+    image: easynmt/api:2.0.2-cpu
+    volumes:
+      - /mnt/easynmt:/cache/
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+    networks:
+      - app_network
   caddy:
     image: caddy:latest
     ports:
@@ -90,14 +105,6 @@
     networks:
       - app_network
     restart: always
-  easynmt:
-    image: easynmt/api:2.0.2-cpu
-    volumes:
-      - /mnt/easynmt:/cache/
-    deploy:
-      resources:
-        limits:
-          cpus: "4.0"
 networks:
   app_network:
     driver: bridge

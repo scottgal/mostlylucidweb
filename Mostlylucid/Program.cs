@@ -63,6 +63,7 @@ services.AddCors(options =>
                 .WithOrigins("https://mostlylucid.net")
                 .WithOrigins("https://localhost:7240")
                 .WithOrigins("https://local.mostlylucid.net")
+                .WithOrigins("https://direct.mostlylucid.net")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
         });
