@@ -21,13 +21,13 @@ jobs:
       run: dotnet restore ./Umami.Net/Umami.Net.csproj
 
     - name: Build project
-      run: dotnet build --configuration Release ./src/Umami.Net/Umami.Net.csproj --no-restore
+      run: dotnet build --configuration Release ./Umami.Net/Umami.Net.csproj --no-restore
 
     - name: Run tests
       run: dotnet test --no-build --verbosity normal
 
     - name: Pack project
-      run: dotnet pack --configuration Release ./src/Umami.Net/Umami.Net.csproj --no-build --output ./nupkg
+      run: dotnet pack --configuration Release ./Umami.Net/Umami.Net.csproj --no-build --output ./nupkg
 
     - name: Publish to NuGet
       run: dotnet nuget push ./nupkg/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
