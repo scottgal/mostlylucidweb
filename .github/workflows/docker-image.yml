@@ -2,16 +2,19 @@ name: Docker Image CI
 
 on:
   push:
-    branches: 
+    tags:
+      - 'release-*'  # Only trigger on tags that start with 'release-'
+    branches:
       - "main"
       - "local"
   pull_request:
-    branches: 
+    branches:
       - "main"
       - "local"
 
 jobs:
   build-and-push:
+    if: startsWith(github.ref, 'refs/tags/release-')
     runs-on: ubuntu-latest
 
     steps:
