@@ -12,6 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		http-client.private.env.json = http-client.private.env.json
 		opensearch-docker.yml = opensearch-docker.yml
 		.dockerignore = .dockerignore
+		seq-compose.yml = seq-compose.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umami.Net", "Umami.Net\Umami.Net.csproj", "{E167AB80-9826-4D98-88AA-1BCC4C35E45A}"

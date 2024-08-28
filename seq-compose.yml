@@ -1,0 +1,15 @@
+services:
+  seq:
+    image: datalust/seq
+    container_name: seq
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_ADMINPASSWORDHASH: ${SEQ_DEFAULT_HASH}
+    volumes:
+      - /mnt/seq:/data
+    ports:
+      - "5443:443"
+      - "45341:45341"
+      - "5341:5341"
+      - "82:80"

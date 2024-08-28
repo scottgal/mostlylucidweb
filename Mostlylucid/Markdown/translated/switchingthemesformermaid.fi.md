@@ -10,6 +10,8 @@ Minua kuitenkin ärsytti se, että se ei reagoinut teemojen vaihtamiseen (pimeä
 
 Tämä on seurausta muutaman tunnin kaivamisesta ja yrittämisestä selvittää, miten se tehdään.
 
+**<span style="color:red"> HUOMAUTUS: Tämä ei toimi luotettavasti. Yritän yhä selvittää miksi.</span>**
+
 [TÄYTÄNTÖÖNPANO
 
 ## Kaavio

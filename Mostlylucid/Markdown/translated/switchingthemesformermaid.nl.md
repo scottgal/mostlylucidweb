@@ -10,6 +10,8 @@ Maar iets wat me ergerde is dat het niet reageerde op het veranderen van thema's
 
 Dit is het resultaat van een paar uur graven en proberen uit te zoeken hoe dit te doen.
 
+**<span style="color:red"> OPMERKING: Dit werkt niet betrouwbaar. Ik probeer nog steeds uit te zoeken waarom.</span>**
+
 [TOC]
 
 ## Het diagram

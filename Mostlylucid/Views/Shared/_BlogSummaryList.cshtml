@@ -6,14 +6,15 @@
         <pager
             x-ref="pager"
             link-url="@Model.LinkUrl"
-               hx-boost="true"
-               hx-push-url="true"
-               hx-target="#content"
-               hx-swap="show:none"
-               page="@Model.Page"
-               page-size="@Model.PageSize"
-               total-items="@Model.TotalItems"
+            hx-boost="true"
+            hx-push-url="true"
+            hx-target="#content"
+            hx-swap="show:none"
+            page="@Model.Page"
+            page-size="@Model.PageSize"
+            total-items="@Model.TotalItems"
             class="w-full"></pager>
+
     }
     @if(ViewBag.Categories != null)
 {
