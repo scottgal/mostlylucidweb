@@ -34,7 +34,7 @@ function setLogoutLink() {
 }
 
 let googleSignInInitialized = false;
-window.onload (() => {
+window.onload =function(ev) {
     // Google Sign-In Initialization
     if (!googleSignInInitialized) {
        initGoogleSignIn();
@@ -51,7 +51,7 @@ window.onload (() => {
     // Highlight.js Initialization
     updateMetaUrls();
 
-});
+}
 document.body.addEventListener('htmx:afterSwap', function(evt) {
     console.log('HTMX afterSwap triggered', evt);
 
