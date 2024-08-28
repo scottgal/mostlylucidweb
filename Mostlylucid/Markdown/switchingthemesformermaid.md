@@ -9,7 +9,7 @@ However something that annoyed me is that it wasn't reactive to switching themes
 
 This is the result of a few hours of digging and trying to figure out how to do this.
 
-<span style="color:red"> **NOTE: This isn't working reliably. I'm still trying to figure out why.** </span>
+**<span style="color:red"> NOTE: This isn't working reliably. I'm still trying to figure out why.</span>**
 
 [TOC]
 
