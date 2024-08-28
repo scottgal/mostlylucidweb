@@ -13,6 +13,7 @@ using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umami.Net;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 

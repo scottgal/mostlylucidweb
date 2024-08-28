@@ -55,6 +55,16 @@ namespace Umami.Net
         }
 
 
+        public async Task<HttpResponseMessage> Track(string eventName, UmamiEventData? eventData = null)
+        {
+            var thisPayload = new UmamiPayload
+            {
+                Name = eventName,
+                Data = eventData ?? new UmamiEventData()
+            };
+            var payload = payloadService.PopulateFromPayload(thisPayload , eventData);
+            return await Send(payload);
+        }
 
         public async Task<HttpResponseMessage> Track(UmamiPayload eventObj, UmamiEventData? eventData = null)
         {

@@ -27,6 +27,18 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory,  UmamiClie
         logger.LogInformation("Umami pageview event sent");
     }
     
+    public async Task Track(string eventName, UmamiEventData? eventData = null)
+    {
+        await using var scope = scopeFactory.CreateAsyncScope(); 
+        var payloadService = scope.ServiceProvider.GetRequiredService<PayloadService>();
+        var thisPayload = new UmamiPayload
+        {
+            Name = eventName,
+            Data = eventData ?? new UmamiEventData()
+        };
+        var payload = payloadService.PopulateFromPayload(thisPayload , eventData);
+         await Send(payload);;
+    }
     public async Task Send(UmamiPayload? payload = null, UmamiEventData? eventData = null,
         string eventType = "event")
     {

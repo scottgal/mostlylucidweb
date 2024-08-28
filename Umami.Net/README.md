@@ -1,1 +1,85 @@
-Test
+# Umami.Net
+
+This is a .NET Core client for the Umami tracking API.
+It's based on the Umami Node client, which can be found [here](https://github.com/umami-software/node).
+
+You can see how to set up Umami as a docker container [here](https://www.mostlylucid.net/blog/usingumamiforlocalanalytics).
+You can read more detail about it's creation on my blog [here](https://www.mostlylucid.net/blog/addingumamitrackingclientfollowup).
+
+To use this client you need the following appsettings.json configuration:
+
+```json
+{
+  "Analytics":{
+    "UmamiPath" : "https://umamilocal.mostlylucid.net",
+    "WebsiteId" : "32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"
+  },
+}
+```
+
+Where `UmamiPath` is the path to your Umami instance and `WebsiteId` is the id of the website you want to track.
+
+To use the client you need to add the following to your `Program.cs`:
+
+```csharp
+using Umami.Net;
+
+services.SetupUmamiClient(builder.Configuration);
+```
+
+This will add the Umami client to the services collection.
+
+You can then use the client in two ways:
+
+1. Inject the `UmamiClient` into your class and call the `Track` method:
+
+```csharp    
+ // Inject UmamiClient umamiClient
+ await umamiClient.Track("Search", new UmamiEventData(){{"query", encodedQuery}});
+```
+
+2. Use the `UmamiBackgroundSender` to track events in the background (this uses an `IHostedService` to send events in the background):
+
+```csharp
+ // Inject UmamiBackgroundSender umamiBackgroundSender
+await umamiBackgroundSender.Track("Search", new UmamiEventData(){{"query", encodedQuery}});
+```
+
+The client will send the event to the Umami API and it will be stored.
+
+The `UmamiEventData` is a dictionary of key value pairs that will be sent to the Umami API as the event data.
+
+There are additionally more low level methods that can be used to send events to the Umami API.
+
+On both the `UmamiClient` and `UmamiBackgroundSender` you can call the following method.
+```csharp
+
+
+ Send(UmamiPayload? payload = null, UmamiEventData? eventData = null,
+        string eventType = "event")
+```
+If you don't pass in a `UmamiPayload` object, the client will create one for you using the `WebsiteId` from the appsettings.json.
+```csharp
+    public  UmamiPayload GetPayload(string? url = null, UmamiEventData? data = null)
+    {
+        var httpContext = httpContextAccessor.HttpContext;
+        var request = httpContext?.Request;
+
+        var payload = new UmamiPayload
+        {
+            Website = settings.WebsiteId,
+            Data = data,
+            Url = url ?? httpContext?.Request?.Path.Value,
+            IpAddress = httpContext?.Connection?.RemoteIpAddress?.ToString(),
+            UserAgent = request?.Headers["User-Agent"].FirstOrDefault(),
+            Referrer = request?.Headers["Referer"].FirstOrDefault(),
+           Hostname = request?.Host.Host,
+        };
+        
+        return payload;
+    }
+
+```
+You can see that this populates the `UmamiPayload` object with the `WebsiteId` from the appsettings.json, the `Url`, `IpAddress`, `UserAgent`, `Referrer` and `Hostname` from the `HttpContext`.
+
+NOTE: eventType can only be "event" or "identify" as per the Umami API.
