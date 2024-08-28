@@ -10,7 +10,7 @@
         <PackageId>Umami.Net</PackageId>
         <Authors>Scott Galloway</Authors>
         <PackageIcon>icon.png</PackageIcon>
-        <RepositoryUrl>https://github.com/scottgal/mostlylucidweb</RepositoryUrl>
+        <RepositoryUrl>https://github.com/scottgal/mostlylucidweb/tree/main/Umami.Net</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageTags>web</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
