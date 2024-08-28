@@ -15,7 +15,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '7.x' # Specify the .NET version you need
+        dotnet-version: '8.x' # Specify the .NET version you need
 
     - name: Restore dependencies
       run: dotnet restore ./Umami.Net/Umami.Net.csproj
