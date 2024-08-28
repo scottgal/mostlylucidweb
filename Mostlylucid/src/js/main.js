@@ -55,7 +55,8 @@ window.onload =function(ev) {
 document.body.addEventListener('htmx:afterSwap', function(evt) {
     console.log('HTMX afterSwap triggered', evt);
 
-    if (evt.detail.target.id !== 'contentcontainer') return
+    const targetId = evt.detail.target.id;
+    if (targetId !== 'contentcontainer' && targetId !== 'commentlist') return
     hljs.highlightAll();
     try {
         window.initMermaid();
@@ -64,7 +65,6 @@ document.body.addEventListener('htmx:afterSwap', function(evt) {
         console.error('Failed to initialize Mermaid:', e);
     }
     updateMetaUrls();
-    //initGoogleSignIn();
     setLogoutLink();
 });
 
