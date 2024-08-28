@@ -32,7 +32,12 @@
       <PackageReference Include="Polly" Version="8.4.1" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
     </ItemGroup>
-
+    <PropertyGroup>
+        <MinVerTagPrefix>v</MinVerTagPrefix>
+    </PropertyGroup>
+    <PropertyGroup>
+        <MinVerSkip Condition="'$(Configuration)' == 'Debug'">true</MinVerSkip>
+    </PropertyGroup>
     <ItemGroup>
       <Content Update="icon.png">
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
