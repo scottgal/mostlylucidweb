@@ -34,7 +34,7 @@ function setLogoutLink() {
 }
 
 let googleSignInInitialized = false;
-addEventListener("DOMContentLoaded", () => {
+document.body.addEventListener("DOMContentLoaded", () => {
     // Google Sign-In Initialization
     if (!googleSignInInitialized) {
        initGoogleSignIn();
