@@ -5,7 +5,7 @@
 
 # Johdanto
 
-Ei, minulla on Umami-asiakas, joka on pakattava ja asetettava saataville Nuget-pakettina. Tämä on aika yksinkertainen prosessi, mutta muutama asia on tiedostettava.
+Nyt minulla on Umamin asiakas; minun on pakattava se ja asetettava se saataville Nuget-pakettina. Tämä on aika yksinkertainen prosessi, mutta muutama asia on tiedostettava.
 
 [TÄYTÄNTÖÖNPANO
 

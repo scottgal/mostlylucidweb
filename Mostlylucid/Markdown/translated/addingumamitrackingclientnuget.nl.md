@@ -5,7 +5,7 @@
 
 # Inleiding
 
-Nee, ik heb de Umami client die ik nodig heb om het in te pakken en beschikbaar te maken als een Nuget pakket. Dit is een vrij eenvoudig proces, maar er zijn een paar dingen om je van bewust te zijn.
+Nu heb ik de Umami-cliënt; ik moet het inpakken en beschikbaar maken als een Nuget-pakket. Dit is een vrij eenvoudig proces, maar er zijn een paar dingen om je van bewust te zijn.
 
 [TOC]
 

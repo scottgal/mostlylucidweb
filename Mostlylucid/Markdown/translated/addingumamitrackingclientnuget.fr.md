@@ -5,7 +5,7 @@
 
 # Présentation
 
-Non, j'ai le client Umami que je dois emballer et le rendre disponible en tant que paquet Nuget. Il s'agit d'un processus assez simple, mais il y a quelques choses à savoir.
+Maintenant, j'ai le client Umami; je dois l'emballer et le rendre disponible en tant que paquet Nuget. Il s'agit d'un processus assez simple, mais il y a quelques choses à savoir.
 
 [TOC]
 

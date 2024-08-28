@@ -3,7 +3,7 @@
 <datetime class="hidden">2024-08-28T02:00</datetime>
 
 # Introduction
-No I have the Umami client I need to package it up and make it available as a Nuget package. This is a pretty simple process but there are a few things to be aware of.
+Now I have the Umami client; I need to package it up and make it available as a Nuget package. This is a pretty simple process but there are a few things to be aware of.
 
 [TOC]
 

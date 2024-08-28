@@ -5,7 +5,7 @@
 
 # Inledning
 
-Nej, jag har Umami-klienten som jag måste packa ihop och göra den tillgänglig som ett Nuget-paket. Detta är en ganska enkel process, men det finns några saker att vara medveten om.
+Nu har jag Umami klienten; Jag måste packa upp den och göra den tillgänglig som ett Nuget paket. Detta är en ganska enkel process, men det finns några saker att vara medveten om.
 
 [TOC]
 

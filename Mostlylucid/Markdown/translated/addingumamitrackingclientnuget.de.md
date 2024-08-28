@@ -5,7 +5,7 @@
 
 # Einleitung
 
-Nein, ich habe den Umami-Client, den ich verpacken und als Nuget-Paket zur Verfügung stellen muss. Dies ist ein ziemlich einfacher Prozess, aber es gibt ein paar Dinge zu beachten.
+Jetzt habe ich den Umami-Client; ich muss ihn verpacken und als Nuget-Paket zur Verfügung stellen. Dies ist ein ziemlich einfacher Prozess, aber es gibt ein paar Dinge zu beachten.
 
 [TOC]
 

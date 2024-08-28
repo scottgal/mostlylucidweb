@@ -5,7 +5,7 @@
 
 # Introduzione
 
-No, ho il cliente Umami che devo impacchettare e renderlo disponibile come pacchetto Nuget. Questo è un processo abbastanza semplice, ma ci sono alcune cose di cui essere consapevoli.
+Ora ho il client Umami; devo impacchettarlo e renderlo disponibile come pacchetto Nuget. Questo è un processo abbastanza semplice, ma ci sono alcune cose di cui essere consapevoli.
 
 [TOC]
 
