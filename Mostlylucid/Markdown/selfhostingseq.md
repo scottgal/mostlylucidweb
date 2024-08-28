@@ -1,6 +1,6 @@
 ﻿# Self Hosting Seq for ASP.NET Logging
 
-<datetime class="hidden">2024-08-07T00:30</datetime>
+<datetime class="hidden">2024-08-28T09:37</datetime>
 <!--category-- ASP.NET, Seq, Serilog, Docker -->
 
 # Introduction
