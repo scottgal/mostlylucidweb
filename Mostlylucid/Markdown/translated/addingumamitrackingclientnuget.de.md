@@ -13,7 +13,7 @@ Jetzt habe ich den Umami-Client; ich muss ihn verpacken und als Nuget-Paket zur 
 
 ## Versionierung
 
-Ich beschloss zu kopieren [Khalid](@khalidabuhakmeh@mastodon.social) und verwenden Sie das ausgezeichnete Minver-Paket, um mein Nuget-Paket zu versionieren. Dies ist ein einfaches Paket, das das git-Versions-Tag verwendet, um die Versionsnummer zu bestimmen.
+Ich beschloss zu kopieren [Khalid](https://khalidabuhakmeh.com/) und verwenden Sie das ausgezeichnete Minver-Paket, um mein Nuget-Paket zu versionieren. Dies ist ein einfaches Paket, das das git-Versions-Tag verwendet, um die Versionsnummer zu bestimmen.
 
 Um es zu benutzen, habe ich einfach die folgenden zu meinem `Umami.Net.csproj` Datei:
 

@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Mostlylucid.Blog;
 using Mostlylucid.EntityFramework;
+using Serilog;
+using SerilogTracing;
 
 public class BackgroundEFBlogUpdater(IServiceScopeFactory scopeFactory, ILogger<BackgroundEFBlogUpdater> logger)
     : IHostedService, IDisposable
 {
-    private Task _backgroundTask;
+    private Task _backgroundTask = Task.CompletedTask;
     private CancellationTokenSource _cancellationTokenSource = new();
 
     public  Task StartAsync(CancellationToken cancellationToken)
@@ -13,10 +15,12 @@ public class BackgroundEFBlogUpdater(IServiceScopeFactory scopeFactory, ILogger<
        
         logger.LogInformation("Starting EF Blog Updater");
 
+       using var activity = Log.Logger.StartActivity("Background DB Update");
         // Start the background task using the internal cancellation token source
         _backgroundTask = Task.Run(() => RunBackgroundTask(_cancellationTokenSource.Token))
                               .ContinueWith(OnTaskCompleted, cancellationToken);
 
+        activity?.Complete();
         return Task.CompletedTask;
         
     }

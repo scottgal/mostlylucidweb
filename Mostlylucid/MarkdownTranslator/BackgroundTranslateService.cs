@@ -3,6 +3,9 @@ using Mostlylucid.Blog;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Helpers;
+using Serilog;
+using Serilog.Core;
+using SerilogTracing;
 
 namespace Mostlylucid.MarkdownTranslator;
 
@@ -237,7 +240,8 @@ public class BackgroundTranslateService(
         TaskCompletionSource<TaskCompletion> tcs)
     {
         var scope = scopeFactory.CreateScope();
-
+        using var activity= Log.Logger.StartActivity("Translate to {Language} for File {FileName}",
+            translateModel.Language, string.IsNullOrEmpty(translateModel.OriginalFileName) ? "No File" : translateModel.OriginalFileName);
         var slug = Path.GetFileNameWithoutExtension(translateModel.OriginalFileName);
         if (translateModel.Persist)
         {
@@ -268,10 +272,12 @@ public class BackgroundTranslateService(
                 await PersistTranslation(scope, slug, translateModel, translatedMarkdown);
             }
             
+            activity?.Complete();
             tcs.SetResult(new TaskCompletion(translatedMarkdown, translateModel.OriginalMarkdown, translateModel.Language, true, DateTime.Now));
         }
         catch (Exception e)
         {
+            activity?.Activity?.SetTag("Error", e.Message);
             logger.LogError(e, "Error translating {File} to {Language}", translateModel.OriginalFileName,
                 translateModel.Language);
             

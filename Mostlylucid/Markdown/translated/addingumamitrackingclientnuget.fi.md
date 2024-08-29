@@ -13,7 +13,7 @@ Nyt minulla on Umamin asiakas; minun on pakattava se ja asetettava se saataville
 
 ## Muuntaminen
 
-Päätin kopioida [Khalid](@khalidabuhakmeh@mastodon.social) ja käytä erinomaista minver-pakettia Nuget-pakettini versioon. Tämä on yksinkertainen paketti, joka käyttää git-versiolappua numeron määrittämiseen.
+Päätin kopioida [Khalid](https://khalidabuhakmeh.com/) ja käytä erinomaista minver-pakettia Nuget-pakettini versioon. Tämä on yksinkertainen paketti, joka käyttää git-versiolappua numeron määrittämiseen.
 
 Voit käyttää sitä yksinkertaisesti lisäsin seuraavat minun `Umami.Net.csproj` tiedosto:
 

@@ -13,7 +13,7 @@
 
 ## 版本
 
-我决定复印 [哈立德( Khalid)](@khalidabuhakmeh@mastodon.social) 并使用优异的薄荷包来版本我的 Nuget 软件包 。 这是一个简单的软件包, 使用 git 版本标签来确定版本编号 。
+我决定复印 [哈立德( Khalid)](https://khalidabuhakmeh.com/) 并使用优异的薄荷包来版本我的 Nuget 软件包 。 这是一个简单的软件包, 使用 git 版本标签来确定版本编号 。
 
 为了使用它,我简单地补充了以下内容: `Umami.Net.csproj` 文件 :
 

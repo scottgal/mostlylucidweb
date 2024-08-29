@@ -6,6 +6,7 @@ using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.EntityFramework;
+using Npgsql;
 using Serilog;
 
 namespace Mostlylucid.Blog;
@@ -30,9 +31,15 @@ public static class BlogSetup
                 {
                     if (env.IsDevelopment())
                     {
+                        options.EnableDetailedErrors(true);
                         options.EnableSensitiveDataLogging(true);
                     }
-                    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"));
+                    var connectionString = configuration.GetConnectionString("DefaultConnection");
+                    var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString)
+                        {
+                            ApplicationName = "mostlylucid"
+                        };
+                    options.UseNpgsql(connectionStringBuilder.ConnectionString);
                 });
                 services.AddScoped<IBlogService, EFBlogService>();
                 services.AddScoped<ICommentService, EFCommentService>();

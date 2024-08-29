@@ -18,19 +18,9 @@ public class CommentController(AuthSettings authSettings,
     ICommentService  commentService, IEmailSenderHostedService sender, CommentViewService commentViewService,  AnalyticsSettings analyticsSettings,IBlogService blogService, ILogger<CommentController> logger)
     : BaseController(authSettings, analyticsSettings, blogService, logger)
 {
-    // GET
-    public IActionResult Index()
-    {
-        return View();
-    }
+ 
     
-    [HttpGet]
-    [Route("list-comments")]
-    public async Task<IActionResult> ListComments(int postId)
-    {
-        var comments = await commentService.GetForPost(postId);
-        return PartialView(comments);
-    }
+
     
     [HttpGet]
     [Route("get-commentform")]

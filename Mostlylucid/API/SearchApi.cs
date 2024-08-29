@@ -5,6 +5,8 @@ using Mostlylucid.Blog;
 using Mostlylucid.EntityFramework;
 using Mostlylucid.OpenSearch;
 using NpgsqlTypes;
+using Serilog;
+using SerilogTracing;
 using Umami.Net;
 using Umami.Net.Models;
 
@@ -29,8 +31,13 @@ public class SearchApi(IMostlylucidDBContext context, UmamiBackgroundSender umam
     [HttpGet]
     [Route("search/{query}")]
     [ValidateAntiForgeryToken]
-    public async Task<JsonHttpResult<List<SearchResults>>> Search(string query)
+    public async Task<Results<JsonHttpResult<List<SearchResults>>, BadRequest<string>>> Search(string query)
     {
+        using var activity = Log.Logger.StartActivity("Search {query}", query);
+        try
+        {
+
+       
         List<(string Title, string Slug)> posts = new();
         if (!query.Contains(" "))
         {
@@ -47,7 +54,16 @@ public class SearchApi(IMostlylucidDBContext context, UmamiBackgroundSender umam
         var host = Request.Host.Value;
         var output = posts.Select(x => new SearchResults(x.Title.Trim(), x.Slug, @Url.ActionLink("Show", "Blog", new{ x.Slug}, protocol:"https", host:host) )).ToList();
         
+        activity?.Activity?.SetTag("Results", output.Count);
+
+        activity?.Complete();
         return TypedResults.Json(output);
+        }
+        catch (Exception e)
+        {
+              Log.Error(e, "Error in search");
+              return TypedResults.BadRequest("Error in search");
+        }
     }
     
     

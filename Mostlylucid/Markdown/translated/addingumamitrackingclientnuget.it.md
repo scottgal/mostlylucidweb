@@ -13,7 +13,7 @@ Ora ho il client Umami; devo impacchettarlo e renderlo disponibile come pacchett
 
 ## Versione
 
-Ho deciso di copiare [KhalidCity name (optional, probably does not need a translation)](@khalidabuhakmeh@mastodon.social) e utilizzare l'eccellente pacchetto di triturazione per la versione del mio pacchetto Nuget. Questo è un semplice pacchetto che usa il tag git version per determinare il numero di versione.
+Ho deciso di copiare [KhalidCity name (optional, probably does not need a translation)](https://khalidabuhakmeh.com/) e utilizzare l'eccellente pacchetto di triturazione per la versione del mio pacchetto Nuget. Questo è un semplice pacchetto che usa il tag git version per determinare il numero di versione.
 
 Per usarlo ho semplicemente aggiunto il seguente al mio `Umami.Net.csproj` file:
 

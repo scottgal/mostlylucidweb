@@ -13,7 +13,7 @@ Nu heb ik de Umami-cliënt; ik moet het inpakken en beschikbaar maken als een Nu
 
 ## Versie
 
-Ik besloot te kopiëren [Khalid](@khalidabuhakmeh@mastodon.social) en gebruik het uitstekende Minver pakket om mijn Nuget pakket te versieren. Dit is een eenvoudig pakket dat de git versie tag gebruikt om het versienummer te bepalen.
+Ik besloot te kopiëren [Khalid](https://khalidabuhakmeh.com/) en gebruik het uitstekende Minver pakket om mijn Nuget pakket te versieren. Dit is een eenvoudig pakket dat de git versie tag gebruikt om het versienummer te bepalen.
 
 Om het te gebruiken heb ik gewoon het volgende toegevoegd aan mijn `Umami.Net.csproj` bestand:
 

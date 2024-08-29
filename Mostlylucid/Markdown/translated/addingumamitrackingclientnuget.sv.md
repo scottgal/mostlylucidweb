@@ -13,7 +13,7 @@ Nu har jag Umami klienten; Jag måste packa upp den och göra den tillgänglig s
 
 ## Version
 
-Jag bestämde mig för att kopiera [Khalid Ordförande](@khalidabuhakmeh@mastodon.social) och använd den utmärkta minver paketet för att version min Nuget paket. Detta är ett enkelt paket som använder git versionstaggen för att bestämma versionsnumret.
+Jag bestämde mig för att kopiera [Khalid Ordförande](https://khalidabuhakmeh.com/) och använd den utmärkta minver paketet för att version min Nuget paket. Detta är ett enkelt paket som använder git versionstaggen för att bestämma versionsnumret.
 
 För att använda den lade jag helt enkelt till följande till min `Umami.Net.csproj` fil:
 
