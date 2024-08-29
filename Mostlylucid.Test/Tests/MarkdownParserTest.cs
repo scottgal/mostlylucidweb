@@ -72,7 +72,8 @@ public class MarkdownParserTest
     public void TestMarkdown_Date()
     {
         var result = GetBlogPostViewModel();
-        Assert.True(result.PublishedDate.ToString() == "Wednesday, 01, 01, 25 01:01:00");
+        Assert.True(result.PublishedDate.ToString("dddd, dd, MM, yy HH:mm:ss")
+                    == "Wednesday, 01, 01, 25 01:01:00");
     }
 
     [Fact]
