@@ -1,7 +1,7 @@
-﻿using System.Net.Http.Json;
+﻿
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Umami.Net.Config;
 using Umami.Net.Helpers;
@@ -23,12 +23,17 @@ namespace Umami.Net
         WriteIndented = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
-        public async Task<HttpResponseMessage> Send(UmamiPayload? payload=null, UmamiEventData? eventData =null,  string type = "event")
+        public async Task<HttpResponseMessage> Send(
+            UmamiPayload? payload=null,
+            UmamiEventData? eventData =null,
+            string type = "event")
         {
+            if(type != "event" && type != "identify") throw new ArgumentException("Type must be either 'event' or 'identify'");
              payload = payloadService.PopulateFromPayload( payload, eventData);
             
             var jsonPayload = new { type, payload };
-            logger.LogInformation("Sending data to Umami: {Payload}", JsonSerializer.Serialize(jsonPayload, options));
+
+        
 
             var response = await client.PostAsJsonAsync("api/send", jsonPayload, options);
 
@@ -39,6 +44,7 @@ namespace Umami.Net
             }
             else if(logger.IsEnabled(LogLevel.Information))
             {
+              
                 var content = await response.Content.ReadAsStringAsync();
                 logger.LogInformation("Successfully sent data to Umami: {StatusCode}, {ReasonPhrase}, {Content}", response.StatusCode, response.ReasonPhrase, content);
             }
@@ -46,16 +52,24 @@ namespace Umami.Net
             return response;
         }
 
-        public async Task<HttpResponseMessage> TrackPageView(string? url = "", string? title = "", UmamiPayload? payload = null, UmamiEventData? eventData = null)
+        public async Task<HttpResponseMessage> TrackPageView(
+            string? url = "", 
+            string? title = "", 
+            UmamiPayload? payload = null,
+            UmamiEventData? eventData = null)
         {
             var sendPayload = payloadService.PopulateFromPayload(payload, eventData);
-            sendPayload.Url = url;
-            sendPayload.Title = title;
+            if(!string.IsNullOrEmpty(url))
+              sendPayload.Url = url;
+            if(!string.IsNullOrEmpty(title))
+                sendPayload.Title = title;
             return await Send(sendPayload);
         }
 
 
-        public async Task<HttpResponseMessage> Track(string eventName, UmamiEventData? eventData = null)
+        public async Task<HttpResponseMessage> Track(
+            string eventName, 
+            UmamiEventData? eventData = null)
         {
             var thisPayload = new UmamiPayload
             {
@@ -66,7 +80,8 @@ namespace Umami.Net
             return await Send(payload);
         }
 
-        public async Task<HttpResponseMessage> Track(UmamiPayload eventObj, UmamiEventData? eventData = null)
+        public async Task<HttpResponseMessage> Track(UmamiPayload eventObj,
+            UmamiEventData? eventData = null)
         {
             var payload = eventObj;
             payload.Data = eventData ?? new UmamiEventData();
@@ -79,7 +94,8 @@ namespace Umami.Net
             var payload = new UmamiPayload
             {
                 Website = settings.WebsiteId,
-                Data = eventData
+                Data = eventData,
+               
             };
 
             return await Send(payload, null, "identify");

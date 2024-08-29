@@ -2,13 +2,16 @@
 window.mostlylucid = window.mostlylucid || {};
 
 import mermaid from "mermaid";
-
+import htmx from "htmx.org";
+import hljs from "highlight.js";
+window.hljs=hljs;
+window.htmx = htmx;
 window.mermaid=mermaid;
 mermaid.initialize({startOnLoad:false});
 // Importing modules
 import { typeahead } from "./typeahead";
 import { submitTranslation, viewTranslation } from "./translations";
-import { simplemde } from "./simplemde";
+import { codeeditor } from "./simplemde";
 import { globalSetup } from "./global";
 import  {comments} from  "./comments"; 
 import "./mdeswitch"; 
@@ -21,7 +24,7 @@ window.mostlylucid.translations = {
     submitTranslation: submitTranslation,
     viewTranslation: viewTranslation
 };
-window.mostlylucid.simplemde = simplemde(); // Assuming simplemde() returns the instance
+window.mostlylucid.simplemde = codeeditor(); // Assuming simplemde() returns the instance
 window.globalSetup = globalSetup;
 
 function setLogoutLink() {

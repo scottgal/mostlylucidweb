@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
@@ -11,11 +10,20 @@ namespace Umami.Net;
 
 public static class Setup
 {
+    public static void ValidateSettings(UmamiClientSettings settings)
+    {
+        if (string.IsNullOrEmpty(settings.UmamiPath)) throw new ArgumentNullException(settings.UmamiPath, "UmamiUrl is required");
+        if(!Uri.TryCreate(settings.UmamiPath, UriKind.Absolute, out _))
+            throw new FormatException("UmamiUrl must be a valid Uri");
+        if (string.IsNullOrEmpty(settings.WebsiteId)) throw new ArgumentNullException(settings.WebsiteId, "WebsiteId is required");
+        if (!Guid.TryParseExact(settings.WebsiteId, "D", out _))
+            throw new FormatException("WebSiteId must be a valid Guid");
+    }
     public static void SetupUmamiClient(this IServiceCollection services, IConfiguration config)
     {
        var umamiSettings= services.ConfigurePOCO<UmamiClientSettings>(config.GetSection(UmamiClientSettings.Section));
-       if(string.IsNullOrEmpty( umamiSettings.UmamiPath)) throw new Exception("UmamiUrl is required");
-       if(string.IsNullOrEmpty(umamiSettings.WebsiteId)) throw new Exception("WebsiteId is required");
+         ValidateSettings(umamiSettings);
+          services.AddSingleton(umamiSettings);
        services.AddTransient<HttpLogger>();
         services.AddHttpClient<UmamiClient>((serviceProvider, client) =>
             {

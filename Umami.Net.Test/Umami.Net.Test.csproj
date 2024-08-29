@@ -14,11 +14,9 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
-        <PackageReference Include="MockQueryable.Moq" Version="7.0.2"/>
-        <PackageReference Include="Moq" Version="4.20.70"/>
-        <PackageReference Include="Moq.EntityFrameworkCore" Version="8.0.1.2"/>
+        <PackageReference Include="Moq.Contrib.HttpClient" Version="1.4.0"/>
         <PackageReference Include="xunit" Version="2.9.0" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
           <PrivateAssets>all</PrivateAssets>
@@ -31,17 +29,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Mostlylucid\Mostlylucid.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-        <EmbeddedResource Include="Resources\bad_testentry.md">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </EmbeddedResource>
-        <None Remove="Resources\testentry.md"/>
-        <EmbeddedResource Include="Resources\testentry.md">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </EmbeddedResource>
+        <ProjectReference Include="..\Umami.Net\Umami.Net.csproj"/>
     </ItemGroup>
 
 </Project>

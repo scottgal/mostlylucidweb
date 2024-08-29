@@ -28,7 +28,9 @@
   },
   "dependencies": {
     "@types/alpinejs": "^3.13.10",
+    "highlight.js": "^11.10.0",
     "htmx.org": "^2.0.1",
-    "mermaid": "^11.0.2"
+    "mermaid": "^11.0.2",
+    "simplemde": "^1.11.2"
   }
 }

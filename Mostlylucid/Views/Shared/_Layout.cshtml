@@ -217,12 +217,11 @@ dark:text-white dark:group-hover:text-secondary"></span>
 
 </div>
 
-<script src="~/js/dist/htmx.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
-<script type="text/javascript" src="https://unpkg.com/highlightjs-cshtml-razor/dist/cshtml-razor.min.js"></script>
+
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script defer src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId"></script>
 <script src="~/js/dist/main.js" asp-append-version="true"  data-cfasync="false" > </script>
+<script type="text/javascript" src="https://unpkg.com/highlightjs-cshtml-razor/dist/cshtml-razor.min.js"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

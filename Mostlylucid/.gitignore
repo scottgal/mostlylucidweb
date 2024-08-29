@@ -265,3 +265,4 @@ __pycache__/
 *.pyc
 /wwwroot/cache/
 /logs/
+/wwwroot/js/dist/

@@ -1,4 +1,4 @@
-export  function simplemde() {
+export  function codeeditor() {
     return {
         initialize: initialize,
         saveContentToDisk: saveContentToDisk,

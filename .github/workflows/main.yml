@@ -1,4 +1,5 @@
 name: Publish Umami.NET
+
 on:
   push:
     tags:
@@ -9,25 +10,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: '8.x' # Specify the .NET version you need
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.x' # Specify the .NET version you need
 
-    - name: Restore dependencies
-      run: dotnet restore ./Umami.Net/Umami.Net.csproj
+      - name: Restore dependencies
+        run: dotnet restore ./Umami.Net/Umami.Net.csproj
 
-    - name: Build project
-      run: dotnet build --configuration Release ./Umami.Net/Umami.Net.csproj --no-restore
+      - name: Build project
+        run: dotnet build --configuration Release ./Umami.Net/Umami.Net.csproj --no-restore
 
-    - name: Pack project
-      run: dotnet pack --configuration Release ./Umami.Net/Umami.Net.csproj --no-build --output ./nupkg
+      - name: Run tests
+        run: dotnet test --configuration Release ./Umami.Net.Tests/Umami.Net.Tests.csproj --no-build --verbosity normal
 
-    - name: Publish to NuGet
-      run: dotnet nuget push ./nupkg/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.UMAMI_NUGET_API_KEY }}
-      env:
-        NUGET_API_KEY: ${{ secrets.UMAMI_NUGET_API_KEY }}
+      - name: Pack project
+        run: dotnet pack --configuration Release ./Umami.Net/Umami.Net.csproj --no-build --output ./nupkg
 
+      - name: Publish to NuGet
+        run: dotnet nuget push ./nupkg/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.UMAMI_NUGET_API_KEY }}
+        env:
+          NUGET_API_KEY: ${{ secrets.UMAMI_NUGET_API_KEY }}
