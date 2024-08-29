@@ -1,6 +1,11 @@
 ﻿const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
+    variants: {
+        extend: {
+            display: ['print']
+        },
+    },
     content: ["./**/*.html", "./**/*.cshtml"],
     safelist: ["dark"],
     darkMode: "class",
@@ -10,8 +15,10 @@ module.exports = {
         },
 
         screens: {
-            xs: "375px",
             ...defaultTheme.screens,
+            xs: "375px",
+            print: { raw: 'print' },
+          
         },
 
         colors: {

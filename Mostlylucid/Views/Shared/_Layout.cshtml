@@ -77,7 +77,7 @@
     <link
         crossorigin="anonymous"
         href="/css/dist/main.css" asp-append-version="true"
-        media="screen"
+        media="screen, print"
         rel="stylesheet"
     />
     <link id="light-mode" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/default.min.css">
@@ -107,7 +107,7 @@
         <div class="flex flex-wrap items-center justify-between mb-3 pt-4 pb-2 lg:pt-4 lb:pb-4 w-full border-b border-grey-lighter" id="header">
             <a href="/" class="flex items-center mb-4 lg:mb-0">
                 <span class="bx bx-home text-2xl font-bold  mr-4 mt-1 transition-colors group-hover:text-green 
-dark:text-white dark:group-hover:text-secondary"></span>
+dark:text-white dark:group-hover:text-secondary print:hidden" ></span>
                 <div class="mr-2">
                     <div class="svg-container">
                         <img src="/img/logo.svg" alt="mostlylucid limited" :class="{ 'img-filter-dark': isDarkMode }"/>
@@ -115,13 +115,13 @@ dark:text-white dark:group-hover:text-secondary"></span>
                 </div>
             </a>
 
-            <div class="w-full lg:w-auto">
+            <div class="w-full lg:w-auto print:hidden">
                 <ul class="flex flex-wrap items-center justify-end space-x-2">
                     <li class="group relative mb-1">
                         <partial name="_TypeAhead" />
                     </li>
 
-                    <li class="group relative mb-1">
+                    <li class="group relative mb-1 ">
                         <div class="flex items-center space-x-4">
                             @if (Model != null)
                             {
