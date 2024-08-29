@@ -25,7 +25,7 @@ jobs:
         run: dotnet build --configuration Release ./Umami.Net/Umami.Net.csproj --no-restore
 
       - name: Run tests
-        run: dotnet test --configuration Release ./Umami.Net.Tests/Umami.Net.Tests.csproj --no-build --verbosity normal
+        run: dotnet test --configuration Release ./Umami.Net.Test/Umami.Net.Test.csproj --no-build --verbosity normal
 
       - name: Pack project
         run: dotnet pack --configuration Release ./Umami.Net/Umami.Net.csproj --no-build --output ./nupkg
