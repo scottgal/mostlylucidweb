@@ -24,8 +24,8 @@ jobs:
       - name: Build project
         run: dotnet build --configuration Release ./Umami.Net/Umami.Net.csproj --no-restore
 
-      - name: Run tests
-        run: dotnet test --configuration Release ./Umami.Net.Test/Umami.Net.Test.csproj --no-build --logger:"trx;LogFileName=TestResults.trx" --results-directory "./TestResults" --verbosity normal
+      - name: Run tests using .NET CLI
+        run: dotnet test ./Umami.Net.Test/Umami.Net.Test.csproj --configuration Release --no-build --logger:"trx;LogFileName=TestResults.trx" --results-directory "./TestResults" --verbosity normal
 
       - name: Upload Test Results
         if: always()
