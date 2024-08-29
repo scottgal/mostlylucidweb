@@ -1,41 +1,81 @@
 ﻿@model Mostlylucid.Models.Blog.PostListViewModel
 <div class="pt-2" id="content">
 
-    @if (Model.TotalItems > Model.PageSize)
+   
+    <div class="inline-flex w-full items-center justify-center">
+        @if (Model.TotalItems > Model.PageSize)
+        {
+        <pager
+            x-ref="pager"
+            link-url="@Model.LinkUrl"
+            hx-boost="true"
+            hx-push-url="true"
+            hx-target="#content"
+            hx-swap="show:none"
+            page="@Model.Page"
+            page-size="@Model.PageSize"
+            total-items="@Model.TotalItems">
+        </pager>
+        }
+        <div class="ml-4">
+            @{
+                var pageSizeOptions = new List<int> { 5, 10, 20, 30, 40, 50, 100 };
+                pageSizeOptions = pageSizeOptions.Where(x => x <= Model.TotalItems).ToList();
+                if (pageSizeOptions.Max(x => x) < Model.TotalItems)
+                {
+                    pageSizeOptions.Add(Model.TotalItems);
+                }
+
+                var selected = Model.PageSize;
+            }
+            <label for="pageSize" class="font-body text-sm text-primary dark:text-white">Posts per page</label>
+            <select id="pageSize" class="select select-bordered select-sm text-black dark:bg-custom-dark-bg bg-white dark:text-white py-0 " x-on:change="changePageSize()">
+                @foreach (var size in pageSizeOptions)
+                {
+                    var selectedValue = size == selected;
+                    if (selectedValue)
+                    {
+                        <option value="@size" selected>@size</option>
+                    }
+                    else
+                    {
+                        <option c value="@size">@size</option>
+                    }
+                }
+
+            </select>
+        </div>
+
+        <script>
+                function changePageSize() {
+                    const pageSize = document.getElementById('pageSize').value;
+                    htmx.ajax('get', `@Model.LinkUrl?page=1&pageSize=${pageSize}`, {
+                        target: '#content',
+                        swap: 'innerHTML',
+                    }).then(() => {
+                        history.pushState({}, null,  `@Model.LinkUrl?page=1&pageSize=${pageSize}`);
+                    });
+                }
+            </script>
+
+    </div>
+    
+    @if (ViewBag.Categories != null)
     {
-        <div class="inline-flex w-full items-center justify-center">
-            <pager
-                x-ref="pager"
-                link-url="@Model.LinkUrl"
-                hx-boost="true"
-                hx-push-url="true"
-                hx-target="#content"
-                hx-swap="show:none"
-                page="@Model.Page"
-                page-size="@Model.PageSize"
-                total-items="@Model.TotalItems"
-            ></pager>
-            <div class="tooltip" data-tip="Show all posts">
-                <a class="btn btn-outline btn-sm ml-4" hx-target="#content" hx-trigger="boost" asp-route-page="1" asp-route-pagesize="@Model.TotalItems" asp-action="Index"  ><i class='bx bx-list-plus'></i> all</a>
+        <div class="pb-3">
+            <h4 class="font-body text-lg text-primary dark:text-white">Categories</h4>
+            <div class="flex flex-wrap gap-2 pt-2">
+                @foreach (var category in ViewBag.Categories)
+                {
+                    <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
+                        <span class="inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">@category</span>
+                    </a>
+                }
             </div>
         </div>
     }
-    @if(ViewBag.Categories != null)
-{
-    <div class="pb-3">
-        <h4 class="font-body text-lg text-primary dark:text-white">Categories</h4>
-        <div class="flex flex-wrap gap-2 pt-2">
-            @foreach (var category in ViewBag.Categories)
-            {
-                <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
-                    <span class="inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">@category</span>
-                </a>
-            }
-        </div>
-    </div>
-}
-@foreach (var post in Model.Posts)
-{
-    <partial name="_ListPost" model="post"/>
-}
+    @foreach (var post in Model.Posts)
+    {
+        <partial name="_ListPost" model="post"/>
+    }
 </div>

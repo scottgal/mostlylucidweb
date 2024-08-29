@@ -78,6 +78,10 @@ window.onload = function(ev) {
             updateMetaUrls();
             setLogoutLink();
         });
+        document.addEventListener('htmx:afterSettle', () => {
+            // Reinitialize Alpine.js components after HTMX content swap
+            Alpine.initTree(document);
+        });
     }
 };
 
