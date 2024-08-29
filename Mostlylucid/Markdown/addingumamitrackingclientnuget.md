@@ -10,7 +10,7 @@ Now I have the Umami client; I need to package it up and make it available as a 
 # Creating the Nuget Package
 
 ## Versioning
-I decided to copy [Khalid](@khalidabuhakmeh@mastodon.social) and use the excellent minver package to version my Nuget package. This is a simple package that uses the git version tag to determine the version number. 
+I decided to copy [Khalid](https://khalidabuhakmeh.com/) and use the excellent minver package to version my Nuget package. This is a simple package that uses the git version tag to determine the version number. 
 
 To use it I simply added the following to my `Umami.Net.csproj` file:
 
