@@ -29,7 +29,7 @@
                 <a href="#"
                    x-on:click.prevent="selectedLanguage = '@(language.ConvertCodeToLanguage())'; selectedFlag = '/img/flags/@(language).svg'; selectedShortCode='@language'; open = false"
                    class="flex dark:text-white text-black items-center p-2 hover:bg-gray-100">
-                    <img src="/img/flags/@(language).svg" asp-append-version="true" class="ml-2 h-4 w-4 mr-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="@language"> @language.ConvertCodeToLanguage()
+                    <img src="/img/flags/@(language).svg" asp-append-version="true" width="16px" height="16px" class="ml-2 h-4 w-4 mr-4 rounded outline outline-1  outline-green-dark dark:outline-white" alt="@language"> @language.ConvertCodeToLanguage()
                 </a>
             </li>
             }

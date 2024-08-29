@@ -27,8 +27,9 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "@types/alpinejs": "^3.13.10",
+    "alpinejs": "^3.14.1",
     "highlight.js": "^11.10.0",
+    "highlightjs-cshtml-razor": "^2.1.1",
     "htmx.org": "^2.0.1",
     "mermaid": "^11.0.2",
     "simplemde": "^1.11.2"

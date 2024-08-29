@@ -49,7 +49,7 @@
         name="description"
         content="Scott Galloway is a lead developer and software engineer with a passion for building web applications."
     />
-    <link rel="icon" type="image/png" href="/img/favicon.png" />
+    <link rel="icon" type="image/png" href="/img/smalllogo.svg" />
     <script src="https://accounts.google.com/gsi/client"  data-cfasync="false" async defer></script>
 
     <link
@@ -90,8 +90,7 @@
 
     <link id="simplemde-light" rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
 
-    <!--Alpine Js V3-->
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
 
 </head>
 
@@ -114,7 +113,6 @@ dark:text-white dark:group-hover:text-secondary"></span>
                         <img src="/img/logo.svg" alt="mostlylucid limited" :class="{ 'img-filter-dark': isDarkMode }"/>
                     </div>
                 </div>
-                <!-- <img src="img/3-dots-bounce.svg"  :class="{ 'img-filter-dark': isDarkMode }"/>-->
             </a>
 
             <div class="w-full lg:w-auto">
@@ -134,7 +132,7 @@ dark:text-white dark:group-hover:text-secondary"></span>
                                 <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-outline btn-sm  text-blue-dark dark:text-white">
                                     @if (Model.AvatarUrl != null)
                                     {
-                                    <img src="@Model.AvatarUrl" class="h-6 w-6 rounded-full" alt="User Avatar" />
+                                    <img src="@Model.AvatarUrl"  width="24px" height="24px" class="h-6 w-6 rounded-full" alt="User Avatar" />
                                     }
                                 <span class="text-body text-blue-dark dark:text-white"> @Model.Name</span>
                                 
@@ -219,9 +217,9 @@ dark:text-white dark:group-hover:text-secondary"></span>
 
 
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
-<script defer src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId"></script>
 <script src="~/js/dist/main.js" asp-append-version="true"  data-cfasync="false" > </script>
-<script type="text/javascript" src="https://unpkg.com/highlightjs-cshtml-razor/dist/cshtml-razor.min.js"></script>
+<script defer src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId"></script>
+
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

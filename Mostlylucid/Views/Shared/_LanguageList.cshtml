@@ -11,7 +11,7 @@ var active= "opacity-50 hover:opacity-100";
     }
     <div class="tooltip mt-1.5" data-tip="@language.ConvertCodeToLanguage()">
     <a hx-boost="true"   hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.slug" asp-route-language="@language" class=" rounded outline outline-1  outline-green-dark dark:outline-white inline-block w-6 h-4  @active">
-        <img src="~/img/flags/@(language).svg"  asp-append-version="true" alt="@language.ConvertCodeToLanguage()" class="rounded" />
+        <img src="~/img/flags/@(language).svg" height="16px" width="24px"   asp-append-version="true" alt="@language.ConvertCodeToLanguage()" class="h-4 w-6 rounded" />
     </a>
     </div>
 }

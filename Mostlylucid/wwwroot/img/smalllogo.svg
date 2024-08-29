@@ -1,4 +1,32 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet">
-    <text x="10" y="60" font-family="Roboto" font-size="80" font-style="italic" font-weight="bold" fill="black">m</text>
-    <text x="70" y="60" font-weight="bold" font-family="Roboto" font-size="80"  fill="black">l</text>
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="100" height="80" viewBox="0 0 100 80" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <style type="text/css">
+            @import url('https://fonts.googleapis.com/css?family=Raleway:600,700italic');
+
+            /* Default (light mode) */
+            rect {
+            fill: #e0e0e0; /* Light grey background */
+            }
+            text {
+            fill: black;
+            }
+
+            /* Dark mode */
+            @media (prefers-color-scheme: dark) {
+            rect {
+            fill: #333333; /* Dark grey background */
+            }
+            text {
+            fill: white;
+            }
+            }
+        </style>
+    </defs>
+
+    <!-- Rounded rectangle background -->
+    <rect x="0" y="0" width="100" height="80" rx="10" ry="10" />
+
+    <!-- Text elements -->
+    <text x="5" y="65" font-family="Raleway" font-size="80" font-style="italic" font-weight="700">m</text>
+    <text x="70" y="65" font-weight="600" font-family="Raleway" font-size="80">l</text>
 </svg>

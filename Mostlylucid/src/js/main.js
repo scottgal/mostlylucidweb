@@ -4,6 +4,11 @@ window.mostlylucid = window.mostlylucid || {};
 import mermaid from "mermaid";
 import htmx from "htmx.org";
 import hljs from "highlight.js";
+
+
+import Alpine from 'alpinejs'
+window.Alpine = Alpine
+
 window.hljs=hljs;
 window.htmx = htmx;
 window.mermaid=mermaid;
@@ -53,26 +58,30 @@ window.mermaidinit = function() {
 
 window.onload = function(ev) {
     if(document.readyState === 'complete') {
+        Alpine.start();
         initGoogleSignIn();
         mermaidinit();
         hljs.highlightAll();
         setLogoutLink();
         updateMetaUrls();
+        const hljsRazor = require('highlightjs-cshtml-razor');
+        hljs.registerLanguage("cshtml-razor", hljsRazor);
         console.log('Document is ready');
+        document.body.addEventListener('htmx:afterSwap', function(evt) {
+            console.log('HTMX afterSwap triggered', evt);
+
+            const targetId = evt.detail.target.id;
+            if (targetId !== 'contentcontainer' && targetId !== 'commentlist') return;
+
+            mermaidinit();
+            hljs.highlightAll();
+            updateMetaUrls();
+            setLogoutLink();
+        });
     }
 };
 
-document.body.addEventListener('htmx:afterSwap', function(evt) {
-    console.log('HTMX afterSwap triggered', evt);
 
-    const targetId = evt.detail.target.id;
-    if (targetId !== 'contentcontainer' && targetId !== 'commentlist') return;
-
-    mermaidinit();
-    hljs.highlightAll();
-    updateMetaUrls();
-    setLogoutLink();
-});
 
 function updateMetaUrls() {
     var currentUrl = window.location.href;
