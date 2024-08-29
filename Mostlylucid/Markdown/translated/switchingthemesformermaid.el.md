@@ -1,7 +1,7 @@
-# Αλλαγή θεμάτων για τη Γοργόνα
+# Αλλαγή θεμάτων για τη Γοργόνα (Ενημέρωση)
 
 <!--category-- Mermaid, Markdown, Javascript -->
-<datetime class="hidden">2024-08-26T20:36</datetime>
+<datetime class="hidden">2024-08-29T05:00</datetime>
 
 ## Εισαγωγή
 
@@ -10,48 +10,39 @@
 
 Αυτό είναι το αποτέλεσμα μερικών ωρών σκάψιμο και προσπαθεί να καταλάβει πώς να το κάνει αυτό.
 
+Μπορείτε να βρείτε την πηγή για mdeswitcher εδώ:
+[mdeswitcher.js](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid/src/js/mdeswitch.js).
+
+**<span style="color:green"> ΣΗΜΕΙΩΣΗ: Το έχω ενημερώσει αυτό ουσιαστικά.</span>**
+
 [TOC]
 
 ## Το Διάγραμμα
 
 ```mermaid
-sequenceDiagram
-    participant Window as window
-    participant Mermaid as mermaid
-    participant Document as document
-    participant LocalStorage as localStorage
+graph LR
+    A[Start] --> B[Initialize Mermaid with Theme]
+    B --> C{Are there any elements matching 'div.mermaid'?}
+    C --> |No| D[Exit]
+    C --> |Yes| E[Save Original Data]
+    E --> F{Did saving data succeed?}
+    F --> |No| D[Exit]
+    F --> |Yes| G[Set up Theme Event Listeners]
+    G --> H[Check Local Storage for Dark Mode]
+    H --> I{Is Dark Mode enabled?}
+    I --> |Yes| J[Load Mermaid with Dark Theme]
+    I --> |No| K[Load Mermaid with Default Theme]
+    J --> L[Wait for Events]
+    K --> L[Wait for Events]
+    L --> M{Event Triggered?}
+    M --> |Dark Theme Set| N[Reset Processed Data]
+    N --> O[Load Mermaid with Dark Theme]
+    M --> |Light Theme Set| P[Reset Processed Data]
+    P --> Q[Load Mermaid with Default Theme]
+    O --> L
+    Q --> L
+    L --> D[Exit]
 
-    Window->>Init: initMermaid()
-
-    Init->>SaveOriginalData: Call saveOriginalData()
-    SaveOriginalData->>Document: querySelectorAll(elementCode)
-    SaveOriginalData->>Element: Set 'data-original-code' for each element
-    SaveOriginalData->>Init: Resolve saveOriginalData promise
-
-    Init->>Document: Add event listener for 'dark-theme-set'
-    Init->>Document: Add event listener for 'light-theme-set'
-
-    Note over Init: Event Listener for 'dark-theme-set'
-    Document->>ResetProcessed: Trigger resetProcessed() on dark-theme-set
-    ResetProcessed->>Document: querySelectorAll(elementCode)
-    ResetProcessed->>Element: Reset processed state and restore textContent
-    ResetProcessed->>Init: Resolve resetProcessed promise
-    Init->>LoadMermaid: Call loadMermaid('dark')
-    LoadMermaid->>Mermaid: Initialize and run with 'dark' theme
-
-    Note over Init: Event Listener for 'light-theme-set'
-    Document->>ResetProcessed: Trigger resetProcessed() on light-theme-set
-    ResetProcessed->>Document: querySelectorAll(elementCode)
-    ResetProcessed->>Element: Reset processed state and restore textContent
-    ResetProcessed->>Init: Resolve resetProcessed promise
-    Init->>LoadMermaid: Call loadMermaid('default')
-    LoadMermaid->>Mermaid: Initialize and run with 'default' theme
-
-    Note over Init: Check local storage theme
-    Init->>LocalStorage: Retrieve localStorage.theme
-    LocalStorage->>Init: Return 'dark' or other
-    Init->>LoadMermaid: Call loadMermaid based on theme
-    LoadMermaid->>Mermaid: Initialize and run with theme
 
 ```
 
@@ -157,13 +148,34 @@ export  function globalSetup() {
 Στο............................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................................. `main.js` Αρχείο που ρύθμισα τον διακόπτη θέματος. Εισάγω επίσης το `mdeswitch` αρχείο που περιέχει τον κωδικό για την αλλαγή θεμάτων.
 
 ```javascript
-import "./mdeswitch";
-addEventListener("DOMContentLoaded", () => {
-    window.initMermaid();
+//Important: Memraid will ALWAYS intialize on window.onload, so we need to make sure we disable this behaviour:
+import mermaid from "mermaid";
+
+window.mermaid=mermaid;
+mermaid.initialize({startOnLoad:false});
+
+window.mermaidinit = function() {
+    mermaid.initialize({ startOnLoad: false });
+    try {
+        window.initMermaid().then(r => console.log('Mermaid initialized'));
+    } catch (e) {
+        console.error('Failed to initialize Mermaid:', e);
+    }
+
+}
+
+document.body.addEventListener('htmx:afterSwap', function(evt) {
+    mermaidinit();
+    //This should be called after the mermaid diagrams have been rendered.
+    hljs.highlightAll();
 });
-addEventListener('htmx:afterSwap', function(evt) {
-    window.initMermaid();
-});
+
+window.onload = function(ev) {
+    if(document.readyState === 'complete') {
+        mermaidinit();
+        hljs.highlightAll();
+    }
+};
 ```
 
 ## MDESwtich
@@ -172,82 +184,109 @@ addEventListener('htmx:afterSwap', function(evt) {
 (Το φρικτό [διάγραμμα ανωτέρω](#the-diagram) δείχνει την ακολουθία των γεγονότων που συμβαίνουν όταν το θέμα αλλάζει)
 
 ```javascript
-(function(window){
-    'use strict'
+(function(window) {
+    'use strict';
 
-    const elementCode = 'div.mermaid'
-    const loadMermaid = function(theme) {
-        window.mermaid.initialize({theme})
-        window.mermaid.run()
-    }
-    const saveOriginalData = function(){
-        return new Promise((resolve, reject) => {
-            try {
-                var els = document.querySelectorAll(elementCode),
-                    count = els.length;
-                if(!els || count ===0 ) resolve ();
-                els.forEach(element => {
-                    element.setAttribute('data-original-code',encodeURIComponent( element.textContent));
-                    count--
-                    if(count == 0){
-                        resolve()
-                    }
-                });
-            } catch (error) {
-                reject(error)
-            }
-        })
-    }
-    const resetProcessed = function(){
-        return new Promise((resolve, reject) => {
-            try {
-                var els = document.querySelectorAll(elementCode),
-                    count = els.length;
-                if(!els || count ===0 ) resolve ();
-                els.forEach(element => {
-                    if(element.getAttribute('data-original-code') != null){
-                        element.removeAttribute('data-processed')
-                        element.textContent =decodeURIComponent( element.getAttribute('data-original-code'));
-                    }
-                    count--
-                    if(count == 0){
-                        resolve()
-                    }
-                });
-            } catch (error) {
-                reject(error)
-            }
-        })
-    }
+    const elementCode = 'div.mermaid';
 
-    const init = ()=>{
+    const loadMermaid = async (theme) => {
 
-        saveOriginalData()
-            .catch( console.error )
-        document.body.addEventListener('dark-theme-set', ()=>{
-            resetProcessed()
-                .then(() =>{
-                    loadMermaid('dark');
-                    console.log("dark theme set")})
-                .catch(console.error)
-        })
-        document.body.addEventListener('light-theme-set', ()=>{
-            resetProcessed()
-                .then(() =>{
-                    loadMermaid('default');
-                    console.log("dark theme set")})
-                .catch(console.error)
-        })
-        let isDarkMode = localStorage.theme === 'dark';
-        if(isDarkMode) {
-            loadMermaid('dark');
+        mermaid.initialize({startOnLoad: false, theme: theme });
+        console.log("Loading mermaid with theme:", theme);
+        await mermaid.run({
+            querySelector: elementCode,
+        });
+    };
+
+    const saveOriginalData = async () => {
+        try {
+            console.log("Saving original data");
+            const elements = document.querySelectorAll(elementCode);
+            const count = elements.length;
+
+            if (count === 0) return;
+
+            const promises = Array.from(elements).map((element) => {
+                if (element.getAttribute('data-processed') != null) {
+                    console.log("Element already processed");
+                    return;
+                }
+                element.setAttribute('data-original-code', element.innerHTML);
+            });
+
+            await Promise.all(promises);
+        } catch (error) {
+            console.error(error);
+            throw error;
         }
-        else{
-            loadMermaid('default')
+    };
+
+    const resetProcessed = async () => {
+        try {
+            console.log("Resetting processed data");
+            const elements = document.querySelectorAll(elementCode);
+            const count = elements.length;
+
+            if (count === 0) return;
+
+            const promises = Array.from(elements).map((element) => {
+                if (element.getAttribute('data-original-code') != null) {
+                    element.removeAttribute('data-processed');
+                    element.innerHTML = element.getAttribute('data-original-code');
+                }
+                else {
+                    console.log("Element already reset");
+                }
+            });
+
+            await Promise.all(promises);
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+    };
+
+    window.initMermaid = async () => {
+        const mermaidElements = document.querySelectorAll(elementCode);
+        if (mermaidElements.length === 0) return;
+
+        try {
+            await saveOriginalData();
+        } catch (error) {
+            console.error("Error saving original data:", error);
+            return; // Early exit if saveOriginalData fails
         }
 
-    }
-    window.initMermaid = init
+        const handleDarkThemeSet = async () => {
+            try {
+                await resetProcessed();
+                await loadMermaid('dark');
+                console.log("Dark theme set");
+            } catch (error) {
+                console.error("Error during dark theme set:", error);
+            }
+        };
+
+        const handleLightThemeSet = async () => {
+            try {
+                await resetProcessed();
+                await loadMermaid('default');
+                console.log("Light theme set");
+            } catch (error) {
+                console.error("Error during light theme set:", error);
+            }
+        };
+        document.body.removeEventListener('dark-theme-set', handleDarkThemeSet);
+        document.body.removeEventListener('light-theme-set', handleLightThemeSet);
+        document.body.addEventListener('dark-theme-set', handleDarkThemeSet);
+        document.body.addEventListener('light-theme-set', handleLightThemeSet);
+
+        const isDarkMode = localStorage.theme === 'dark';
+        await loadMermaid(isDarkMode ? 'dark' : 'default').then(r => console.log('Initial load complete'));
+
+
+    };
+
 })(window);
 ```
 
@@ -278,38 +317,47 @@ let isDarkMode = localStorage.theme === 'dark';
 Θα δείτε αυτό ακριβώς δημιουργεί μια υπόσχεση ότι βρόχοι μέσα από όλα τα στοιχεία και αποθηκεύει το αρχικό περιεχόμενο σε ένα `data-original-code` γνώριμη ιδιότητα.
 
 ```javascript
-    const saveOriginalData = function(){
-        return new Promise((resolve, reject) => {
-            try {
-                var els = document.querySelectorAll(elementCode),
-                    count = els.length;
-                if(!els || count ===0 ) resolve ();
-                els.forEach(element => {
-                    element.setAttribute('data-original-code',encodeURIComponent(element.textContent))
-                    count--
-                    if(count == 0){
-                        resolve()
-                    }
-                });
-            } catch (error) {
-                reject(error)
+    const saveOriginalData = async () => {
+    try {
+        console.log("Saving original data");
+        const elements = document.querySelectorAll(elementCode);
+        const count = elements.length;
+
+        if (count === 0) return;
+
+        const promises = Array.from(elements).map((element) => {
+            if (element.getAttribute('data-processed') != null) {
+                console.log("Element already processed");
+                return;
             }
-        })
+            element.setAttribute('data-original-code', element.innerHTML);
+        });
+
+        await Promise.all(promises);
+    } catch (error) {
+        console.error(error);
+        throw error;
     }
+};
 ```
 
 `resetProcessed` είναι το ίδιο, εκτός από το αντίστροφο, όπου παίρνει το σημάδι από το `data-original-code` Το αποδίδω και το επαναφέρω στο στοιχείο.
-Σημείωσέ το επίσης. `encodeURIComponent` την αξία που λέω ότι κάποιες χορδές δεν ήταν αποθηκευμένες σωστά.
 
 ### Init@ info: whatsthis
 
 Τώρα έχουμε όλα αυτά τα δεδομένα μπορούμε να επανεκκινήσουμε γοργόνα για να εφαρμόσουμε το νέο μας θέμα και να ανασυνθέσουμε το διάγραμμα SVG στην έξοδο HTML μας.
 
 ```javascript
- const loadMermaid = function(theme) {
-        window.mermaid.initialize({theme})
-        window.mermaid.run()
-    }
+    const elementCode = 'div.mermaid';
+
+const loadMermaid = async (theme) => {
+
+    mermaid.initialize({startOnLoad: false, theme: theme });
+    console.log("Loading mermaid with theme:", theme);
+    await mermaid.run({
+        querySelector: elementCode,
+    });
+};
 ```
 
 ## Συμπέρασμα
