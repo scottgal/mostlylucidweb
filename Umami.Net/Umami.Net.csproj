@@ -60,14 +60,14 @@
         <FrameworkReference Include="Microsoft.AspNetCore.App" />
     </ItemGroup>
 
-    <Target Name="NugetPackAutoVersioning" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">
-        <!-- Delete the contents of the target directory -->
-        <RemoveDir Directories="$(SolutionDir)nuget" />
-        <!-- Recreate the target directory -->
-        <MakeDir Directories="$(SolutionDir)nuget" />
-        <!-- Run the dotnet pack command -->
-        <Exec Command="dotnet pack -p:PackageVersion=$([System.DateTime]::Now.ToString(&quot;yyyy.MM.dd.HHmm&quot;))-preview -p:V --no-build --configuration $(Configuration) --output &quot;$(SolutionDir)nuget&quot;" />
-        <Exec Command="dotnet nuget push $(SolutionDir)nuget\*.nupkg --source Local" />
-        <Exec Command="del /f /s /q $(SolutionDir)nuget\*.nupkg" />
-    </Target>
+<!--    <Target Name="NugetPackAutoVersioning" AfterTargets="Build" Condition="'$(Configuration)' == 'Debug'">-->
+<!--        &lt;!&ndash; Delete the contents of the target directory &ndash;&gt;-->
+<!--        <RemoveDir Directories="$(SolutionDir)nuget" />-->
+<!--        &lt;!&ndash; Recreate the target directory &ndash;&gt;-->
+<!--        <MakeDir Directories="$(SolutionDir)nuget" />-->
+<!--        &lt;!&ndash; Run the dotnet pack command &ndash;&gt;-->
+<!--        <Exec Command="dotnet pack -p:PackageVersion=$([System.DateTime]::Now.ToString(&quot;yyyy.MM.dd.HHmm&quot;))-preview -p:V &#45;&#45;no-build &#45;&#45;configuration $(Configuration) &#45;&#45;output &quot;$(SolutionDir)nuget&quot;" />-->
+<!--        <Exec Command="dotnet nuget push $(SolutionDir)nuget\*.nupkg &#45;&#45;source Local" />-->
+<!--        <Exec Command="del /f /s /q $(SolutionDir)nuget\*.nupkg" />-->
+<!--    </Target>-->
 </Project>
