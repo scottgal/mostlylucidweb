@@ -1,24 +1,38 @@
-export function setup()
-{
-    window.mostlylucid.simplemde.initialize('commenteditor', true);
-    
-}
+export function comments() {
+    return{
+        setValues :setValues,
+        setup : setup
+    }
 
-export function setValues(evt)
-{
-    const button =evt.currentTarget;
-    let element = window.mostlylucid.simplemde.getinstance('commenteditor');
-    let content = element.value();
-    let email = document.getElementById("Email");
-    let name = document.getElementById("Name");
-    let blogPostId = document.getElementById("BlogPostId");
-    
-    var values = {
-        "content": content,
-        "email": email.value,
-        "name": name.value,
-        "blogPostId": blogPostId.value
+    function setup ()  {
+        if (mostlylucid.simplemde && typeof mostlylucid.simplemde.initialize === 'function') {
+            mostlylucid.simplemde.initialize('commenteditor', true);
+        } else {
+            console.error("simplemde is not initialized correctly.");
+        }
     };
-    button.setAttribute('hx-vals', JSON.stringify(values));
-   //button.click();
+
+    function setValues (evt)  {
+        const button = evt.currentTarget;
+        const element = mostlylucid.simplemde.getinstance('commenteditor');
+        const content = element.value();
+        const email = document.getElementById("Email");
+        const name = document.getElementById("Name");
+        const blogPostId = document.getElementById("BlogPostId");
+
+        const values = {
+            content: content,
+            email: email.value,
+            name: name.value,
+            blogPostId: blogPostId.value
+        };
+
+        button.setAttribute('hx-vals', JSON.stringify(values));
+    };
+
+
+
+    // Ensure setup is called when DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', setup);
+
 }

@@ -12,6 +12,7 @@ using Serilog;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umami.Net;
+using Umami.Net.Models;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -113,7 +114,7 @@ app.Use( async (context, next) =>
     if (path.EndsWith("RSS", StringComparison.OrdinalIgnoreCase))
     {
       var rss = context.RequestServices.GetRequiredService<UmamiBackgroundSender>();
-        await rss.TrackPageView(path,"RSS Feed");
+        await rss.Track("RSS");
     }
     await next();
 });

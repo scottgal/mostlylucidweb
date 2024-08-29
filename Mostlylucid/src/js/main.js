@@ -1,28 +1,33 @@
-﻿import {typeahead} from "./typeahead";
+﻿// Initialize the mostlylucid namespace if not already defined
+window.mostlylucid = window.mostlylucid || {};
 
-import  {submitTranslation, viewTranslation} from   "./translations";
-import {simplemde} from  "./simplemde";
+import mermaid from "mermaid";
 
-import {setup, setValues} from "./comments";
-import {globalSetup} from "./global";
-window.globalSetup = globalSetup;
-import "./mdeswitch";
-window.mostlylucid = {};
+window.mermaid=mermaid;
+mermaid.initialize({startOnLoad:false});
+// Importing modules
+import { typeahead } from "./typeahead";
+import { submitTranslation, viewTranslation } from "./translations";
+import { simplemde } from "./simplemde";
+import { globalSetup } from "./global";
+import  {comments} from  "./comments"; 
+import "./mdeswitch"; 
+
+window.mostlylucid.comments = comments();
+
+// Attach imported modules to the mostlylucid namespace
 window.mostlylucid.typeahead = typeahead;
-window.mostlylucid.translations = {};
-window.mostlylucid.translations.submitTranslation = submitTranslation;
-window.mostlylucid.translations.viewTranslation = viewTranslation;
-window.mostlylucid.simplemde =simplemde();
-
-window.mostlylucid.comments={}; 
-window.mostlylucid.comments.setup=setup;
-window.mostlylucid.comments.setValues = setValues;
-
+window.mostlylucid.translations = {
+    submitTranslation: submitTranslation,
+    viewTranslation: viewTranslation
+};
+window.mostlylucid.simplemde = simplemde(); // Assuming simplemde() returns the instance
+window.globalSetup = globalSetup;
 
 function setLogoutLink() {
     // Get the logout link
     var logoutLink = document.querySelector('a[data-logout-link]');
-
+    
     if (logoutLink) {
         // Get the current URL
         var currentUrl = window.location.href;
@@ -33,56 +38,46 @@ function setLogoutLink() {
     }
 }
 
-let googleSignInInitialized = false;
-window.onload =function(ev) {
-    // Google Sign-In Initialization
-    if (!googleSignInInitialized) {
-       initGoogleSignIn();
-        googleSignInInitialized = true;  // Set the flag to true after initialization
-    }
-    hljs.highlightAll();
-    try {
-        console.log("Initializing Mermaid");
-        window.initMermaid();
-    }
-    catch (e) {
-        console.error('Failed to initialize Mermaid:', e);
-    }
+window.mermaidinit = function() {
+    mermaid.initialize({ startOnLoad: false });
+        try {
+            window.initMermaid().then(r => console.log('Mermaid initialized'));
+        } catch (e) {
+            console.error('Failed to initialize Mermaid:', e);
+        }
     
-    // Highlight.js Initialization
-    updateMetaUrls();
-
 }
+
+window.onload = function(ev) {
+    if(document.readyState === 'complete') {
+        initGoogleSignIn();
+        mermaidinit();
+        hljs.highlightAll();
+        setLogoutLink();
+        updateMetaUrls();
+        console.log('Document is ready');
+    }
+};
+
 document.body.addEventListener('htmx:afterSwap', function(evt) {
     console.log('HTMX afterSwap triggered', evt);
 
     const targetId = evt.detail.target.id;
-    if (targetId !== 'contentcontainer' && targetId !== 'commentlist') return
+    if (targetId !== 'contentcontainer' && targetId !== 'commentlist') return;
+
+    mermaidinit();
     hljs.highlightAll();
-    try {
-        console.log("Initializing Mermaid");
-        window.initMermaid();
-    }
-    catch (e) {
-        console.error('Failed to initialize Mermaid:', e);
-    }
-    
     updateMetaUrls();
     setLogoutLink();
 });
 
-
-function updateMetaUrls()
-{
+function updateMetaUrls() {
     var currentUrl = window.location.href;
 
     // Set the current URL in the og:url and twitter:url meta tags
     document.getElementById('metaOgUrl').setAttribute('content', currentUrl);
     document.getElementById('metaTwitterUrl').setAttribute('content', currentUrl);
 }
-
-
-
 
 function renderButton(element) {
     // Check if the button has already been initialized
@@ -103,6 +98,7 @@ function renderButton(element) {
         element.setAttribute('data-google-rendered', 'true');
     }
 }
+
 function initGoogleSignIn() {
     google.accounts.id.initialize({
         client_id: "839055275161-u7dqn2oco2729n6i5mk0fe7gap0bmg6g.apps.googleusercontent.com",
@@ -112,7 +108,6 @@ function initGoogleSignIn() {
     if (element) {
         renderButton(element);
     }
-
 }
 
 function handleCredentialResponse(response) {

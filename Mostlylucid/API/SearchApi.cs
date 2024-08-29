@@ -16,7 +16,7 @@ public class SearchApi(IMostlylucidDBContext context, UmamiBackgroundSender umam
 {
     [HttpGet]
     [Route("osearch/{query}")]
-   // [ValidateAntiForgeryToken]
+    [ValidateAntiForgeryToken]
     public async Task<JsonHttpResult<List<SearchResults>>> OpenSearch(string query, string language = MarkdownBaseService.EnglishLanguage)
     {
         var results = await indexService.GetSearchResults(language, query);

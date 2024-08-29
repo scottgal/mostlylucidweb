@@ -3,9 +3,13 @@
 
     const elementCode = 'div.mermaid';
 
-    const loadMermaid = (theme) => {
-        window.mermaid.initialize({startOnLoad: false,theme: theme});
-        window.mermaid.run({nodes: document.querySelectorAll(elementCode)})
+    const loadMermaid = async (theme) => {
+     
+        mermaid.initialize({startOnLoad: false, theme: theme });
+        console.log("Loading mermaid with theme:", theme);
+        await mermaid.run({
+            querySelector: elementCode,
+        });
     };
 
     const saveOriginalData = async () => {
@@ -17,7 +21,10 @@
             if (count === 0) return;
 
             const promises = Array.from(elements).map((element) => {
-                if (element.getAttribute('data-processed') != null) return;
+                if (element.getAttribute('data-processed') != null) {
+                 console.log("Element already processed");
+                    return;
+                }
                 element.setAttribute('data-original-code', element.innerHTML);
             });
 
@@ -41,6 +48,9 @@
                     element.removeAttribute('data-processed');
                     element.innerHTML = element.getAttribute('data-original-code');
                 }
+                else {
+                    console.log("Element already reset");
+                }
             });
 
             await Promise.all(promises);
@@ -50,39 +60,45 @@
         }
     };
 
-    const init = async () => {
+    window.initMermaid = async () => {
         const mermaidElements = document.querySelectorAll(elementCode);
         if (mermaidElements.length === 0) return;
 
         try {
             await saveOriginalData();
         } catch (error) {
-            console.error(error);
+            console.error("Error saving original data:", error);
+            return; // Early exit if saveOriginalData fails
         }
 
-        document.body.addEventListener('dark-theme-set', async () => {
+        const handleDarkThemeSet = async () => {
             try {
                 await resetProcessed();
-                loadMermaid('dark');
+                await loadMermaid('dark');
                 console.log("Dark theme set");
             } catch (error) {
-                console.error(error);
+                console.error("Error during dark theme set:", error);
             }
-        });
+        };
 
-        document.body.addEventListener('light-theme-set', async () => {
+        const handleLightThemeSet = async () => {
             try {
                 await resetProcessed();
-                loadMermaid('default');
+                await loadMermaid('default');
                 console.log("Light theme set");
             } catch (error) {
-                console.error(error);
+                console.error("Error during light theme set:", error);
             }
-        });
+        };
+        document.body.removeEventListener('dark-theme-set', handleDarkThemeSet);
+        document.body.removeEventListener('light-theme-set', handleLightThemeSet);
+        document.body.addEventListener('dark-theme-set', handleDarkThemeSet);
+        document.body.addEventListener('light-theme-set', handleLightThemeSet);
 
         const isDarkMode = localStorage.theme === 'dark';
-        loadMermaid(isDarkMode ? 'dark' : 'default');
+        await loadMermaid(isDarkMode ? 'dark' : 'default').then(r => console.log('Initial load complete'));
+
+      
     };
 
-    window.initMermaid = init;
 })(window);
