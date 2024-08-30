@@ -21,7 +21,7 @@
             @{
                 var pageSizeOptions = new List<int> { 5, 10, 20, 30, 40, 50, 100 };
                 pageSizeOptions = pageSizeOptions.Where(x => x <= Model.TotalItems).ToList();
-                if (pageSizeOptions.Max(x => x) < Model.TotalItems)
+                if (pageSizeOptions.Any() && pageSizeOptions.Max(x => x) < Model.TotalItems)
                 {
                     pageSizeOptions.Add(Model.TotalItems);
                 }
@@ -39,7 +39,7 @@
                     }
                     else
                     {
-                        <option c value="@size">@size</option>
+                        <option  value="@size">@size</option>
                     }
                 }
 

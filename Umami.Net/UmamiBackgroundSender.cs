@@ -26,6 +26,7 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, ILogger<Um
         logger.LogInformation("Umami pageview event sent");
     }
     
+
     public async Task Track(string eventName, UmamiEventData? eventData = null)
     {
         await using var scope = scopeFactory.CreateAsyncScope(); 

@@ -29,7 +29,8 @@ try
     });
     using var listener = new ActivityListenerConfiguration()
         .Instrument.HttpClientRequests().Instrument
-        .AspNetCoreRequests().TraceToSharedLogger();
+        .AspNetCoreRequests()
+        .TraceToSharedLogger();
 
     var config = builder.Configuration;
     builder.Configuration.AddEnvironmentVariables();

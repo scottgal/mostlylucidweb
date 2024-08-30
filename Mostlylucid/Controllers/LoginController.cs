@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace Mostlylucid.Controllers
 {
@@ -48,6 +47,7 @@ namespace Mostlylucid.Controllers
             {
                 IsPersistent = true
             };
+            
 
             await HttpContext.SignInAsync(
                 CookieAuthenticationDefaults.AuthenticationScheme,
