@@ -108,6 +108,6 @@ namespace Umami.Net
             return await Send(payload, null, "identify");
         }
     
-        public async Task<HttpResponseMessage> Identify(string sessionId) => await Identify(sessionId: sessionId);
+        public async Task<HttpResponseMessage> IdentifySession(string sessionId) => await Identify(sessionId: sessionId);
     }
 }

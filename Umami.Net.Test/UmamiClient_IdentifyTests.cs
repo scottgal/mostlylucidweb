@@ -10,7 +10,7 @@ public class UmamiClient_IdentifyTests
     public async Task Send_Session()
     {
         var umamiClient = SetupExtensions.GetUmamiClient();
-        var response = await umamiClient.Identify(Consts.SessionId);
+        var response = await umamiClient.IdentifySession(Consts.SessionId);
         var content = await response.Content.ReadFromJsonAsync<EchoedRequest>();
         Assert.NotNull(response);
         Assert.NotNull(content);
