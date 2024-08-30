@@ -2,12 +2,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Umami.Net.Config;
 using Umami.Net.Models;
 
 namespace Umami.Net;
 
-public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory,  UmamiClientSettings settings, ILogger<UmamiBackgroundSender> logger) : IHostedService
+public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, ILogger<UmamiBackgroundSender> logger) : IHostedService
 {
 
     private  Channel<SendBackgroundPayload> _channel = Channel.CreateUnbounded<SendBackgroundPayload>();
@@ -64,7 +63,6 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory,  UmamiClie
             // Signal cancellation and complete the channel
             await _cancellationTokenSource.CancelAsync();
             _channel.Writer.Complete();
-
             try
             {
                 // Wait for the background task to complete processing any remaining items
@@ -107,5 +105,5 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory,  UmamiClie
         }
     }
 
-    public record SendBackgroundPayload(string EventType, UmamiPayload Payload);
+    private record SendBackgroundPayload(string EventType, UmamiPayload Payload);
 }

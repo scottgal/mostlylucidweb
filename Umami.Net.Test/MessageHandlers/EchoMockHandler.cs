@@ -2,22 +2,8 @@
 using System.Text;
 using Moq;
 using Moq.Protected;
-using Umami.Net.Models;
 
-namespace Umami.Net.Test;
-
-public class MockMessageHandler(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> sendAsyncFunc)
-    : DelegatingHandler
-{
-    private readonly Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> _sendAsyncFunc =
-        sendAsyncFunc ?? throw new ArgumentNullException(nameof(sendAsyncFunc));
-
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
-        CancellationToken cancellationToken)
-    {
-        return _sendAsyncFunc(request, cancellationToken);
-    }
-}
+namespace Umami.Net.Test.MessageHandlers;
 
 public static class EchoMockHandler
 {
@@ -88,10 +74,4 @@ public static class EchoMockHandler
             Content = new StringContent(responseContent, Encoding.UTF8, "application/json")
         };
     }
-}
-
-public class EchoedRequest
-{
-    public string Type { get; set; }
-    public UmamiPayload Payload { get; set; }
 }

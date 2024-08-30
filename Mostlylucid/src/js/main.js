@@ -146,3 +146,13 @@ function handleCredentialResponse(response) {
         console.error('No credential in response.');
     }
 }
+
+window.changePageSize=   function changePageSize(linkUrl) {
+    const pageSize = document.getElementById('pageSize').value;
+    htmx.ajax('get', `${linkUrl}?page=1&pageSize=${pageSize}`, {
+        target: '#content',
+        swap: 'innerHTML',
+    }).then(() => {
+        history.pushState({}, null,  `${linkUrl}?page=1&pageSize=${pageSize}`);
+    });
+}

@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umami.Net.Config;
+using Umami.Net.Test.MessageHandlers;
 
-namespace Umami.Net.Test;
+namespace Umami.Net.Test.Extensions;
 
 public static class SetupExtensions
 {
@@ -29,6 +30,7 @@ public static class SetupExtensions
         {
             var umamiSettings = serviceProvider.GetRequiredService<UmamiClientSettings>();
             client.DefaultRequestHeaders.Add("User-Agent",
+
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36");
             client.BaseAddress = new Uri(umamiSettings.UmamiPath);
         }).ConfigurePrimaryHttpMessageHandler(() => mockHandler);

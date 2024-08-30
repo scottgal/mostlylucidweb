@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Umami.Net.Test.Extensions;
 
 namespace Umami.Net.Test;
 

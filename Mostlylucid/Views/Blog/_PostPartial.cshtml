@@ -1,15 +1,11 @@
 ﻿@using Microsoft.AspNetCore.Http.Extensions
 @using Mostlylucid.Helpers
 @model Mostlylucid.Models.Blog.BlogPostViewModel
-
-
-
 <title>@($"{Model.Title} ({Model.Language.ConvertCodeToLanguage()})")</title>
 <div class="pt-2 lg:pt-2">
     <div class="border-b border-grey-lighter pb-2 sm:pb-2">
 
-        <h2
-            class="pb-2 block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-4xl md:text-5xl">
+        <h2 class="pb-2 block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-4xl md:text-5xl">
             @Model.Title
         </h2>
         <div>
@@ -63,7 +59,7 @@
             $data.showNewElement = true;  // Use $data to reference Alpine component's state
         }
     });
-"  class="pt-6" id="commentsection">
+"  class="pt-6 print:!hidden" id="commentsection">
         <!-- Button that will disappear once showNewElement is true -->
         <a x-show="!showNewElement"
            class="btn btm-sm btn-outline mb-6"

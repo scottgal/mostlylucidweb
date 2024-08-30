@@ -12,6 +12,8 @@ public class UmamiPayload
     public string? Title { get; set; }
     public string? Url { get; set; }
     public string? Name { get; set; }
+    
+    public string? SessionId { get; set; }
 
     public string? IpAddress { get; set; }
 

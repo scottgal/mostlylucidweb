@@ -17,7 +17,7 @@ namespace Umami.Net
    {
 
 
-    private static  JsonSerializerOptions options = new JsonSerializerOptions
+    private static  JsonSerializerOptions options = new()
     {
         PropertyNamingPolicy = new LowerCaseNamingPolicy(), // Custom naming policy for lower-cased properties
         WriteIndented = true,
@@ -89,16 +89,25 @@ namespace Umami.Net
             return await Send(payload);
         }
 
-        public async Task<HttpResponseMessage> Identify(UmamiEventData eventData)
+        public async Task<HttpResponseMessage> Identify(string? email =null, string? username = null, 
+            string? sessionId = null, string? userId=null, UmamiEventData? eventData = null)
         {
+            eventData ??= new UmamiEventData();
+            if(!string.IsNullOrEmpty(email))
+                eventData.TryAdd("email", email);
+            if(!string.IsNullOrEmpty(username))
+                eventData.TryAdd("username", username);
+            if(!string.IsNullOrEmpty(userId))
+                eventData.TryAdd("userId", userId);
             var payload = new UmamiPayload
             {
                 Website = settings.WebsiteId,
+                SessionId = sessionId,
                 Data = eventData,
-               
             };
-
             return await Send(payload, null, "identify");
         }
+    
+        public async Task<HttpResponseMessage> Identify(string sessionId) => await Identify(sessionId: sessionId);
     }
 }

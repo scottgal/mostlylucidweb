@@ -35,6 +35,9 @@ public class PayloadService(IHttpContextAccessor httpContextAccessor, UmamiClien
 
         if (payload.Data != null)
             newPayload.Data = payload.Data;
+        
+        if (payload.SessionId != null)
+            newPayload.SessionId = payload.SessionId;
 
         return newPayload;
     }
@@ -53,6 +56,7 @@ public class PayloadService(IHttpContextAccessor httpContextAccessor, UmamiClien
             UserAgent = request?.Headers["User-Agent"].FirstOrDefault(),
             Referrer = request?.Headers["Referer"].FirstOrDefault(),
            Hostname = request?.Host.Host,
+           
         };
         
         return payload;

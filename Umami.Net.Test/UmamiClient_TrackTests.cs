@@ -1,5 +1,8 @@
 using System.Net;
 using System.Net.Http.Json;
+using Umami.Net.Models;
+using Umami.Net.Test.Extensions;
+using Umami.Net.Test.MessageHandlers;
 
 namespace Umami.Net.Test;
 
@@ -44,5 +47,22 @@ public class UmamiClient_TrackTests
         Assert.NotNull(content);
         Assert.Equal(Consts.DefaultType, content.Type);
         Assert.Equal(Consts.DefaultName, content.Payload.Name);
+    }
+    
+    [Fact]
+    public async Task Track_FullEvent()
+    {
+        var umamiClient = SetupExtensions.GetUmamiClient();
+        var payload = new UmamiPayload(){Name = Consts.DefaultName};
+        var eventData = new UmamiEventData(){{"string", "value" }};
+        var response = await umamiClient.Track(payload, eventData);
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var content = await response.Content.ReadFromJsonAsync<EchoedRequest>();
+        Assert.NotNull(content);
+        Assert.Equal(Consts.DefaultType, content.Type);
+        Assert.Equal(Consts.DefaultName, content.Payload.Name);
+        Assert.NotNull(content.Payload.Data);
+        Assert.Equal("value", content.Payload.Data["string"].ToString());
     }
 }

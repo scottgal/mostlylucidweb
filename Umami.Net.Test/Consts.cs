@@ -13,4 +13,12 @@ public class Consts
     public const string DefaultTitle = "Example Page";
     public const string DefaultName = "RSS";
     public const string DefaultType = "event";
+
+    public const string Email = "test@test.com";
+
+    public const string UserId = "11224456";
+    
+    public const string UserName = "Test User";
+    
+    public const string SessionId = "B41A9964-FD33-4108-B6EC-9A6B68150763";
 }

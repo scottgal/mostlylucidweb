@@ -29,7 +29,7 @@
                 var selected = Model.PageSize;
             }
             <label for="pageSize" class="font-body text-sm text-primary dark:text-white">Posts per page</label>
-            <select id="pageSize" class="select select-bordered select-sm text-black dark:bg-custom-dark-bg bg-white dark:text-white py-0 " x-on:change="changePageSize()">
+            <select id="pageSize" class="select select-bordered select-sm text-black dark:bg-custom-dark-bg bg-white dark:text-white py-0 " x-on:change="changePageSize('@Model.LinkUrl')">
                 @foreach (var size in pageSizeOptions)
                 {
                     var selectedValue = size == selected;
@@ -45,17 +45,8 @@
 
             </select>
         </div>
-
         <script>
-                function changePageSize() {
-                    const pageSize = document.getElementById('pageSize').value;
-                    htmx.ajax('get', `@Model.LinkUrl?page=1&pageSize=${pageSize}`, {
-                        target: '#content',
-                        swap: 'innerHTML',
-                    }).then(() => {
-                        history.pushState({}, null,  `@Model.LinkUrl?page=1&pageSize=${pageSize}`);
-                    });
-                }
+             
             </script>
 
     </div>
