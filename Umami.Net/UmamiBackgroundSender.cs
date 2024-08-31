@@ -25,6 +25,42 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, ILogger<Um
         await _channel.Writer.WriteAsync(new SendBackgroundPayload("event", sendPayload));
         logger.LogInformation("Umami pageview event sent");
     }
+
+    public async Task Identify(string? email = null, string? username = null,
+        string? sessionId = null, string? userId = null, UmamiEventData? eventData = null)
+    {
+        await using var scope = scopeFactory.CreateAsyncScope();
+        eventData ??= new UmamiEventData();
+        if (!string.IsNullOrEmpty(email))
+            eventData.TryAdd("email", email);
+        if (!string.IsNullOrEmpty(username))
+            eventData.TryAdd("username", username);
+        if (!string.IsNullOrEmpty(userId))
+            eventData.TryAdd("userId", userId);
+        
+        
+        var thisPayload = new UmamiPayload
+        {
+            Data = eventData,
+            SessionId = sessionId
+        };
+        var payloadService = scope.ServiceProvider.GetRequiredService<PayloadService>();
+        var payload = payloadService.PopulateFromPayload(thisPayload, eventData);
+        await Send(payload, eventType: "identify");
+    }
+    
+    public async Task IdentifySession(string sessionId, UmamiEventData? eventData = null)
+    {
+        await using var scope = scopeFactory.CreateAsyncScope();
+        var thisPayload = new UmamiPayload
+        {
+            SessionId = sessionId,
+            Data = eventData ?? new UmamiEventData()
+        };
+        var payloadService = scope.ServiceProvider.GetRequiredService<PayloadService>();
+        var payload = payloadService.PopulateFromPayload(thisPayload, eventData);
+        await Send(payload, eventType: "identify");
+    }
     
 
     public async Task Track(string eventName, UmamiEventData? eventData = null)

@@ -66,6 +66,7 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
            commentViewList.Comments   =await commentViewService.GetApprovedComments(Int32.Parse(post.Id));
        }
   
+       commentViewList.Comments.ForEach(x=> x.IsAdmin = user.IsAdmin);
        post.Comments = commentViewList;
        if(Request.IsHtmx())
        {

@@ -26,7 +26,9 @@ public class CommentEntity
   
     public DateTime CreatedAt { get; set; }
 
-
+    [NotMapped]
+    public int CurrentDepth { get; set; } = 0;
+    
     // Foreign key for the post this comment belongs to
     public int PostId { get; set; }
     

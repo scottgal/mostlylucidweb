@@ -13,6 +13,7 @@ using SerilogTracing;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umami.Net;
+using WebEssentials.AspNetCore.Pwa;
 
 try
 {
@@ -38,12 +39,9 @@ try
     var auth = builder.Configure<AuthSettings>();
     var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
     var services = builder.Services;
-
-
 // Add services to
 // the container.
     services.AddOutputCache(); // Remove duplicate call later in your code
-    services.AddControllersWithViews();
     services.AddResponseCaching();
 
     services.AddEndpointsApiExplorer();
@@ -90,7 +88,14 @@ try
             options.ClientId = auth.GoogleClientId;
             options.ClientSecret = auth.GoogleClientSecret;
         });
-
+    services.AddMvc();
+    services.AddProgressiveWebApp(new PwaOptions
+    {
+        RegisterServiceWorker = true,
+        RegisterWebmanifest = false,  // (Manually register in Layout file)
+        Strategy = ServiceWorkerStrategy.NetworkFirst,
+        OfflineRoute = "Offline.html"
+    });
     var app = builder.Build();
     app.UseSerilogRequestLogging();
 

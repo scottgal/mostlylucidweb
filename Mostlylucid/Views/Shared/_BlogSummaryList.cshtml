@@ -17,37 +17,39 @@
             total-items="@Model.TotalItems">
         </pager>
         }
-        <div class="ml-4">
-            @{
-                var pageSizeOptions = new List<int> { 5, 10, 20, 30, 40, 50, 100 };
-                pageSizeOptions = pageSizeOptions.Where(x => x <= Model.TotalItems).ToList();
-                if (pageSizeOptions.Any() && pageSizeOptions.Max(x => x) < Model.TotalItems)
-                {
-                    pageSizeOptions.Add(Model.TotalItems);
-                }
-
-                var selected = Model.PageSize;
+        @{
+            var pageSizeOptions = new List<int> { 5, 10, 20, 30, 40, 50, 100 };
+            pageSizeOptions = pageSizeOptions.Where(x => x <= Model.TotalItems).ToList();
+            if (pageSizeOptions.Any() && pageSizeOptions.Max(x => x) < Model.TotalItems)
+            {
+                pageSizeOptions.Add(Model.TotalItems);
             }
-            <label for="pageSize" class="font-body text-sm text-primary dark:text-white">Posts per page</label>
-            <select id="pageSize" class="select select-bordered select-sm text-black dark:bg-custom-dark-bg bg-white dark:text-white py-0 " x-on:change="changePageSize('@Model.LinkUrl')">
-                @foreach (var size in pageSizeOptions)
-                {
-                    var selectedValue = size == selected;
-                    if (selectedValue)
-                    {
-                        <option value="@size" selected>@size</option>
-                    }
-                    else
-                    {
-                        <option  value="@size">@size</option>
-                    }
-                }
 
-            </select>
-        </div>
-        <script>
-             
-            </script>
+            var selected = Model.PageSize;
+
+            if (pageSizeOptions.Count > 1)
+            {
+                <div class="ml-4">
+
+                    <label for="pageSize" class="font-body text-sm text-primary dark:text-white">Posts per page</label>
+                    <select id="pageSize" class="select select-bordered select-sm text-black dark:bg-custom-dark-bg bg-white dark:text-white py-0 " x-on:change="changePageSize('@Model.LinkUrl')">
+                        @foreach (var size in pageSizeOptions)
+                        {
+                            var selectedValue = size == selected;
+                            if (selectedValue)
+                            {
+                                <option value="@size" selected>@size</option>
+                            }
+                            else
+                            {
+                                <option value="@size">@size</option>
+                            }
+                        }
+
+                    </select>
+                </div>
+            }
+        }
 
     </div>
     

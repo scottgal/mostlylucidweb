@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Mostlylucid.Blog;
 using Mostlylucid.Blog.EntityFramework;
-using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Config;
 using Mostlylucid.Email;
@@ -36,6 +35,7 @@ public class CommentController(AuthSettings authSettings,
         model.Name = user.Name ?? string.Empty;
         model.Email = user.Email ?? string.Empty;
         model.AvatarUrl = user.AvatarUrl;
+        model.ParentId = parentCommentId;
         
        
         return PartialView("_CommentForm", model);
@@ -55,8 +55,10 @@ public class CommentController(AuthSettings authSettings,
         var name = model.Name ?? "Anonymous";
         var email = model.Email ?? "Anonymous";
         var comment = model.Content;
+
+        var parentCommentId = model.ParentId;
         
-      var htmlContent=  await commentService.Add(postId, null, name, comment);
+      var htmlContent=  await commentService.Add(postId, parentCommentId, name, comment);
       if (string.IsNullOrEmpty(htmlContent))
       {
           ModelState.AddModelError("Content", "Comment could not be saved");
@@ -122,6 +124,32 @@ public class CommentController(AuthSettings authSettings,
         var comment = await commentService.Get(commentId);
         var postId = comment.PostId;
         return RedirectToAction("GetCommentList", new {postId});
+    }
+    
+    [HttpPost]
+    [Route("reply")]
+    public async Task<IActionResult> Reply(CommentInputModel model)
+    {
+     
+        var postId = model.BlogPostId;
+        var name = model.Name ?? "Anonymous";
+        var email = model.Email ?? "Anonymous";
+        var htmlContent = await commentService.Add(postId, model.ParentId, name, model.Content);
+        if (string.IsNullOrEmpty(htmlContent))
+        {
+            return BadRequest();
+        }
+        var slug = await blogService.GetSlug(postId);
+        var url = Url.Action("Show", "Blog", new {slug }, Request.Scheme);
+        var commentModel = new CommentEmailModel
+        {
+            SenderEmail = email ?? "",
+            Comment = htmlContent,
+            PostUrl = url??string.Empty,
+        };
+        await sender.SendEmailAsync(commentModel);
+        model.Content = htmlContent;
+        return PartialView("_CommentResponse", model);
     }
     
     [HttpGet]

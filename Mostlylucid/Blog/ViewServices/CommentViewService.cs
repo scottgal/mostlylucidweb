@@ -4,13 +4,12 @@ using Mostlylucid.Models.Comments;
 
 namespace Mostlylucid.Blog.ViewServices;
 
-public class CommentViewService(ICommentService commentService, ILogger<CommentViewService> logger)
+public class CommentViewService(ICommentService commentService)
 {
-    
-    public async Task<List<CommentViewModel>> GetComments(int postId,int page=1, int pageSize=10, int? maxDepth = null, CommentStatus? status = CommentStatus.Approved)
+    private async Task<List<CommentViewModel>> GetComments(int postId,int page=1, int pageSize=10, int? maxDepth = null, CommentStatus? status = CommentStatus.Approved)
     {
         var comments = await commentService.GetForPost(postId, page, pageSize:pageSize, maxDepth, status);
-        return comments.Select(c => new CommentViewModel(c.Id, c.CreatedAt, c.Author, c.Status, c.HtmlContent ?? c.Content,c.PostId, c.ParentCommentId ?? 0)).ToList();
+        return comments.Select(c => new CommentViewModel(c.Id, c.CreatedAt, c.Author, c.Status, c.HtmlContent ?? c.Content,c.PostId, c.ParentCommentId ?? 0, c.CurrentDepth)).ToList();
     }
     
     public async Task<List<CommentViewModel>> GetAllComments(int postId,int page=1, int pageSize=100, int? maxDepth = null)

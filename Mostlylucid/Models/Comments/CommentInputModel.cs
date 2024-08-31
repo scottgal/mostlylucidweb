@@ -20,6 +20,6 @@ namespace Mostlylucid.Models.Comments;
         public string? Content { get; set; } 
         [Required]
         public int  BlogPostId { get; set; }
-        public int ParentId { get; set; } 
+        public int? ParentId { get; set; } 
 
     }

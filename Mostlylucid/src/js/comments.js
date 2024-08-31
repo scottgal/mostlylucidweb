@@ -20,19 +20,16 @@ export function comments() {
         const name = document.getElementById("Name");
         const blogPostId = document.getElementById("BlogPostId");
 
+        const parentId = document.getElementById("ParentId")
         const values = {
             content: content,
             email: email.value,
             name: name.value,
-            blogPostId: blogPostId.value
+            blogPostId: blogPostId.value,
+            parentId: parentId.value
         };
 
         button.setAttribute('hx-vals', JSON.stringify(values));
     };
-
-
-
-    // Ensure setup is called when DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', setup);
 
 }

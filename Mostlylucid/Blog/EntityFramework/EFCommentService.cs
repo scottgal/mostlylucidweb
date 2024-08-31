@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Mostlylucid.EntityFramework;
 using Mostlylucid.EntityFramework.Models;
+using Serilog;
+using SerilogTracing;
 
 namespace Mostlylucid.Blog.EntityFramework;
 
@@ -10,10 +12,14 @@ public class EFCommentService(IMostlylucidDBContext context,  ILogger<EFCommentS
     
   public async Task<string> Add(int postId, int? parentCommentId, string author, string content)
   {
+      using var activity = Log.Logger.StartActivity("AddComment {PostId}, {ParentCommentId},{Author}, {Content}", 
+          new {postId, parentCommentId, author, content});
       await using var transaction = await context.Database.BeginTransactionAsync();
       try
       {
+         
          var html = Markdig.Markdown.ToHtml(content);
+         
           // Create the new comment
           var newComment = new CommentEntity()
           {
@@ -36,7 +42,7 @@ public class EFCommentService(IMostlylucidDBContext context,  ILogger<EFCommentS
           // Self-referencing closure entry
           commentClosures.Add(new CommentClosure
           {
-              AncestorId = newComment.Id,
+              AncestorId =  newComment.Id,
               DescendantId = newComment.Id,
               Depth = 0
           });
@@ -60,17 +66,22 @@ public class EFCommentService(IMostlylucidDBContext context,  ILogger<EFCommentS
                   });
               }
 
-              // Add a direct parent-child relationship
-              commentClosures.Add(new CommentClosure
+// Add a direct parent-child relationship only if it is not already added
+              if (parentAncestors.All(a => a.AncestorId != parentCommentId.Value))
               {
-                  AncestorId = parentCommentId.Value,
-                  DescendantId = newComment.Id,
-                  Depth = 1
-              });
+                  commentClosures.Add(new CommentClosure
+                  {
+                      AncestorId = parentCommentId.Value,
+                      DescendantId = newComment.Id,
+                      Depth = 1
+                  });
+              }
+
           }
 
           context.CommentClosures.AddRange(commentClosures);
           await context.SaveChangesAsync();
+          activity.Complete();
           logger.LogInformation("Saved comment closure to DB");
 
           // Commit transaction
@@ -87,7 +98,8 @@ public class EFCommentService(IMostlylucidDBContext context,  ILogger<EFCommentS
       return string.Empty;
   }
 
-  public async Task<List<CommentEntity>> GetForPost(int blogPostId, int page = 1, int pageSize = 10, int? maxDepth = null, CommentStatus? status = null)
+  public async Task<List<CommentEntity>> GetForPost(int blogPostId, int page = 1, int pageSize = 10,
+      int? maxDepth = null, CommentStatus? status = null)
   {
       // Step 1: Query the top-level comments for the specified blog post
       var query = context.Comments
@@ -96,43 +108,44 @@ public class EFCommentService(IMostlylucidDBContext context,  ILogger<EFCommentS
           .Skip((page - 1) * pageSize)
           .Take(pageSize);
 
-      // Step 2: Filter by status if provided
+
+// Step 2: Filter by status if provided
       if (status.HasValue)
       {
           query = query.Where(c => c.Status == status.Value);
       }
-
-      var topLevelComments = await query
+      return await query.ToListAsync();
+// Step 3: Include related entities
+      query = query
           .Include(c => c.ParentComment)
-          .Include(d=>d.Descendants)
-          .ToListAsync();
+          .Include(c => c.Descendants);
 
-      // Step 4: Filter descendants based on the maxDepth
-      foreach (var comment in topLevelComments)
+      var comments = await query.ToListAsync();
+// Filter out the current comment from its own descendants in memory
+      foreach (var comment in comments)
       {
-          if (maxDepth != null)
-          {
-              FilterDescendantsByDepth(comment, 0, maxDepth.Value);
-          }
+          comment.Descendants = comment.Descendants.Where(d => d.DescendantId != comment.Id).ToList();
       }
 
-      return topLevelComments;
-  }
 
-// Recursive helper method to limit the descendants based on the specified depth
-  private void FilterDescendantsByDepth(CommentEntity comment, int currentDepth, int maxDepth)
-  {
-      if (currentDepth >= maxDepth)
+
+      List<CommentClosure> descendants = new();
+      foreach (var comment in comments)
       {
-          // If the max depth is reached or there are no descendants, stop recursion
-          comment.Descendants = new List<CommentClosure>();  // Clear further descendants beyond maxDepth
-          return;
+         descendants = comment.Descendants.ToList();
+         foreach(var descendant in descendants)
+         {
+             CommentEntity commentDescendant = descendant.Descendant;
+             while (commentDescendant != null)
+             {
+                var currentComment = comments.FirstOrDefault(x => x.Id == commentDescendant.Id);
+                currentComment.CurrentDepth = descendant.Depth;
+                commentDescendant = descendant.Descendant;
+             }
+         }
       }
 
-      foreach (var closure in comment.Descendants.ToList())  // Iterate over a copy to prevent modification during iteration
-      {
-          FilterDescendantsByDepth(closure.Descendant, currentDepth + 1, maxDepth);
-      }
+      return comments;
   }
 
   public async Task<CommentEntity?> Get(int commentId)

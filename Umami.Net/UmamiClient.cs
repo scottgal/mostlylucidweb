@@ -89,6 +89,12 @@ namespace Umami.Net
             return await Send(payload);
         }
 
+        public async Task<HttpResponseMessage> Identify(UmamiPayload payload, UmamiEventData? eventData = null)
+        {
+            var sendPayload = payloadService.PopulateFromPayload(payload, eventData);
+            return await Send(sendPayload, eventData, "identify");
+        }
+        
         public async Task<HttpResponseMessage> Identify(string? email =null, string? username = null, 
             string? sessionId = null, string? userId=null, UmamiEventData? eventData = null)
         {
@@ -105,7 +111,7 @@ namespace Umami.Net
                 SessionId = sessionId,
                 Data = eventData,
             };
-            return await Send(payload, null, "identify");
+            return await Identify(payload, eventData);
         }
     
         public async Task<HttpResponseMessage> IdentifySession(string sessionId) => await Identify(sessionId: sessionId);
