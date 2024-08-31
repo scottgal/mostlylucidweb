@@ -34,6 +34,7 @@ public class EFCommentService(IMostlylucidDBContext context,  ILogger<EFCommentS
             
           context.Comments.Add(newComment);
           await context.SaveChangesAsync();
+          activity.AddProperty("CommentId", newComment.Id);
           logger.LogInformation("Saved comment to DB");// Save to generate the new comment's Id
 
           // Insert into CommentClosure table
