@@ -1,4 +1,6 @@
 ﻿// Initialize the mostlylucid namespace if not already defined
+import hljsRazor from "highlightjs-cshtml-razor";
+
 window.mostlylucid = window.mostlylucid || {};
 
 import mermaid from "mermaid";
@@ -61,11 +63,11 @@ window.onload = function(ev) {
         Alpine.start();
         initGoogleSignIn();
         mermaidinit();
+        const hljsRazor = require('highlightjs-cshtml-razor');
+        hljs.registerLanguage("cshtml-razor", hljsRazor);
         hljs.highlightAll();
         setLogoutLink();
         updateMetaUrls();
-        const hljsRazor = require('highlightjs-cshtml-razor');
-        hljs.registerLanguage("cshtml-razor", hljsRazor);
         console.log('Document is ready');
         document.body.addEventListener('htmx:afterSwap', function(evt) {
             console.log('HTMX afterSwap triggered', evt);
