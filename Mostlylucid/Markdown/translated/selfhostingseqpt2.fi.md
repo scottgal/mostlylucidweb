@@ -5,9 +5,9 @@
 <!--category-- ASP.NET, Seq, Serilog -->
 # Johdanto
 
-Edellisessä osassa näytin, miten pystytetään [ASP.NET Core -sovelluksen avulla Seqille omatoiminen isännöinti ](/blog/selfhostingseq)...................................................................................................................................... Nyt kun se on pystytetty, on aika käyttää enemmän sen ominaisuuksia mahdollistaakseen täydellisemmän kirjauksen ja jäljittämisen uuden Seq-instanssin avulla.
+Edellisessä osassa näytin, miten pystytetään [ASP.NET Core -sovelluksen avulla Seqille omatoiminen isännöinti ](/blog/selfhostingseq) Nyt kun se on pystytetty, on aika käyttää enemmän sen ominaisuuksia mahdollistaakseen täydellisemmän kirjauksen ja jäljittämisen uuden Seq-instanssin avulla.
 
-[TÄYTÄNTÖÖNPANO
+[TOC]
 
 # Jäljitys
 
