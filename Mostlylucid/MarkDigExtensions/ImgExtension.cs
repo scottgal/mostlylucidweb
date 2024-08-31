@@ -16,19 +16,21 @@ public class ImgExtension : IMarkdownExtension
     {
     }
 
-    public void ChangeImgPath(MarkdownDocument document)
+    private void ChangeImgPath(MarkdownDocument document)
     {
         foreach (var link in document.Descendants<LinkInline>())
             if (link.IsImage)
             {
-                if(link.Url.StartsWith("http")) continue;
+                var url = link.Url;
+                if(url.StartsWith("http:") || url.StartsWith("https:")) continue;
                 
-                if (!link.Url.Contains("?"))
+                if (!url.Contains("?"))
                 {
-                   link.Url += "?format=webp&quality=50";
+                   url += "?format=webp&quality=50";
                 }
 
-                link.Url = "/articleimages/" + link.Url;
+                url = "/articleimages/" + url;
+                link.Url = url;
             }
                
     }
