@@ -2,6 +2,8 @@
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Umami.Net.Models;
+using JwtPayload = System.IdentityModel.Tokens.Jwt.JwtPayload;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace Umami.Net.Test.Extensions;
@@ -9,16 +11,18 @@ namespace Umami.Net.Test.Extensions;
 public static class JwtExtensions
 {
     private const string Secret = "2B8758EA-8E59-49C9-9005-F1117AC24168";
-    public static string GenerateJwt(string secret = Secret)
+    public static string GenerateJwt( UmamiPayload umamiPayload, string secret = Secret)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
+//Based on website_id, hostname, ip, userAgent
+        var visitorId =
+            $"{umamiPayload.Website}{umamiPayload.Hostname}{umamiPayload.IpAddress}{umamiPayload.UserAgent}";
         var claims = new[]
         {
             new Claim("id", "28ac27ad-9945-52b1-a629-7004f174a644"),
-            new Claim("websiteId", "32c2aa31-b1ac-44c0-b8f3-ff1f50403bee"),
-            new Claim("hostname", "localhost"),
+            new Claim("websiteId", umamiPayload.Website),
+            new Claim("hostname", umamiPayload.Hostname),
             new Claim("browser", "chrome"),
             new Claim("os", "Windows 10"),
             new Claim("device", ""),
@@ -26,7 +30,7 @@ public static class JwtExtensions
             new Claim("language", ""),
             new Claim("country", "GB"),
             new Claim("createdAt", "2024-08-30T10:19:28.462Z"),
-            new Claim("visitId", "475ec995-a106-52e0-9b47-88584ae77089"),
+            new Claim("visitId", visitorId),
             new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
 

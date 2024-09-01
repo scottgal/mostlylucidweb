@@ -42,7 +42,7 @@ public class PayloadService(IHttpContextAccessor httpContextAccessor, UmamiClien
         return newPayload;
     }
 
-    public  UmamiPayload GetPayload(string? url = null, UmamiEventData? data = null)
+    private UmamiPayload GetPayload(string? url = null, UmamiEventData? data = null)
     {
         var httpContext = httpContextAccessor.HttpContext;
         var request = httpContext?.Request;

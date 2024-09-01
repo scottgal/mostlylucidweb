@@ -1,7 +1,9 @@
 ﻿
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Umami.Net.Config;
 using Umami.Net.Helpers;
@@ -32,9 +34,8 @@ namespace Umami.Net
              payload = payloadService.PopulateFromPayload( payload, eventData);
             
             var jsonPayload = new { type, payload };
-
-        
-
+            var request = new HttpRequestMessage(HttpMethod.Post, "api/send");
+            request.Headers.Add("User-Agent", payload.UserAgent);
             var response = await client.PostAsJsonAsync("api/send", jsonPayload, options);
 
             if (!response.IsSuccessStatusCode)

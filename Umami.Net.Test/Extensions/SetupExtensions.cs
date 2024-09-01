@@ -21,17 +21,11 @@ public static class SetupExtensions
         services.AddSingleton(umamiClientSettings);
         services.AddScoped<PayloadService>();
         services.AddLogging(x => x.AddConsole());
-
         // Mocking HttpMessageHandler with Moq
         var mockHandler = handler ?? EchoMockHandler.Create();
-
-
         services.AddHttpClient<UmamiClient>((serviceProvider, client) =>
         {
             var umamiSettings = serviceProvider.GetRequiredService<UmamiClientSettings>();
-            client.DefaultRequestHeaders.Add("User-Agent",
-
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36");
             client.BaseAddress = new Uri(umamiSettings.UmamiPath);
         }).ConfigurePrimaryHttpMessageHandler(() => mockHandler);
         return services;
@@ -45,20 +39,29 @@ public static class SetupExtensions
         httpContext.Request.Host = new HostString(host);
         httpContext.Request.Path = new PathString(path);
         httpContext.Connection.RemoteIpAddress = IPAddress.Parse(ip);
-        httpContext.Request.Headers["User-Agent"] = userAgent;
-        httpContext.Request.Headers["Referer"] = referer;
+        httpContext.Request.Headers.UserAgent = userAgent;
+        httpContext.Request.Headers.Referer = referer;
 
         var context = new HttpContextAccessor { HttpContext = httpContext };
         return context;
     }
 
-    public static UmamiClient GetUmamiClient(IServiceCollection? serviceCollection = null,
+    public static void SetupUmamiClient(IServiceCollection serviceCollection,
         HttpContextAccessor? contextAccessor = null)
     {
         var services = serviceCollection ?? SetupServiceCollection();
         var context = contextAccessor ?? SetupHttpContextAccessor();
         services.AddSingleton<IHttpContextAccessor>(context);
-        var serviceProvider = services.BuildServiceProvider();
+        
+    }
+    
+    public static UmamiClient GetUmamiClient(IServiceCollection? serviceCollection = null,
+        HttpContextAccessor? contextAccessor = null)
+    {
+        serviceCollection ??= SetupServiceCollection();
+        SetupUmamiClient(serviceCollection, contextAccessor);
+        if (serviceCollection == null) throw new NullReferenceException(nameof(serviceCollection));
+        var serviceProvider = serviceCollection.BuildServiceProvider();
         return serviceProvider.GetRequiredService<UmamiClient>();
     }
 }

@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mostlylucid.Test", "Mostlyl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umami.Net.Test", "Umami.Net.Test\Umami.Net.Test.csproj", "{B054AEB3-622E-48ED-8E4F-1E5C51F8E751}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Umami.Net.LiveTest", "Umami.Net.LiveTest\Umami.Net.LiveTest.csproj", "{E60ED87F-5FDF-4423-ADE4-0A01CB749F9A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,5 +47,9 @@ Global
 		{B054AEB3-622E-48ED-8E4F-1E5C51F8E751}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B054AEB3-622E-48ED-8E4F-1E5C51F8E751}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B054AEB3-622E-48ED-8E4F-1E5C51F8E751}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E60ED87F-5FDF-4423-ADE4-0A01CB749F9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E60ED87F-5FDF-4423-ADE4-0A01CB749F9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E60ED87F-5FDF-4423-ADE4-0A01CB749F9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E60ED87F-5FDF-4423-ADE4-0A01CB749F9A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

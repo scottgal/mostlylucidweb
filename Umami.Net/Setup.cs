@@ -28,7 +28,7 @@ public static class Setup
         services.AddHttpClient<UmamiClient>((serviceProvider, client) =>
             {
                  umamiSettings = serviceProvider.GetRequiredService<UmamiClientSettings>();
-            client.DefaultRequestHeaders.Add("User-Agent", $"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36");
+         ;
             client.BaseAddress = new Uri(umamiSettings.UmamiPath);
         }).SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Set lifetime to five minutes
         .AddPolicyHandler(GetRetryPolicy())

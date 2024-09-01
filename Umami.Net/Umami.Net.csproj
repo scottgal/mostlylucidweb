@@ -32,6 +32,7 @@
       </PackageReference>
       <PackageReference Include="Polly" Version="8.4.1" />
       <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
     </ItemGroup>
     <PropertyGroup>
         <MinVerTagPrefix>v</MinVerTagPrefix>

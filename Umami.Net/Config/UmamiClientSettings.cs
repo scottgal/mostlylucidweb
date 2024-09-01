@@ -7,3 +7,9 @@ public class UmamiClientSettings : IConfigSection
 
     public string WebsiteId { get; set; } = string.Empty;
 }
+
+public class UmamiDataSettings : UmamiClientSettings
+{
+    public string Username { get; set; } = "admin";
+    public string Password { get; set; } = "password";
+}

@@ -19,7 +19,7 @@ public class UmamiBackgroundSenderTests
 
         services.AddScoped<IHostedService, UmamiBackgroundSender>(provider =>
             provider.GetRequiredService<UmamiBackgroundSender>());
-        _ = SetupExtensions.GetUmamiClient(services);
+        SetupExtensions.SetupUmamiClient(services);
         var serviceProvider = services.BuildServiceProvider();
         var backgroundSender = serviceProvider.GetRequiredService<UmamiBackgroundSender>();
         var hostedService = serviceProvider.GetRequiredService<IHostedService>();
