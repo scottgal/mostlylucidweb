@@ -123,6 +123,18 @@ module.exports = {
                         "p, li": {
                             fontWeight: theme("fontWeight.light"),
                         },
+                        "h1":{
+                        fontSize: theme("fontSize.2xl"),  
+                        },
+                        "h2":{
+                            fontSize: theme("fontSize.xl"),
+                        },
+                        "h3":{
+                            fontSize: theme("fontSize.lg"),
+                        },
+                        "h4":{
+                            fontSize: theme("fontSize.base"),
+                        },
                         "h1, h2, h3, h4, h5, h6": {
                             fontWeight: theme("fontWeight.semibold"),
                         },
@@ -142,11 +154,23 @@ module.exports = {
                                 fontWeight: theme("fontWeight.normal"),
                             },
                         },
+                        pre: {
+                            border: "1px solid #888",
+                            borderRadius: theme('borderRadius.xl'),
+                            padding: "0",
+                            backgroundColor: theme("colors.primary")
+                        }
                     },
                 },
                 dark: {
                     css: {
                         color: theme("colors.white"),
+                        pre: {
+                            border: "1px solid #888",
+                            borderRadius: theme('borderRadius.xl'),
+                            padding: "0",
+                            backgroundColor: theme("colors.primary")
+                        },
                         a: {
                             color: theme("colors.secondary"),
                             "&:hover": {
