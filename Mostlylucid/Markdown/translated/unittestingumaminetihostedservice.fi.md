@@ -6,7 +6,7 @@ Edellisessä kirjoituksessa keskustelimme siitä, miten testattaisiin `UmamiClie
 
 Kuten tavallista, näet tämän lähdekoodin GitHubistani. [täällä](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSender_Tests.cs).
 
-[TOC]
+[TÄYTÄNTÖÖNPANO
 
 <!--category-- xUnit, Umami, IHostedService, Moq -->
 <datetime class="hidden">2024-09-03T09:00</datetime>
