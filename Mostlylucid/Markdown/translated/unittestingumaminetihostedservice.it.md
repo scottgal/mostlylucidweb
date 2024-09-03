@@ -4,7 +4,7 @@
 
 Nell'articolo precedente, abbiamo discusso come testare la `UmamiClient` usando xUnit e Moq. In questo articolo, discuteremo come testare il `UmamiBackgroundSender` classe. La `UmamiBackgroundSender` è un po 'diverso da `UmamiClient` come usa `IHostedService` per rimanere in esecuzione in background e inviare richieste attraverso `UmamiClient` completamente fuori dalla thread di esecuzione principale (in modo che non blocchi l'esecuzione).
 
-Come al solito puoi vedere tutto il codice sorgente per questo sul mio GitHub [qui](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSenderTests.cs).
+Come al solito puoi vedere tutto il codice sorgente per questo sul mio GitHub [qui](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSender_Tests.cs).
 
 [TOC]
 

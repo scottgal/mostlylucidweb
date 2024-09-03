@@ -4,9 +4,9 @@
 
 在前一条款中,我们讨论了如何检验 `UmamiClient` 使用 x Unit 和 Moq 。 在本条中,我们将讨论如何检验 `UmamiBackgroundSender` 类。 缩略 `UmamiBackgroundSender` 与 `UmamiClient` 使用时 `IHostedService` 保持在背景中运行并发送请求 `UmamiClient` 完全脱离主执行线( 以免阻断执行) 。
 
-和往常一样,你可以在我的GitHub上看到所有源代码 [在这里](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSenderTests.cs).
+和往常一样,你可以在我的GitHub上看到所有源代码 [在这里](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSender_Tests.cs).
 
-[技选委
+[TOC]
 
 <!--category-- xUnit, Umami, IHostedService, Moq -->
 <datetime class="hidden">2024-009-003-09:00</datetime>

@@ -4,9 +4,9 @@
 
 पिछले लेख में हमने चर्चा की कि कैसे परीक्षा की जा सकती है `UmamiClient` एक्स- इकाई तथा मोजेजे का उपयोग करें. इस लेख में हम चर्चा करेंगे कि परीक्षा का सामना कैसे किया जा सकता है `UmamiBackgroundSender` वर्ग. वह `UmamiBackgroundSender` थोड़ा अलग है `UmamiClient` जैसा कि यह प्रयोग करता है `IHostedService` पृष्ठ भूमि में चल रहे रहने के लिए तथा से होकर अनुरोध करता है. `UmamiClient` मुख्य कार्य थ्रेड से पूरी तरह बाहर (इसलिए यह चलाने योग्य नहीं है).
 
-हमेशा के रूप में आप मेरे GiHb पर इस सभी स्रोत कोड देख सकते हैं [यहाँ](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSenderTests.cs).
+हमेशा के रूप में आप मेरे GiHb पर इस सभी स्रोत कोड देख सकते हैं [यहाँ](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSender_Tests.cs).
 
-[विषय
+[TOC]
 
 <!--category-- xUnit, Umami, IHostedService, Moq -->
 <datetime class="hidden">2024-09-03टी09: 00</datetime>

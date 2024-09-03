@@ -4,7 +4,7 @@
 
 Edellisessä kirjoituksessa keskustelimme siitä, miten testattaisiin `UmamiClient` xUnitin ja Moqin käyttö. Tässä artikkelissa käsittelemme, miten testata `UmamiBackgroundSender` Luokka. Erytropoietiini `UmamiBackgroundSender` on vähän erilainen `UmamiClient` kuten se käyttää `IHostedService` pysyäkseen taustalla ja lähettääkseen pyyntöjä `UmamiClient` Täysin pois tärkeimmästä teloitusketjusta (joten se ei estä teloitusta).
 
-Kuten tavallista, näet tämän lähdekoodin GitHubistani. [täällä](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSenderTests.cs).
+Kuten tavallista, näet tämän lähdekoodin GitHubistani. [täällä](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSender_Tests.cs).
 
 [TOC]
 

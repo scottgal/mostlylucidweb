@@ -4,7 +4,7 @@
 
 Στο προηγούμενο άρθρο, συζητήσαμε πώς να δοκιμάσουμε το `UmamiClient` χρησιμοποιώντας xUnit και Moq. Σε αυτό το άρθρο, θα συζητήσουμε πώς να δοκιμάσετε το `UmamiBackgroundSender` Μαθήματα. Η `UmamiBackgroundSender` είναι λίγο διαφορετικό από `UmamiClient` όπως χρησιμοποιεί `IHostedService` να συνεχίσει να τρέχει στο παρασκήνιο και να στείλει αιτήματα μέσω `UmamiClient` εντελώς έξω από το κύριο νήμα εκτέλεσης (ώστε να μην μπλοκάρει την εκτέλεση).
 
-Ως συνήθως μπορείς να δεις όλο τον πηγαίο κώδικα γι' αυτό στο GitHub μου [Ορίστε.](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSenderTests.cs).
+Ως συνήθως μπορείς να δεις όλο τον πηγαίο κώδικα γι' αυτό στο GitHub μου [Ορίστε.](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSender_Tests.cs).
 
 [TOC]
 

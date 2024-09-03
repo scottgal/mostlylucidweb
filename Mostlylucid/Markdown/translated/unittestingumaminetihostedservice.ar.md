@@ -4,7 +4,7 @@
 
 وفي المادة السابقة، ناقشنا كيفية اختبار `UmamiClient` XUnit and Muq. في هذه المادة، سنناقش كيفية اختبار `UmamiBackgroundSender` -مصنفة. -مصنفة. الـ `UmamiBackgroundSender` مختلف نوعاً ما عن `UmamiClient` على النحو الذي تستخدمه `IHostedService` (ب) أن تظل تعمل في الخلفية وترسل الطلبات من خلال `UmamiClient` تماماً خارج الخيط التنفيذ الرئيسي (لذا فإنه لا يمنع التنفيذ).
 
-كالمعتاد يمكنك أن ترى كل شفرة المصدر لهذا على بلدي جيت هوب [هنا هنا](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSenderTests.cs).
+كالمعتاد يمكنك أن ترى كل شفرة المصدر لهذا على بلدي جيت هوب [هنا هنا](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSender_Tests.cs).
 
 [TOC]
 

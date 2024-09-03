@@ -4,7 +4,7 @@
 
 У попередній статті ми обговорили, як перевірити `UmamiClient` за допомогою xUnit і Moq. У цій статті ми обговоримо, як перевірити себе. `UmamiBackgroundSender` Клас. The `UmamiBackgroundSender` трохи відрізняється від `UmamiClient` як використовується `IHostedService` продовжити роботу у фоновому режимі і надіслати запити через `UmamiClient` повністю поза основною ниткою (так що вона не блокує виконання).
 
-Як завжди, ви можете бачити всі початкові коди для цього на моєму GitHub [тут](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSenderTests.cs).
+Як завжди, ви можете бачити всі початкові коди для цього на моєму GitHub [тут](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSender_Tests.cs).
 
 [TOC]
 

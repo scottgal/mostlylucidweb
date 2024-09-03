@@ -4,7 +4,7 @@
 
 In het vorige artikel bespraken we hoe we de `UmamiClient` gebruik van xUnit en Moq. In dit artikel bespreken we hoe we de `UmamiBackgroundSender` Klas. De `UmamiBackgroundSender` is een beetje anders dan `UmamiClient` zoals het gebruikt `IHostedService` om op de achtergrond te blijven draaien en verzoeken door te sturen `UmamiClient` volledig uit de belangrijkste executive thread (dus het blokkeert de uitvoering niet).
 
-Zoals gewoonlijk kunt u alle broncode voor dit zien op mijn GitHub [Hier.](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSenderTests.cs).
+Zoals gewoonlijk kunt u alle broncode voor dit zien op mijn GitHub [Hier.](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSender_Tests.cs).
 
 [TOC]
 
