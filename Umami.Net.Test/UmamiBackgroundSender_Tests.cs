@@ -9,7 +9,7 @@ using Umami.Net.Test.MessageHandlers;
 
 namespace Umami.Net.Test;
 
-public class UmamiBackgroundSenderTests
+public class UmamiBackgroundSender_Tests
 {
     private (UmamiBackgroundSender, IHostedService) GetServices(HttpMessageHandler handler)
     {
@@ -38,7 +38,7 @@ public class UmamiBackgroundSenderTests
             try
             {
                 var responseContent = EchoMockHandler.ResponseHandler(message, token);
-                var jsonContent = await responseContent.Content.ReadFromJsonAsync<EchoedRequest>(token);
+                var jsonContent = await responseContent.Result.Content.ReadFromJsonAsync<EchoedRequest>(token);
                 var content = new StringContent("{}", Encoding.UTF8, "application/json");
                 Assert.Contains("api/send", message.RequestUri.ToString());
                 Assert.NotNull(jsonContent);
@@ -85,7 +85,7 @@ public class UmamiBackgroundSenderTests
         {
             try
             {
-                var responseContent = EchoMockHandler.ResponseHandler(message, token);
+                var responseContent =await EchoMockHandler.ResponseHandler(message, token);
                 var jsonContent = await responseContent.Content.ReadFromJsonAsync<EchoedRequest>(token);
                 Assert.Contains("api/send", message.RequestUri.ToString());
                 Assert.NotNull(jsonContent);
@@ -136,7 +136,7 @@ public class UmamiBackgroundSenderTests
         {
             try
             {
-                var responseContent = EchoMockHandler.ResponseHandler(message, token);
+                var responseContent =await EchoMockHandler.ResponseHandler(message, token);
                 var jsonContent = await responseContent.Content.ReadFromJsonAsync<EchoedRequest>(token);
                 // Assertions
                 Assert.Contains("api/send", message.RequestUri.ToString());

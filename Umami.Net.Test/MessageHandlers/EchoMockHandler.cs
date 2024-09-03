@@ -11,11 +11,10 @@ public static class EchoMockHandler
         Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> responseFunc)
     {
         var mockHandler = new Mock<HttpMessageHandler>();
-
         mockHandler.Protected()
             .Setup<Task<HttpResponseMessage>>(
                 "SendAsync",
-                ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString().Contains("api/send")),
+                ItExpr.IsAny<HttpRequestMessage>(),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync((HttpRequestMessage request, CancellationToken cancellationToken) =>
                 responseFunc(request, cancellationToken).Result);
@@ -25,53 +24,21 @@ public static class EchoMockHandler
 
     public static HttpMessageHandler Create()
     {
-        var mockHandler = new Mock<HttpMessageHandler>();
-
-        mockHandler.Protected()
-            .Setup<Task<HttpResponseMessage>>(
-                "SendAsync",
-                ItExpr.Is<HttpRequestMessage>(x => x.RequestUri.ToString().Contains("api/send")),
-                ItExpr.IsAny<CancellationToken>())
-            .ReturnsAsync((HttpRequestMessage request, CancellationToken cancellationToken) =>
-            {
-                // Read the request content
-                var requestBody = request.Content != null
-                    ? request.Content.ReadAsStringAsync(cancellationToken).Result
-                    : null;
-
-                // Create a response that echoes the request body
-                var responseContent = requestBody != null
-                    ? requestBody
-                    : "No request body";
-
-
-                // Return the response
-                return new HttpResponseMessage(HttpStatusCode.OK)
-                {
-                    Content = new StringContent(responseContent, Encoding.UTF8, "application/json")
-                };
-            });
-
-        return mockHandler.Object;
+        var handler = Create(ResponseHandler);
+        return handler;
     }
 
-    public static HttpResponseMessage ResponseHandler(HttpRequestMessage request, CancellationToken cancellationToken)
+    public static async Task<HttpResponseMessage> ResponseHandler(HttpRequestMessage request,
+        CancellationToken cancellationToken)
     {
         // Read the request content
-        var requestBody = request.Content != null
-            ? request.Content.ReadAsStringAsync(cancellationToken).Result
-            : null;
-
+        var requestBody = request.Content?.ReadAsStringAsync(cancellationToken).Result;
         // Create a response that echoes the request body
-        var responseContent = requestBody != null
-            ? requestBody
-            : "No request body";
-
-
+        var responseContent = requestBody ?? "No request body";
         // Return the response
-        return new HttpResponseMessage(HttpStatusCode.OK)
+        return await Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
         {
             Content = new StringContent(responseContent, Encoding.UTF8, "application/json")
-        };
+        });
     }
 }

@@ -1,4 +1,4 @@
-﻿0.1.5
+﻿0.2.0
 Adds new Identify endpoints. 
 These can be used on user signin to identify the user.
 Task<HttpResponseMessage> Identify(string? email =null, string? username = null, 
@@ -9,3 +9,5 @@ Task<HttpResponseMessage> Identify(UmamiPayload payload, UmamiEventData? eventDa
  Task<HttpResponseMessage> IdentifySession(string sessionId);
  
  The same endpoints exist in the UmamiClient and UmamiBackgroundSender
+ 
+ Adds new UmamiData service. This service can fetch data from the Umami API.

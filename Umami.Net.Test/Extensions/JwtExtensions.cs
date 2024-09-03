@@ -17,23 +17,31 @@ public static class JwtExtensions
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 //Based on website_id, hostname, ip, userAgent
         var visitorId =
-            $"{umamiPayload.Website}{umamiPayload.Hostname}{umamiPayload.IpAddress}{umamiPayload.UserAgent}";
+            $"{umamiPayload.Website}{umamiPayload.IpAddress}{umamiPayload.UserAgent}".ToGuid();
+        
+        var ua = umamiPayload.UserAgent;
+        UAParser.Parser uaParser = UAParser.Parser.GetDefault();
+        var clientInfo = uaParser.Parse(ua);
+  
+        
         var claims = new[]
         {
             new Claim("id", "28ac27ad-9945-52b1-a629-7004f174a644"),
             new Claim("websiteId", umamiPayload.Website),
             new Claim("hostname", umamiPayload.Hostname),
-            new Claim("browser", "chrome"),
-            new Claim("os", "Windows 10"),
-            new Claim("device", ""),
+            new Claim("browser", clientInfo.Browser.Family),
+            new Claim("os", clientInfo.OS.ToString()),
+            new Claim("device", clientInfo.Device.ToString()),
             new Claim("screen", ""),
             new Claim("language", ""),
             new Claim("country", "GB"),
+            new Claim("subdivision1", "Scotland"),
+            new Claim("subdivision2", "Glasgow City"),
             new Claim("createdAt", "2024-08-30T10:19:28.462Z"),
+            new Claim("city", "Glasgow"),
             new Claim("visitId", visitorId),
             new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
-
         var token = new JwtSecurityToken(
             header: new JwtHeader(credentials),
             payload: new JwtPayload(claims)

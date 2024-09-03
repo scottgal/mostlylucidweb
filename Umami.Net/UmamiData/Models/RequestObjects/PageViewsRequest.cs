@@ -4,7 +4,7 @@ public class PageViewsRequest : BaseRequest
 {
     // Required properties
 
-    public string Unit { get; set; } = "day"; // Time unit (year | month | hour | day)
+    public Unit Unit { get; set; } = Unit.Day; // Time unit (year | month | hour | day)
     public string Timezone { get; set; } // Timezone (ex. America/Los_Angeles)
 
     // Optional properties

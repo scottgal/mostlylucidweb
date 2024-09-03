@@ -13,12 +13,13 @@ public class PageViews_Test
     {
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
-        var websiteDataService = serviceProvider.GetRequiredService<UmamiService>();
+        var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
     
       var pageViews = await websiteDataService.GetPageViews(new PageViewsRequest()
        {
            StartAtDate = DateTime.Now.AddDays(-7),
-           EndAtDate = DateTime.Now
+           EndAtDate = DateTime.Now,
+           Unit = Unit.Hour
        });
        Assert.NotNull(pageViews);
        Assert.Equal( HttpStatusCode.OK, pageViews.Status);

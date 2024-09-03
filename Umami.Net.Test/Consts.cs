@@ -7,7 +7,7 @@ public class Consts
     public const string Host = "example.com";
     public const string Path = "/example";
     public const string Ip = "127.0.0.1";
-    public const string UserAgent = "Test User Agent";
+    public const string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36";
     public const string Referer = "Test Referer";
     public const string DefaultUrl = "/testpath";
     public const string DefaultTitle = "Example Page";

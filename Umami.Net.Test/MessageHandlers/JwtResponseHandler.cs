@@ -1,8 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text;
-using Moq;
-using Moq.Protected;
 using Umami.Net.Models;
 using Umami.Net.Test.Extensions;
 
@@ -14,17 +12,12 @@ public class JwtResponseHandler
     {
         var handler = EchoMockHandler.Create(async (request, cancellationToken) =>
         {
-            // Read the request content
-            var requestBody = request.Content != null
-                ? request.Content.ReadAsStringAsync(cancellationToken).Result
-                : null;
-
-            // Create a response that echoes the request body
-         
-
-            var userAgent = request.Headers.UserAgent.ToString();
-            var umamiPayload =await request.Content?.ReadFromJsonAsync<UmamiPayload>();
-           var  responseContent = JwtExtensions.GenerateJwt(umamiPayload);
+            var umamiPayload =await request.Content?.ReadFromJsonAsync<EchoedRequest>(cancellationToken: cancellationToken)!;
+            if(umamiPayload == null)
+            {
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+            }
+           var  responseContent = JwtExtensions.GenerateJwt(umamiPayload.Payload);
             
             // Return the response
             return new HttpResponseMessage(HttpStatusCode.OK)

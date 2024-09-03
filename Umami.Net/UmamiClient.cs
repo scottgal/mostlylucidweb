@@ -53,6 +53,34 @@ namespace Umami.Net
             return response;
         }
 
+        
+        public async Task<UmamiResponse> SendAndDecode(
+            UmamiPayload? payload = null,
+            UmamiEventData? eventData = null,
+            string type = "event")
+        {
+            var response = await Send(payload, eventData, type);
+            return await DecodeResponse(response);
+        }
+       
+        public async Task<UmamiResponse> TrackPageViewAndDecode(
+            string? url = "", 
+            string? title = "", 
+            UmamiPayload? payload = null,
+            UmamiEventData? eventData = null)
+        {
+            var response = await TrackPageView(url, title, payload, eventData);
+            return await DecodeResponse(response);
+        }
+        
+        public async Task<UmamiResponse> TrackAndDecode(
+            string eventName, 
+            UmamiEventData? eventData = null)
+        {
+            var response = await Track(eventName, eventData);
+            return await DecodeResponse(response);
+        }
+        
         public async Task<HttpResponseMessage> TrackPageView(
             string? url = "", 
             string? title = "", 
@@ -88,6 +116,15 @@ namespace Umami.Net
             payload.Data = eventData ?? new UmamiEventData();
             payload.Website = settings.WebsiteId;
             return await Send(payload);
+        }
+
+        private async Task<UmamiResponse> DecodeResponse(HttpResponseMessage responseMessage)
+        {
+            var decoded =await JwtDecoder.DecodeResponse(responseMessage);
+            if(decoded == null)
+                throw new Exception("Failed to decode response");
+            var payload = UmamiResponse.Decode(decoded);
+            return payload;
         }
 
         public async Task<HttpResponseMessage> Identify(UmamiPayload payload, UmamiEventData? eventData = null)
