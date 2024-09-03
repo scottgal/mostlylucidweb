@@ -6,7 +6,7 @@
 
 和往常一样,你可以在我的GitHub上看到所有源代码 [在这里](https://github.com/scottgal/mostlylucidweb/blob/main/Umami.Net.Test/UmamiBackgroundSender_Tests.cs).
 
-[TOC]
+[技选委
 
 <!--category-- xUnit, Umami, IHostedService, Moq -->
 <datetime class="hidden">2024-009-003-09:00</datetime>

@@ -24,19 +24,22 @@ Our profession is rife with the socially awkward (and yes like myself slightly a
 # The Solution
 First read their resume; don't even talk to them if their resume doesn't make it clear they have experience sufficient for the job you're hiring for. This is not only respectful of their time but also yours.
 
-First, setting up the interview (or interviews) should be as stress free as possible for the participants. This means:
+Second, setting up the interview (or interviews) should be as stress free as possible for the participants. This means:
 1. Give adequate notice. Don't spring an interview on someone with 24 hours notice (or worse the same day).
 2. Make it clear what the interview format will be, who'll be there annd expected outcomes (is it the final, a technical screen etc).
 3. READ THE PERSON'S RESUME. I can't stress this enough. If you're interviewing someone you should know their resume inside out. This is not only respectful but it also gives you a chance to ask questions about their experience.
+4. Make sure you have the details IN THE MAIL; if it's Teams / Zoom ensure they have the link. If it's in person make sure they know where to go.
 
 ## The Interview
-First; do they seem like someone who would fit with the team in terms of temperament; are they a good fit for the team? This is important; you can have the best coder in the world but if they're a jerk they're not worth it.
+BE ON TIME; nothing makes a person more anxious than waiting for an interview to start. If you're late you're already starting off on the wrong foot. If they're late give them a few minutes; they likely haven't been in back to back meetings so their setup might be screwy.
+
+Do they seem like someone who would fit with the team in terms of temperament; are they a good fit for the team? This is important; you can have the best coder in the world but if they're a jerk they're not worth it.
 
 One tip I've come up with (after years of Fibonacci sequence questions, reversing arrays, linked lists etc) is.
 
 **CODERS LIKE TALKING ABOUT CODE THEY KNOW**
 
-First this means that if you're doing a technical assessment the person doing the interview needs to be able to talk about the code they're seeing. 
+This means that if you're doing a technical assessment the person doing the interview needs to be able to talk about the code they're seeing. 
 If it's a framework you don't know (like me interviewing Angular devs) don't worry too much. 
 
 So before the interview with enough notice (5 days is generally good) tell them that you'll be asking them to talk about a piece of code they've written. I don't GENERALLY ask for a GitHub link (many people at even senior levels might not have this; I've worked on many projects which are proprietary and can't be shared).
