@@ -10,7 +10,6 @@ public static class SetupExtensions
 {
     public static void SetupUmamiData(this IServiceCollection services, string username="username", string password="password")
     {
-       
         var umamiSettings = new UmamiDataSettings()
         {
             UmamiPath = Consts.UmamiPath,

@@ -31,8 +31,6 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
                 {
                     return new HttpResponseMessage(HttpStatusCode.BadRequest);
                 }
-
-
             default:
 
                 if (absPath.StartsWith($"/api/websites/{Consts.WebSiteId}/pageviews"))
