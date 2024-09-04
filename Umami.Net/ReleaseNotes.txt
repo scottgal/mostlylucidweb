@@ -11,3 +11,16 @@ Task<HttpResponseMessage> Identify(UmamiPayload payload, UmamiEventData? eventDa
  The same endpoints exist in the UmamiClient and UmamiBackgroundSender
  
  Adds new UmamiData service. This service can fetch data from the Umami API.
+ 
+ The UmamiDataService has the following methods:
+ async Task<UmamiResult<MetricsResponseModels[]>> GetMetrics(MetricsRequest metricsRequest)
+  async Task<UmamiResult<PageViewsResponseModel>> GetPageViews(DateTime startDate, DateTime endDate,
+         Unit unit = Unit.Day)
+  
+  async Task<UmamiResult<PageViewsResponseModel>> GetPageViews(PageViewsRequest pageViewsRequest)
+  
+  async Task<UmamiResult<StatsResponseModels>> GetStats(StatsRequest statsRequest)
+  
+   Task<UmamiResult<StatsResponseModels>> GetStats(DateTime startDate, DateTime endDate)
+   
+   For more information see the ReadMe.       
