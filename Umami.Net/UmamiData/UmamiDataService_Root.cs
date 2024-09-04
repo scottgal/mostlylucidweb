@@ -16,17 +16,21 @@ public partial class UmamiDataService(UmamiDataSettings analyticsSettings, AuthS
   
 
     
-public async Task<UmamiResult<MetricsResponseModels>> GetMetrics(MetricsRequest metricsRequest)
+public async Task<UmamiResult<MetricsResponseModels[]>> GetMetrics(MetricsRequest metricsRequest)
 {
+    try
+    {
+
+   
     if(await authService.LoginAsync() == false)
     {
-        return new UmamiResult<MetricsResponseModels>(HttpStatusCode.Unauthorized, "Failed to login", null);
+        return new UmamiResult<MetricsResponseModels[]>(HttpStatusCode.Unauthorized, "Failed to login", null);
     }
     // Start building the query string
     var queryParams = new List<string>
     {
-        $"start={metricsRequest.StartAt}",
-        $"end={metricsRequest.EndAt}",
+        $"startAt={metricsRequest.StartAt}",
+        $"endAt={metricsRequest.EndAt}",
         $"type={metricsRequest.Type}"
     };
 
@@ -52,12 +56,12 @@ public async Task<UmamiResult<MetricsResponseModels>> GetMetrics(MetricsRequest 
   
    
     // Make the HTTP request
-    var response = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/metrics/{metricsRequest.Type}?{queryString}");
+    var response = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/metrics?{queryString}");
 
     if (response.IsSuccessStatusCode)
     {
-        var content = await response.Content.ReadFromJsonAsync<MetricsResponseModels>();
-        return new UmamiResult<MetricsResponseModels>(response.StatusCode, response.ReasonPhrase ?? "Success", content ?? new MetricsResponseModels());
+        var content = await response.Content.ReadFromJsonAsync<MetricsResponseModels[]>();
+        return new UmamiResult<MetricsResponseModels[]>(response.StatusCode, response.ReasonPhrase ?? "Success", content ?? Array.Empty<MetricsResponseModels>());
     }
 
     if (response.StatusCode == HttpStatusCode.Unauthorized)
@@ -67,8 +71,14 @@ public async Task<UmamiResult<MetricsResponseModels>> GetMetrics(MetricsRequest 
     }
     
         logger.LogError("Failed to get metrics");
-        return new UmamiResult<MetricsResponseModels>(response.StatusCode, response.ReasonPhrase ?? "Failed to get metrics", null);
-}
+        return new UmamiResult<MetricsResponseModels[]>(response.StatusCode, response.ReasonPhrase ?? "Failed to get metrics", null);
+    }
+    catch (Exception e)
+    {
+       logger.LogError(e, "Failed to get metrics");
+         return new UmamiResult<MetricsResponseModels[]>(HttpStatusCode.InternalServerError, "Failed to get metrics", null);
+    }
+    }
 
 
     
