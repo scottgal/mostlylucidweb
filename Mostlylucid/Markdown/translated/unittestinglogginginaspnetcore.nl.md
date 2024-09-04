@@ -1,15 +1,18 @@
-﻿# Unit Testing Umami.Net - Logging in ASP.NET Core
+# Unit Testing Umami.Net - Loggen in ASP.NET Core
 
-# Introduction
-I'm a relative noob using Moq (yes I'm aware of the controversies) and I was trying to test a new service I'm adding to Umami.Net, UmamiData. This is a service this allows me to pull data from my Umami instance to use in stuff like sorting posts by popularity etc...
+# Inleiding
+
+Ik ben een relatieve noob met behulp van Moq (ja ik ben me bewust van de controverses) en ik probeerde een nieuwe service te testen die ik toevoeg aan Umami.Net, UmamiData. Dit is een dienst die me toelaat om gegevens uit mijn Umami instantie te halen om te gebruiken in dingen zoals het sorteren van berichten door populariteit etc...
 
 [TOC]
+
 <!--category-- xUnit, ASP.NET Core -->
 <datetime class="hidden">2024-09-04T13:22</datetime>
 
-# The Problem
-I was trying to add a simple test for the login function I need to use when pulling data. 
-As you can see it's a simple service which passes a username and password to the `/api/auth/login` endpoint and gets a result. If the result is successful it stores the token in the `_token` field and sets the `Authorization` header for the `HttpClient` to use in future requests.
+# Het probleem
+
+Ik probeerde een eenvoudige test toe te voegen voor de login functie die ik moet gebruiken bij het trekken van gegevens.
+Zoals u kunt zien is het een eenvoudige dienst die een gebruikersnaam en wachtwoord aan de `/api/auth/login` eindpunt en krijgt een resultaat. Als het resultaat succesvol is het slaat de token in de `_token` veld en stelt de `Authorization` kop voor de `HttpClient` te gebruiken in toekomstige verzoeken.
 
 ```csharp
 public class AuthService(HttpClient httpClient, UmamiDataSettings umamiSettings, ILogger<AuthService> logger)
@@ -49,9 +52,10 @@ public class AuthService(HttpClient httpClient, UmamiDataSettings umamiSettings,
     }
 }
 ```
-Now I also wanted to test against the logger to make sure it was logging the correct messages. I'm using the `Microsoft.Extensions.Logging` namespace and I wanted to test that the correct log messages were being written to the logger.
 
-In Moq there's a BUNCH of posts around testing logging they all have this basic form (from https://adamstorr.co.uk/blog/mocking-ilogger-with-moq/)
+Nu wilde ik ook testen tegen de logger om er zeker van te zijn dat het de juiste berichten inlogde. Ik gebruik de `Microsoft.Extensions.Logging` namespace en ik wilden testen of de juiste logberichten naar de logger werden geschreven.
+
+In Moq is er een BUNCH van berichten rond het testen van logging hebben ze allemaal dit basisformulier (van https://adamstorr.co.uk/blog/mocking-ilogger-with-moq/)
 
 ```csharp
 public static Mock<ILogger<T>> VerifyDebugWasCalled<T>(this Mock<ILogger<T>> logger, string expectedMessage)
@@ -70,16 +74,16 @@ public static Mock<ILogger<T>> VerifyDebugWasCalled<T>(this Mock<ILogger<T>> log
 }
 ```
 
-HOWEVER due to Moq's recent changes (It.IsAnyType is now obsolete) and ASP.NET Core's changes to FormattedLogValues I was having a hard time getting this to work.
+Hoe dan ook als gevolg van Moq's recente veranderingen (It.IsAnyType is nu verouderd) en ASP.NET Core's wijzigingen in GeformatteerdeLogValues Ik had het moeilijk om dit te laten werken.
 
-I tried a BUNCH of versions and variants but it always failed. So...I gave up.
+Ik probeerde een BUNCH van versies en varianten, maar het is altijd mislukt. Dus... gaf ik het op.
 
-# The Solution
-So reading a bunch of GitHub messages I came across a post by David Fowler (my former colleague and now the Lord of .NET) which showed a simple way to test logging in ASP.NET Core. 
-This uses the *new to me* `Microsoft.Extensions.Diagnostics.Testing` [package](https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.Diagnostics.Testing) which has some really useful extensions for testing logging.
+# De oplossing
 
-So instead of all the Moq stuff I just added the `Microsoft.Extensions.Diagnostics.Testing` package and added the following to my tests.
+Dus het lezen van een aantal GitHub berichten kwam ik over een post van David Fowler (mijn voormalige collega en nu de Lord of.NET) die een eenvoudige manier om te testen logging in ASP.NET Core toonde.
+Dit maakt gebruik van de *nieuw voor mij* `Microsoft.Extensions.Diagnostics.Testing` [pakket](https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.Diagnostics.Testing) die heeft een aantal echt nuttige extensies voor het testen van logging.
 
+Dus in plaats van al het Moq-gedoe heb ik net de `Microsoft.Extensions.Diagnostics.Testing` pakket en voegde het volgende toe aan mijn tests.
 
 ```csharp
     public IServiceProvider GetServiceProvider (string username="username", string password="password")
@@ -95,10 +99,11 @@ So instead of all the Moq stuff I just added the `Microsoft.Extensions.Diagnosti
     }
 ```
 
-You'll see that this sets up my ServiceCollection, adds the new `FakeLogger<T>` and then sets up the `UmamiData` service with the username and password I want to use (so I can test failure).
+U zult zien dat dit zet mijn ServiceCollection, voegt de nieuwe `FakeLogger<T>` en zet dan de `UmamiData` service met de gebruikersnaam en wachtwoord die ik wil gebruiken (zodat ik een storing kan testen).
 
-## The Tests Using FakeLogger
-Then my tests can become:
+## De tests met behulp van FakeLogger
+
+Dan kunnen mijn tests worden:
 
 ```csharp
     [Fact]
@@ -115,11 +120,13 @@ Then my tests can become:
         Assert.True(result);
     }
 ```
-Where you'll see I simply call the `GetServiceProvider` method to get my service provider, then get the `AuthService` and `ILogger<AuthService>` from the service provider.
 
-Because I have these set up as `FakeLogger<T>` I can then access the `FakeLogCollector` and `FakeLogRecord` to get the logs and check them.
+Waar je zult zien... bel ik gewoon... `GetServiceProvider` methode om mijn service provider te krijgen, dan krijgen de `AuthService` en `ILogger<AuthService>` van de dienstverlener.
 
-Then I can simply check the logs for the correct messages.
+Want ik heb deze opgezet als `FakeLogger<T>` Ik kan dan toegang krijgen tot de `FakeLogCollector` en `FakeLogRecord` Om de logs te halen en te controleren.
 
-# In Conclusion
-So there you have it, a simple way to test log messages in Unit Tests without the Moq nonsense.
+Dan kan ik gewoon de logs controleren op de juiste berichten.
+
+# Conclusie
+
+Dus daar heb je het, een eenvoudige manier om logberichten te testen in Unit Tests zonder de Moq onzin.

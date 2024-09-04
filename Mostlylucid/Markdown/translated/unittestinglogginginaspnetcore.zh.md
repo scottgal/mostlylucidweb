@@ -1,15 +1,18 @@
-﻿# Unit Testing Umami.Net - Logging in ASP.NET Core
+# Umami.Net - ASP.NET核心的登录
 
-# Introduction
-I'm a relative noob using Moq (yes I'm aware of the controversies) and I was trying to test a new service I'm adding to Umami.Net, UmamiData. This is a service this allows me to pull data from my Umami instance to use in stuff like sorting posts by popularity etc...
+# 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
-[TOC]
+我是使用Moq(是的,我知道有争议)的亲戚, 我想测试我给Ummami.Net, UmmiData 添加的新服务。 这个服务可以让我从我的Umami实例中提取数据,
+
+[技选委
+
 <!--category-- xUnit, ASP.NET Core -->
-<datetime class="hidden">2024-09-04T13:22</datetime>
+<datetime class="hidden">2024-009-04T13:22</datetime>
 
-# The Problem
-I was trying to add a simple test for the login function I need to use when pulling data. 
-As you can see it's a simple service which passes a username and password to the `/api/auth/login` endpoint and gets a result. If the result is successful it stores the token in the `_token` field and sets the `Authorization` header for the `HttpClient` to use in future requests.
+# 问题
+
+我试图添加一个简单的测试, 测试在调用数据时我需要使用的登录函数 。
+正如您可以看到的,这是一个简单的服务, 传递用户名和密码到 `/api/auth/login` 终点和结果。 如果结果成功,它会将标语存储在 `_token` 字段设置 `Authorization` 和 `HttpClient` 用于今后的请求。
 
 ```csharp
 public class AuthService(HttpClient httpClient, UmamiDataSettings umamiSettings, ILogger<AuthService> logger)
@@ -49,9 +52,10 @@ public class AuthService(HttpClient httpClient, UmamiDataSettings umamiSettings,
     }
 }
 ```
-Now I also wanted to test against the logger to make sure it was logging the correct messages. I'm using the `Microsoft.Extensions.Logging` namespace and I wanted to test that the correct log messages were being written to the logger.
 
-In Moq there's a BUNCH of posts around testing logging they all have this basic form (from https://adamstorr.co.uk/blog/mocking-ilogger-with-moq/)
+现在,我还想对登录器进行测试,以确保它记录正确的信息。 我用的是 `Microsoft.Extensions.Logging` 命名空间和我想测试 正确的日志信息 正在写入到日志中 。
+
+在Moq,有一套BUNCH的标签 环绕着测试伐木 他们都有这种基本的形式(来自https://adamstorr.co.uk/blog/mocking-ilogger- with-moq/)
 
 ```csharp
 public static Mock<ILogger<T>> VerifyDebugWasCalled<T>(this Mock<ILogger<T>> logger, string expectedMessage)
@@ -70,16 +74,16 @@ public static Mock<ILogger<T>> VerifyDebugWasCalled<T>(this Mock<ILogger<T>> log
 }
 ```
 
-HOWEVER due to Moq's recent changes (It.IsAnyType is now obsolete) and ASP.NET Core's changes to FormattedLogValues I was having a hard time getting this to work.
+以及ASP.NET Core对格式化LogValues的修改,
 
-I tried a BUNCH of versions and variants but it always failed. So...I gave up.
+我试过BUNCH的版本和变体 但总是失败了 所以... 我放弃了
 
-# The Solution
-So reading a bunch of GitHub messages I came across a post by David Fowler (my former colleague and now the Lord of .NET) which showed a simple way to test logging in ASP.NET Core. 
-This uses the *new to me* `Microsoft.Extensions.Diagnostics.Testing` [package](https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.Diagnostics.Testing) which has some really useful extensions for testing logging.
+# 解决方案
 
-So instead of all the Moq stuff I just added the `Microsoft.Extensions.Diagnostics.Testing` package and added the following to my tests.
+读到一连串GitHub留言, 我遇见David Fowler(我前同事,现为.NET之王)的一篇文章,
+此处使用 *对我而言全新的* `Microsoft.Extensions.Diagnostics.Testing` [软件包包包](https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.Diagnostics.Testing) 测试日志时有一些非常有用的扩展 。
 
+而不是所有莫克人的东西,我刚刚加了 `Microsoft.Extensions.Diagnostics.Testing` 软件包,并在我的测试中添加以下内容。
 
 ```csharp
     public IServiceProvider GetServiceProvider (string username="username", string password="password")
@@ -95,10 +99,11 @@ So instead of all the Moq stuff I just added the `Microsoft.Extensions.Diagnosti
     }
 ```
 
-You'll see that this sets up my ServiceCollection, adds the new `FakeLogger<T>` and then sets up the `UmamiData` service with the username and password I want to use (so I can test failure).
+你会看到,这设置了 我的服务集合, 增加新的 `FakeLogger<T>` 然后,你应当设置, `UmamiData` 使用用户名和密码的服务( 这样我就可以测试失败) 。
 
-## The Tests Using FakeLogger
-Then my tests can become:
+## 使用假冒错误的测试
+
+然后,我的测试可以变成:
 
 ```csharp
     [Fact]
@@ -115,11 +120,13 @@ Then my tests can become:
         Assert.True(result);
     }
 ```
-Where you'll see I simply call the `GetServiceProvider` method to get my service provider, then get the `AuthService` and `ILogger<AuthService>` from the service provider.
 
-Because I have these set up as `FakeLogger<T>` I can then access the `FakeLogCollector` and `FakeLogRecord` to get the logs and check them.
+在那里你会看到,我只要打电话 `GetServiceProvider` 获得我的服务供应商的方法,然后获得 `AuthService` 和 `ILogger<AuthService>` 由服务提供商提供。
 
-Then I can simply check the logs for the correct messages.
+因为我有这些设置 `FakeLogger<T>` 然后我就可以进入 `FakeLogCollector` 和 `FakeLogRecord` 得到日志并检查它们。
 
-# In Conclusion
-So there you have it, a simple way to test log messages in Unit Tests without the Moq nonsense.
+然后,我可以简单地检查日志以获取正确信息。
+
+# 在结论结论中
+
+所以你有了它,一个简单的方法 测试Unit Tests的日志信息 而不是莫克的胡说八道。

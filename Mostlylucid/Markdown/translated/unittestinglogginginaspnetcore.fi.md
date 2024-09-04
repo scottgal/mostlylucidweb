@@ -1,15 +1,18 @@
-﻿# Unit Testing Umami.Net - Logging in ASP.NET Core
+# Unit Testing Umami.Net - Kirjautuminen ASP.NET Core
 
-# Introduction
-I'm a relative noob using Moq (yes I'm aware of the controversies) and I was trying to test a new service I'm adding to Umami.Net, UmamiData. This is a service this allows me to pull data from my Umami instance to use in stuff like sorting posts by popularity etc...
+# Johdanto
+
+Olen Moqia käyttävä suhteellinen noob (kyllä, olen tietoinen kiistoista) ja yritin testata uutta palvelua, jota lisään Umamiin.Net, UmamiData. Tämä on palvelu, jonka avulla voin vetää Umami-instanssin dataa käyttööni muun muassa valikointitehtävissä suosiolla jne....
 
 [TOC]
-<!--category-- xUnit, ASP.NET Core -->
-<datetime class="hidden">2024-09-04T13:22</datetime>
 
-# The Problem
-I was trying to add a simple test for the login function I need to use when pulling data. 
-As you can see it's a simple service which passes a username and password to the `/api/auth/login` endpoint and gets a result. If the result is successful it stores the token in the `_token` field and sets the `Authorization` header for the `HttpClient` to use in future requests.
+<!--category-- xUnit, ASP.NET Core -->
+<datetime class="hidden">2024–09–04T13:22</datetime>
+
+# Ongelma
+
+Yritin lisätä yksinkertaisen testin kirjautumistoiminnolle, jota tarvitsen dataa vetäessäni.
+Kuten näet, se on yksinkertainen palvelu, joka välittää käyttäjätunnuksen ja salasanan `/api/auth/login` päätepiste ja saadaan tulos. Jos tulos on onnistunut, se tallentaa kupongin `_token` Kenttä ja asettaa `Authorization` Otsikko `HttpClient` käytettäväksi tulevissa pyynnöissä.
 
 ```csharp
 public class AuthService(HttpClient httpClient, UmamiDataSettings umamiSettings, ILogger<AuthService> logger)
@@ -49,9 +52,10 @@ public class AuthService(HttpClient httpClient, UmamiDataSettings umamiSettings,
     }
 }
 ```
-Now I also wanted to test against the logger to make sure it was logging the correct messages. I'm using the `Microsoft.Extensions.Logging` namespace and I wanted to test that the correct log messages were being written to the logger.
 
-In Moq there's a BUNCH of posts around testing logging they all have this basic form (from https://adamstorr.co.uk/blog/mocking-ilogger-with-moq/)
+Nyt halusin myös testata metsuria varmistaakseni, että se kirjautuu oikeisiin viesteihin. Käytän... `Microsoft.Extensions.Logging` namespace ja minä halusimme testata, että metsurille kirjoitetaan oikeat lokiviestit.
+
+Moqissa on BUNCH-virkoja, joissa testataan puunkorjuuta. Kaikilla on tämä peruslomake (https://adamstorr.co.uk/blog/mocking-ilogger-with-moq/).
 
 ```csharp
 public static Mock<ILogger<T>> VerifyDebugWasCalled<T>(this Mock<ILogger<T>> logger, string expectedMessage)
@@ -70,16 +74,16 @@ public static Mock<ILogger<T>> VerifyDebugWasCalled<T>(this Mock<ILogger<T>> log
 }
 ```
 
-HOWEVER due to Moq's recent changes (It.IsAnyType is now obsolete) and ASP.NET Core's changes to FormattedLogValues I was having a hard time getting this to work.
+Moqin viimeaikaisten muutosten (It.IsAnyType on nyt vanhentunut) ja ASP.NET Coren FormattedLogValuesin muutosten vuoksi minun oli vaikea saada tätä toimimaan.
 
-I tried a BUNCH of versions and variants but it always failed. So...I gave up.
+Kokeilin BUNCH-versioita ja -versioita, mutta se epäonnistui aina. Joten... Luovutin.
 
-# The Solution
-So reading a bunch of GitHub messages I came across a post by David Fowler (my former colleague and now the Lord of .NET) which showed a simple way to test logging in ASP.NET Core. 
-This uses the *new to me* `Microsoft.Extensions.Diagnostics.Testing` [package](https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.Diagnostics.Testing) which has some really useful extensions for testing logging.
+# Ratkaisu
 
-So instead of all the Moq stuff I just added the `Microsoft.Extensions.Diagnostics.Testing` package and added the following to my tests.
+Joten lukiessani joukkoa GitHub-viestejä törmäsin David Fowlerin (entinen kollegani ja nyt Lord of.NET) viestiin, joka näytti yksinkertaisen tavan testata kirjautumista ASP.NET Coressa.
+Tässä käytetään *minulle uutta* `Microsoft.Extensions.Diagnostics.Testing` [paketti](https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.Diagnostics.Testing) Jolla on todella hyödyllisiä laajennuksia puunkorjuun testaamiseen.
 
+Moq-juttujen sijaan lisäsin... `Microsoft.Extensions.Diagnostics.Testing` paketoi ja lisäsi testiini seuraavat:
 
 ```csharp
     public IServiceProvider GetServiceProvider (string username="username", string password="password")
@@ -95,10 +99,11 @@ So instead of all the Moq stuff I just added the `Microsoft.Extensions.Diagnosti
     }
 ```
 
-You'll see that this sets up my ServiceCollection, adds the new `FakeLogger<T>` and then sets up the `UmamiData` service with the username and password I want to use (so I can test failure).
+Huomaat, että tämä perustaa ServiceCollectionin, lisää uusi `FakeLogger<T>` ja sitten perustaa `UmamiData` Palvelu käyttäjätunnuksella ja salasanalla, jota haluan käyttää (jotta voin testata epäonnistumista).
 
-## The Tests Using FakeLogger
-Then my tests can become:
+## Testauksia väärennöksillä
+
+Sitten kokeistani voi tulla:
 
 ```csharp
     [Fact]
@@ -115,11 +120,13 @@ Then my tests can become:
         Assert.True(result);
     }
 ```
-Where you'll see I simply call the `GetServiceProvider` method to get my service provider, then get the `AuthService` and `ILogger<AuthService>` from the service provider.
 
-Because I have these set up as `FakeLogger<T>` I can then access the `FakeLogCollector` and `FakeLogRecord` to get the logs and check them.
+Missä näet, minä vain soitan `GetServiceProvider` Metodi saada minun palveluntarjoaja, sitten saada `AuthService` sekä `ILogger<AuthService>` Palveluntuottajalta.
 
-Then I can simply check the logs for the correct messages.
+Koska minulla on nämä valmiina `FakeLogger<T>` Sitten voin käyttää `FakeLogCollector` sekä `FakeLogRecord` Hakemaan lokit ja tarkastamaan ne.
 
-# In Conclusion
-So there you have it, a simple way to test log messages in Unit Tests without the Moq nonsense.
+Sitten voin vain tarkistaa lokit oikeiden viestien varalta.
+
+# Johtopäätöksenä
+
+Siinä se on, yksinkertainen tapa testata lokiviestejä Unit Testsissä ilman moq-hölynpölyä.
