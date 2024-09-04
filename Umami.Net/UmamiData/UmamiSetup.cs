@@ -11,37 +11,28 @@ public static class UmamiSetup
 {
     private static bool ValidateSetup(UmamiDataSettings umamiSettings)
     {
-        if(!Uri.TryCreate(umamiSettings.UmamiPath, UriKind.Absolute, out _))
-        {
-            return false;
-        }
-        if(string.IsNullOrEmpty(umamiSettings.Username) || string.IsNullOrEmpty(umamiSettings.Password))
-        {
-            return false;
-        }
+        if (!Uri.TryCreate(umamiSettings.UmamiPath, UriKind.Absolute, out _)) return false;
+        if (string.IsNullOrEmpty(umamiSettings.Username) || string.IsNullOrEmpty(umamiSettings.Password)) return false;
         return true;
     }
-    
+
     public static void SetupUmamiData(this IServiceCollection services, IConfiguration config)
     {
-     
         var umamiSettings = services.ConfigurePOCO<UmamiDataSettings>(config.GetSection(UmamiClientSettings.Section));
-        if(!ValidateSetup(umamiSettings)) throw new Exception("Invalid UmamiDataSettings");
-        services.AddHttpClient<AuthService>(options =>
-        {
-            options.BaseAddress = new Uri(umamiSettings.UmamiPath);
-            
-        }) .SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Set lifetime to five minutes
-        .AddPolicyHandler(GetRetryPolicy());;
+        if (!ValidateSetup(umamiSettings)) throw new Exception("Invalid UmamiDataSettings");
+        services.AddHttpClient<AuthService>(options => { options.BaseAddress = new Uri(umamiSettings.UmamiPath); })
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5)) //Set lifetime to five minutes
+            .AddPolicyHandler(GetRetryPolicy());
+        ;
         services.AddScoped<UmamiDataService>();
-
     }
-    static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+
+    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
     {
         return HttpPolicyExtensions
             .HandleTransientHttpError()
-            .OrResult(msg =>  msg.StatusCode == HttpStatusCode.ServiceUnavailable || msg.StatusCode == HttpStatusCode.Unauthorized)
+            .OrResult(msg =>
+                msg.StatusCode == HttpStatusCode.ServiceUnavailable || msg.StatusCode == HttpStatusCode.Unauthorized)
             .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
     }
-
 }

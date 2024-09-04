@@ -8,21 +8,8 @@ namespace Umami.Net.Test.UmamiData;
 
 
 //Uses https://github.com/dotnet/extensions/tree/main/src/Libraries/Microsoft.Extensions.Diagnostics.Testing
-public class UmamiData_LoginTest
+public class UmamiData_Login_Test : UmamiDataBase
 {
-
-    public IServiceProvider GetServiceProvider (string username="username", string password="password")
-    {
-        var services = new ServiceCollection();
-        var mockLogger = new FakeLogger<UmamiDataService>();
-        var authLogger = new FakeLogger<AuthService>();
-        services.AddScoped<ILogger<UmamiDataService>>(_ => mockLogger);
-        services.AddScoped<ILogger<AuthService>>(_ => authLogger);
-        services.SetupUmamiData(username, password);
-        return  services.BuildServiceProvider();
-        
-    }
-    
     [Fact]
     public async Task SetupTest_Good()
     {

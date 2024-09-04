@@ -2,7 +2,6 @@
 
 public class MetricsRequest : BaseRequest
 {
-  
     public MetricType Type { get; set; } // Metrics type
 
     // Optional properties
@@ -20,15 +19,4 @@ public class MetricsRequest : BaseRequest
     public string? Language { get; set; } // Name of language
     public string? Event { get; set; } // Name of event
     public int? Limit { get; set; } = 500; // Number of events returned (default: 500)
-}
-
-public enum MetricType
-{
-    url,
-    referrer, 
-    browser , 
-    os , 
-    device , 
-    country,
-    @event
 }

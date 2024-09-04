@@ -7,8 +7,8 @@ public class StatsResponseModels
     public Visits visits { get; set; }
     public Bounces bounces { get; set; }
     public Totaltime totaltime { get; set; }
-    
-    
+
+
     public class Pageviews
     {
         public int value { get; set; }

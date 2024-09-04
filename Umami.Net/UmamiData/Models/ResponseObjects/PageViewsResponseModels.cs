@@ -4,6 +4,7 @@ public class PageViewsResponseModel
 {
     public Pageviews[] pageviews { get; set; }
     public Sessions[] sessions { get; set; }
+
     public class Pageviews
     {
         public string x { get; set; }
@@ -15,5 +16,4 @@ public class PageViewsResponseModel
         public string x { get; set; }
         public int y { get; set; }
     }
-
 }

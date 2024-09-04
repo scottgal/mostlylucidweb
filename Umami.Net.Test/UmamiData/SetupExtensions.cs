@@ -13,9 +13,10 @@ public static class SetupExtensions
        
         var umamiSettings = new UmamiDataSettings()
         {
-            UmamiPath = "https://umami.com",
+            UmamiPath = Consts.UmamiPath,
             Username = username,
-            Password = password
+            Password = password,
+            WebsiteId = Consts.WebSiteId
         };
         services.AddSingleton(umamiSettings);
         services.AddHttpClient<AuthService>((provider,client) =>
