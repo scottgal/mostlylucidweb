@@ -23,4 +23,7 @@ Task<HttpResponseMessage> Identify(UmamiPayload payload, UmamiEventData? eventDa
   
    Task<UmamiResult<StatsResponseModels>> GetStats(DateTime startDate, DateTime endDate)
    
-   For more information see the ReadMe.       
+   For more information see the ReadMe.  
+   
+0.2.1
+Update readme, adds new ActiveUsers endpoint to the UmamiDataService.     
