@@ -16,7 +16,7 @@ public class UmamiData_Login_Test : UmamiDataBase
         var serviceProvider = GetServiceProvider();
         var authService = serviceProvider.GetRequiredService<AuthService>();
         var authLogger = serviceProvider.GetRequiredService<ILogger<AuthService>>();
-        var result = await authService.LoginAsync();
+        var result = await authService.Login();
         var fakeLogger = (FakeLogger<AuthService>)authLogger;
         FakeLogCollector collector = fakeLogger.Collector; // Collector allows you to access the captured logs
          IReadOnlyList<FakeLogRecord> logs = collector.GetSnapshot();
@@ -32,7 +32,7 @@ public class UmamiData_Login_Test : UmamiDataBase
         var authService = serviceProvider.GetRequiredService<AuthService>();
         var authLogger = serviceProvider.GetRequiredService<ILogger<AuthService>>();
         // Act
-        var result = await authService.LoginAsync();
+        var result = await authService.Login();
         var fakeLogger = (FakeLogger<AuthService>)authLogger;
         FakeLogCollector collector = fakeLogger.Collector; // Collector allows you to access the captured logs
         IReadOnlyList<FakeLogRecord> logs = collector.GetSnapshot();

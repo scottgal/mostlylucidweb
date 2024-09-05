@@ -13,6 +13,7 @@ namespace Mostlylucid.Blog.EntityFramework;
 public class EFBlogService(
     IMostlylucidDBContext context,
     MarkdownRenderingService markdownRenderingService,
+    UmamiDataSortService umamiDataSortService,
     ILogger<EFBlogService> logger)
     : EFBaseService(context, logger), IBlogService
 {
@@ -173,6 +174,23 @@ public class EFBlogService(
             postModels.Add(postResult.ToListModel(langArr));
         }
 
+        var popularityData =(await umamiDataSortService.GetMetrics(DateTime.Now.AddDays(-30), DateTime.Now, "/blog/"))?.ToList();
+
+        if (popularityData?.Any() == true)
+        {
+          
+        var blogDictionary = popularityData.ToDictionary(x => x.x, x => x.y);
+        
+        foreach (var post in postModels)
+        {
+            var views = blogDictionary.Where(x => x.Key.EndsWith(post.Slug))?.Sum(x=>x.Value);
+            if (views != null)
+            {
+                post.Views = views.Value;
+            }
+        }
+          
+        }
         var postListViewModel = new PostListViewModel
         {
             Page = page,

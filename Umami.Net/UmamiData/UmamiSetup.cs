@@ -32,7 +32,7 @@ public static class UmamiSetup
         return HttpPolicyExtensions
             .HandleTransientHttpError()
             .OrResult(msg =>
-                msg.StatusCode == HttpStatusCode.ServiceUnavailable || msg.StatusCode == HttpStatusCode.Unauthorized)
+                msg.StatusCode == HttpStatusCode.ServiceUnavailable)
             .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
     }
 }

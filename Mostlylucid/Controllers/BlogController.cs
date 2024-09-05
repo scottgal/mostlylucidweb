@@ -98,9 +98,9 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     
     [Route("language/{slug}/{language}")]
     [HttpGet]
-    public IActionResult Compat(string slug, string language)
+    public async Task<IActionResult> Compat(string slug, string language)
     {
-       return RedirectToAction(nameof(Language), new { slug, language });
+       return await Show(slug, language);
     }
     
 
@@ -111,16 +111,6 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     [OutputCache(Duration = 3600, VaryByHeaderNames = new[] {"hx-request"}, VaryByQueryKeys = new[] {nameof(slug), nameof(language)})]
     public  async Task<IActionResult> Language(string slug, string language)
     {
-        var post =await blogService.GetPost(slug, language);
-        if(post == null)
-        {
-            return RedirectToAction("Index", "Blog");
-        }
-        ViewBag.Title = post.Title + " - " + language;
-        if(Request.IsHtmx())
-        {
-            return PartialView("_PostPartial", post);
-        }
-        return View("Post", post);
+        return await Show(slug, language);
     }
 }

@@ -31,6 +31,12 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
                 {
                     return new HttpResponseMessage(HttpStatusCode.BadRequest);
                 }
+            case "/api/auth/verify":
+                //To allow Login to continue.
+                return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            case "/api/auth/verify?test":
+                //To allow Login to continue fail.
+                return new HttpResponseMessage(HttpStatusCode.OK);
             default:
 
                 if (absPath.StartsWith($"/api/websites/{Consts.WebSiteId}/pageviews"))
@@ -46,6 +52,18 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
                     return ReturnMetrics(metricsRequest);
                 }
 
+                if (absPath.StartsWith($"/api/websites/{Consts.WebSiteId}/active"))
+                {
+                    var activeUsers = new ActiveUsersResponse()
+                    {
+                        ActiveUsers = 10
+                    };
+                    var json = JsonSerializer.Serialize(activeUsers);
+                    return new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(json, Encoding.UTF8, "application/json")
+                    };
+                }
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
         }
     }

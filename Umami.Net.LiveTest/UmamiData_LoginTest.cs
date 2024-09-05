@@ -12,7 +12,7 @@ public class UmamiData_LoginTest
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var authService = serviceProvider.GetRequiredService<AuthService>();
-        var result =await authService.LoginAsync();
+        var result =await authService.Login();
         Assert.True(result);
     }
     

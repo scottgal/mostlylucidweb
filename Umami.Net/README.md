@@ -1,5 +1,6 @@
 # Umami.Net
 
+## UmamiClient
 This is a .NET Core client for the Umami tracking API.
 It's based on the Umami Node client, which can be found [here](https://github.com/umami-software/node).
 
@@ -98,3 +99,29 @@ If you don't pass in a `UmamiPayload` object, the client will create one for you
 You can see that this populates the `UmamiPayload` object with the `WebsiteId` from the appsettings.json, the `Url`, `IpAddress`, `UserAgent`, `Referrer` and `Hostname` from the `HttpContext`.
 
 NOTE: eventType can only be "event" or "identify" as per the Umami API.
+
+
+## UmamiData
+There's also a service that can be used to pull data from the Umami API. This is a service that allows me to pull data from my Umami instance to use in stuff like sorting posts by popularity etc...
+
+To set it up you need to add a username and password for your umami instance to the Analytics element in your settings file:
+```json
+    "Analytics":{
+        "UmamiPath" : "https://umami.mostlylucid.net",
+        "WebsiteId" : "1e3b7657-9487-4857-a9e9-4e1920aa8c42",
+        "UserName": "admin",
+        "Password": ""
+     
+    }
+```
+Then in your `Program.cs` you set up the `UmamiDataService` as follows:
+```csharp
+    services.SetupUmamiData(config);
+```
+
+You can then inject the `UmamiDataService` into your class and use it to pull data from the Umami API.
+
+For example. to fetch all PageViews for a given date range:
+```csharp
+    var data = await umamiDataService.GetPageViews("2021-01-01", "2021-01-31");
+```

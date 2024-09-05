@@ -1,6 +1,8 @@
-﻿using System.Net;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
+using Umami.Net.UmamiData.Helpers;
 using Umami.Net.UmamiData.Models;
 using Umami.Net.UmamiData.Models.RequestObjects;
 using Umami.Net.UmamiData.Models.ResponseObjects;
@@ -16,7 +18,7 @@ namespace Umami.Net.UmamiData;
 public partial class UmamiDataService
 {
     public async Task<UmamiResult<PageViewsResponseModel>> GetPageViews(DateTime startDate, DateTime endDate,
-        Unit unit = Unit.Day)
+        Unit unit = Unit.day)
     {
         var pageViewsRequest = new PageViewsRequest
         {
@@ -29,34 +31,14 @@ public partial class UmamiDataService
 
     public async Task<UmamiResult<PageViewsResponseModel>> GetPageViews(PageViewsRequest pageViewsRequest)
     {
-        if (await authService.LoginAsync() == false)
+        if (await authService.Login() == false)
             return new UmamiResult<PageViewsResponseModel>(HttpStatusCode.Unauthorized, "Failed to login", null);
-        // Start building the query string
-        var queryParams = new List<string>
-        {
-            $"startAt={pageViewsRequest.StartAt}",
-            $"endAt={pageViewsRequest.EndAt}",
-            $"unit={pageViewsRequest.Unit.ToLowerString()}"
-        };
+ 
+        var queryString = pageViewsRequest.ToQueryString();
 
-        // Add optional parameters if they are not null
-        if (!string.IsNullOrEmpty(pageViewsRequest.Timezone)) queryParams.Add($"timezone={pageViewsRequest.Timezone}");
-        if (!string.IsNullOrEmpty(pageViewsRequest.Url)) queryParams.Add($"url={pageViewsRequest.Url}");
-        if (!string.IsNullOrEmpty(pageViewsRequest.Referrer)) queryParams.Add($"referrer={pageViewsRequest.Referrer}");
-        if (!string.IsNullOrEmpty(pageViewsRequest.Title)) queryParams.Add($"title={pageViewsRequest.Title}");
-        if (!string.IsNullOrEmpty(pageViewsRequest.Host)) queryParams.Add($"host={pageViewsRequest.Host}");
-        if (!string.IsNullOrEmpty(pageViewsRequest.Os)) queryParams.Add($"os={pageViewsRequest.Os}");
-        if (!string.IsNullOrEmpty(pageViewsRequest.Browser)) queryParams.Add($"browser={pageViewsRequest.Browser}");
-        if (!string.IsNullOrEmpty(pageViewsRequest.Device)) queryParams.Add($"device={pageViewsRequest.Device}");
-        if (!string.IsNullOrEmpty(pageViewsRequest.Country)) queryParams.Add($"country={pageViewsRequest.Country}");
-        if (!string.IsNullOrEmpty(pageViewsRequest.Region)) queryParams.Add($"region={pageViewsRequest.Region}");
-        if (!string.IsNullOrEmpty(pageViewsRequest.City)) queryParams.Add($"city={pageViewsRequest.City}");
 
-        // Combine the query parameters into a query string
-        var queryString = string.Join("&", queryParams);
-
-        // Make the HTTP request
-        var response = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/pageviews?{queryString}");
+      // Make the HTTP request
+        var response = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/pageviews{queryString}");
 
         if (response.IsSuccessStatusCode)
         {
@@ -68,7 +50,7 @@ public partial class UmamiDataService
 
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            await authService.LoginAsync();
+            await authService.Login();
             return await GetPageViews(pageViewsRequest);
         }
 

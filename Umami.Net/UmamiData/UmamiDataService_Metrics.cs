@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
+using Umami.Net.UmamiData.Helpers;
 using Umami.Net.UmamiData.Models;
 using Umami.Net.UmamiData.Models.RequestObjects;
 using Umami.Net.UmamiData.Models.ResponseObjects;
@@ -9,42 +10,22 @@ namespace Umami.Net.UmamiData;
 
 public partial class UmamiDataService
 {
+    /// <summary>
+    /// Gets the Metrics for the website from Umami
+    /// </summary>
+    /// <param name="metricsRequest"> An object which allows you to set the QueryString parameters.</param>
+    /// <returns></returns>
     public async Task<UmamiResult<MetricsResponseModels[]>> GetMetrics(MetricsRequest metricsRequest)
     {
         try
         {
-            if (await authService.LoginAsync() == false)
+            if (await authService.Login() == false)
                 return new UmamiResult<MetricsResponseModels[]>(HttpStatusCode.Unauthorized, "Failed to login", null);
             // Start building the query string
-            var queryParams = new List<string>
-            {
-                $"startAt={metricsRequest.StartAt}",
-                $"endAt={metricsRequest.EndAt}",
-                $"type={metricsRequest.Type}"
-            };
-
-            // Add optional parameters if they are not null
-            if (!string.IsNullOrEmpty(metricsRequest.Url)) queryParams.Add($"url={metricsRequest.Url}");
-            if (!string.IsNullOrEmpty(metricsRequest.Referrer)) queryParams.Add($"referrer={metricsRequest.Referrer}");
-            if (!string.IsNullOrEmpty(metricsRequest.Title)) queryParams.Add($"title={metricsRequest.Title}");
-            if (!string.IsNullOrEmpty(metricsRequest.Query)) queryParams.Add($"query={metricsRequest.Query}");
-            if (!string.IsNullOrEmpty(metricsRequest.Host)) queryParams.Add($"host={metricsRequest.Host}");
-            if (!string.IsNullOrEmpty(metricsRequest.Os)) queryParams.Add($"os={metricsRequest.Os}");
-            if (!string.IsNullOrEmpty(metricsRequest.Browser)) queryParams.Add($"browser={metricsRequest.Browser}");
-            if (!string.IsNullOrEmpty(metricsRequest.Device)) queryParams.Add($"device={metricsRequest.Device}");
-            if (!string.IsNullOrEmpty(metricsRequest.Country)) queryParams.Add($"country={metricsRequest.Country}");
-            if (!string.IsNullOrEmpty(metricsRequest.Region)) queryParams.Add($"region={metricsRequest.Region}");
-            if (!string.IsNullOrEmpty(metricsRequest.City)) queryParams.Add($"city={metricsRequest.City}");
-            if (!string.IsNullOrEmpty(metricsRequest.Language)) queryParams.Add($"language={metricsRequest.Language}");
-            if (!string.IsNullOrEmpty(metricsRequest.Event)) queryParams.Add($"event={metricsRequest.Event}");
-            if (metricsRequest.Limit.HasValue) queryParams.Add($"limit={metricsRequest.Limit}");
-
-            // Combine the query parameters into a query string
-            var queryString = string.Join("&", queryParams);
-
+            var queryString = metricsRequest.ToQueryString();
 
             // Make the HTTP request
-            var response = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/metrics?{queryString}");
+            var response = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/metrics{queryString}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -55,7 +36,7 @@ public partial class UmamiDataService
 
             if (response.StatusCode == HttpStatusCode.Unauthorized)
             {
-                await authService.LoginAsync();
+                await authService.Login();
                 return await GetMetrics(metricsRequest);
             }
 

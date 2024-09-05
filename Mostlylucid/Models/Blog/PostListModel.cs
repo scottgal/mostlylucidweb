@@ -9,6 +9,7 @@ public class PostListModel
     
     public DateTime UpdatedDate { get; set; }
     
+    public int Views { get; set; }
     public string Language { get; set; }= string.Empty;
     
     public string[] Languages { get; set; } = Array.Empty<string>();

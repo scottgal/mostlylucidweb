@@ -1,9 +1,13 @@
-﻿namespace Umami.Net.UmamiData.Models.RequestObjects;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace Umami.Net.UmamiData.Models.RequestObjects;
 
 public enum Unit
 {
-    Year,
-    Month,
-    Hour,
-    Day
+
+    year,
+    month,
+    hour,
+    day
 }

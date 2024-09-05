@@ -17,8 +17,10 @@ public class Metrics_Test
         
         var metrics = await websiteDataService.GetMetrics(new MetricsRequest()
         {
-            StartAtDate = DateTime.Now.AddDays(-7),
+            StartAtDate = DateTime.Now.AddDays(-30),
             EndAtDate = DateTime.Now,
+            Type = MetricType.url,
+            Limit = 500
         });
         Assert.NotNull(metrics);
         Assert.Equal( HttpStatusCode.OK, metrics.Status);
@@ -60,4 +62,42 @@ public class Metrics_Test
         Assert.Equal( HttpStatusCode.OK, metrics.Status);
 
     }
+    
+    [Fact]
+    public async Task Metrics_StartEndForCountry()
+    {
+        var setup = new SetupUmamiData();
+        var serviceProvider = setup.Setup();
+        var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
+        
+        var metrics = await websiteDataService.GetMetrics(new MetricsRequest()
+        {
+            StartAtDate = DateTime.Now.AddDays(-7),
+            EndAtDate = DateTime.Now,
+            Type = MetricType.country
+        });
+        Assert.NotNull(metrics);
+        Assert.Equal( HttpStatusCode.OK, metrics.Status);
+
+    }
+    
+    [Fact]
+    public async Task Metrics_StartEndForEvent()
+    {
+        var setup = new SetupUmamiData();
+        var serviceProvider = setup.Setup();
+        var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
+        
+        var metrics = await websiteDataService.GetMetrics(new MetricsRequest()
+        {
+            StartAtDate = DateTime.Now.AddDays(-7),
+            EndAtDate = DateTime.Now,
+            Type = MetricType.@event,
+            Event = "searchEvent"
+        });
+        Assert.NotNull(metrics);
+        Assert.Equal( HttpStatusCode.OK, metrics.Status);
+
+    }
+    
 }

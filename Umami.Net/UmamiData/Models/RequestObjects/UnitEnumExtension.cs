@@ -6,10 +6,10 @@ public static class UnitEnumExtension
     {
         return unit switch
         {
-            Unit.Year => "year",
-            Unit.Month => "month",
-            Unit.Hour => "hour",
-            Unit.Day => "day",
+            Unit.year => "year",
+            Unit.month => "month",
+            Unit.hour => "hour",
+            Unit.day => "day",
             _ => throw new ArgumentOutOfRangeException(nameof(unit), unit, null)
         };
     }

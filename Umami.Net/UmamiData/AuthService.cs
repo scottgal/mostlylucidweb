@@ -13,8 +13,14 @@ public class AuthService(HttpClient httpClient, UmamiDataSettings umamiSettings,
     private string _token = string.Empty;
     public HttpClient HttpClient => httpClient;
 
-    public async Task<bool> LoginAsync()
+    /// <summary>
+    /// Logs in to the Umami API
+    /// </summary>
+    /// <param name="skipVerify">Mostly used for testing, this will skip the VerifyToken stage</param>
+    /// <returns>True or False depending on whether the login succeeded</returns>
+    public async Task<bool> Login(bool skipVerify = false)
     {
+        if(!skipVerify && await VerifyToken()) return true;
         var loginData = new
         {
             username = umamiSettings.Username,
@@ -42,5 +48,18 @@ public class AuthService(HttpClient httpClient, UmamiDataSettings umamiSettings,
 
         logger.LogError("Login failed");
         return false;
+    }
+    
+    public async Task<bool> VerifyToken(bool isTest=false)
+    {
+        var verify = await httpClient.GetAsync("/api/auth/verify" + (isTest ? "?test" : ""));
+        if(verify.IsSuccessStatusCode == false)
+        {
+            logger.LogError("Verify failed");
+            return false;
+        }
+        logger.LogInformation("Verify successful");
+        return true;
+        
     }
 }

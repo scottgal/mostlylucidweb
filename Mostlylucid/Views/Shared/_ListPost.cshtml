@@ -3,7 +3,7 @@
 <div class="border-b border-grey-lighter pb-8 mb-8">
  
     <a asp-controller="Blog" asp-action="Show" hx-boost="true"  hx-swap="show:window:top"  hx-target="#contentcontainer" asp-route-slug="@Model.Slug"
-       class="block font-body text-lg font-semibold transition-colors hover:text-green text-blue-dark dark:text-white  dark:hover:text-secondary">@Model.Title</a>
+       class="block font-body text-lg font-semibold transition-colors hover:text-green text-blue-dark dark:text-white  dark:hover:text-secondary">@Model.Title</a>  
     <div class="flex space-x-2 items-center py-4">
     @foreach (var category in Model.Categories)
     {
@@ -23,5 +23,8 @@
         <p class="pl-2 font-body font-light text-primary light:text-black dark:text-white">
             @Model.ReadingTime
         </p>
+        <span class="font-body text-grey dark:text-white">//</span>
+        <p class="pl-2 font-body font-light text-primary light:text-black dark:text-white">
+        @(Model.Views) views in past month</p>
     </div>
 </div>

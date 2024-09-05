@@ -6,23 +6,18 @@ using Umami.Net.UmamiData.Models.RequestObjects;
 
 namespace Umami.Net.LiveTest;
 
-public class PageViews_Test
+public class ActiveUsers_Test
 {
     [Fact]
-    public async Task PageViews_StartEnd()
+    public async Task Stats_StartEndForUrl()
     {
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-    
-      var pageViews = await websiteDataService.GetPageViews(new PageViewsRequest()
-       {
-           StartAtDate = DateTime.Now.AddDays(-7),
-           EndAtDate = DateTime.Now,
-           Unit = Unit.Hour
-       });
-       Assert.NotNull(pageViews);
-       Assert.Equal( HttpStatusCode.OK, pageViews.Status);
+
+        var activeUsers = await websiteDataService.GetActiveUsers();
+        Assert.NotNull(activeUsers);
+        Assert.Equal( HttpStatusCode.OK, activeUsers.Status);
 
     }
 }

@@ -10,5 +10,7 @@ public class PostListViewModel : BaseViewModel
     public int TotalItems { get; set; }
     
     public int PageSize { get; set; }
+    
+
     public List<PostListModel> Posts { get; set; }
 }

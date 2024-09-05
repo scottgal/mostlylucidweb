@@ -13,6 +13,7 @@ using SerilogTracing;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using Umami.Net;
+using Umami.Net.UmamiData;
 using WebEssentials.AspNetCore.Pwa;
 
 try
@@ -43,12 +44,14 @@ try
 // the container.
     services.AddOutputCache(); // Remove duplicate call later in your code
     services.AddResponseCaching();
-
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();
     services.SetupTranslateService();
     services.SetupOpenSearch(config);
-
+ 
+    services.SetupUmamiData(config);
+    services.AddScoped<UmamiDataSortService>();
+    
     services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
     services.SetupEmail(builder.Configuration);
     services.SetupRSS();
