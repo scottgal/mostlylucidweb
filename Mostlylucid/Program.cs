@@ -50,7 +50,7 @@ try
     services.SetupOpenSearch(config);
  
     services.SetupUmamiData(config);
-    services.AddScoped<UmamiDataSortService>();
+    services.AddScoped<IUmamiDataSortService, UmamiDataSortService>();
     
     services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
     services.SetupEmail(builder.Configuration);

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Mostlylucid.EntityFramework;
 using Mostlylucid.EntityFramework.Models;
-using Mostlylucid.Helpers;
 using Mostlylucid.Mappers;
 using Mostlylucid.Models.Blog;
 using Serilog;
@@ -13,7 +12,7 @@ namespace Mostlylucid.Blog.EntityFramework;
 public class EFBlogService(
     IMostlylucidDBContext context,
     MarkdownRenderingService markdownRenderingService,
-    UmamiDataSortService umamiDataSortService,
+    IUmamiDataSortService umamiDataSortService,
     ILogger<EFBlogService> logger)
     : EFBaseService(context, logger), IBlogService
 {

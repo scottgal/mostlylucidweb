@@ -11,7 +11,7 @@ namespace Mostlylucid.Blog;
 
 public class UmamiDataSortService(
     UmamiDataService dataService,
-    IMemoryCache cache)
+    IMemoryCache cache) : IUmamiDataSortService
 {
     public async Task<List<MetricsResponseModels>?> GetMetrics(DateTime startAt, DateTime endAt, string prefix="" )
     {

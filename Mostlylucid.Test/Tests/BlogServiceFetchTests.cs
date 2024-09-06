@@ -23,6 +23,7 @@ public class BlogServiceFetchTests
         // 3. Register the mock of IMostlylucidDbContext into the ServiceCollection
         services.AddSingleton(_dbContextMock.Object);
         // Optionally register other services
+        services.AddScoped<IUmamiDataSortService, UmamiDataSortFake>();
         services.AddScoped<IBlogService, EFBlogService>(); // Example service that depends on IMostlylucidDbContext
         services.AddLogging(configure => configure.AddConsole());
         services.AddScoped<MarkdownRenderingService>();

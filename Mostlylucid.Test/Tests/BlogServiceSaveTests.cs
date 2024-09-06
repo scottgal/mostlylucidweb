@@ -23,7 +23,7 @@ public class BlogServiceSaveTests
 
         // 3. Register the mock of IMostlylucidDbContext into the ServiceCollection
         services.AddSingleton(_dbContextMock.Object);
-
+        services.AddScoped<IUmamiDataSortService, UmamiDataSortFake>();
         // Optionally register other services
         services.AddScoped<IBlogService, EFBlogService>(); // Example service that depends on IMostlylucidDbContext
         services.AddLogging(configure => configure.AddConsole());
