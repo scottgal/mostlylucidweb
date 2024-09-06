@@ -114,8 +114,8 @@ Vous pouvez voir que MUCH du code construit la QueryString à partir de la class
             response.ReasonPhrase ?? "Failed to get page views", null);
     }
 ```
-</details>
 
+</details>
 Comme vous pouvez le voir, il suffit de construire une chaîne de requête. authentifie l'appel (voir [dernier article](/blog/unittestinglogginginaspnetcore) pour quelques détails sur cela) et ensuite fait l'appel à l'API Umami. Alors, comment testons-nous ça?
 
 ## Tester le UmamiDataService

@@ -62,7 +62,6 @@ Je kunt zien dat MEEL van de code de QueryString bouwt vanuit de doorgegeven in 
 
 <details>
 <summary>GetPageViews</summary>
-
 ```csharp
     public async Task<UmamiResult<PageViewsResponseModel>> GetPageViews(PageViewsRequest pageViewsRequest)
     {

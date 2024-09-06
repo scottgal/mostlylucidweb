@@ -1,16 +1,16 @@
-# Unit Testaa Umami.Net - Testaa Umami Dataa ilman Moqia
+# Umami.Net - 不使用摩克测试Umami数据
 
-# Johdanto
+# 一. 导言 导言 导言 导言 导言 导言 一,导言 导言 导言 导言 导言 导言
 
-Tämän sarjan edellisessä osassa, jossa testasin[ Umami.Net tracking methods ](/blog/unittestingumaminet)
+在这个系列的上一部分,我测试了[ Umami.Net跟踪方法 ](/blog/unittestingumaminet)
 
 <!--category-- xUnit, ASP.NET Core -->
-<datetime class="hidden">2024–09–04T20–30</datetime>
-[TOC]
+<datetime class="hidden">2024-09-004T20:30</datetime>
+[技选委
 
-## Ongelma
+## 问题
 
-Edellisessä osassa käytin Moqia antaakseni minulle `Mock<HttpMessageHandler>` ja palauta käsittelijä, jota käytetään `UmamiClient`, Tämä on yleinen kaava, kun testataan koodia, joka käyttää `HttpClient`. Tässä viestissä näytän sinulle, miten testata uutta `UmamiDataService` Moqia käyttämättä.
+在前一部分我用莫克给我一个 `Mock<HttpMessageHandler>` 中所使用的处理器,然后返回 `UmamiClient`,这是一个常见模式,当测试代码使用 `HttpClient`.. 在这个职位上,我将教你如何测试新的 `UmamiDataService` 没有使用 Moq 。
 
 ```csharp
     public static HttpMessageHandler Create()
@@ -46,23 +46,22 @@ Edellisessä osassa käytin Moqia antaakseni minulle `Mock<HttpMessageHandler>` 
     }
 ```
 
-## Miksi käyttää Moqia?
+## 为什么用莫克?
 
-Moq on tehokas pilkkaava kirjasto, jonka avulla voit luoda valeobjekteja rajapintoja ja luokkia varten. Sitä käytetään laajalti yksikkötestauksessa, jossa testattava koodi eristetään sen riippuvuuksista. On kuitenkin tapauksia, joissa Moqin käyttö voi olla hankalaa tai jopa mahdotonta. Esimerkiksi staattisia menetelmiä käyttävän koodin testauksessa tai kun testattava koodi kytketään tiukasti sen riippuvuuteen.
+Moq 是一个强大的模拟图书馆, 允许您为界面和课程创建模拟对象 。 它广泛用于单位测试,将测试中的代码与其依赖性隔离开来。 然而,在有些情况下,使用Moq可能是繁琐的,甚至是不可能的。 例如,当测试代码使用静态方法时,或当测试中的代码与其依赖性紧密结合时。
 
-Edellä antamani esimerkki antaa paljon joustavuutta testauksessa. `UmamiClient` Luokkaa, mutta siinä on myös huonoja puolia. Se on UGLY-koodi ja tekee paljon sellaista, mitä en oikeastaan tarvitse. Joten testattaessa `UmamiDataService` Päätin kokeilla eri lähestymistapaa.
+以上我所举的例子在测试 `UmamiClient` 类,但也有一些缺点。 这是UGLY密码 做很多我并不需要的东西 所以当测试时 `UmamiDataService` 我决定尝试另一种方法
 
-# UmamiDataServicen testaus
+# 测试 UmmiDataServices
 
-Erytropoietiini `UmamiDataService` on tuleva lisä Umami.Net-kirjastoon, jonka avulla voit noutaa tietoja Umami-kirjastosta esimerkiksi katsomalla, kuinka monta näkymää sivulla oli, mitä tietyn tyyppisiä tapahtumia tapahtui, joita suodattivat tonneittain muuttujat liek country, city, OS, screen size, jne. Tämä on hyvin voimakas, mutta juuri nyt [Umami API toimii vain JavaScriptin kautta](https://umami.is/docs/api/website-stats). Joten haluan pelata sillä datalla, jonka tein luodakseni sille C#-asiakkaan.
+缩略 `UmamiDataService` 这是Umami. Net 库的未来补充, 这将使您能够从 Umami 库中获取数据, 例如查看网页有多少浏览, 某类事件发生多少, 由数以吨计的参数覆盖国家、 城市、 OS、 屏幕大小等过滤 。 这是一个非常强大的,但现在 [Umami API 仅通过 JavaScript 有效](https://umami.is/docs/api/website-stats).. 所以想利用这些数据 我努力为它创建了一个 C # 客户端。
 
-Erytropoietiini `UmamiDataService` Luokka jakaantuu kullattuihin osittaisiin luokkiin (menetelmät ovat SUPER long) esimerkiksi tässä `PageViews` menetelmä.
+缩略 `UmamiDataService` 类被划分为模块部分类(方法为SUPER长),例如,这里是 `PageViews` 方法。
 
-Huomaat, että suuri osa koodista rakentaa QueryStringiä PageViewsRequest -kurssin läpimenosta (tähän on muitakin tapoja, mutta tämä, esimerkiksi attribuuttien tai heijastusten käyttö, toimii täällä).
+您可以看到,该代码的 MUCH 正在从 PagePeviewResources Services 类( 还有其他方法可以做到这一点, 但此方法, 例如在这里使用属性或反射工作 ) 中构建QueyString 。
 
 <details>
 <summary>GetPageViews</summary>
-
 ```csharp
     public async Task<UmamiResult<PageViewsResponseModel>> GetPageViews(PageViewsRequest pageViewsRequest)
     {
@@ -116,13 +115,13 @@ Huomaat, että suuri osa koodista rakentaa QueryStringiä PageViewsRequest -kurs
 ```
 
 </details>
-Kuten näette, tämä todella rakentaa kyselyjonon. Vahvistaa puhelun (ks. [viimeinen artikkeli](/blog/unittestinglogginginaspnetcore) Lisätietoja tästä) ja sitten soittaa Umamin API-puhelimeen. Miten testaamme tätä?
+正如你可以看到的,这实际上只是构建了一个查询字符串。 认证调用电话(见 [最后一条](/blog/unittestinglogginginaspnetcore) 以了解这方面的一些细节),然后向Umami API发出呼吁。 那么,我们如何测试这个呢?
 
-## Umamidatapalvelun testaaminen
+## 测试 UmmiData Services 数据服务
 
-Toisin kuin UmamiClient, päätin testata `UmamiDataService` Moqia käyttämättä. Sen sijaan loin yksinkertaisen `DelegatingHandler` Luokka, jonka avulla voin kuulustella pyyntöä ja sitten vastata. Tämä on paljon yksinkertaisempi lähestymistapa kuin Moqin käyttö, ja sen avulla voin testata `UmamiDataService` ilman, että on pakko pilkata `HttpClient`.
+与UmamiClient的测试相反, 我决定测试 `UmamiDataService` 没有使用 Moq 。 相反,我创造了一个简单的 `DelegatingHandler` 允许我询问请求,然后回覆答复。 这比使用Moq简单得多, `UmamiDataService` 无需嘲笑 `HttpClient`.
 
-Alla olevassa koodissa näet, että yksinkertaisesti laajennan `DelegatingHandler` ja ohita `SendAsync` menetelmä. Tällä menetelmällä voin tarkastaa pyynnön ja palauttaa pyynnön mukaisen vastauksen.
+在下面的代码中,你可以看到,我只要延长 `DelegatingHandler` 并覆盖 `SendAsync` 方法。 这种方法使我能够检查请求,并根据请求回信答复。
 
 ```csharp
 public class UmamiDataDelegatingHandler : DelegatingHandler
@@ -166,9 +165,9 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
  }
 ```
 
-## Asetukset
+## 设置设置设置设置设置设置设置
 
-Perustetaan uusi `UmamiDataService` Tämän käsittelijän käyttö on yhtä yksinkertaista.
+设置新的 `UmamiDataService` 使用此处理器同样简单。
 
 ```csharp
     public IServiceProvider GetServiceProvider (string username="username", string password="password")
@@ -184,9 +183,9 @@ Perustetaan uusi `UmamiDataService` Tämän käsittelijän käyttö on yhtä yks
     }
 ```
 
-Huomaat, että järjestin juuri `ServiceCollection`, lisätään `FakeLogger<T>` (ks. [viimeinen artikkeli tarkempia tietoja tästä](/blog/unittestinglogginginaspnetcore) ja sen jälkeen perustaa `UmamiData` Palvelu käyttäjätunnuksella ja salasanalla, jota haluan käyttää (jotta voin testata epäonnistumista).
+你会看到我刚刚设计了 `ServiceCollection`,加上 `FakeLogger<T>` (再次见 [有关细节的最后一篇文章](/blog/unittestinglogginginaspnetcore) 然后,然后, `UmamiData` 使用用户名和密码的服务( 这样我就可以测试失败) 。
 
-Kutsun sitten `services.SetupUmamiData(username, password);` joka on laajennusmenetelmä, jonka loin perustaakseni `UmamiDataService` • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • `UmamiDataDelegatingHandler` ja `AuthService`;
+然后我呼唤你们, `services.SetupUmamiData(username, password);` 这是我为建立 `UmamiDataService` 和和 `UmamiDataDelegatingHandler` 和 `AuthService`;
 
 ```csharp
     public static void SetupUmamiData(this IServiceCollection services, string username="username", string password="password")
@@ -212,11 +211,11 @@ Kutsun sitten `services.SetupUmamiData(username, password);` joka on laajennusme
     }
 ```
 
-Huomaat, että tässä kohtaa koukutan `UmamiDataDelegatingHandler` ja `AuthService` Euroopan unionin toiminnasta tehtyyn sopimukseen ja Euroopan unionin toiminnasta tehtyyn sopimukseen liitetyssä pöytäkirjassa N:o 2 olevan 1 ja 2 kohdan mukaisesti. `UmamiDataService`. Tämä on rakenteeltaan sellainen, että `AuthService` "Omistaa" `HttpClient` ja `UmamiDataService` käyttää `AuthService` soittaa puhelut Umami API kanssa `bearer` kuponki ja `BaseAddress` Se on jo valmiina.
+你可以看到,这就是 在这里,我勾入 `UmamiDataDelegatingHandler` 和 `AuthService` 会 议 日 和 排 `UmamiDataService`.. 目前的结构方式是 `AuthService` # 自己 # # 自己 # # 自己 # # 自己 # # `HttpClient` 和 `UmamiDataService` 使用 `AuthService` 致电Umami API 与 `bearer` 符号和符号 `BaseAddress` 已经设置 。
 
-## Testit
+## 测试
 
-Tämä tekee tämän testaamisesta todella yksinkertaista. Se on vain hieman sanavalmis, koska halusin myös testata puunkorjuuta. Se ei tee muuta kuin lähettää minun kauttani. `DelegatingHandler` ja simuloin vastausta pyynnön perusteella.
+这真的让测试过程变得非常简单。 这只是一点动词 因为我也想测试 伐木。 它所做的就是通过我的 `DelegatingHandler` 我根据请求模拟回应。
 
 ```csharp
 public class UmamiData_PageViewsRequest_Test : UmamiDataBase
@@ -247,9 +246,9 @@ public class UmamiData_PageViewsRequest_Test : UmamiDataBase
 }
 ```
 
-### Vastauksen simulointi
+### 模拟响应
 
-Simuloidakseni vastausta tähän menetelmään muistatte, että minulla on tämä rivi... `UmamiDataDelegatingHandler`:
+模拟此方法的响应, 您会记得, 我有这条线在 `UmamiDataDelegatingHandler`:
 
 ```csharp
   if (absPath.StartsWith($"/api/websites/{Consts.WebSiteId}/pageviews"))
@@ -260,7 +259,7 @@ Simuloidakseni vastausta tähän menetelmään muistatte, että minulla on täm�
                 }
 ```
 
-Kaikki tämä vain vetää tietoa kyselystä ja muodostaa "realistisen" vastauksen (olen koonnut Live Tests, jälleen hyvin vähän dokumentteja tästä). Näet, kuinka monta päivää testaan aloitus- ja lopetuspäivän välillä ja sitten palautan vastauksen, jossa on sama määrä päiviä.
+所有这一切都是从查询字符串中提取信息, 并构建一个“现实主义”回应(基于我编译的现场测试, 你会看到我测试从开始到结束日期之间的天数, 然后用同样的天数返回回复。
 
 ```csharp
     private static HttpResponseMessage ReturnPageViewsMessage(PageViewsRequest request)
@@ -300,6 +299,6 @@ Kaikki tämä vain vetää tietoa kyselystä ja muodostaa "realistisen" vastauks
     }
 ```
 
-# Johtopäätöksenä
+# 在结论结论中
 
-Joten se on se, että se on aika helppo testata `HttpClient` Pyyntö ilman Moqin käyttöä, ja mielestäni se on paljon puhtaampi näin. Menetät osan Moqissa mahdollistamasta hienostuneisuudesta, mutta tällaisissa yksinkertaisissa testeissä se on mielestäni hyvä vaihtokauppa.
+所以测试一个 `HttpClient` 请求不需要使用Moq, 我觉得这样更干净。 在莫克州,你确实失去了一些 先进的技术 但对于这样的简单测试, 我认为这是一个很好的权衡。

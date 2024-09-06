@@ -1,16 +1,16 @@
-# Unit Testaa Umami.Net - Testaa Umami Dataa ilman Moqia
+# Unit Testing Umami.Net - Testen von Umami-Daten ohne Moq
 
-# Johdanto
+# Einleitung
 
-Tämän sarjan edellisessä osassa, jossa testasin[ Umami.Net tracking methods ](/blog/unittestingumaminet)
+Im vorherigen Teil dieser Serie, wo ich getestet[ Umami.Net Tracking Methoden ](/blog/unittestingumaminet)
 
 <!--category-- xUnit, ASP.NET Core -->
-<datetime class="hidden">2024–09–04T20–30</datetime>
+<datetime class="hidden">2024-09-04T20:30</datetime>
 [TOC]
 
-## Ongelma
+## Das Problem
 
-Edellisessä osassa käytin Moqia antaakseni minulle `Mock<HttpMessageHandler>` ja palauta käsittelijä, jota käytetään `UmamiClient`, Tämä on yleinen kaava, kun testataan koodia, joka käyttää `HttpClient`. Tässä viestissä näytän sinulle, miten testata uutta `UmamiDataService` Moqia käyttämättä.
+Im vorherigen Teil habe ich Moq benutzt, um mir eine `Mock<HttpMessageHandler>` und den benutzten Handler zurückgeben `UmamiClient`, ist dies ein häufiges Muster beim Testen von Code, der verwendet `HttpClient`......................................................................................................... In diesem Beitrag werde ich Ihnen zeigen, wie man die neue testen `UmamiDataService` ohne Verwendung von Moq.
 
 ```csharp
     public static HttpMessageHandler Create()
@@ -46,19 +46,19 @@ Edellisessä osassa käytin Moqia antaakseni minulle `Mock<HttpMessageHandler>` 
     }
 ```
 
-## Miksi käyttää Moqia?
+## Warum Moq benutzen?
 
-Moq on tehokas pilkkaava kirjasto, jonka avulla voit luoda valeobjekteja rajapintoja ja luokkia varten. Sitä käytetään laajalti yksikkötestauksessa, jossa testattava koodi eristetään sen riippuvuuksista. On kuitenkin tapauksia, joissa Moqin käyttö voi olla hankalaa tai jopa mahdotonta. Esimerkiksi staattisia menetelmiä käyttävän koodin testauksessa tai kun testattava koodi kytketään tiukasti sen riippuvuuteen.
+Moq ist eine leistungsstarke Spoting-Bibliothek, mit der Sie Spot-Objekte für Interfaces und Klassen erstellen können. Es ist weit verbreitet in Unit-Tests verwendet, um den Code unter Test von seinen Abhängigkeiten zu isolieren. Allerdings gibt es einige Fälle, in denen die Verwendung von Moq schwerfällig oder sogar unmöglich sein kann. Zum Beispiel beim Testen von Code, der statische Methoden verwendet oder wenn der zu testende Code fest an seine Abhängigkeiten gekoppelt ist.
 
-Edellä antamani esimerkki antaa paljon joustavuutta testauksessa. `UmamiClient` Luokkaa, mutta siinä on myös huonoja puolia. Se on UGLY-koodi ja tekee paljon sellaista, mitä en oikeastaan tarvitse. Joten testattaessa `UmamiDataService` Päätin kokeilla eri lähestymistapaa.
+Das Beispiel, das ich oben gab, gibt eine Menge Flexibilität bei der Prüfung der `UmamiClient` Klasse, aber es hat auch einige Nachteile. Es ist UGLY Code und macht eine Menge Dinge, die ich nicht wirklich brauche. Also bei der Prüfung `UmamiDataService` Ich beschloss, einen anderen Ansatz zu versuchen.
 
-# UmamiDataServicen testaus
+# Testen von UmamiDataService
 
-Erytropoietiini `UmamiDataService` on tuleva lisä Umami.Net-kirjastoon, jonka avulla voit noutaa tietoja Umami-kirjastosta esimerkiksi katsomalla, kuinka monta näkymää sivulla oli, mitä tietyn tyyppisiä tapahtumia tapahtui, joita suodattivat tonneittain muuttujat liek country, city, OS, screen size, jne. Tämä on hyvin voimakas, mutta juuri nyt [Umami API toimii vain JavaScriptin kautta](https://umami.is/docs/api/website-stats). Joten haluan pelata sillä datalla, jonka tein luodakseni sille C#-asiakkaan.
+Das `UmamiDataService` ist eine zukünftige Ergänzung der Umami.Net-Bibliothek, die es Ihnen ermöglicht, Daten von Umami für Dinge wie sehen, wie viele Ansichten eine Seite hatte, welche Ereignisse von einem bestimmten Typ, gefiltert durch eine Tonne Parameter Liek Land, Stadt, OS, Bildschirmgröße, etc. Dies ist eine sehr mächtige, aber im Moment die [Umami API funktioniert nur über JavaScript](https://umami.is/docs/api/website-stats)......................................................................................................... Also mit diesen Daten spielen zu wollen, machte ich die Mühe, einen C#-Client dafür zu erstellen.
 
-Erytropoietiini `UmamiDataService` Luokka jakaantuu kullattuihin osittaisiin luokkiin (menetelmät ovat SUPER long) esimerkiksi tässä `PageViews` menetelmä.
+Das `UmamiDataService` class ist in multiple Teilklassen (die Methoden sind SUPER lang) unterteilt, zum Beispiel ist hier die `PageViews` verfahren.
 
-Huomaat, että suuri osa koodista rakentaa QueryStringiä PageViewsRequest -kurssin läpimenosta (tähän on muitakin tapoja, mutta tämä, esimerkiksi attribuuttien tai heijastusten käyttö, toimii täällä).
+Sie können sehen, dass MUCH des Codes die QueryString aus der übergebenen in PageViewsRequest-Klasse erstellt (es gibt andere Möglichkeiten, dies zu tun, aber dies, zum Beispiel mit Attributen oder Reflexion funktioniert hier).
 
 <details>
 <summary>GetPageViews</summary>
@@ -116,13 +116,13 @@ Huomaat, että suuri osa koodista rakentaa QueryStringiä PageViewsRequest -kurs
 ```
 
 </details>
-Kuten näette, tämä todella rakentaa kyselyjonon. Vahvistaa puhelun (ks. [viimeinen artikkeli](/blog/unittestinglogginginaspnetcore) Lisätietoja tästä) ja sitten soittaa Umamin API-puhelimeen. Miten testaamme tätä?
+Wie Sie sehen können, konstruiert dies wirklich nur einen Query String. authentifiziert den Anruf (siehe [letzter Artikel](/blog/unittestinglogginginaspnetcore) für einige Details dazu) und macht dann den Anruf an die Umami API. Wie testen wir das?
 
-## Umamidatapalvelun testaaminen
+## Testen des UmamiDataService
 
-Toisin kuin UmamiClient, päätin testata `UmamiDataService` Moqia käyttämättä. Sen sijaan loin yksinkertaisen `DelegatingHandler` Luokka, jonka avulla voin kuulustella pyyntöä ja sitten vastata. Tämä on paljon yksinkertaisempi lähestymistapa kuin Moqin käyttö, ja sen avulla voin testata `UmamiDataService` ilman, että on pakko pilkata `HttpClient`.
+Im Gegensatz zum Testen von UmamiClient entschied ich mich, die `UmamiDataService` ohne Verwendung von Moq. Stattdessen habe ich eine einfache `DelegatingHandler` Klasse, die es mir erlaubt, die Anfrage zu verhören und dann eine Antwort zurückzugeben. Dies ist ein viel einfacherer Ansatz als die Verwendung von Moq und ermöglicht es mir, die `UmamiDataService` ohne zu verspotten die `HttpClient`.
 
-Alla olevassa koodissa näet, että yksinkertaisesti laajennan `DelegatingHandler` ja ohita `SendAsync` menetelmä. Tällä menetelmällä voin tarkastaa pyynnön ja palauttaa pyynnön mukaisen vastauksen.
+Im Code unten sehen Sie, dass ich einfach expandiere `DelegatingHandler` und überschreiben die `SendAsync` verfahren. Diese Methode ermöglicht es mir, die Anfrage zu prüfen und eine Antwort basierend auf der Anfrage zurückzugeben.
 
 ```csharp
 public class UmamiDataDelegatingHandler : DelegatingHandler
@@ -166,9 +166,9 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
  }
 ```
 
-## Asetukset
+## Einrichtung
 
-Perustetaan uusi `UmamiDataService` Tämän käsittelijän käyttö on yhtä yksinkertaista.
+Um die neue `UmamiDataService` Dieser Handler ist ähnlich einfach zu verwenden.
 
 ```csharp
     public IServiceProvider GetServiceProvider (string username="username", string password="password")
@@ -184,9 +184,9 @@ Perustetaan uusi `UmamiDataService` Tämän käsittelijän käyttö on yhtä yks
     }
 ```
 
-Huomaat, että järjestin juuri `ServiceCollection`, lisätään `FakeLogger<T>` (ks. [viimeinen artikkeli tarkempia tietoja tästä](/blog/unittestinglogginginaspnetcore) ja sen jälkeen perustaa `UmamiData` Palvelu käyttäjätunnuksella ja salasanalla, jota haluan käyttää (jotta voin testata epäonnistumista).
+Du wirst sehen, dass ich gerade die `ServiceCollection`, fügen Sie die `FakeLogger<T>` (siehe auch die [letzter Artikel für Details zu diesem](/blog/unittestinglogginginaspnetcore) und dann die Einrichtung der `UmamiData` Service mit dem Benutzernamen und Passwort, das ich verwenden möchte (damit ich Fehler testen kann).
 
-Kutsun sitten `services.SetupUmamiData(username, password);` joka on laajennusmenetelmä, jonka loin perustaakseni `UmamiDataService` • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • • `UmamiDataDelegatingHandler` ja `AuthService`;
+Ich rufe dann in `services.SetupUmamiData(username, password);` die eine Erweiterungsmethode ist, die ich erstellt habe, um die `UmamiDataService` mit der `UmamiDataDelegatingHandler` und der `AuthService`;
 
 ```csharp
     public static void SetupUmamiData(this IServiceCollection services, string username="username", string password="password")
@@ -212,11 +212,11 @@ Kutsun sitten `services.SetupUmamiData(username, password);` joka on laajennusme
     }
 ```
 
-Huomaat, että tässä kohtaa koukutan `UmamiDataDelegatingHandler` ja `AuthService` Euroopan unionin toiminnasta tehtyyn sopimukseen ja Euroopan unionin toiminnasta tehtyyn sopimukseen liitetyssä pöytäkirjassa N:o 2 olevan 1 ja 2 kohdan mukaisesti. `UmamiDataService`. Tämä on rakenteeltaan sellainen, että `AuthService` "Omistaa" `HttpClient` ja `UmamiDataService` käyttää `AuthService` soittaa puhelut Umami API kanssa `bearer` kuponki ja `BaseAddress` Se on jo valmiina.
+Sie können sehen, dass dies ist, wo ich haken in der `UmamiDataDelegatingHandler` und der `AuthService` zu dem `UmamiDataService`......................................................................................................... Die Art und Weise, wie dies strukturiert ist, ist, dass die `AuthService` "Eigene" `HttpClient` und der `UmamiDataService` verwendet die `AuthService` um die Anrufe zur Umami API mit dem `bearer` Zeichen und `BaseAddress` Schon fertig.
 
-## Testit
+## Die Prüfungen
 
-Tämä tekee tämän testaamisesta todella yksinkertaista. Se on vain hieman sanavalmis, koska halusin myös testata puunkorjuuta. Se ei tee muuta kuin lähettää minun kauttani. `DelegatingHandler` ja simuloin vastausta pyynnön perusteella.
+Das macht es wirklich einfach, das zu testen. Es ist nur ein bisschen verbal, da ich auch die Protokollierung testen wollte. Alles, was es tut, ist, durch meine `DelegatingHandler` und ich simulieren eine Antwort basierend auf der Anfrage.
 
 ```csharp
 public class UmamiData_PageViewsRequest_Test : UmamiDataBase
@@ -247,9 +247,9 @@ public class UmamiData_PageViewsRequest_Test : UmamiDataBase
 }
 ```
 
-### Vastauksen simulointi
+### Simulation der Reaktion
 
-Simuloidakseni vastausta tähän menetelmään muistatte, että minulla on tämä rivi... `UmamiDataDelegatingHandler`:
+Um die Reaktion für diese Methode zu simulieren, werden Sie sich erinnern, dass ich diese Zeile in der `UmamiDataDelegatingHandler`:
 
 ```csharp
   if (absPath.StartsWith($"/api/websites/{Consts.WebSiteId}/pageviews"))
@@ -260,7 +260,7 @@ Simuloidakseni vastausta tähän menetelmään muistatte, että minulla on täm�
                 }
 ```
 
-Kaikki tämä vain vetää tietoa kyselystä ja muodostaa "realistisen" vastauksen (olen koonnut Live Tests, jälleen hyvin vähän dokumentteja tästä). Näet, kuinka monta päivää testaan aloitus- ja lopetuspäivän välillä ja sitten palautan vastauksen, jossa on sama määrä päiviä.
+Alles, was dies tut, ist, Informationen aus dem Querystring zu ziehen und eine'realistische' Antwort zu konstruieren (basierend auf Live Tests, die ich zusammengestellt habe, wieder sehr wenig Docs dazu). Sie werden sehen, ich teste für die Anzahl der Tage zwischen dem Start-und Enddatum und dann eine Antwort mit der gleichen Anzahl von Tagen zurück.
 
 ```csharp
     private static HttpResponseMessage ReturnPageViewsMessage(PageViewsRequest request)
@@ -300,6 +300,6 @@ Kaikki tämä vain vetää tietoa kyselystä ja muodostaa "realistisen" vastauks
     }
 ```
 
-# Johtopäätöksenä
+# Schlussfolgerung
 
-Joten se on se, että se on aika helppo testata `HttpClient` Pyyntö ilman Moqin käyttöä, ja mielestäni se on paljon puhtaampi näin. Menetät osan Moqissa mahdollistamasta hienostuneisuudesta, mutta tällaisissa yksinkertaisissa testeissä se on mielestäni hyvä vaihtokauppa.
+Also das ist es wirklich, es ist ziemlich einfach, ein zu testen `HttpClient` Anfrage ohne Moq und ich denke, es ist weit sauberer auf diese Weise. Sie verlieren einige der Raffinesse möglich gemacht in Moq, aber für einfache Tests wie diese, Ich denke, es ist ein guter Kompromiss.
