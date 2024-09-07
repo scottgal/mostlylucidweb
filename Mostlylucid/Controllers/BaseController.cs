@@ -39,13 +39,13 @@ public class BaseController : Controller
 
     public override async Task OnActionExecutionAsync(ActionExecutingContext filterContext, ActionExecutionDelegate next)
     {
-        var userInfoService = HttpContext.RequestServices.GetRequiredService<IUmamiUserInfoService>();
+/*        var userInfoService = HttpContext.RequestServices.GetRequiredService<IUmamiUserInfoService>();
 
         var userInfo =await userInfoService.GetUserInfo(Request.GetUserId(Response));
         if(userInfo != null)
         {
             UmamiResponse = userInfo;
-        }
+        }*/
         if (!Request.IsHtmx())
         {
            

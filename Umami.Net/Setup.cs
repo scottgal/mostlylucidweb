@@ -42,6 +42,7 @@ public static class Setup
         }
         services.AddHttpContextAccessor();
         services.AddScoped<PayloadService>();
+        services.AddSingleton<JwtDecoder>();
         services.AddSingleton<UmamiBackgroundSender>();
         services.AddHostedService<UmamiBackgroundSender>(provider => provider.GetRequiredService<UmamiBackgroundSender>());
     }

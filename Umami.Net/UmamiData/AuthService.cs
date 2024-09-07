@@ -55,7 +55,7 @@ public class AuthService(HttpClient httpClient, UmamiDataSettings umamiSettings,
         var verify = await httpClient.GetAsync("/api/auth/verify" + (isTest ? "?test" : ""));
         if(verify.IsSuccessStatusCode == false)
         {
-            logger.LogError("Verify failed");
+            logger.LogWarning("Verify failed");
             return false;
         }
         logger.LogInformation("Verify successful");

@@ -11,6 +11,7 @@ namespace Umami.Net;
 public class UmamiClient(
     HttpClient client,
     PayloadService payloadService,
+    JwtDecoder jwtDecoder,
     ILogger<UmamiClient> logger,
     UmamiClientSettings settings)
 {
@@ -131,7 +132,7 @@ public class UmamiClient(
 
     private async Task<UmamiResponse?> DecodeResponse(HttpResponseMessage responseMessage)
     {
-        var decoded = await JwtDecoder.DecodeResponse(responseMessage);
+        var decoded = await jwtDecoder.DecodeResponse(responseMessage);
         if (decoded == null)
         {
             logger.LogError("Failed to decode response from Umami");

@@ -8,7 +8,7 @@ namespace Mostlylucid.Umami;
 
 public interface IUmamiUserInfoService
 {
-    Task<UmamiResponse> GetUserInfo(string userId);
+    Task<UmamiResponse?> GetUserInfo(string userId);
 }
 
 public class UmamiUserInfoService(IMemoryCache cache, UmamiClient umamiClient, ILogger<UmamiUserInfoService> logger) : IUmamiUserInfoService
@@ -21,13 +21,7 @@ public class UmamiUserInfoService(IMemoryCache cache, UmamiClient umamiClient, I
         {
             return userInfo;
         }
-        var userInfoRequest = await umamiClient.IdentifySession(userId);
-        var decoded =await JwtDecoder.DecodeResponse(userInfoRequest);
-        if (decoded == null)
-            return null;
-        userInfo = UmamiResponse.Decode(decoded);
-  
-       
+         userInfo = await umamiClient.IdentifySessionAndDecode(userId);
         if(userInfo == null)
         {
             logger.LogWarning("Failed to get user info for {UserId}", userId);
