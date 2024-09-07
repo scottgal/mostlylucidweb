@@ -2,11 +2,13 @@
 using Htmx;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mostlylucid.Blog;
 using Mostlylucid.Config;
+using Mostlylucid.Helpers;
+using Mostlylucid.Umami;
+using Umami.Net.Models;
 
 namespace Mostlylucid.Controllers;
 
@@ -17,14 +19,17 @@ public class BaseController : Controller
     private readonly ILogger<BaseController> _logger;
     private readonly AnalyticsSettings _analyticsSettings;
 
-    public BaseController(AnalyticsSettings analyticsSettings, ILogger<BaseController> logger)
+    protected UmamiResponse? UmamiResponse;
+    protected string UserId => Request.GetUserId(Response);
+
+    public BaseController(AnalyticsSettings analyticsSettings,  ILogger<BaseController> logger)
     {
         _analyticsSettings = analyticsSettings;
         _logger = logger;
     }
 
     
-    public BaseController(AuthSettings authSettingsSettings, AnalyticsSettings analyticsSettings, IBlogService blogService, ILogger<BaseController> logger) : this(analyticsSettings, logger)
+    public BaseController(AuthSettings authSettingsSettings,  AnalyticsSettings analyticsSettings, IBlogService blogService, ILogger<BaseController> logger) : this(analyticsSettings, logger)
     {
         _authSettingsSettings = authSettingsSettings;
         _blogService = blogService;
@@ -34,9 +39,16 @@ public class BaseController : Controller
 
     public override async Task OnActionExecutionAsync(ActionExecutingContext filterContext, ActionExecutionDelegate next)
     {
+        var userInfoService = HttpContext.RequestServices.GetRequiredService<IUmamiUserInfoService>();
+
+        var userInfo =await userInfoService.GetUserInfo(Request.GetUserId(Response));
+        if(userInfo != null)
+        {
+            UmamiResponse = userInfo;
+        }
         if (!Request.IsHtmx())
         {
-         
+           
             ViewBag.UmamiPath = _analyticsSettings.UmamiPath;
             ViewBag.UmamiWebsiteId = _analyticsSettings.WebsiteId;
             ViewBag.UmamiScript = _analyticsSettings.UmamiScript;
@@ -55,9 +67,9 @@ public class BaseController : Controller
     public record LoginData(bool LoggedIn, string? Name, string? AvatarUrl, string? Email, string? Identifier, bool IsAdmin = false);
     
 
-    protected LoginData GetUserInfo()
+    protected async Task<LoginData> GetUserInfo()
     {
-        var authenticateResult = HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme).Result;
+        var authenticateResult =await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         if (!authenticateResult.Succeeded)
         {
             _logger.LogInformation("User is not authenticated");

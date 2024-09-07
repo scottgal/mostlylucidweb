@@ -18,7 +18,7 @@ namespace Mostlylucid.Controllers;
         [HttpGet]
     public async Task<IActionResult> Index(int page = 1,int pageSize = 5)
     {
-            var authenticateResult = GetUserInfo();
+            var authenticateResult =await GetUserInfo();
             var posts =await blogService.GetPagedPosts(page, pageSize);
             posts.LinkUrl= Url.Action("Index", "Home");
             if (Request.IsHtmx())

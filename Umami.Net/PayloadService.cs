@@ -38,7 +38,14 @@ public class PayloadService(IHttpContextAccessor httpContextAccessor, UmamiClien
         
         if (payload.SessionId != null)
             newPayload.SessionId = payload.SessionId;
+        
+        if(payload.UserAgent != null)
+            newPayload.UserAgent = payload.UserAgent;
+        
+        if(payload.Hostname != null)
+            newPayload.Hostname = payload.Hostname;
 
+        newPayload.PayloadPopulated = true;
         return newPayload;
     }
 

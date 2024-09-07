@@ -27,11 +27,11 @@ public class EditorController(
     [Route("edit")]
     public async Task<IActionResult> Edit(string? slug = null, string language = "")
     {
- 
-        var userId = Request.GetUserId(Response);
+
+        var userId = UserId;
         var tasks = translateCacheService.GetTasks(userId);
         var translations = tasks.Select(x=> new TranslateResultTask(x, false)).ToList();
-        var userInRole = GetUserInfo();
+        var userInRole =await GetUserInfo();
         var editorModel = new EditorModel
         {
             Languages = translateServiceConfig.Languages.ToList(),
@@ -39,7 +39,7 @@ public class EditorController(
             Authenticated = userInRole.LoggedIn,
             IsAdmin = userInRole.IsAdmin,
             AvatarUrl = userInRole.AvatarUrl,
-            UserSessionId = Request.GetUserId(Response),
+            UserSessionId = UserId,
             TranslationTasks = translations
         };
         if (slug == null)
@@ -63,7 +63,7 @@ public class EditorController(
     [Route("get-translations")]
     public IActionResult GetTranslations()
     {
-        var userId = Request.GetUserId(Response);
+        var userId = UserId;
         var tasks = translateCacheService.GetTasks(userId);
         var translations = tasks.Select(x=> new TranslateResultTask(x, false)).ToList();
         return PartialView("_GetTranslations", translations);

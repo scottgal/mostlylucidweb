@@ -48,7 +48,7 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
            return NotFound();
        }
       
-       var user = GetUserInfo();
+       var user =await GetUserInfo();
        post.Authenticated = user.LoggedIn;
        post.Name = user.Name;
        post.Email = user.Email;
@@ -83,7 +83,7 @@ public class BlogController(AuthSettings authSettings, AnalyticsSettings analyti
     {
         ViewBag.Category = category;
         var posts =await blogService.GetPostsByCategory(category, page, pageSize);
-        var user = GetUserInfo();
+        var user =await GetUserInfo();
         posts.Authenticated = user.LoggedIn;
         posts.Name = user.Name;
         posts.AvatarUrl = user.AvatarUrl;

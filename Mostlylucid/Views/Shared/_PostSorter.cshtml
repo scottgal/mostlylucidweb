@@ -1,2 +1,28 @@
-﻿
+﻿@using Mostlylucid.Helpers
+@using Mostlylucid.Models.Blog
+<div id="SortDropDown" x-data="{ 
+    open: false, 
+    selectedOrder: 'Sort By', 
+}" class="relative inline-block mt-3">
+    <!-- Dropdown Button -->
+    <button x-on:click="open = !open" class="btn btn-sm btn-outline flex items-center space-x-2">
+        <span x-text="selectedOrder"></span>
+    </button>
 
+    <!-- Dropdown Menu -->
+    <div x-show="open" x-on:click.away="open = false"
+         class="absolute left-0 mt-2 w-64 rounded-md shadow-lg dark:bg-custom-dark-bg bg-white ring-1 ring-black ring-opacity-5 z-50">
+        <ul class="p-2">
+            @foreach (var order in Enum.GetValues<OrderPostsBy>() )
+            {
+                <li>
+                <a href="#"
+                   x-on:click.prevent="selectedOrder = '@(order))'; open = false"
+                   class="flex dark:text-white text-black items-center p-2 hover:bg-gray-100">
+                    @order.EnumDisplayName()
+                </a>
+            </li>
+            }
+        </ul>
+    </div>
+</div>

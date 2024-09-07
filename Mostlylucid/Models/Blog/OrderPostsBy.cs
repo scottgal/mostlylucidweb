@@ -1,4 +1,7 @@
-﻿namespace Mostlylucid.Models.Blog;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace Mostlylucid.Models.Blog;
 
 public record SortOptions
 {
@@ -8,12 +11,17 @@ public record SortOptions
 
 public enum OrderPostsBy
 {
+    [Display(Name = "Published Date")]
     Default,
+    [Display(Name = "Popularity")]
     Popularity,
-    Published,
+    [Display(Name = "Title")]
     Title,
+    [Display(Name = "My Country")]
     PopularityInCountry,
+    [Display(Name = "My Region")]
     PopularityInRegion,
+    [Display(Name = "My Continent")]
     PopularityInContinent
 }
 

@@ -1,6 +1,6 @@
 ﻿using Umami.Net.Config;
 
-namespace Umami.Net.Test;
+namespace Umami.Net.Test.UmamiClientTests;
 
 public class Setup_Tests
 {

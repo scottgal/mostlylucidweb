@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Umami.Net.Test.Extensions;
 
-namespace Umami.Net.Test;
+namespace Umami.Net.Test.UmamiClientTests;
 
 public class UmamiClient_SendTests
 {

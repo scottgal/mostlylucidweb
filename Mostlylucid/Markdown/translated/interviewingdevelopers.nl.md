@@ -30,7 +30,7 @@ Lees eerst hun CV; praat zelfs niet met hen als hun CV niet duidelijk maakt dat 
 Ten tweede moet het opzetten van het interview (of interviews) zo stressvrij mogelijk zijn voor de deelnemers. Dit betekent:
 
 1. Geef een passende waarschuwing. Verstuur geen interview met iemand met een opzegtermijn van 24 uur (of slechter op dezelfde dag).
-2. Maak duidelijk wat het interview formaat zal zijn, wie zal er end verwachte resultaten (is het de finale, een technisch scherm etc).
+2. Maak duidelijk wat het interview formaat zal zijn, wie er zal zijn en verwachte resultaten (is het de finale, een technisch scherm etc).
 3. Lees het resume van de persoon. Ik kan dit niet genoeg benadrukken. Als je iemand interviewt, moet je hun CV binnenstebuiten kennen. Dit is niet alleen respectvol, maar het geeft je ook een kans om vragen te stellen over hun ervaring.
 4. Zorg ervoor dat je de details IN DE MAIL hebt; als het Teams / Zoom is, zorg er dan voor dat ze de link hebben. Als het persoonlijk is, zorg dan dat ze weten waar ze heen moeten.
 

@@ -8,6 +8,7 @@ using Mostlylucid.EntityFramework;
 using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.OpenSearch;
 using Mostlylucid.RSS;
+using Mostlylucid.Umami;
 using Serilog;
 using SerilogTracing;
 using SixLabors.ImageSharp.Web.Caching;
@@ -51,7 +52,7 @@ try
  
     services.SetupUmamiData(config);
     services.AddScoped<IUmamiDataSortService, UmamiDataSortService>();
-    
+    services.AddScoped<IUmamiUserInfoService, UmamiUserInfoService>();
     services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
     services.SetupEmail(builder.Configuration);
     services.SetupRSS();

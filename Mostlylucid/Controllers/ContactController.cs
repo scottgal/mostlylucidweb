@@ -21,13 +21,13 @@ public class ContactController(
 {
     [Route("")]
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         
         ViewBag.Title = "Contact";
         ;
         var model = new ContactViewModel();
-        var user = GetUserInfo();
+        var user =await GetUserInfo();
         model.Authenticated = user.LoggedIn;
         model.Name = user.Name;
         model.Email = user.Email;

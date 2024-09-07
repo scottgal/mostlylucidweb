@@ -1,6 +1,6 @@
 ﻿namespace Mostlylucid.Helpers;
 
-public static class UserIdHtlper
+public static class UserIdHelper
 {
     public  static string GetUserId(this HttpRequest request, HttpResponse response)
     {
@@ -9,7 +9,7 @@ public static class UserIdHtlper
         userId = Guid.NewGuid().ToString();
         var cookieOptions = new CookieOptions
         {
-            Expires = DateTimeOffset.UtcNow.AddHours(6),
+            Expires = DateTimeOffset.UtcNow.AddHours(24),
             HttpOnly = true,
             Secure = false,
             SameSite = SameSiteMode.Strict

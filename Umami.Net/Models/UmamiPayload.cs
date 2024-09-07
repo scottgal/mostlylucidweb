@@ -1,9 +1,13 @@
-﻿namespace Umami.Net.Models;
+﻿using System.Text.Json.Serialization;
+
+namespace Umami.Net.Models;
 
 using System.Collections.Generic;
 
 public class UmamiPayload
 {
+    [JsonIgnore]
+    public bool PayloadPopulated { get; set; }
     public  string Website { get; set; }= null!;
     public string? Hostname { get; set; }
     public string? Language { get; set; }

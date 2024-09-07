@@ -1,8 +1,6 @@
 ﻿namespace Umami.Net.Helpers;
 
-using System;
 using System.IdentityModel.Tokens.Jwt;
-using System.Text.Json;
 
 public static class JwtDecoder
 {
@@ -16,11 +14,9 @@ public static class JwtDecoder
     {
         var handler = new JwtSecurityTokenHandler();
         var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-        var json = jsonToken?.Payload.SerializeToJson();
+        var json = jsonToken?.Payload;
+        return json;
 
-        if (json == null)
-            throw new Exception("Invalid JWT token");
 
-        return JsonSerializer.Deserialize<JwtPayload>(json);
     }
 }

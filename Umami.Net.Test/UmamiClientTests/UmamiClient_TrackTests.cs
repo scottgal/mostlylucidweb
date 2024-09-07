@@ -4,7 +4,7 @@ using Umami.Net.Models;
 using Umami.Net.Test.Extensions;
 using Umami.Net.Test.MessageHandlers;
 
-namespace Umami.Net.Test;
+namespace Umami.Net.Test.UmamiClientTests;
 
 public class UmamiClient_TrackTests
 {

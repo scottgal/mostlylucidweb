@@ -26,7 +26,7 @@ First read their resume; don't even talk to them if their resume doesn't make it
 
 Second, setting up the interview (or interviews) should be as stress free as possible for the participants. This means:
 1. Give adequate notice. Don't spring an interview on someone with 24 hours notice (or worse the same day).
-2. Make it clear what the interview format will be, who'll be there annd expected outcomes (is it the final, a technical screen etc).
+2. Make it clear what the interview format will be, who'll be there and expected outcomes (is it the final, a technical screen etc).
 3. READ THE PERSON'S RESUME. I can't stress this enough. If you're interviewing someone you should know their resume inside out. This is not only respectful but it also gives you a chance to ask questions about their experience.
 4. Make sure you have the details IN THE MAIL; if it's Teams / Zoom ensure they have the link. If it's in person make sure they know where to go.
 

@@ -7,6 +7,7 @@ using Mostlylucid.Config;
 using Mostlylucid.Email;
 using Mostlylucid.Email.Models;
 using Mostlylucid.EntityFramework.Models;
+using Mostlylucid.Helpers;
 using Mostlylucid.Models.Comments;
 
 namespace Mostlylucid.Controllers;
@@ -23,14 +24,14 @@ public class CommentController(AuthSettings authSettings,
     
     [HttpGet]
     [Route("get-commentform")]
-    public IActionResult GetCommentForm(int postId, int? parentCommentId)
+    public async Task<IActionResult> GetCommentForm(int postId, int? parentCommentId)
     {
         var model = new CommentInputModel
         {
             BlogPostId = postId, 
             ParentId= parentCommentId ?? 0
         };
-        var user = GetUserInfo();
+        var user =await GetUserInfo();
         model.Authenticated = user.LoggedIn;
         model.Name = user.Name ?? string.Empty;
         model.Email = user.Email ?? string.Empty;
@@ -81,7 +82,7 @@ public class CommentController(AuthSettings authSettings,
     [Route("get-commentlist/{postId}")]
     public async Task<IActionResult> GetCommentList(int postId)
     {
-        var user = GetUserInfo();
+        var user =await GetUserInfo();
         var commentViewList = new CommentViewList();
         commentViewList.PostId = postId;
         commentViewList.IsAdmin = user.IsAdmin;
@@ -104,7 +105,7 @@ public class CommentController(AuthSettings authSettings,
     [Route("change-status")]
     public async Task<IActionResult> ChangeStatus(int commentId, CommentStatus status)
     {
-        var user = GetUserInfo();
+        var user =await GetUserInfo();
         if (!user.IsAdmin)
         {
             return Unauthorized();
