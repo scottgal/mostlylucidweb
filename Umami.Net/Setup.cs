@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Polly;
+using Polly.Contrib.WaitAndRetry;
 using Polly.Extensions.Http;
 using Umami.Net.Config;
 using Umami.Net.Helpers;
@@ -21,37 +22,31 @@ public static class Setup
     }
     public static void SetupUmamiClient(this IServiceCollection services, IConfiguration config)
     {
+        var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
        var umamiSettings= services.ConfigurePOCO<UmamiClientSettings>(config.GetSection(UmamiClientSettings.Section));
          ValidateSettings(umamiSettings);
           services.AddSingleton(umamiSettings);
-       services.AddTransient<HttpLogger>();
-        services.AddHttpClient<UmamiClient>((serviceProvider, client) =>
+     
+        var httpClientBuilder = services.AddHttpClient<UmamiClient>((serviceProvider, client) =>
             {
-                 umamiSettings = serviceProvider.GetRequiredService<UmamiClientSettings>();
-         ;
-            client.BaseAddress = new Uri(umamiSettings.UmamiPath);
-        }).SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Set lifetime to five minutes
-        .AddPolicyHandler(GetRetryPolicy())
-       #if DEBUG 
-        .AddLogger<HttpLogger>();
-        #else
-        ;
-        #endif
-
+                var settings = serviceProvider.GetRequiredService<UmamiClientSettings>();
+                client.BaseAddress = new Uri(settings.UmamiPath);
+            }).SetHandlerLifetime(TimeSpan.FromMinutes(5))  //Set lifetime to five minutes
+            .AddPolicyHandler(RetryPolicyExtension.GetRetryPolicy());
+        
+        if (isDevelopment)
+        {
+            services.AddTransient<HttpLogger>();
+            httpClientBuilder.AddLogger<HttpLogger>();
+         
+        }
         services.AddHttpContextAccessor();
         services.AddScoped<PayloadService>();
         services.AddSingleton<UmamiBackgroundSender>();
-        
         services.AddHostedService<UmamiBackgroundSender>(provider => provider.GetRequiredService<UmamiBackgroundSender>());
     }
     
  
     
-    static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
-    {
-        return HttpPolicyExtensions
-            .HandleTransientHttpError()
-            .OrResult(msg =>  msg.StatusCode == HttpStatusCode.ServiceUnavailable)
-            .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-    }
+  
 }

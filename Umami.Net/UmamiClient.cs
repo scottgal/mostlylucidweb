@@ -14,7 +14,7 @@ public class UmamiClient(
     ILogger<UmamiClient> logger,
     UmamiClientSettings settings)
 {
-    private static readonly JsonSerializerOptions options = new()
+    private static readonly JsonSerializerOptions Options = new()
     {
         PropertyNamingPolicy = new LowerCaseNamingPolicy(), // Custom naming policy for lower-cased properties
         WriteIndented = true,
@@ -36,7 +36,7 @@ public class UmamiClient(
         var request = new HttpRequestMessage(HttpMethod.Post, "api/send");
         request.Headers.Remove("User-Agent");
         request.Headers.Add("User-Agent", payload.UserAgent);
-        request.Content = JsonContent.Create(jsonPayload, options: options);
+        request.Content = JsonContent.Create(jsonPayload, options: Options);
         var response = await client.SendAsync(request);
 
         if (!response.IsSuccessStatusCode)
@@ -56,7 +56,7 @@ public class UmamiClient(
     }
 
 
-    public async Task<UmamiResponse> SendAndDecode(
+    public async Task<UmamiResponse?> SendAndDecode(
         UmamiPayload? payload = null,
         UmamiEventData? eventData = null,
         string type = "event")
@@ -65,7 +65,7 @@ public class UmamiClient(
         return await DecodeResponse(response);
     }
 
-    public async Task<UmamiResponse> TrackPageViewAndDecode(
+    public async Task<UmamiResponse?> TrackPageViewAndDecode(
         string? url = "",
         string? title = "",
         UmamiPayload? payload = null,
@@ -92,7 +92,7 @@ public class UmamiClient(
     }
 
 
-    public async Task<UmamiResponse> TrackAndDecode(
+    public async Task<UmamiResponse?> TrackAndDecode(
         string eventName,
         UmamiEventData? eventData = null)
     {
@@ -100,7 +100,7 @@ public class UmamiClient(
         return await DecodeResponse(response);
     }
 
-    public async Task<UmamiResponse> TrackAndDecode(
+    public async Task<UmamiResponse?> TrackAndDecode(
         UmamiPayload eventObj,
         UmamiEventData? eventData = null)
     {
@@ -129,29 +129,32 @@ public class UmamiClient(
         return await Send(payload);
     }
 
-    private async Task<UmamiResponse> DecodeResponse(HttpResponseMessage responseMessage)
+    private async Task<UmamiResponse?> DecodeResponse(HttpResponseMessage responseMessage)
     {
         var decoded = await JwtDecoder.DecodeResponse(responseMessage);
         if (decoded == null)
-            throw new Exception("Failed to decode response");
+        {
+            logger.LogError("Failed to decode response from Umami");
+            return null;
+        }
         var payload = UmamiResponse.Decode(decoded);
         return payload;
     }
 
 
-    public async Task<UmamiResponse> IdentifyAndDecode()
+    public async Task<UmamiResponse?> IdentifyAndDecode()
     {
         return await IdentifyAndDecode(new UmamiPayload());
     }
 
 
-    public async Task<UmamiResponse> IdentifyAndDecode(UmamiPayload payload, UmamiEventData? eventData = null)
+    public async Task<UmamiResponse?> IdentifyAndDecode(UmamiPayload payload, UmamiEventData? eventData = null)
     {
         var response = await Identify(payload, eventData);
         return await DecodeResponse(response);
     }
 
-    public async Task<UmamiResponse> IdentifyAndDecode(string sessionId, string? email = null, string? username = null,
+    public async Task<UmamiResponse?> IdentifyAndDecode(string sessionId, string? email = null, string? username = null,
         string? userId = null, UmamiEventData? eventData = null)
     {
         var response = await Identify(email, username, sessionId, userId, eventData);
@@ -183,7 +186,7 @@ public class UmamiClient(
         return await Identify(sessionId: sessionId);
     }
 
-    public async Task<UmamiResponse> IdentifySessionAndDecode(string sessionId)
+    public async Task<UmamiResponse?> IdentifySessionAndDecode(string sessionId)
     {
         return await IdentifyAndDecode(sessionId);
     }

@@ -57,6 +57,7 @@
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.7.3" />
       <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.0.2" />
       <PackageReference Include="System.IO.Hashing" Version="8.0.0" />
+      <PackageReference Include="Umami.Net" Version="0.3.0" />
       <PackageReference Include="WebEssentials.AspNetCore.PWA" Version="1.0.85" />
     </ItemGroup>
 
@@ -73,9 +74,6 @@
       <Content Include="..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>    
-    </ItemGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\Umami.Net\Umami.Net.csproj" />
     </ItemGroup>
   
 

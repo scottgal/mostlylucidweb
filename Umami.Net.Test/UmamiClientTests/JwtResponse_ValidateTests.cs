@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Umami.Net.Models;
 using Umami.Net.Test.Extensions;
 using Umami.Net.Test.MessageHandlers;
 
@@ -56,4 +57,50 @@ public class JwtResponse_ValidateTests
         Assert.Equal("Chrome", response.Browser);
         Assert.Equal("Windows 10", response.Os);
     }
+    
+    [Fact]
+    public async Task Track_EventObject()
+    {
+        var handler = JwtResponseHandler.Create();
+        var umamiClient = GetServices(handler);
+        var response = await umamiClient.TrackAndDecode(new UmamiPayload{Name = "RSS"});
+        Assert.NotNull(response);
+        Assert.Equal("Chrome", response.Browser);
+        Assert.Equal("Windows 10", response.Os);
+    }
+    
+    [Fact]
+    public async Task Track_EventObjectWithData()
+    {
+        var handler = JwtResponseHandler.Create();
+        var umamiClient = GetServices(handler);
+        var response = await umamiClient.TrackAndDecode(new UmamiPayload{Name = "RSS"}, new UmamiEventData{{"key", "value"}});
+        Assert.NotNull(response);
+        Assert.Equal("Chrome", response.Browser);
+        Assert.Equal("Windows 10", response.Os);
+    }
+    
+    [Fact]
+    public async Task Identify_SessionAndDecode()
+    {
+        var handler = JwtResponseHandler.Create();
+        var umamiClient = GetServices(handler);
+        var response = await umamiClient.IdentifySessionAndDecode("1234");
+        Assert.NotNull(response);
+        Assert.Equal("Chrome", response.Browser);
+        Assert.Equal("Windows 10", response.Os);
+    }
+    
+        
+    [Fact]
+    public async Task Identify_SendAndDecode()
+    {
+        var handler = JwtResponseHandler.Create();
+        var umamiClient = GetServices(handler);
+        var response = await umamiClient.SendAndDecode(new UmamiPayload{Name = "RSS"}, new UmamiEventData{{"key", "value"}});
+        Assert.NotNull(response);
+        Assert.Equal("Chrome", response.Browser);
+        Assert.Equal("Windows 10", response.Os);
+    }
+
 }

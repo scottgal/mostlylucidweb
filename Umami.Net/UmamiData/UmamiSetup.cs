@@ -1,9 +1,7 @@
-﻿using System.Net;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Polly;
-using Polly.Extensions.Http;
 using Umami.Net.Config;
+using Umami.Net.Helpers;
 
 namespace Umami.Net.UmamiData;
 
@@ -18,21 +16,21 @@ public static class UmamiSetup
 
     public static void SetupUmamiData(this IServiceCollection services, IConfiguration config)
     {
+        var isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+        
         var umamiSettings = services.ConfigurePOCO<UmamiDataSettings>(config.GetSection(UmamiClientSettings.Section));
         if (!ValidateSetup(umamiSettings)) throw new Exception("Invalid UmamiDataSettings");
-        services.AddHttpClient<AuthService>(options => { options.BaseAddress = new Uri(umamiSettings.UmamiPath); })
+       var httpClientBuilder= services.AddHttpClient<AuthService>(options => { options.BaseAddress = new Uri(umamiSettings.UmamiPath); })
             .SetHandlerLifetime(TimeSpan.FromMinutes(5)) //Set lifetime to five minutes
-            .AddPolicyHandler(GetRetryPolicy());
-        ;
+            .AddPolicyHandler(RetryPolicyExtension.GetRetryPolicy());
+        
+        if (isDevelopment)
+        {
+            services.AddTransient<HttpLogger>();
+            httpClientBuilder.AddLogger<HttpLogger>();
+        }
         services.AddScoped<UmamiDataService>();
     }
 
-    private static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
-    {
-        return HttpPolicyExtensions
-            .HandleTransientHttpError()
-            .OrResult(msg =>
-                msg.StatusCode == HttpStatusCode.ServiceUnavailable)
-            .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
-    }
+
 }

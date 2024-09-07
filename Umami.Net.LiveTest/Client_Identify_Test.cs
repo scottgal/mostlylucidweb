@@ -11,7 +11,7 @@ public class Client_Identify_Test
     {
         var services = SetupUmamiClient.Setup();
         var umamiClient = services.GetRequiredService<UmamiClient>();
-       var resp= await umamiClient.IdentifyAndDecode(new UmamiPayload(){UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"});
+       var resp= await umamiClient.IdentifyAndDecode();
         Assert.NotNull(resp);
     }
     
@@ -21,7 +21,7 @@ public class Client_Identify_Test
     {
         var services = SetupUmamiClient.Setup();
         var umamiClient = services.GetRequiredService<UmamiClient>();
-        var resp= await umamiClient.TrackPageViewAndDecode( url: "/test", payload: new UmamiPayload(){UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36"});
+        var resp= await umamiClient.TrackPageViewAndDecode( url: "/test");
         Assert.NotNull(resp);
     }
 }

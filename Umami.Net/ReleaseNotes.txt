@@ -27,3 +27,9 @@ Task<HttpResponseMessage> Identify(UmamiPayload payload, UmamiEventData? eventDa
    
 0.2.1
 Update readme, adds new ActiveUsers endpoint to the UmamiDataService.     
+
+0.3.1
+Adds new IdentifyAndDecode endpoints which return a decoded response.
+These can be used to provide information about a user (without a cookie) 
+
+Adds multiple Decode endpoints which return a decoded response.
