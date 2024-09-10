@@ -14,8 +14,8 @@ public class Metrics_Test
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-        
-        var metrics = await websiteDataService.GetMetrics(new MetricsRequest()
+
+        var metrics = await websiteDataService.GetMetrics(new MetricsRequest
         {
             StartAtDate = DateTime.Now.AddDays(-30),
             EndAtDate = DateTime.Now,
@@ -23,72 +23,68 @@ public class Metrics_Test
             Limit = 500
         });
         Assert.NotNull(metrics);
-        Assert.Equal( HttpStatusCode.OK, metrics.Status);
-
+        Assert.Equal(HttpStatusCode.OK, metrics.Status);
     }
-    
+
     [Fact]
     public async Task Metrics_StartEndEvent()
     {
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-        
-        var metrics = await websiteDataService.GetMetrics(new MetricsRequest()
+
+        var metrics = await websiteDataService.GetMetrics(new MetricsRequest
         {
             StartAtDate = DateTime.Now.AddDays(-7),
             EndAtDate = DateTime.Now,
             Type = MetricType.@event
         });
         Assert.NotNull(metrics);
-        Assert.Equal( HttpStatusCode.OK, metrics.Status);
-
+        Assert.Equal(HttpStatusCode.OK, metrics.Status);
     }
-    
+
     [Fact]
     public async Task Metrics_StartEndForUrl()
     {
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-        
-        var metrics = await websiteDataService.GetMetrics(new MetricsRequest()
+
+        var metrics = await websiteDataService.GetMetrics(new MetricsRequest
         {
             StartAtDate = DateTime.Now.AddDays(-7),
             EndAtDate = DateTime.Now,
             Url = "/"
         });
         Assert.NotNull(metrics);
-        Assert.Equal( HttpStatusCode.OK, metrics.Status);
-
+        Assert.Equal(HttpStatusCode.OK, metrics.Status);
     }
-    
+
     [Fact]
     public async Task Metrics_StartEndForCountry()
     {
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-        
-        var metrics = await websiteDataService.GetMetrics(new MetricsRequest()
+
+        var metrics = await websiteDataService.GetMetrics(new MetricsRequest
         {
             StartAtDate = DateTime.Now.AddDays(-7),
             EndAtDate = DateTime.Now,
             Type = MetricType.country
         });
         Assert.NotNull(metrics);
-        Assert.Equal( HttpStatusCode.OK, metrics.Status);
-
+        Assert.Equal(HttpStatusCode.OK, metrics.Status);
     }
-    
+
     [Fact]
     public async Task Metrics_StartEndForEvent()
     {
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-        
-        var metrics = await websiteDataService.GetMetrics(new MetricsRequest()
+
+        var metrics = await websiteDataService.GetMetrics(new MetricsRequest
         {
             StartAtDate = DateTime.Now.AddDays(-7),
             EndAtDate = DateTime.Now,
@@ -96,8 +92,6 @@ public class Metrics_Test
             Event = "searchEvent"
         });
         Assert.NotNull(metrics);
-        Assert.Equal( HttpStatusCode.OK, metrics.Status);
-
+        Assert.Equal(HttpStatusCode.OK, metrics.Status);
     }
-    
 }

@@ -2,7 +2,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umami.Net.LiveTest.Setup;
 using Umami.Net.UmamiData;
-using Umami.Net.UmamiData.Models.RequestObjects;
 
 namespace Umami.Net.LiveTest;
 
@@ -17,7 +16,6 @@ public class ActiveUsers_Test
 
         var activeUsers = await websiteDataService.GetActiveUsers();
         Assert.NotNull(activeUsers);
-        Assert.Equal( HttpStatusCode.OK, activeUsers.Status);
-
+        Assert.Equal(HttpStatusCode.OK, activeUsers.Status);
     }
 }

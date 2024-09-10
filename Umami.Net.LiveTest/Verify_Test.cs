@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Umami.Net.LiveTest.Setup;
 using Umami.Net.UmamiData;
 
@@ -7,7 +6,6 @@ namespace Umami.Net.LiveTest;
 
 public class Verify_Test
 {
-    
     [Fact]
     public async Task Verify_Test_Fail()
     {
@@ -17,9 +15,8 @@ public class Verify_Test
 
         var activeUsers = await authService.VerifyToken();
         Assert.False(activeUsers);
-
     }
-    
+
     [Fact]
     public async Task Verify_Test_LoginSuccess()
     {
@@ -33,6 +30,5 @@ public class Verify_Test
         Assert.True(login);
         var activeUsers2 = await authService.VerifyToken();
         Assert.True(activeUsers2);
-
     }
 }

@@ -11,7 +11,7 @@ namespace Umami.Net.UmamiData;
 public partial class UmamiDataService
 {
     /// <summary>
-    /// Gets the Metrics for the website from Umami
+    ///     Gets the Metrics for the website from Umami
     /// </summary>
     /// <param name="metricsRequest"> An object which allows you to set the QueryString parameters.</param>
     /// <returns></returns>

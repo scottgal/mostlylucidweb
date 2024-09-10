@@ -1,12 +1,20 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Umami.Net.Config;
 using Umami.Net.Models;
 
 namespace Umami.Net;
 
-public class PayloadService(IHttpContextAccessor httpContextAccessor, UmamiClientSettings settings)
+public class PayloadService(
+    IHttpContextAccessor httpContextAccessor,
+    UmamiClientSettings settings,
+    ILogger<PayloadService> logger)
 {
-    public  UmamiPayload PopulateFromPayload( UmamiPayload? payload, UmamiEventData? data)
+    public static string DefaultUserAgent =>
+        $"Mozilla/5.0 (Windows 11)  Umami.Net/{Assembly.GetAssembly(typeof(UmamiClient))!.GetName().Version}";
+
+    public UmamiPayload PopulateFromPayload(UmamiPayload? payload, UmamiEventData? data)
     {
         var newPayload = GetPayload(data: data);
 
@@ -35,14 +43,26 @@ public class PayloadService(IHttpContextAccessor httpContextAccessor, UmamiClien
 
         if (payload.Data != null)
             newPayload.Data = payload.Data;
-        
+
         if (payload.SessionId != null)
             newPayload.SessionId = payload.SessionId;
-        
-        if(payload.UserAgent != null)
-            newPayload.UserAgent = payload.UserAgent;
-        
-        if(payload.Hostname != null)
+
+
+        newPayload.UserAgent = payload.UserAgent ?? DefaultUserAgent;
+
+        if (payload.UseDefaultUserAgent)
+        {
+            var userData = newPayload.Data ?? new UmamiEventData();
+            userData.TryAdd("OriginalUserAgent", newPayload.UserAgent ?? "");
+            newPayload.UserAgent = DefaultUserAgent;
+            newPayload.Data = userData;
+        }
+
+
+        logger.LogInformation("Using UserAgent: {UserAgent}", newPayload.UserAgent);
+
+
+        if (payload.Hostname != null)
             newPayload.Hostname = payload.Hostname;
 
         newPayload.PayloadPopulated = true;
@@ -62,10 +82,9 @@ public class PayloadService(IHttpContextAccessor httpContextAccessor, UmamiClien
             IpAddress = httpContext?.Connection?.RemoteIpAddress?.ToString(),
             UserAgent = request?.Headers["User-Agent"].FirstOrDefault(),
             Referrer = request?.Headers["Referer"].FirstOrDefault(),
-           Hostname = request?.Host.Host,
-           
+            Hostname = request?.Host.Host
         };
-        
+
         return payload;
     }
 }

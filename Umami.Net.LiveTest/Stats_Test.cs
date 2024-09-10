@@ -14,15 +14,14 @@ public class Stats_Test
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-        
-        var metrics = await websiteDataService.GetStats(new StatsRequest()
+
+        var metrics = await websiteDataService.GetStats(new StatsRequest
         {
             StartAtDate = DateTime.Now.AddDays(-7),
             EndAtDate = DateTime.Now,
             Url = "/"
         });
         Assert.NotNull(metrics);
-        Assert.Equal( HttpStatusCode.OK, metrics.Status);
-
+        Assert.Equal(HttpStatusCode.OK, metrics.Status);
     }
 }

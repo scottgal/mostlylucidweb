@@ -1,7 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
 using System.Text;
-using Umami.Net.Models;
 using Umami.Net.Test.Extensions;
 
 namespace Umami.Net.Test.MessageHandlers;
@@ -12,13 +11,22 @@ public class JwtResponseHandler
     {
         var handler = EchoMockHandler.Create(async (request, cancellationToken) =>
         {
-            var umamiPayload =await request.Content?.ReadFromJsonAsync<EchoedRequest>(cancellationToken: cancellationToken)!;
-            if(umamiPayload == null)
+            if (request.Headers.UserAgent.ToString() == "BOT")
             {
-                return new HttpResponseMessage(HttpStatusCode.BadRequest);
+                //Return the beep boop response for a bot response.
+                var response = JsonContent.Create(new { beep = "boop" });
+                return new HttpResponseMessage(HttpStatusCode.OK)
+                {
+                    Content = response
+                };
             }
-           var  responseContent = JwtExtensions.GenerateJwt(umamiPayload.Payload);
-            
+
+            var umamiPayload =
+                await request.Content?.ReadFromJsonAsync<EchoedRequest>(cancellationToken)!;
+            if (umamiPayload == null) return new HttpResponseMessage(HttpStatusCode.BadRequest);
+
+            var responseContent = JwtExtensions.GenerateJwt(umamiPayload.Payload);
+
             // Return the response
             return new HttpResponseMessage(HttpStatusCode.OK)
             {

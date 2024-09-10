@@ -17,12 +17,12 @@ public class UmamiClient_IdentifyTests
         Assert.NotNull(content);
         Assert.Equal(Consts.SessionId, content.Payload.SessionId);
     }
-    
+
     [Fact]
     public async Task Send_User()
     {
         var umamiClient = SetupExtensions.GetUmamiClient();
-        var response = await umamiClient.Identify(email:Consts.Email, username:Consts.UserName);
+        var response = await umamiClient.Identify(Consts.Email, Consts.UserName);
         var content = await response.Content.ReadFromJsonAsync<EchoedRequest>();
         Assert.NotNull(response);
         Assert.NotNull(content);
@@ -30,12 +30,12 @@ public class UmamiClient_IdentifyTests
         Assert.Equal(Consts.Email, content.Payload.Data["email"].ToString());
         Assert.Equal(Consts.UserName, content.Payload.Data["username"].ToString());
     }
-    
+
     [Fact]
     public async Task Send_UserId()
     {
         var umamiClient = SetupExtensions.GetUmamiClient();
-        var response = await umamiClient.Identify(email:Consts.Email, username:Consts.UserName, userId:Consts.UserId);
+        var response = await umamiClient.Identify(Consts.Email, Consts.UserName, userId: Consts.UserId);
         var content = await response.Content.ReadFromJsonAsync<EchoedRequest>();
         Assert.NotNull(response);
         Assert.NotNull(content);
@@ -44,13 +44,13 @@ public class UmamiClient_IdentifyTests
         Assert.Equal(Consts.UserName, content.Payload.Data["username"].ToString());
         Assert.Equal(Consts.UserId, content.Payload.Data["userId"].ToString());
     }
-    
+
     [Fact]
     public async Task Identify()
     {
         var umamiClient = SetupExtensions.GetUmamiClient();
-        var eventData=BuildEventData(Consts.Email, Consts.UserName, Consts.UserId, null);
-        var response = await umamiClient.Identify(new UmamiPayload(){Data = eventData});
+        var eventData = BuildEventData(Consts.Email, Consts.UserName, Consts.UserId, null);
+        var response = await umamiClient.Identify(new UmamiPayload { Data = eventData });
         var content = await response.Content.ReadFromJsonAsync<EchoedRequest>();
         Assert.NotNull(response);
         Assert.NotNull(content);
@@ -59,8 +59,8 @@ public class UmamiClient_IdentifyTests
         Assert.Equal(Consts.UserName, content.Payload.Data["username"].ToString());
         Assert.Equal(Consts.UserId, content.Payload.Data["userId"].ToString());
     }
-    
-    
+
+
     private UmamiEventData BuildEventData(string? email, string? username, string? userId, UmamiEventData? eventData)
     {
         eventData ??= new UmamiEventData();

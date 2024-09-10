@@ -33,3 +33,7 @@ Adds new IdentifyAndDecode endpoints which return a decoded response.
 These can be used to provide information about a user (without a cookie) 
 
 Adds multiple Decode endpoints which return a decoded response.
+
+0.4.0 
+Adds new ability to specify the default UserAgent for the UmamiClient. This is used to avoid the IsBot detection in Umami.
+Adds new Status for the UmamiDataResponse, this will tell you if a request has been identified as a bot.

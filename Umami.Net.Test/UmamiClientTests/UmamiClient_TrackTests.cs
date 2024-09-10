@@ -48,13 +48,13 @@ public class UmamiClient_TrackTests
         Assert.Equal(Consts.DefaultType, content.Type);
         Assert.Equal(Consts.DefaultName, content.Payload.Name);
     }
-    
+
     [Fact]
     public async Task Track_FullEvent()
     {
         var umamiClient = SetupExtensions.GetUmamiClient();
-        var payload = new UmamiPayload(){Name = Consts.DefaultName};
-        var eventData = new UmamiEventData(){{"string", "value" }};
+        var payload = new UmamiPayload { Name = Consts.DefaultName };
+        var eventData = new UmamiEventData { { "string", "value" } };
         var response = await umamiClient.Track(payload, eventData);
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Logging;
 using Umami.Net.UmamiData.Helpers;
@@ -33,11 +32,11 @@ public partial class UmamiDataService
     {
         if (await authService.Login() == false)
             return new UmamiResult<PageViewsResponseModel>(HttpStatusCode.Unauthorized, "Failed to login", null);
- 
+
         var queryString = pageViewsRequest.ToQueryString();
 
 
-      // Make the HTTP request
+        // Make the HTTP request
         var response = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/pageviews{queryString}");
 
         if (response.IsSuccessStatusCode)

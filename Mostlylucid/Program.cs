@@ -130,7 +130,7 @@ try
         if (path.EndsWith("RSS", StringComparison.OrdinalIgnoreCase))
         {
             var rss = context.RequestServices.GetRequiredService<UmamiBackgroundSender>();
-            await rss.Track("RSS");
+            await rss.TrackPageView("RSS", "RSS");
         }
 
         await next();

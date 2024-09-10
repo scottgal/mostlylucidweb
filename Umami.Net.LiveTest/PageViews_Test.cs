@@ -14,44 +14,42 @@ public class PageViews_Test
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-    
-      var pageViews = await websiteDataService.GetPageViews(new PageViewsRequest()
-       {
-           StartAtDate = DateTime.Now.AddDays(-7),
-           EndAtDate = DateTime.Now,
-           Unit = Unit.hour
-       });
-       Assert.NotNull(pageViews);
-       Assert.Equal( HttpStatusCode.OK, pageViews.Status);
 
+        var pageViews = await websiteDataService.GetPageViews(new PageViewsRequest
+        {
+            StartAtDate = DateTime.Now.AddDays(-7),
+            EndAtDate = DateTime.Now,
+            Unit = Unit.hour
+        });
+        Assert.NotNull(pageViews);
+        Assert.Equal(HttpStatusCode.OK, pageViews.Status);
     }
-    
+
     [Fact]
     public async Task PageViews_StartEnd_Day()
     {
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-    
-        var pageViews = await websiteDataService.GetPageViews(new PageViewsRequest()
+
+        var pageViews = await websiteDataService.GetPageViews(new PageViewsRequest
         {
             StartAtDate = DateTime.Now.AddDays(-7),
             EndAtDate = DateTime.Now,
             Unit = Unit.day
         });
         Assert.NotNull(pageViews);
-        Assert.Equal( HttpStatusCode.OK, pageViews.Status);
-
+        Assert.Equal(HttpStatusCode.OK, pageViews.Status);
     }
-    
+
     [Fact]
     public async Task PageViews_StartEnd_Day_Url()
     {
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-    
-        var pageViews = await websiteDataService.GetPageViews(new PageViewsRequest()
+
+        var pageViews = await websiteDataService.GetPageViews(new PageViewsRequest
         {
             StartAtDate = DateTime.Now.AddDays(-7),
             EndAtDate = DateTime.Now,
@@ -59,18 +57,17 @@ public class PageViews_Test
             Url = "/blog"
         });
         Assert.NotNull(pageViews);
-        Assert.Equal( HttpStatusCode.OK, pageViews.Status);
-
+        Assert.Equal(HttpStatusCode.OK, pageViews.Status);
     }
-    
+
     [Fact]
     public async Task PageViews_StartEnd_Month_Url()
     {
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var websiteDataService = serviceProvider.GetRequiredService<UmamiDataService>();
-    
-        var pageViews = await websiteDataService.GetPageViews(new PageViewsRequest()
+
+        var pageViews = await websiteDataService.GetPageViews(new PageViewsRequest
         {
             StartAtDate = DateTime.Now.AddDays(-90),
             EndAtDate = DateTime.Now,
@@ -78,7 +75,6 @@ public class PageViews_Test
             Url = "/blog"
         });
         Assert.NotNull(pageViews);
-        Assert.Equal( HttpStatusCode.OK, pageViews.Status);
-
+        Assert.Equal(HttpStatusCode.OK, pageViews.Status);
     }
 }

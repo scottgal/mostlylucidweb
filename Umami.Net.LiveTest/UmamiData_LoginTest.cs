@@ -12,14 +12,14 @@ public class UmamiData_LoginTest
         var setup = new SetupUmamiData();
         var serviceProvider = setup.Setup();
         var authService = serviceProvider.GetRequiredService<AuthService>();
-        var result =await authService.Login();
+        var result = await authService.Login();
         Assert.True(result);
     }
-    
+
     [Fact]
     public void SetupTest_Bad()
     {
         var setup = new SetupUmamiData();
-        Assert.Throws<Exception>(()=>setup.Setup("appsettings_bad.json"));
+        Assert.Throws<Exception>(() => setup.Setup("appsettings_bad.json"));
     }
 }

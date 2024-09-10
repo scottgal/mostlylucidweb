@@ -1,11 +1,14 @@
 # Umami.Net
 
 ## UmamiClient
+
 This is a .NET Core client for the Umami tracking API.
 It's based on the Umami Node client, which can be found [here](https://github.com/umami-software/node).
 
-You can see how to set up Umami as a docker container [here](https://www.mostlylucid.net/blog/usingumamiforlocalanalytics).
-You can read more detail about it's creation on my blog [here](https://www.mostlylucid.net/blog/addingumamitrackingclientfollowup).
+You can see how to set up Umami as a docker
+container [here](https://www.mostlylucid.net/blog/usingumamiforlocalanalytics).
+You can read more detail about it's creation on my
+blog [here](https://www.mostlylucid.net/blog/addingumamitrackingclientfollowup).
 
 To use this client you need the following appsettings.json configuration:
 
@@ -33,6 +36,7 @@ This will add the Umami client to the services collection.
 You can then use the client in two ways:
 
 ## Track
+
 1. Inject the `UmamiClient` into your class and call the `Track` method:
 
 ```csharp    
@@ -40,7 +44,8 @@ You can then use the client in two ways:
  await umamiClient.Track("Search", new UmamiEventData(){{"query", encodedQuery}});
 ```
 
-2. Use the `UmamiBackgroundSender` to track events in the background (this uses an `IHostedService` to send events in the background):
+2. Use the `UmamiBackgroundSender` to track events in the background (this uses an `IHostedService` to send events in
+   the background):
 
 ```csharp
  // Inject UmamiBackgroundSender umamiBackgroundSender
@@ -54,7 +59,9 @@ The `UmamiEventData` is a dictionary of key value pairs that will be sent to the
 There are additionally more low level methods that can be used to send events to the Umami API.
 
 ## Track PageView
-There's also a convenience method to track a page view. This will send an  event to the Umami API with the url set (which counts as a pageview).
+
+There's also a convenience method to track a page view. This will send an event to the Umami API with the url set (which
+counts as a pageview).
 
 ```csharp
   await  umamiBackgroundSender.TrackPageView("api/search/" + encodedQuery, "searchEvent", eventData: new UmamiEventData(){{"query", encodedQuery}});
@@ -62,19 +69,23 @@ There's also a convenience method to track a page view. This will send an  event
    await umamiClient.TrackPageView("api/search/" + encodedQuery, "searchEvent", eventData: new UmamiEventData(){{"query", encodedQuery}});
 ```
 
-Here we're setting the url to "api/search/" + encodedQuery and the event type to "searchEvent". We're also passing in a dictionary of key value pairs as the event data.
-
+Here we're setting the url to "api/search/" + encodedQuery and the event type to "searchEvent". We're also passing in a
+dictionary of key value pairs as the event data.
 
 ## Raw 'Send' method
 
 On both the `UmamiClient` and `UmamiBackgroundSender` you can call the following method.
+
 ```csharp
 
 
  Send(UmamiPayload? payload = null, UmamiEventData? eventData = null,
         string eventType = "event")
 ```
-If you don't pass in a `UmamiPayload` object, the client will create one for you using the `WebsiteId` from the appsettings.json.
+
+If you don't pass in a `UmamiPayload` object, the client will create one for you using the `WebsiteId` from the
+appsettings.json.
+
 ```csharp
     public  UmamiPayload GetPayload(string? url = null, UmamiEventData? data = null)
     {
@@ -96,15 +107,20 @@ If you don't pass in a `UmamiPayload` object, the client will create one for you
     }
 
 ```
-You can see that this populates the `UmamiPayload` object with the `WebsiteId` from the appsettings.json, the `Url`, `IpAddress`, `UserAgent`, `Referrer` and `Hostname` from the `HttpContext`.
+
+You can see that this populates the `UmamiPayload` object with the `WebsiteId` from the appsettings.json, the `Url`,
+`IpAddress`, `UserAgent`, `Referrer` and `Hostname` from the `HttpContext`.
 
 NOTE: eventType can only be "event" or "identify" as per the Umami API.
 
-
 ## UmamiData
-There's also a service that can be used to pull data from the Umami API. This is a service that allows me to pull data from my Umami instance to use in stuff like sorting posts by popularity etc...
 
-To set it up you need to add a username and password for your umami instance to the Analytics element in your settings file:
+There's also a service that can be used to pull data from the Umami API. This is a service that allows me to pull data
+from my Umami instance to use in stuff like sorting posts by popularity etc...
+
+To set it up you need to add a username and password for your umami instance to the Analytics element in your settings
+file:
+
 ```json
     "Analytics":{
         "UmamiPath" : "https://umami.mostlylucid.net",
@@ -114,7 +130,9 @@ To set it up you need to add a username and password for your umami instance to 
      
     }
 ```
+
 Then in your `Program.cs` you set up the `UmamiDataService` as follows:
+
 ```csharp
     services.SetupUmamiData(config);
 ```
@@ -122,19 +140,23 @@ Then in your `Program.cs` you set up the `UmamiDataService` as follows:
 You can then inject the `UmamiDataService` into your class and use it to pull data from the Umami API.
 
 # Usage
+
 Now you have the `UmamiDataService` in your service collection you can start using it!
 
 ## Methods
+
 The methods are all from the Umami API definition you can read about them here:
 https://umami.is/docs/api/website-stats
 
-All returns are wrapped in an `UmamiResults<T>` object which has a `Success` property and a `Result` property. The `Result` property is the object returned from the Umami API.
+All returns are wrapped in an `UmamiResults<T>` object which has a `Success` property and a `Result` property. The
+`Result` property is the object returned from the Umami API.
 
 ```csharp
 public record UmamiResult<T>(HttpStatusCode Status, string Message, T? Data);
 ```
 
-All requests apart from `ActiveUsers` have a base request object with two compulsory properties. I added convenience DateTimes to the base request object to make it easier to set the start and end dates.
+All requests apart from `ActiveUsers` have a base request object with two compulsory properties. I added convenience
+DateTimes to the base request object to make it easier to set the start and end dates.
 
 ```csharp
 public class BaseRequest
@@ -151,21 +173,23 @@ public class BaseRequest
 The service has the following methods:
 
 ### Active Users
+
 This just gets the total number of CURRENT active users on the site
+
 ```csharp
 public async Task<UmamiResult<ActiveUsersResponse>> GetActiveUsers()
 ```
 
-
-
 ### Stats
+
 This returns a bunch of statistics about the site, including the number of users, page views, etc.
 
 ```csharp
 public async Task<UmamiResult<StatsResponseModels>> GetStats(StatsRequest statsRequest)    
 ```
 
-You may set a number of parameters to filter the data returned from the API. For instance using `url` will return the stats for a specific URL.
+You may set a number of parameters to filter the data returned from the API. For instance using `url` will return the
+stats for a specific URL.
 
 <details>
 <summary>StatsRequest object</summary>
@@ -210,6 +234,7 @@ public class StatsRequest : BaseRequest
     public string? City { get; set; } // Name of city
 }
 ```
+
 </details>
 
 The JSON object Umami returns is as follows.
@@ -223,6 +248,7 @@ The JSON object Umami returns is as follows.
   "totaltime": { "value": 4, "change": 4 }
 }
 ```
+
 This is wrapped inside my `StatsResponseModel` object.
 
 ```csharp
@@ -270,12 +296,16 @@ public class StatsResponseModels
 ```
 
 ### Metrics
+
 Metrics in Umami provide you the number of views for specific types of properties.
 
 #### Events
+
 One example of these is Events`:
 
-'Events' in Umami are specific items you can track on a site. When tracking events using Umami.Net you can set a number of properties which are tracked with the event name. For instance here I track `Search` requests with the URL and the search term.
+'Events' in Umami are specific items you can track on a site. When tracking events using Umami.Net you can set a number
+of properties which are tracked with the event name. For instance here I track `Search` requests with the URL and the
+search term.
 
 ```csharp
        await  umamiBackgroundSender.Track( "searchEvent", eventData: new UmamiEventData(){{"query", encodedQuery}});
@@ -286,7 +316,9 @@ To fetch data about this event you would use the `Metrics` method:
 ```csharp
 public async Task<UmamiResult<MetricsResponseModels[]>> GetMetrics(MetricsRequest metricsRequest)
 ```
-As with the other methods this accepts the `MetricsRequest` object (with the compulsory `BaseRequest` properties) and a number of optional properties to filter the data.
+
+As with the other methods this accepts the `MetricsRequest` object (with the compulsory `BaseRequest` properties) and a
+number of optional properties to filter the data.
 
 <details>
 <summary>MetricsRequest object</summary>
@@ -340,9 +372,11 @@ public class MetricsRequest : BaseRequest
     public int? Limit { get; set; } = 500; // Number of events returned (default: 500)
 }
 ```
+
 </details>
 
-Here you can see that you can specify a number of properties in the request element to specify what metrics you want to return.
+Here you can see that you can specify a number of properties in the request element to specify what metrics you want to
+return.
 
 You can also set a `Limit` property to limit the number of results returned.
 
@@ -365,6 +399,7 @@ The JSON object returned from the API is as follows:
   { "x": "searchEvent", "y": 46 }
 ]
 ```
+
 And again I wrap this in my `MetricsResponseModels` object.
 
 ```csharp
@@ -378,7 +413,10 @@ public class MetricsResponseModels
 Where x is the event name and y is the number of times it has been triggered.
 
 #### Page Views
-One of the most useful metrics is the number of page views. This is the number of times a page has been viewed on the site. Below is the test I use to get the number of page views over the past 30 days. You'll note the `Type` parameter is set as `MetricType.url` however this is also the default value so you don't need to set it.
+
+One of the most useful metrics is the number of page views. This is the number of times a page has been viewed on the
+site. Below is the test I use to get the number of page views over the past 30 days. You'll note the `Type` parameter is
+set as `MetricType.url` however this is also the default value so you don't need to set it.
 
 ```csharp
   [Fact]
@@ -400,6 +438,7 @@ One of the most useful metrics is the number of page views. This is the number o
 
     }
 ```
+
 This returns a `MetricsResponse` object which has the following JSON structure:
 
 ```json
@@ -422,6 +461,7 @@ This returns a `MetricsResponse` object which has the following JSON structure:
 Where `x` is the URL and `y` is the number of times it has been viewed.
 
 ### PageViews
+
 This returns the number of page views for a specific URL.
 
 Again here is a test I use for this method:
@@ -458,9 +498,11 @@ This returns a `PageViewsResponse` object which has the following JSON structure
 ]
 ```
 
-Where `date` is the date and `value` is the number of page views, this is repeated for each day in the range specified (or hour, month, etc. depending on the `Unit` property).
+Where `date` is the date and `value` is the number of page views, this is repeated for each day in the range specified (
+or hour, month, etc. depending on the `Unit` property).
 
-As with the other methods this accepts the `PageViewsRequest` object (with the compulsory `BaseRequest` properties) and a number of optional properties to filter the data.
+As with the other methods this accepts the `PageViewsRequest` object (with the compulsory `BaseRequest` properties) and
+a number of optional properties to filter the data.
 
 <details>
 <summary>PageViewsRequest object</summary>
@@ -500,13 +542,18 @@ public class PageViewsRequest : BaseRequest
     public string? City { get; set; } // Name of city
 }
 ```
+
 </details>
 
-As with the other methods you can set a number of properties to filter the data returned from the API, for instance you could set the
+As with the other methods you can set a number of properties to filter the data returned from the API, for instance you
+could set the
 `Country` property to get the number of page views from a specific country.
 
 # Using the Service
-In this site I have some code which lets me use this service to get the number of views each blog page has. In the code below I take a start and end date and a prefix (which is `/blog` in my case) and get the number of views for each page in the blog.
+
+In this site I have some code which lets me use this service to get the number of views each blog page has. In the code
+below I take a start and end date and a prefix (which is `/blog` in my case) and get the number of views for each page
+in the blog.
 
 I then cache this data for an hour so I don't have to keep hitting the Umami API.
 

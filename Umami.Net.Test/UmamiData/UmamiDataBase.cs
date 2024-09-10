@@ -7,7 +7,7 @@ namespace Umami.Net.Test.UmamiData;
 
 public class UmamiDataBase
 {
-    public IServiceProvider GetServiceProvider (string username="username", string password="password")
+    public IServiceProvider GetServiceProvider(string username = "username", string password = "password")
     {
         var services = new ServiceCollection();
         var mockLogger = new FakeLogger<UmamiDataService>();
@@ -15,7 +15,6 @@ public class UmamiDataBase
         services.AddScoped<ILogger<UmamiDataService>>(_ => mockLogger);
         services.AddScoped<ILogger<AuthService>>(_ => authLogger);
         services.SetupUmamiData(username, password);
-        return  services.BuildServiceProvider();
-        
+        return services.BuildServiceProvider();
     }
 }

@@ -36,9 +36,10 @@ public class UmamiClient(
         var jsonPayload = new { type, payload };
         var request = new HttpRequestMessage(HttpMethod.Post, "api/send");
         request.Headers.Remove("User-Agent");
-        request.Headers.Add("User-Agent", payload.UserAgent);
+        request.Headers.TryAddWithoutValidation("User-Agent", payload.UserAgent);
         request.Content = JsonContent.Create(jsonPayload, options: Options);
         var response = await client.SendAsync(request);
+
 
         if (!response.IsSuccessStatusCode)
         {
@@ -57,7 +58,7 @@ public class UmamiClient(
     }
 
 
-    public async Task<UmamiResponse?> SendAndDecode(
+    public async Task<UmamiDataResponse?> SendAndDecode(
         UmamiPayload? payload = null,
         UmamiEventData? eventData = null,
         string type = "event")
@@ -66,7 +67,7 @@ public class UmamiClient(
         return await DecodeResponse(response);
     }
 
-    public async Task<UmamiResponse?> TrackPageViewAndDecode(
+    public async Task<UmamiDataResponse?> TrackPageViewAndDecode(
         string? url = "",
         string? title = "",
         UmamiPayload? payload = null,
@@ -93,7 +94,7 @@ public class UmamiClient(
     }
 
 
-    public async Task<UmamiResponse?> TrackAndDecode(
+    public async Task<UmamiDataResponse?> TrackAndDecode(
         string eventName,
         UmamiEventData? eventData = null)
     {
@@ -101,7 +102,7 @@ public class UmamiClient(
         return await DecodeResponse(response);
     }
 
-    public async Task<UmamiResponse?> TrackAndDecode(
+    public async Task<UmamiDataResponse?> TrackAndDecode(
         UmamiPayload eventObj,
         UmamiEventData? eventData = null)
     {
@@ -130,32 +131,47 @@ public class UmamiClient(
         return await Send(payload);
     }
 
-    private async Task<UmamiResponse?> DecodeResponse(HttpResponseMessage responseMessage)
+    private async Task<UmamiDataResponse?> DecodeResponse(HttpResponseMessage responseMessage)
     {
-        var decoded = await jwtDecoder.DecodeResponse(responseMessage);
-        if (decoded == null)
+        var responseString = await responseMessage.Content.ReadAsStringAsync();
+
+        switch (responseMessage.IsSuccessStatusCode)
         {
-            logger.LogError("Failed to decode response from Umami");
-            return null;
+            case false:
+                return new UmamiDataResponse(UmamiDataResponse.ResponseStatus.Failed);
+            case true when responseString.Contains("beep") && responseString.Contains("boop"):
+                logger.LogWarning("Bot detected data not stored in Umami");
+                return new UmamiDataResponse(UmamiDataResponse.ResponseStatus.BotDetected);
+
+            case true:
+                var decoded = await jwtDecoder.DecodeResponse(responseMessage);
+                if (decoded == null)
+                {
+                    logger.LogError("Failed to decode response from Umami");
+                    return null;
+                }
+
+                var payload = UmamiDataResponse.Decode(decoded);
+
+                return payload;
         }
-        var payload = UmamiResponse.Decode(decoded);
-        return payload;
     }
 
 
-    public async Task<UmamiResponse?> IdentifyAndDecode()
+    public async Task<UmamiDataResponse?> IdentifyAndDecode()
     {
         return await IdentifyAndDecode(new UmamiPayload());
     }
 
 
-    public async Task<UmamiResponse?> IdentifyAndDecode(UmamiPayload payload, UmamiEventData? eventData = null)
+    public async Task<UmamiDataResponse?> IdentifyAndDecode(UmamiPayload payload, UmamiEventData? eventData = null)
     {
         var response = await Identify(payload, eventData);
         return await DecodeResponse(response);
     }
 
-    public async Task<UmamiResponse?> IdentifyAndDecode(string sessionId, string? email = null, string? username = null,
+    public async Task<UmamiDataResponse?> IdentifyAndDecode(string sessionId, string? email = null,
+        string? username = null,
         string? userId = null, UmamiEventData? eventData = null)
     {
         var response = await Identify(email, username, sessionId, userId, eventData);
@@ -187,7 +203,7 @@ public class UmamiClient(
         return await Identify(sessionId: sessionId);
     }
 
-    public async Task<UmamiResponse?> IdentifySessionAndDecode(string sessionId)
+    public async Task<UmamiDataResponse?> IdentifySessionAndDecode(string sessionId)
     {
         return await IdentifyAndDecode(sessionId);
     }

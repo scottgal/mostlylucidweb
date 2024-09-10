@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umami.Net.Config;
+using Umami.Net.Helpers;
 using Umami.Net.Test.MessageHandlers;
 
 namespace Umami.Net.Test.Extensions;
@@ -20,6 +21,7 @@ public static class SetupExtensions
         };
         services.AddSingleton(umamiClientSettings);
         services.AddScoped<PayloadService>();
+        services.AddSingleton<JwtDecoder>();
         services.AddLogging(x => x.AddConsole());
         // Mocking HttpMessageHandler with Moq
         var mockHandler = handler ?? EchoMockHandler.Create();
@@ -52,9 +54,8 @@ public static class SetupExtensions
         var services = serviceCollection ?? SetupServiceCollection();
         var context = contextAccessor ?? SetupHttpContextAccessor();
         services.AddSingleton<IHttpContextAccessor>(context);
-        
     }
-    
+
     public static UmamiClient GetUmamiClient(IServiceCollection? serviceCollection = null,
         HttpContextAccessor? contextAccessor = null)
     {

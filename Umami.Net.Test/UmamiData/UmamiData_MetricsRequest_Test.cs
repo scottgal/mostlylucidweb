@@ -20,7 +20,7 @@ public class UmamiData_MetricsRequest_Test : UmamiDataBase
         var response = await umamiDataService.GetMetrics(metricsRequest);
         Assert.NotNull(response);
     }
-    
+
     [Fact]
     public async Task GetMetricsRequest_Events()
     {

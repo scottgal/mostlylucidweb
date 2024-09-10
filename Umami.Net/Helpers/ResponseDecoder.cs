@@ -1,28 +1,25 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.IdentityModel.Tokens.Jwt;
+using Microsoft.Extensions.Logging;
 
 namespace Umami.Net.Helpers;
 
-using System.IdentityModel.Tokens.Jwt;
-
-public  class JwtDecoder(ILogger<JwtDecoder> logger)
+public class JwtDecoder(ILogger<JwtDecoder> logger)
 {
-    public  async Task<JwtPayload?> DecodeResponse(HttpResponseMessage responseMessage)
+    public async Task<JwtPayload?> DecodeResponse(HttpResponseMessage responseMessage)
     {
         try
         {
-
-       
-         var content = await responseMessage.Content.ReadAsStringAsync();
-         return DecodeJwt(content);
+            var content = await responseMessage.Content.ReadAsStringAsync();
+            return DecodeJwt(content);
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Failed to decode response");
+            logger.LogError(e, "Failed to read content");
             return null;
         }
     }
 
-    private  JwtPayload? DecodeJwt(string token)
+    private JwtPayload? DecodeJwt(string token)
     {
         try
         {

@@ -7,7 +7,6 @@ namespace Umami.Net.LiveTest.Setup;
 
 public class SetupUmamiData
 {
-    
     public IServiceProvider Setup(string settingsfile = "appsettings.json")
     {
         var services = new ServiceCollection();
@@ -17,8 +16,5 @@ public class SetupUmamiData
             .Build();
         services.SetupUmamiData(config);
         return services.BuildServiceProvider();
-
     }
-
-    
 }

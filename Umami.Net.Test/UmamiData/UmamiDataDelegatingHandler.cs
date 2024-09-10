@@ -11,7 +11,9 @@ namespace Umami.Net.Test.UmamiData;
 
 public class UmamiDataDelegatingHandler : DelegatingHandler
 {
-    private record AuthRequest(string username, string password);
+    private static readonly string[] EventNames = { "RSS", "Event 1", "Event 2", "Event 3", "Event 4" };
+
+    private static readonly string[] Urls = { "/page1", "/page2", "/page3", "/page4", "/" };
 
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
         CancellationToken cancellationToken)
@@ -23,14 +25,9 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
                 var authContent = await request.Content.ReadFromJsonAsync<AuthRequest>(cancellationToken);
                 if (authContent?.username == "username" && authContent?.password == "password")
                     return ReturnAuthenticatedMessage();
-                else if (authContent?.username == "bad")
-                {
+                if (authContent?.username == "bad")
                     return new HttpResponseMessage(HttpStatusCode.Unauthorized);
-                }
-                else
-                {
-                    return new HttpResponseMessage(HttpStatusCode.BadRequest);
-                }
+                return new HttpResponseMessage(HttpStatusCode.BadRequest);
             case "/api/auth/verify":
                 //To allow Login to continue.
                 return new HttpResponseMessage(HttpStatusCode.Unauthorized);
@@ -41,8 +38,8 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
 
                 if (absPath.StartsWith($"/api/websites/{Consts.WebSiteId}/pageviews"))
                 {
-                    var pageViews = GetParams<PageViewsRequest> (request);
-                  
+                    var pageViews = GetParams<PageViewsRequest>(request);
+
                     return ReturnPageViewsMessage(pageViews);
                 }
 
@@ -54,7 +51,7 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
 
                 if (absPath.StartsWith($"/api/websites/{Consts.WebSiteId}/active"))
                 {
-                    var activeUsers = new ActiveUsersResponse()
+                    var activeUsers = new ActiveUsersResponse
                     {
                         ActiveUsers = 10
                     };
@@ -64,6 +61,7 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
                         Content = new StringContent(json, Encoding.UTF8, "application/json")
                     };
                 }
+
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
         }
     }
@@ -72,21 +70,16 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
     {
         var queryParams = HttpUtility.ParseQueryString(requestMessage.RequestUri.Query);
         var startAt = queryParams["startAt"];
-        DateTime startDate = DateTime.Now;
+        var startDate = DateTime.Now;
         if (long.TryParse(startAt, out var startMs))
-        {
             startDate = DateTimeOffset.FromUnixTimeMilliseconds(startMs).DateTime;
-        }
 
         var endAt = queryParams["endAt"];
-        DateTime endDate = DateTime.Now;
-        if (long.TryParse(endAt, out var endMs))
-        {
-            endDate = DateTimeOffset.FromUnixTimeMilliseconds(endMs).DateTime;
-        }
+        var endDate = DateTime.Now;
+        if (long.TryParse(endAt, out var endMs)) endDate = DateTimeOffset.FromUnixTimeMilliseconds(endMs).DateTime;
 
-      
-        var baseRequest = new T()
+
+        var baseRequest = new T
         {
             StartAtDate = startDate,
             EndAtDate = endDate
@@ -114,7 +107,7 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
         request.City = queryParams["city"];
         return request;
     }
-    
+
 
     private static MetricsRequest FillMetricsRequest(MetricsRequest request, NameValueCollection queryParams)
     {
@@ -133,39 +126,23 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
         request.City = queryParams["city"];
         request.Language = queryParams["language"];
         request.Event = queryParams["event"];
-        if (int.TryParse(queryParams["limit"], out var limit))
-        {
-            request.Limit = limit;
-        }
+        if (int.TryParse(queryParams["limit"], out var limit)) request.Limit = limit;
         return request;
     }
 
-    private static readonly string[] EventNames = new[] { "RSS", "Event 1", "Event 2", "Event 3", "Event 4" };
-
-    private static readonly string[] Urls = new[] { "/page1", "/page2", "/page3", "/page4", "/" };
     private static HttpResponseMessage ReturnMetrics(MetricsRequest request)
     {
+        var itemsList = Array.Empty<string>();
+        if (request.Type == MetricType.@event) itemsList = EventNames;
 
-        string[] itemsList = Array.Empty<string>();
-        if (request.Type == MetricType.@event)
-        {
-            itemsList = EventNames;
-            
-        }
-
-        if (request.Type == MetricType.url)
-        {
-            itemsList = Urls;
-        }
+        if (request.Type == MetricType.url) itemsList = Urls;
         var metricsList = new List<MetricsResponseModels>();
-        for (int i = 0; i < itemsList.Length; i++)
-        {
-            metricsList.Add(new MetricsResponseModels()
+        for (var i = 0; i < itemsList.Length; i++)
+            metricsList.Add(new MetricsResponseModels
             {
                 x = itemsList[i],
-                y = i*2
+                y = i * 2
             });
-        }
 
         var json = JsonSerializer.Serialize(metricsList);
         return new HttpResponseMessage(HttpStatusCode.OK)
@@ -173,7 +150,7 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
             Content = new StringContent(json, Encoding.UTF8, "application/json")
         };
     }
-    
+
     private static HttpResponseMessage ReturnPageViewsMessage(PageViewsRequest request)
     {
         var startAt = request.StartAt;
@@ -184,21 +161,21 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
 
         var pageViewsList = new List<PageViewsResponseModel.Pageviews>();
         var sessionsList = new List<PageViewsResponseModel.Sessions>();
-        for(int i=0; i<days; i++)
+        for (var i = 0; i < days; i++)
         {
-            
-            pageViewsList.Add(new PageViewsResponseModel.Pageviews()
+            pageViewsList.Add(new PageViewsResponseModel.Pageviews
             {
                 x = startDate.AddDays(i).ToString("yyyy-MM-dd"),
-                y = i*4
+                y = i * 4
             });
-            sessionsList.Add(new PageViewsResponseModel.Sessions()
+            sessionsList.Add(new PageViewsResponseModel.Sessions
             {
                 x = startDate.AddDays(i).ToString("yyyy-MM-dd"),
-                y = i*8
+                y = i * 8
             });
         }
-        var pageViewResponse = new PageViewsResponseModel()
+
+        var pageViewResponse = new PageViewsResponseModel
         {
             pageviews = pageViewsList.ToArray(),
             sessions = sessionsList.ToArray()
@@ -212,10 +189,10 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
 
     private static HttpResponseMessage ReturnAuthenticatedMessage()
     {
-        var authResponse = new AuthResponse()
+        var authResponse = new AuthResponse
         {
             Token = "1234567890",
-            User = new UserResponse()
+            User = new UserResponse
             {
                 Id = "123",
                 Username = "test",
@@ -230,4 +207,6 @@ public class UmamiDataDelegatingHandler : DelegatingHandler
             Content = new StringContent(json, Encoding.UTF8, "application/json")
         };
     }
+
+    private record AuthRequest(string username, string password);
 }
