@@ -118,7 +118,9 @@ dark:text-white dark:group-hover:text-secondary print:hidden" ></span>
             <div class="w-full lg:w-auto print:hidden">
                 <ul class="flex flex-wrap items-center justify-end space-x-2">
                     <li class="group relative mb-1">
-                        <partial name="_TypeAhead" />
+                        <div  hx-trigger="load" hx-get="/typeahead">
+                        </div>
+
                     </li>
 
                     <li class="group relative mb-1 ">

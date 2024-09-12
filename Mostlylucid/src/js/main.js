@@ -70,11 +70,9 @@ window.onload = function(ev) {
         updateMetaUrls();
         console.log('Document is ready');
         document.body.addEventListener('htmx:afterSwap', function(evt) {
-            console.log('HTMX afterSwap triggered', evt);
-
             const targetId = evt.detail.target.id;
             if (targetId !== 'contentcontainer' && targetId !== 'commentlist') return;
-
+            console.log('HTMX afterSwap triggered', evt);
             mermaidinit();
             hljs.highlightAll();
             updateMetaUrls();

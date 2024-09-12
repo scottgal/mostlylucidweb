@@ -30,6 +30,7 @@ public class SearchApi(
 
     [HttpGet]
     [Route("search/{query}")]
+    [ValidateAntiForgeryToken]
     public async Task<Results<JsonHttpResult<List<BlogSearchService.SearchResults>>, BadRequest<string>>>
         Search(string query)
     {

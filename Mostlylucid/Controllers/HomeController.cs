@@ -32,6 +32,13 @@ public class HomeController(BaseControllerService baseControllerService, ILogger
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    [HttpGet("typeahead")]
+    public IActionResult TypeAhead()
+    {
+        return PartialView("_TypeAhead");
+    }
+    
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     [HttpGet]
     public IActionResult Error()
     {
