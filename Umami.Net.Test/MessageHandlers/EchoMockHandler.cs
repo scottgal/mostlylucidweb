@@ -31,6 +31,7 @@ public static class EchoMockHandler
     public static async Task<HttpResponseMessage> ResponseHandler(HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
+        var userAgent = request.Headers.UserAgent.ToString();
         // Read the request content
         var requestBody = request.Content?.ReadAsStringAsync(cancellationToken).Result;
         // Create a response that echoes the request body
@@ -38,6 +39,7 @@ public static class EchoMockHandler
         // Return the response
         return await Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
         {
+            Headers = { {"User-Agent", userAgent} },
             Content = new StringContent(responseContent, Encoding.UTF8, "application/json")
         });
     }

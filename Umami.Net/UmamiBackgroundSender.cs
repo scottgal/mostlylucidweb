@@ -97,15 +97,11 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, ILogger<Um
     {
         await using var scope = scopeFactory.CreateAsyncScope();
         var payloadService = scope.ServiceProvider.GetRequiredService<PayloadService>();
-        var thisPayload = new UmamiPayload
-        {
-            Name = eventName,
-            Data = eventData ?? new UmamiEventData(),
-            UseDefaultUserAgent = useDefaultUserAgent
-        };
-        var payload = payloadService.PopulateFromPayload(thisPayload, eventData);
+        var payload = payloadService.PopulateFromPayload(null, data: eventData);
+       payload.Name = eventName;
+       payload.UseDefaultUserAgent = useDefaultUserAgent;
         await Send(payload);
-        ;
+        
     }
 
     public async Task Send(UmamiPayload? payload = null, UmamiEventData? eventData = null,

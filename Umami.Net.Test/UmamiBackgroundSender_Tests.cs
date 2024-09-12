@@ -160,4 +160,101 @@ public class UmamiBackgroundSender_Tests
 
         await tcs.Task;
     }
+    
+    
+    [Fact]
+    public async Task Track_PageView_DefaultUserAgent()
+    {
+        // Arrange
+        var pageName = "RSS";
+        var pageTitle = "RSS Feed";
+        var tcs = new TaskCompletionSource<bool>();
+        var handler = EchoMockHandler.Create(async (message, token) =>
+        {
+            try
+            {
+                var responseContent = await EchoMockHandler.ResponseHandler(message, token);
+                responseContent.Headers.TryGetValues("User-Agent", out var userAgent);
+                
+                var jsonContent = await responseContent.Content.ReadFromJsonAsync<EchoedRequest>(token);
+                // Assertions
+                Assert.Equal(PayloadService.DefaultUserAgent, userAgent?.First());
+                Assert.Contains("api/send", message.RequestUri.ToString());
+                Assert.NotNull(jsonContent);
+                Assert.NotNull(jsonContent.Payload);
+                Assert.Equal(pageName, jsonContent.Payload.Url);
+                Assert.Equal(pageTitle, jsonContent.Payload.Title);
+                Assert.NotNull(jsonContent.Payload.Data); 
+                var originalUserAgent = jsonContent.Payload.Data["OriginalUserAgent"];
+                Assert.Equal(Consts.UserAgent, originalUserAgent.ToString());
+
+                // Signal completion
+                tcs.SetResult(true);
+
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = responseContent.Content };
+            }
+            catch (Exception e)
+            {
+                tcs.SetException(e);
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+            }
+        });
+
+        var (backgroundSender, hostedService) = GetServices(handler);
+        var cancellationToken = new CancellationToken();
+        await hostedService.StartAsync(cancellationToken);
+        await backgroundSender.TrackPageView(pageName,title:pageTitle, useDefaultUserAgent: true);
+
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(1000, cancellationToken));
+        if (completedTask != tcs.Task) throw new TimeoutException("The background task did not complete in time.");
+
+        await tcs.Task;
+    }
+    
+        [Fact]
+    public async Task Track_Event_DefaultUserAgent()
+    {
+        // Arrange
+        var eventName = "RSS";
+        var tcs = new TaskCompletionSource<bool>();
+        var handler = EchoMockHandler.Create(async (message, token) =>
+        {
+            try
+            {
+                var responseContent = await EchoMockHandler.ResponseHandler(message, token);
+                responseContent.Headers.TryGetValues("User-Agent", out var userAgent);
+                
+                var jsonContent = await responseContent.Content.ReadFromJsonAsync<EchoedRequest>(token);
+                // Assertions
+                Assert.Equal(PayloadService.DefaultUserAgent, userAgent?.First());
+                Assert.Contains("api/send", message.RequestUri.ToString());
+                Assert.NotNull(jsonContent);
+                Assert.NotNull(jsonContent.Payload);
+                Assert.Equal(eventName, jsonContent.Payload.Name);
+                Assert.NotNull(jsonContent.Payload.Data); 
+                var originalUserAgent = jsonContent.Payload.Data["OriginalUserAgent"];
+                Assert.Equal(Consts.UserAgent, originalUserAgent.ToString());
+
+                // Signal completion
+                tcs.SetResult(true);
+
+                return new HttpResponseMessage(HttpStatusCode.OK) { Content = responseContent.Content };
+            }
+            catch (Exception e)
+            {
+                tcs.SetException(e);
+                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+            }
+        });
+
+        var (backgroundSender, hostedService) = GetServices(handler);
+        var cancellationToken = new CancellationToken();
+        await hostedService.StartAsync(cancellationToken);
+        await backgroundSender.Track(eventName,useDefaultUserAgent: true);
+
+        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(1000, cancellationToken));
+        if (completedTask != tcs.Task) throw new TimeoutException("The background task did not complete in time.");
+
+        await tcs.Task;
+    }
 }
