@@ -1,5 +1,4 @@
 ﻿using Mostlylucid.Config.Markdown;
-using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog.Markdown;

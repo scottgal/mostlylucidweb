@@ -1,12 +1,8 @@
 ﻿<div x-data="window.mostlylucid.typeahead()" class="relative" id="searchelement"  x-on:click.outside="results = []">
-    @Html.AntiForgeryToken()
     <label class="input input-sm dark:bg-custom-dark-bg bg-white input-bordered flex items-center gap-2">
-       
-        
         <input
             type="text"
             x-model="query"
-
             x-on:input.debounce.300ms="search"
             x-on:keydown.down.prevent="moveDown"
             x-on:keydown.up.prevent="moveUp"

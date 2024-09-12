@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Mostlylucid.Helpers;
-using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.MarkdownTranslator.Models;
-using Umami.Net;
 using Umami.Net.Models;
 
 namespace Mostlylucid.API;

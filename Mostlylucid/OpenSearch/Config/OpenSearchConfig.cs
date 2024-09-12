@@ -1,6 +1,4 @@
-﻿using Mostlylucid.Config;
-
-namespace Mostlylucid.OpenSearch.Config;
+﻿namespace Mostlylucid.OpenSearch.Config;
 
 public class OpenSearchConfig : IConfigSection
 {

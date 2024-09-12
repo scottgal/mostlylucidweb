@@ -1,13 +1,9 @@
 ﻿using AngleSharp.Dom;
-using Microsoft.EntityFrameworkCore;
 using Mostlylucid.Blog.EntityFramework;
 using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Blog.ViewServices;
-using Mostlylucid.Config;
 using Mostlylucid.Config.Markdown;
-using Mostlylucid.EntityFramework;
 using Npgsql;
-using Serilog;
 
 namespace Mostlylucid.Blog;
 
@@ -44,6 +40,7 @@ public static class BlogSetup
                 services.AddScoped<IBlogService, EFBlogService>();
                 services.AddScoped<ICommentService, EFCommentService>();
                 services.AddScoped<IBlogPopulator, EFBlogPopulator>();
+                services.AddScoped<BlogSearchService>();
                 services.AddScoped<CommentViewService>();
                 services.AddHostedService<BackgroundEFBlogUpdater>();
                 break;

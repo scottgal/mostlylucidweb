@@ -1,8 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Mostlylucid.EntityFramework;
-using Mostlylucid.EntityFramework.Models;
-using Serilog;
-using SerilogTracing;
+﻿using Mostlylucid.EntityFramework.Models;
 
 namespace Mostlylucid.Blog.EntityFramework;
 

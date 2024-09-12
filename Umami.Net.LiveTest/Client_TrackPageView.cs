@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Testing;
 using Umami.Net.LiveTest.Setup;
 using Umami.Net.Models;
 
@@ -28,11 +30,21 @@ public class Client_TrackPageView
     }
 
     [Fact]
-    public async Task Client_TrackPageView_NoDecode()
+    public async Task Background_TrackPageView_NoDecode()
     {
         var services = SetupUmamiClient.Setup();
         var umamiClient = services.GetRequiredService<UmamiBackgroundSender>();
-        await umamiClient.TrackPageView("/test", "test");
+        await umamiClient.TrackPageView("/test", "test", useDefaultUserAgent:true);
+    }
+    
+    [Fact]
+    public async Task Background_TrackPageView_Bot()
+    {
+        var services = SetupUmamiClient.Setup();
+        var umamiClient = services.GetRequiredService<UmamiBackgroundSender>();
+        await umamiClient.TrackPageView("/test", "test", new UmamiPayload() { UserAgent = "Bot" });
+       await Task.Delay(1000);
+        
     }
 
 

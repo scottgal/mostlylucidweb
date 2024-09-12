@@ -1,5 +1,4 @@
-﻿using Mostlylucid.Blog;
-using Mostlylucid.OpenSearch.Models;
+﻿using Mostlylucid.OpenSearch.Models;
 
 namespace Mostlylucid.OpenSearch;
 

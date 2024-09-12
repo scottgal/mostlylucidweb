@@ -1,5 +1,4 @@
-﻿using Mostlylucid.Config;
-using Mostlylucid.OpenSearch.Config;
+﻿using Mostlylucid.OpenSearch.Config;
 using OpenSearch.Client;
 
 namespace Mostlylucid.OpenSearch;

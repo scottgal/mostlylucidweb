@@ -37,8 +37,8 @@ public static class SetupUmamiClient
         payloadLogger ??= new FakeLogger<PayloadService>();
 
         services.AddScoped<ILogger<PayloadService>>(_ => payloadLogger);
-        if (umamiClientLogger != null)
-            umamiClientLogger = new FakeLogger<UmamiClient>();
+        umamiClientLogger ??= new FakeLogger<UmamiClient>();
+        services.AddScoped<ILogger<UmamiClient>>(_ => umamiClientLogger);
         services.AddScoped<PayloadService>();
         services.AddScoped<UmamiBackgroundSender>();
 

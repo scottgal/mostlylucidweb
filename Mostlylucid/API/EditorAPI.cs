@@ -1,6 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Mostlylucid.Blog;
-using Umami.Net;
 using Umami.Net.Models;
 
 namespace Mostlylucid.API;

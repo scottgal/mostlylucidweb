@@ -1,21 +1,5 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.Google;
-using Microsoft.EntityFrameworkCore;
-using Mostlylucid.Blog;
-using Mostlylucid.Config;
-using Mostlylucid.Email;
-using Mostlylucid.EntityFramework;
-using Mostlylucid.MarkdownTranslator;
-using Mostlylucid.OpenSearch;
-using Mostlylucid.RSS;
-using Mostlylucid.Umami;
-using Serilog;
-using SerilogTracing;
-using SixLabors.ImageSharp.Web.Caching;
-using SixLabors.ImageSharp.Web.DependencyInjection;
-using Umami.Net;
-using Umami.Net.UmamiData;
-using WebEssentials.AspNetCore.Pwa;
+using Mostlylucid.Services;
+using Umami.Net.Models;
 
 try
 {
@@ -53,6 +37,7 @@ try
     services.SetupUmamiData(config);
     services.AddScoped<IUmamiDataSortService, UmamiDataSortService>();
     services.AddScoped<IUmamiUserInfoService, UmamiUserInfoService>();
+    services.AddScoped<BaseControllerService>();
     services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
     services.SetupEmail(builder.Configuration);
     services.SetupRSS();
@@ -130,7 +115,8 @@ try
         if (path.EndsWith("RSS", StringComparison.OrdinalIgnoreCase))
         {
             var rss = context.RequestServices.GetRequiredService<UmamiBackgroundSender>();
-            await rss.TrackPageView("RSS", "RSS");
+           await rss.TrackPageView("RSS", "RSS",useDefaultUserAgent: true);
+      
         }
 
         await next();

@@ -2,7 +2,6 @@
 using System.Net.Mail;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Smtp;
-using Mostlylucid.Config;
 
 namespace Mostlylucid.Email;
 

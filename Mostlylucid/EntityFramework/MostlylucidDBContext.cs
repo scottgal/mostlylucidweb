@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Mostlylucid.EntityFramework.Converters;
+﻿using Mostlylucid.EntityFramework.Converters;
 using Mostlylucid.EntityFramework.Models;
 
 namespace Mostlylucid.EntityFramework;

@@ -1,6 +1,4 @@
-﻿using Mostlylucid.Config;
-
-namespace Mostlylucid.Blog;
+﻿namespace Mostlylucid.Blog;
 
 public class BlogConfig : IConfigSection
 {

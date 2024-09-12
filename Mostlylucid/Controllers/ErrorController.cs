@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Mostlylucid.Config;
-using Mostlylucid.Models.Error;
+using Mostlylucid.Services;
 
 namespace Mostlylucid.Controllers;
 
-public class ErrorController(AnalyticsSettings analyticsSettings, ILogger<ErrorController> logger) : BaseController(analyticsSettings, logger)
+public class ErrorController(BaseControllerService baseControllerService, ILogger<ErrorController> logger) : BaseController(baseControllerService, logger)
 {
     [Route("/error/{statusCode}")]
     [HttpGet]
@@ -13,14 +12,14 @@ public class ErrorController(AnalyticsSettings analyticsSettings, ILogger<ErrorC
     {
         // Retrieve the original request information
         var statusCodeReExecuteFeature = HttpContext.Features.Get<IStatusCodeReExecuteFeature>();
-        
+
         if (statusCodeReExecuteFeature != null)
         {
             // Access the original path and query string that caused the error
             var originalPath = statusCodeReExecuteFeature.OriginalPath;
             var originalQueryString = statusCodeReExecuteFeature.OriginalQueryString;
 
-            
+
             // Optionally log the original URL or pass it to the view
             ViewData["OriginalUrl"] = $"{originalPath}{originalQueryString}";
         }
@@ -29,11 +28,11 @@ public class ErrorController(AnalyticsSettings analyticsSettings, ILogger<ErrorC
         switch (statusCode)
         {
             case 404:
-            return View("NotFound");
+                return View("NotFound");
             case 500:
-            return View("ServerError");
+                return View("ServerError");
             default:
-            return View("Error");
+                return View("Error");
         }
     }
 }

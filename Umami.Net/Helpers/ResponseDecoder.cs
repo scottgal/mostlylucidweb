@@ -5,11 +5,10 @@ namespace Umami.Net.Helpers;
 
 public class JwtDecoder(ILogger<JwtDecoder> logger)
 {
-    public async Task<JwtPayload?> DecodeResponse(HttpResponseMessage responseMessage)
+    public async Task<JwtPayload?> DecodeResponse(string content)
     {
         try
         {
-            var content = await responseMessage.Content.ReadAsStringAsync();
             return DecodeJwt(content);
         }
         catch (Exception e)

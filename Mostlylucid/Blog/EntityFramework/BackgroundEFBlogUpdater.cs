@@ -1,10 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Mostlylucid.Blog;
-using Mostlylucid.EntityFramework;
-using Serilog;
-using SerilogTracing;
-
-public class BackgroundEFBlogUpdater(IServiceScopeFactory scopeFactory, ILogger<BackgroundEFBlogUpdater> logger)
+﻿public class BackgroundEFBlogUpdater(IServiceScopeFactory scopeFactory, ILogger<BackgroundEFBlogUpdater> logger)
     : IHostedService, IDisposable
 {
     private Task _backgroundTask = Task.CompletedTask;

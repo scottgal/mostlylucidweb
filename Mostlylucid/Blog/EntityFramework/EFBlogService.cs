@@ -1,11 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Mostlylucid.EntityFramework;
-using Mostlylucid.EntityFramework.Models;
+﻿using Mostlylucid.EntityFramework.Models;
 using Mostlylucid.Mappers;
 using Mostlylucid.Models.Blog;
-using Serilog;
 using Serilog.Events;
-using SerilogTracing;
 
 namespace Mostlylucid.Blog.EntityFramework;
 

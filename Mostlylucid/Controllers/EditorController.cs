@@ -1,37 +1,25 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
-using Mostlylucid.Blog;
-using Mostlylucid.Config;
-using Mostlylucid.Config.Markdown;
-using Mostlylucid.Helpers;
-using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.MarkdownTranslator.Models;
-using Mostlylucid.Models.Blog;
 using Mostlylucid.Models.Editor;
+using Mostlylucid.Services;
 
 namespace Mostlylucid.Controllers;
 
 [Route("editor")]
 public class EditorController(
-    IBlogService blogService,
-    AuthSettings authSettings,
-    AnalyticsSettings analyticsSettings,
+    BaseControllerService baseControllerService,
     TranslateCacheService translateCacheService,
     TranslateServiceConfig translateServiceConfig,
-    ILogger<EditorController> logger) : BaseController(authSettings,
-    analyticsSettings, blogService, logger)
+    ILogger<EditorController> logger) : BaseController(baseControllerService, logger)
 {
-
-    
     [HttpGet]
     [Route("edit")]
     public async Task<IActionResult> Edit(string? slug = null, string language = "")
     {
-
         var userId = UserId;
         var tasks = translateCacheService.GetTasks(userId);
-        var translations = tasks.Select(x=> new TranslateResultTask(x, false)).ToList();
-        var userInRole =await GetUserInfo();
+        var translations = tasks.Select(x => new TranslateResultTask(x)).ToList();
+        var userInRole = await GetUserInfo();
         var editorModel = new EditorModel
         {
             Languages = translateServiceConfig.Languages.ToList(),
@@ -48,11 +36,8 @@ public class EditorController(
             return View("Editor", editorModel);
         }
 
-        var blogPost = await blogService.GetPost(slug, language);
-        if (blogPost == null)
-        {
-            return NotFound();
-        }
+        var blogPost = await BlogService.GetPost(slug, language);
+        if (blogPost == null) return NotFound();
 
         editorModel.Markdown = blogPost.Markdown;
         editorModel.PostViewModel = blogPost;
@@ -65,10 +50,7 @@ public class EditorController(
     {
         var userId = UserId;
         var tasks = translateCacheService.GetTasks(userId);
-        var translations = tasks.Select(x=> new TranslateResultTask(x, false)).ToList();
+        var translations = tasks.Select(x => new TranslateResultTask(x)).ToList();
         return PartialView("_GetTranslations", translations);
     }
-    
-
-
 }

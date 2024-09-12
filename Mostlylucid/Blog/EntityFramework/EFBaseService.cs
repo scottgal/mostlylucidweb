@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Mostlylucid.EntityFramework;
-using Mostlylucid.EntityFramework.Models;
+﻿using Mostlylucid.EntityFramework.Models;
 using Mostlylucid.Helpers;
 using Mostlylucid.Models.Blog;
 

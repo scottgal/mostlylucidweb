@@ -144,7 +144,7 @@ public class UmamiClient(
                 return new UmamiDataResponse(UmamiDataResponse.ResponseStatus.BotDetected);
 
             case true:
-                var decoded = await jwtDecoder.DecodeResponse(responseMessage);
+                var decoded = await jwtDecoder.DecodeResponse(responseString);
                 if (decoded == null)
                 {
                     logger.LogError("Failed to decode response from Umami");

@@ -1,10 +1,6 @@
 ﻿using System.Net;
 using Microsoft.Extensions.Caching.Memory;
-using Mostlylucid.Blog;
-using Serilog;
 using Serilog.Events;
-using SerilogTracing;
-using Umami.Net.UmamiData;
 using Umami.Net.UmamiData.Models.RequestObjects;
 using Umami.Net.UmamiData.Models.ResponseObjects;
 
