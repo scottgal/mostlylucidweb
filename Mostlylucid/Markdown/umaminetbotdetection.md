@@ -17,6 +17,12 @@ Feedbin feed-id:1234 - 21 subscribers
 ```
 So pretty useful right, it passes some useful details about what your feed id is, the number of users and the user agent. However, this is also a problem as it means that Umami will ignore the request; in fact it'll return a 200 status BUT the content contains `{"beep": "boop"}` meaning that this is identified as a bot request. This is annoying as I can't handle this through normal error handling (it's a 200, not say a 403 etc).
 
+When we look at the Umami Dashboard after making this change I can now see the original UserAgents which requested the feed:
+
+![Umami Dashboard](user-agents.png?width=600&format=webp&quality=30)
+
+So we can see there's now a bunch which would have triggered the bot detection but we can now see these AND track the requests.
+
 # The Solution
 So what's the solution to this? I can't manually parse all these requests and detect if Umami will detect them as a bot; it uses IsBot (https://www.npmjs.com/package/isbot) to detect if a request is a bot or not. There's no C# equivalent and it's a changing list so I can't even use that list (in future I MAY get clever and use the list to detect if a request is a bot or not).
 So I need to intercept the request before it gets to Umami and change the User Agent to something that Umami will accept for specific requests. 

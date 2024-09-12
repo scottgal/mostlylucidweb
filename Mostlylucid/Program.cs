@@ -1,3 +1,4 @@
+using System.Reflection;
 using Mostlylucid.Services;
 using Umami.Net.Models;
 
@@ -114,7 +115,7 @@ try
         var path = context.Request.Path.Value;
         if (path.EndsWith("RSS", StringComparison.OrdinalIgnoreCase))
         {
-            var rss = context.RequestServices.GetRequiredService<UmamiBackgroundSender>();
+          var rss = context.RequestServices.GetRequiredService<UmamiBackgroundSender>();
            await rss.Track("RSS",useDefaultUserAgent: true);
       
         }

@@ -11,9 +11,21 @@ public class PayloadService(
     UmamiClientSettings settings,
     ILogger<PayloadService> logger)
 {
-    public static string DefaultUserAgent =>
-        $"Mozilla/5.0 (Windows 11)  Umami.Net/{Assembly.GetAssembly(typeof(UmamiClient))!.GetName().Version}";
 
+    public static string DefaultUserAgent => _userAgent ??= GetVersion();
+
+    private static string? _userAgent;
+    private static string GetVersion()
+    {
+        var informationalVersion = typeof(UmamiClient).Assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
+            ?.InformationalVersion;
+
+        var subVersion = informationalVersion?.Split('+')[0];
+        return $"Mozilla/5.0 (Windows 11) Umami.Net/{subVersion}";
+    }
+
+    
     public UmamiPayload PopulateFromPayload(UmamiPayload? payload, UmamiEventData? data)
     {
         var newPayload = GetPayload(data: data);
