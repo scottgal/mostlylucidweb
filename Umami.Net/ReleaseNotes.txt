@@ -37,3 +37,7 @@ Adds multiple Decode endpoints which return a decoded response.
 0.4.0 
 Adds new ability to specify the default UserAgent for the UmamiClient. This is used to avoid the IsBot detection in Umami.
 Adds new Status for the UmamiDataResponse, this will tell you if a request has been identified as a bot.
+
+0.4.1
+Fixes a bug in the UmamiBackgroundSender where the Original UserAgent was not being set correctly.
+Adds tests for the UmamiBackgroundSender.
