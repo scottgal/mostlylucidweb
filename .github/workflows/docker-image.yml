@@ -24,33 +24,11 @@ jobs:
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USER_NAME }}" --password-stdin
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-        with:
-          install: true
-
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-buildx-
-
-      - name: Load cache from Docker Hub
-        run: |
-          docker buildx create --use
-          docker pull ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:cache || true
-
       - name: Build and tag the Docker image
         id: build
         run: |
-          set -e  # Stop on any error
           TIMESTAMP=$(date +%s)
           echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
-          
-          # Debugging: Check the branch ref
-          echo "GITHUB REF: ${{ github.ref }}"
           
           # Define the default tags for the main branch
           TAGS="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest"
@@ -62,23 +40,11 @@ jobs:
             ADDITIONAL_TAG="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:$TIMESTAMP-local"
           fi
           
-          # Debugging: Print the tags
-          echo "TAGS: $TAGS"
-          echo "ADDITIONAL TAG: $ADDITIONAL_TAG"
-          
-          # Build the Docker image with the appropriate tags, utilizing cache and pushing the image
-          docker buildx build \
-            --file Mostlylucid/Dockerfile \
-            --tag $TAGS \
-            --tag $ADDITIONAL_TAG \
-            --cache-from ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:cache \
-            --cache-to type=registry,ref=${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:cache,mode=max \
-            --push \
-            .
+          # Build the Docker image with the appropriate tags
+          docker build . --file Mostlylucid/Dockerfile --tag $TAGS --tag $ADDITIONAL_TAG
 
       - name: Push the Docker image to Docker Hub
         run: |
-          set -e  # Stop on any error
           # Push the appropriate tags based on the branch
           if [ "${{ github.ref }}" == "refs/heads/local" ]; then
             docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:local
@@ -86,7 +52,4 @@ jobs:
           else
             docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:latest
             docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:${{ env.TIMESTAMP }}
-          fi  # <- Closing the if-else block with fi
-
-      - name: Push Docker cache to Docker Hub
-        run: docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid:cache
+          fi
