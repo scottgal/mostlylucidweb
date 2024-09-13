@@ -1,7 +1,9 @@
-﻿using System.Threading.Channels;
+﻿using System.Diagnostics;
+using System.Threading.Channels;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Helpers;
 using Serilog.Core;
+using Serilog.Events;
 
 namespace Mostlylucid.MarkdownTranslator;
 
@@ -160,6 +162,7 @@ public class BackgroundTranslateService(
             var tcs = new TaskCompletionSource<TaskCompletion>();
             await _translations.Writer.WriteAsync((translateMessage, tcs));
             tasks.Add(tcs.Task);
+            break;
         }
 
         return tasks;
@@ -235,9 +238,17 @@ public class BackgroundTranslateService(
         (PageTranslationModel, TaskCompletionSource<TaskCompletion>) item,
         TaskCompletionSource<TaskCompletion> tcs)
     {
+        using var activity= Log.Logger.StartActivity("Translate to {Language} for File {FileName}",          translateModel.Language, string.IsNullOrEmpty(translateModel.OriginalFileName) ? "No File" : translateModel.OriginalFileName);
+        if(string.IsNullOrEmpty(translateModel.OriginalMarkdown))
+        {
+            tcs.SetResult(new TaskCompletion(null, translateModel.OriginalMarkdown, translateModel.Language, true, DateTime.Now));
+            activity?.Activity?.SetStatus(ActivityStatusCode.Ok, "No markdown to translate");
+            activity?.Complete();
+            return;
+        }
         var scope = scopeFactory.CreateScope();
-        using var activity= Log.Logger.StartActivity("Translate to {Language} for File {FileName}",
-            translateModel.Language, string.IsNullOrEmpty(translateModel.OriginalFileName) ? "No File" : translateModel.OriginalFileName);
+   
+ 
         var slug = Path.GetFileNameWithoutExtension(translateModel.OriginalFileName);
         if (translateModel.Persist)
         {

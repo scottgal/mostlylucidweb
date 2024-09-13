@@ -2,6 +2,7 @@
 using Mostlylucid.Blog.EntityFramework;
 using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Blog.ViewServices;
+using Mostlylucid.Blog.WatcherService;
 using Mostlylucid.Config.Markdown;
 using Npgsql;
 
@@ -42,7 +43,8 @@ public static class BlogSetup
                 services.AddScoped<IBlogPopulator, EFBlogPopulator>();
                 services.AddScoped<BlogSearchService>();
                 services.AddScoped<CommentViewService>();
-                services.AddHostedService<BackgroundEFBlogUpdater>();
+                services.AddSingleton<EFBlogUpdater>();
+                services.AddHostedService<MarkdownDirectoryWatcherService>();
                 break;
         }
         services.AddScoped<IMarkdownBlogService, MarkdownBlogPopulator>();

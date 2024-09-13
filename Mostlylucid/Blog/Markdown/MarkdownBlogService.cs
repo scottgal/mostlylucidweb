@@ -3,7 +3,7 @@ using Mostlylucid.Models.Blog;
 
 namespace Mostlylucid.Blog.Markdown;
 
-public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownFileBlogService
+public class MarkdownBlogService : MarkdownBaseService, IBlogService
 {
     private readonly ILogger<MarkdownBlogService> _logger;
 
@@ -18,6 +18,12 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
         var pages = GetPageCache();
         var categories = pages.Values.SelectMany(x => x.Categories).Distinct().ToList();
         return await Task.FromResult(categories);
+    }
+
+
+    public Task<bool> Delete(string slug, string language)
+    {
+        throw new NotImplementedException();
     }
 
     public Task<string> GetSlug(int postId)
@@ -71,6 +77,12 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService, IMarkdownF
             _logger.LogError(e, "Error saving post {PostName}", slug);
             return new BlogPostViewModel();
         }
+    }
+    
+    public async Task<BlogPostViewModel> SavePost(BlogPostViewModel model)
+    {
+        await SavePost(model.Slug, model.Language, model.Markdown);
+        return model;
     }
 
 

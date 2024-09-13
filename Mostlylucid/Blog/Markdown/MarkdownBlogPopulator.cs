@@ -35,29 +35,11 @@ public class MarkdownBlogPopulator(MarkdownConfig markdownConfig, MarkdownRender
         if(token.IsCancellationRequested) return;
         SetPageCache(pageCache);
     }
-
-
-
-  
-
-    public async Task<BlogPostViewModel?> GetPageFromSlug(string slug, string language = "")
-    {
-
-        var pagePath =Path.Combine(_markdownConfig.MarkdownPath, $"{slug}.md");
-        if (!string.IsNullOrEmpty(language) && language != EnglishLanguage)
-            pagePath = Path.Combine(_markdownConfig.MarkdownTranslatedPath, $"{slug}.{language}.md");
-        if (!File.Exists(pagePath))
-            return null;
-        var model= await GetPage(pagePath);
-        model.Language = language;
-        return model;
-    }
     
-    private async Task<BlogPostViewModel> GetPage(string filePath)
+    
+    public async Task<BlogPostViewModel> GetPage(string filePath)
     {
-      
         var fileInfo = new FileInfo(filePath);
-       
         // Ensure the file exists
         if (!fileInfo.Exists) throw new FileNotFoundException("The specified file does not exist.", filePath);
         // Read all lines from the file

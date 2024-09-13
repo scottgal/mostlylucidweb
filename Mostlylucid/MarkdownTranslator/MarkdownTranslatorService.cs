@@ -1,18 +1,28 @@
-﻿using Markdig.Syntax;
+﻿using Markdig;
+using Markdig.Helpers;
+using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 
 namespace Mostlylucid.MarkdownTranslator;
 
-public class MarkdownTranslatorService(TranslateServiceConfig translateServiceConfig, ILogger<MarkdownTranslatorService> logger, HttpClient client)
+public class MarkdownTranslatorService(
+    TranslateServiceConfig translateServiceConfig,
+    ILogger<MarkdownTranslatorService> logger,
+    HttpClient client)
 {
-    private record PostRecord(string target_lang, string[] text, string source_lang = "en",bool perform_sentence_splitting = true);
-    
-    
+    private record PostRecord(
+        string target_lang,
+        string[] text,
+        string source_lang = "en",
+        bool perform_sentence_splitting = true);
+
+
     private record PostResponse(string target_lang, string[] translated, string source_lang, float translation_time);
 
     public int IPCount => IPs.Length;
 
     private string[] IPs = translateServiceConfig.IPs;
+
     public async ValueTask<bool> IsServiceUp(CancellationToken cancellationToken)
     {
         var workingIPs = new List<string>();
@@ -22,10 +32,17 @@ public class MarkdownTranslatorService(TranslateServiceConfig translateServiceCo
             foreach (var ip in IPs)
             {
                 logger.LogInformation("Checking service status at {IP}", ip);
-                var response = await client.GetAsync($"{ip}/model_name", cancellationToken);
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    workingIPs.Add(ip);
+                    var response = await client.GetAsync($"{ip}/model_name", cancellationToken);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        workingIPs.Add(ip);
+                    }
+                }
+                catch (Exception)
+                {
+                    logger.LogWarning("Service at {IP} is not available", ip);
                 }
             }
 
@@ -41,19 +58,21 @@ public class MarkdownTranslatorService(TranslateServiceConfig translateServiceCo
     }
 
     private int currentIPIndex = 0;
+
     private async Task<string[]> Post(string[] elements, string targetLang, CancellationToken cancellationToken)
     {
         try
         {
-            if(!IPs.Any())
+            if (!IPs.Any())
             {
                 logger.LogError("No IPs available for translation");
                 throw new Exception("No IPs available for translation");
             }
+
             var ip = IPs[currentIPIndex];
-            
+
             logger.LogInformation("Sending request to {IP}", ip);
-        
+
             // Update the index for the next request
             currentIPIndex = (currentIPIndex + 1) % IPs.Length;
             var postObject = new PostRecord(targetLang, elements);
@@ -66,7 +85,8 @@ public class MarkdownTranslatorService(TranslateServiceConfig translateServiceCo
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Error translating markdown: {Message} for strings {Strings}", e.Message, string.Concat( elements, Environment.NewLine));
+            logger.LogError(e, "Error translating markdown: {Message} for strings {Strings}", e.Message,
+                string.Concat(elements, Environment.NewLine));
             throw;
         }
     }
@@ -74,7 +94,8 @@ public class MarkdownTranslatorService(TranslateServiceConfig translateServiceCo
 
     public async Task<string> TranslateMarkdown(string markdown, string targetLang, CancellationToken cancellationToken)
     {
-        var document = Markdig.Markdown.Parse(markdown);
+        var pipeline = new MarkdownPipelineBuilder().UsePreciseSourceLocation().ConfigureNewLine(Environment.NewLine).Build();
+        var document = Markdig.Markdown.Parse(markdown, pipeline);
         var textStrings = ExtractTextStrings(document);
         var batchSize = 5;
         var stringLength = textStrings.Count;
@@ -87,7 +108,9 @@ public class MarkdownTranslatorService(TranslateServiceConfig translateServiceCo
 
 
         ReinsertTranslatedStrings(document, translatedStrings.ToArray());
-        return document.ToMarkdownString();
+        var outString= document.ToMarkdownString();
+        outString = outString.Replace("</summary>", $"</summary>{Environment.NewLine}");
+        return outString;
     }
 
     private List<string> ExtractTextStrings(MarkdownDocument document)
@@ -98,10 +121,12 @@ public class MarkdownTranslatorService(TranslateServiceConfig translateServiceCo
         {
             if (node is LiteralInline literalInline)
             {
-                var content = literalInline.Content.ToString();
-
+                if (literalInline?.Parent?.FirstChild is HtmlInline { Tag: "<datetime class=\"hidden\">" }) continue;
+                
+                var content = literalInline?.Content.ToString();
+                if(content == null) continue;
                 if (!IsWord(content)) continue;
-              
+
                 textStrings.Add(content);
             }
         }
@@ -112,9 +137,11 @@ public class MarkdownTranslatorService(TranslateServiceConfig translateServiceCo
 
     private bool IsWord(string text)
     {
+        
         var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg" };
         if (imageExtensions.Any(text.Contains)) return false;
-        
+
+        if (text == "TOC]") return false;
         return text.Any(char.IsLetter);
     }
 
@@ -126,12 +153,16 @@ public class MarkdownTranslatorService(TranslateServiceConfig translateServiceCo
         {
             if (node is LiteralInline literalInline && index < translatedStrings.Length)
             {
+                if (literalInline?.Parent?.FirstChild is HtmlInline { Tag: "<datetime class=\"hidden\">" }) continue;
+                if(literalInline==null) continue;
                 var content = literalInline.Content.ToString();
-         
                 if (!IsWord(content)) continue;
-                literalInline.Content = new Markdig.Helpers.StringSlice(translatedStrings[index]);
+                var translatedContent = translatedStrings[index];
+                literalInline.Content = new StringSlice(translatedContent, NewLine.CarriageReturnLineFeed);
                 index++;
             }
         }
     }
+    
+
 }
