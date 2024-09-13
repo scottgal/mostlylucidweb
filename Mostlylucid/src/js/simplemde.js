@@ -118,6 +118,10 @@ let simplemdeInstance = {};
             // Initialize a new SimpleMDE instance and store it in the map
             simplemdeInstance = new SimpleMDE({
                 forceSync: true,
+                renderingConfig: {
+                    singleLineBreaks: true,
+                    codeSyntaxHighlighting: true,
+                },
                 element: element,
                 toolbar: [
                     "bold", "italic", "heading", "|", "quote", "unordered-list", "ordered-list", "|",

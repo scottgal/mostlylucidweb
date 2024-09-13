@@ -1,7 +1,7 @@
 ﻿@model Mostlylucid.Models.Contact.ContactViewModel
 <form asp-action="Submit" hx-boost="true" hx-push-url="false" hx-target="#Comment" method="post" x-data >
         @Html.AntiForgeryToken()
-        <div class="max-w-none border-b border-grey-lighter py-2 dark:prose-dark sm:py-2" x-data="{ initializeEditor() { window.mostlylucid.simplemde.initialize('contactform', true)  } }"
+        <div class="max-w-none border-b border-grey-lighter py-2  sm:py-2" x-data="{ initializeEditor() { window.mostlylucid.simplemde.initialize('contactform', true)  } }"
              x-init="initializeEditor()">
             <div asp-validation-summary="All" class="text-red-500" id="validationsummary"></div>
             <!-- Username Input -->
@@ -26,7 +26,7 @@
 
             <input type="hidden" id="hiddenComment" name="comment"/>
             <!-- Comment Textarea -->
-            <textarea  class="textarea textarea-bordered w-full mt-2 hidden" id="contactform"  placeholder="Your comment...">@Model.Comment</textarea>
+            <textarea  class="w-full mt-2 hidden" id="contactform"  >@Model.Comment</textarea>
             <!-- Submit Button -->
             <button class="btn btn-accent mt-2 text-black"
                     type="submit"

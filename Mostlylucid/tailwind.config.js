@@ -1,12 +1,13 @@
 ﻿const defaultTheme = require("tailwindcss/defaultTheme");
 
 module.exports = {
+    
     variants: {
         extend: {
             display: ['print']
         },
     },
-    content: ["./**/*.html", "./**/*.cshtml"],
+    content: ["./Views/**/*.cshtml"],
     safelist: ["dark"],
     darkMode: "class",
     theme: {        

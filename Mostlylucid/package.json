@@ -28,7 +28,6 @@
   },
   "dependencies": {
     "alpinejs": "^3.14.1",
-    "flag-icons": "^7.2.3",
     "highlight.js": "^11.10.0",
     "highlightjs-cshtml-razor": "^2.1.1",
     "htmx.org": "^2.0.1",

@@ -9,13 +9,17 @@ module.exports = (env, argv) => {
         mode: isProduction ? 'production' : 'development', // Set mode based on environment
         entry: './src/js/main.js', // Your entry file
         output: {
-            filename: 'main.js',
-            path: path.resolve(__dirname, 'wwwroot/js/dist'), // Corrected output directory path
+                filename: '[name].[contenthash].js',  // Use unique name for each chunk
+                clean: true,  // To clean up old files before each build
+            path: path.resolve(__dirname, 'wwwroot/js/dist') // Corrected output directory path
         },
         resolve: {
             extensions: ['.js'], // Optional but fine to include
         },
         optimization: {
+            splitChunks: {
+                chunks: 'all',  // This splits all types of chunks
+            },
             minimize: isProduction, // Only minimize in production mode
             minimizer: isProduction ? [
                 new TerserPlugin({
@@ -40,5 +44,5 @@ module.exports = (env, argv) => {
         },
         // Add the devtool property for source maps
         devtool: isProduction ? 'source-map' : 'eval-source-map', // Use full source maps for production and eval-source-map for development
-    };
-};
+    }
+}

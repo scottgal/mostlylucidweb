@@ -7,6 +7,11 @@
     background-color: rgb(128 0 0 / var(--tw-bg-opacity));
 }
 
+
+.text-red-500 {
+    --tw-text-opacity: 1;
+    color: rgb(209 0 0 / var(--tw-text-opacity));
+}
 .hover\:bg-red:hover {
     --tw-bg-opacity: 1;
     background-color: rgb(128 0 0 / var(--tw-bg-opacity));

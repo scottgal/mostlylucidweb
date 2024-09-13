@@ -2,7 +2,7 @@
 
  
 <div x-data="{ initializeEditor() { window.mostlylucid.comments.setup()  } }"
-     x-init="initializeEditor()" class="max-w-none dark:prose-dark" id="commentform">
+     x-init="initializeEditor()" class="max-w-none" id="commentform">
     <section id="commentsection" ></section>
     
     <input type="hidden" asp-for="BlogPostId" />
@@ -19,17 +19,15 @@
             <input type="text" class="grow text-black dark:text-white bg-transparent border-0"
                    asp-for="Name" placeholder="Name (required)" />
         </label>
-
         <!-- Email Input -->
         <label class="input input-bordered flex items-center gap-2 mb-2 dark:bg-custom-dark-bg bg-white w-1/2">
             <i class='bx bx-envelope'></i>
             <input type="email" class="grow text-black dark:text-white bg-transparent border-0"
                    asp-for="Email" placeholder="Email (optional)" />
         </label>
-
     </div>
 
-    <textarea id="commenteditor" class="hidden w-full h-44 dark:bg-custom-dark-bg bg-white text-black dark:text-white rounded-2xl"></textarea>
+    <textarea id="commenteditor" class="hidden w-full h-44 dark:bg-custom-dark-bg bg-white text-black dark:text-white"></textarea>
 
     <input type="hidden" asp-for="ParentId"></input>
     <button class="btn btn-outline btn-sm mb-4" hx-action="Comment" hx-controller="Comment" hx-post hx-vals x-on:click.prevent="window.mostlylucid.comments.setValues($event)"  hx-swap="outerHTML" hx-target="#commentform">Comment</button>
