@@ -10,7 +10,7 @@
 
   <Target Name="BuildCss" BeforeTargets="BeforeBuild">
     <Exec Command="npm run dev" Condition=" '$(Configuration)' == 'Debug' " />
-    <Exec Command="npm run build" Condition=" '$(Configuration)' == 'Release' " EnvironmentVariables="NODE_ENV=production" />
+<!--    <Exec Command="npm run build" Condition=" '$(Configuration)' == 'Release' " EnvironmentVariables="NODE_ENV=production" />-->
   </Target>
   <PropertyGroup>
     <PreserveCompilationContext>true</PreserveCompilationContext>
@@ -67,6 +67,7 @@
       <Folder Include="Markdown\notmoderatedcomments\" />
       <Folder Include="Migrations\" />
       <Folder Include="wwwroot\css\dist\" />
+      <Folder Include="wwwroot\js\dist\" />
       <Folder Include="wwwroot\lib\" />
     </ItemGroup>
     <ItemGroup>
