@@ -2,8 +2,6 @@
 using System.Threading.Channels;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Helpers;
-using Serilog.Core;
-using Serilog.Events;
 
 namespace Mostlylucid.MarkdownTranslator;
 
