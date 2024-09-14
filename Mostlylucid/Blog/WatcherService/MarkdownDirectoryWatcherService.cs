@@ -4,7 +4,10 @@ using Serilog.Events;
 
 namespace Mostlylucid.Blog.WatcherService;
 
-public class MarkdownDirectoryWatcherService(MarkdownConfig markdownConfig, IServiceScopeFactory serviceScopeFactory, ILogger<MarkdownDirectoryWatcherService> logger)
+public class MarkdownDirectoryWatcherService(
+    MarkdownConfig markdownConfig,
+    IServiceScopeFactory serviceScopeFactory,
+    ILogger<MarkdownDirectoryWatcherService> logger)
     : IHostedService
 {
     private Task _awaitChangeTask = Task.CompletedTask;
@@ -23,7 +26,7 @@ public class MarkdownDirectoryWatcherService(MarkdownConfig markdownConfig, ISer
         // Subscribe to events
         _fileSystemWatcher.EnableRaisingEvents = true;
 
-        _awaitChangeTask = Task.Run(()=> AwaitChanges(cancellationToken));
+        _awaitChangeTask = Task.Run(() => AwaitChanges(cancellationToken));
         logger.LogInformation("Started watching directory {Directory}", markdownConfig.MarkdownPath);
 
 
@@ -57,7 +60,6 @@ public class MarkdownDirectoryWatcherService(MarkdownConfig markdownConfig, ISer
             }
             else if (fileEvent.ChangeType == WatcherChangeTypes.Renamed)
             {
-               
             }
         }
     }
@@ -69,12 +71,13 @@ public class MarkdownDirectoryWatcherService(MarkdownConfig markdownConfig, ISer
         var activity = Log.Logger.StartActivity("Markdown File Changed {Name}", e.Name);
         var retryPolicy = Policy
             .Handle<IOException>() // Only handle IO exceptions (like file in use)
-            .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromMilliseconds(500 * retryAttempt), 
+            .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromMilliseconds(500 * retryAttempt),
                 (exception, timeSpan, retryCount, context) =>
                 {
                     activity?.Activity?.SetTag("Retry Attempt", retryCount);
                     // Log the retry attempt
-                    logger.LogWarning("File is in use, retrying attempt {RetryCount} after {TimeSpan}", retryCount, timeSpan);
+                    logger.LogWarning("File is in use, retrying attempt {RetryCount} after {TimeSpan}", retryCount,
+                        timeSpan);
                 });
 
         try
@@ -108,8 +111,10 @@ public class MarkdownDirectoryWatcherService(MarkdownConfig markdownConfig, ISer
                 {
                     var translateService = scope.ServiceProvider.GetRequiredService<BackgroundTranslateService>();
                     await translateService.TranslateForAllLanguages(
-                        new PageTranslationModel(){OriginalFileName = filePath, OriginalMarkdown = blogModel.Markdown,Persist = true});
+                        new PageTranslationModel()
+                            { OriginalFileName = filePath, OriginalMarkdown = blogModel.Markdown, Persist = true });
                 }
+
                 activity?.Activity?.SetTag("Page Saved", blogModel.Slug);
             });
 
@@ -123,31 +128,43 @@ public class MarkdownDirectoryWatcherService(MarkdownConfig markdownConfig, ISer
 
     private void OnDeleted(WaitForChangedResult e)
     {
-        if(e.Name == null) return;
-        var isTranslated = Path.GetFileNameWithoutExtension(e.Name).Contains(".");
-        var language = MarkdownBaseService.EnglishLanguage;
-        var slug = Path.GetFileNameWithoutExtension(e.Name);
-        if (isTranslated)
+        if (e.Name == null) return;
+        var activity = Log.Logger.StartActivity("Markdown File Deleting {Name}", e.Name);
+        try
         {
-            var name = Path.GetFileNameWithoutExtension(e.Name).Split('.');
-            language = name.Last();
-            slug = name.First();
-            
-        }
-        else
-        {
-            var translatedFiles = Directory.GetFiles(markdownConfig.MarkdownTranslatedPath, $"{slug}.*.*");
-            _fileSystemWatcher.EnableRaisingEvents = false;
-            foreach (var file in translatedFiles)
+            var isTranslated = Path.GetFileNameWithoutExtension(e.Name).Contains(".");
+            var language = MarkdownBaseService.EnglishLanguage;
+            var slug = Path.GetFileNameWithoutExtension(e.Name);
+            if (isTranslated)
             {
-                File.Delete(file);
+                var name = Path.GetFileNameWithoutExtension(e.Name).Split('.');
+                language = name.Last();
+                slug = name.First();
             }
-            _fileSystemWatcher.EnableRaisingEvents = true;
+            else
+            {
+                var translatedFiles = Directory.GetFiles(markdownConfig.MarkdownTranslatedPath, $"{slug}.*.*");
+                _fileSystemWatcher.EnableRaisingEvents = false;
+                foreach (var file in translatedFiles)
+                {
+                    File.Delete(file);
+                }
+
+                _fileSystemWatcher.EnableRaisingEvents = true;
+            }
+
+            var scope = serviceScopeFactory.CreateScope();
+            var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            blogService.Delete(slug, language);
+            activity?.Activity?.SetTag("Page Deleted", slug);
+            activity?.Complete();
+            logger.LogInformation("Deleted blog post {Slug} in {Language}", slug, language);
         }
-        var scope = serviceScopeFactory.CreateScope();
-        var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
-        blogService.Delete(slug, language);
-   
+        catch (Exception exception)
+        {
+            activity?.Complete(LogEventLevel.Error, exception);
+            logger.LogError("Error deleting blog post {Slug}", e.Name);
+        }
     }
 
     private void OnRenamed(object sender, RenamedEventArgs e)

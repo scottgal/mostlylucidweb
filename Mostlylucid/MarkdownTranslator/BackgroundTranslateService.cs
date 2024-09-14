@@ -162,7 +162,6 @@ public class BackgroundTranslateService(
             var tcs = new TaskCompletionSource<TaskCompletion>();
             await _translations.Writer.WriteAsync((translateMessage, tcs));
             tasks.Add(tcs.Task);
-            break;
         }
 
         return tasks;
