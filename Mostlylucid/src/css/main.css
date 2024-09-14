@@ -17,6 +17,10 @@
     background-color: rgb(128 0 0 / var(--tw-bg-opacity));
 }
 
+.text-primary {
+    --tw-text-opacity: 1;
+    color: #2a2a2a;
+}
 
 #contentcontainer {
     height: 100%;

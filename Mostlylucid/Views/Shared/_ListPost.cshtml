@@ -7,8 +7,7 @@
     <div class="flex space-x-2 items-center py-4">
     @foreach (var category in Model.Categories)
     {
-    <a hx-controller="Blog" hx-action="Category" class="rounded-full bg-blue-dark font-body text-sm text-white px-2 py-1 outline outline-1 outline-white" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>@category
-    </a>
+        <partial name="_Category" model="category"/>
     }
 
     @{ var languageModel = (Model.Slug, Model.Languages, Model.Language); }

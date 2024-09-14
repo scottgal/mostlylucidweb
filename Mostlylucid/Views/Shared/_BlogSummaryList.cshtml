@@ -23,15 +23,15 @@
     
     @if (ViewBag.Categories != null)
     {
-        <div class="mb-8 mt-6 border-b-neutral-600 border rounded-xl" x-data="{ showCategories: false }">
+        <div class="mb-8 mt-6 border-neutral-400 dark:border-neutral-600 border rounded-lg" x-data="{ showCategories: false }">
             <h4 
-                class="px-5 py-2 font-body text-lg text-primary dark:text-white w-full flex justify-between items-center cursor-pointer"
+                class="px-5 py-1 bg-neutral-500  bg-opacity-10 rounded-lg  font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer"
                 x-on:click="showCategories = !showCategories"
             >
                 Categories
                 <span>
                     <i
-                        class="bx text-xl"
+                        class="bx text-2xl"
                         :class="showCategories ? 'bx-chevron-up' : 'bx-chevron-down'"
                     ></i>
                 </span>
@@ -47,9 +47,7 @@
             >
                 @foreach (var category in ViewBag.Categories)
                 {
-                    <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href="#">
-                        <span class="inline-block rounded-full bg-blue-light dark:bg-blue-dark px-2 py-1 font-body text-sm text-black dark:text-white outline-1 outline outline-blue-dark dark:outline-grey">@category</span>
-                    </a>
+                    <partial name="_Category" model="category"/>
                 }
            
             </div>

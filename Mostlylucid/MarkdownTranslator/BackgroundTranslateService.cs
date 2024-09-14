@@ -2,6 +2,8 @@
 using System.Threading.Channels;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Helpers;
+using Polly;
+using Serilog.Events;
 
 namespace Mostlylucid.MarkdownTranslator;
 
@@ -21,24 +23,35 @@ public class BackgroundTranslateService(
 
     public bool TranslationServiceUp { get; set; }
     private Task _sendTask = Task.CompletedTask;
+    private Task _startTask = Task.CompletedTask;
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public  Task StartAsync(CancellationToken cancellationToken)
     {
-        
-        if (!await StartupHealthCheck(cancellationToken))
-        {
-            TranslationServiceUp = false;
-            logger.LogError("Translation service is not available");
-        }
-        TranslationServiceUp = true;
-        _healthCheckTask = PeriodicHealthCheck(cancellationToken);
-
-        _sendTask = TranslateFilesAsync(cancellationTokenSource.Token);
-        if (translateServiceConfig.Enabled)
-            await TranslateAllFilesAsync();
+        _startTask =  Task.Run(()=> StartChecks(cancellationToken));
+        return Task.CompletedTask;
     }
 
 
+    private async Task StartChecks(CancellationToken cancellationToken)
+    {
+        await StartupHealthCheck(cancellationToken);
+
+        if (TranslationServiceUp)
+        {
+            _healthCheckTask = PeriodicHealthCheck(cancellationToken);
+
+            _sendTask = TranslateFilesAsync(cancellationTokenSource.Token);
+            if (translateServiceConfig.Enabled)
+                await TranslateAllFilesAsync();
+        }
+        else
+        {
+            logger.LogError("Translation service is not available");
+            _translations.Writer.Complete();
+            await cancellationTokenSource.CancelAsync();
+        }
+    }
+    
     public async Task StopAsync(CancellationToken cancellationToken)
     {
         _translations.Writer.Complete();
@@ -46,32 +59,48 @@ public class BackgroundTranslateService(
         logger.LogInformation("Background translation service stopped");
     }
 
-    private async Task<bool> StartupHealthCheck(CancellationToken cancellationToken)
+    private async Task StartupHealthCheck(CancellationToken cancellationToken)
     {
-        var count = 1;
-        var isUp = false;
-        while (true)
+        var retryPolicy = Policy
+            .HandleResult<bool>(result => !result) // Retry when Ping returns false (service not available)
+            .WaitAndRetryAsync(3, // Retry 3 times
+                attempt => TimeSpan.FromSeconds(5), // Wait 5 seconds between retries
+                (result, timeSpan, retryCount, context) =>
+                {
+                    logger.LogWarning("Translation service is not available, retrying attempt {RetryCount}", retryCount);
+                });
+
+        try
         {
-            if (await Ping(cancellationToken))
+            var isUp = await retryPolicy.ExecuteAsync(async () =>
+            {
+                return await Ping(cancellationToken); // Ping to check if the service is up
+            });
+
+            if (isUp)
             {
                 logger.LogInformation("Translation service is available");
-                isUp = true;
-                break;
+                TranslationServiceUp = true;
             }
-            await Task.Delay(5000, cancellationToken);
-            count++;
-            if (count > 3)
+            else
             {
-             logger.LogError("Translation service is not available");
-                _translations.Writer.Complete();
-                await cancellationTokenSource.CancelAsync();
-                isUp = false;
-                break;
+                logger.LogError("Translation service is not available after retries");
+                await HandleTranslationServiceFailure();
+                TranslationServiceUp = false;
             }
-            logger.LogWarning("Translation service is not available trying again (count: {Count})", count);
         }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An error occurred while checking the translation service availability");
+            await HandleTranslationServiceFailure();
+            TranslationServiceUp = false;
+        }
+    }
 
-        return isUp;
+    private async Task HandleTranslationServiceFailure()
+    {
+        _translations.Writer.Complete();
+        await cancellationTokenSource.CancelAsync();
     }
 
     private async Task PeriodicHealthCheck(CancellationToken cancellationToken)
@@ -274,7 +303,7 @@ public class BackgroundTranslateService(
 
             if (item.Item1.Persist)
             {
-                await PersistTranslation(scope, slug, translateModel, translatedMarkdown);
+                await PersistTranslation(scope, slug, translateModel, translatedMarkdown, activity);
             }
             
             activity?.Complete();
@@ -285,7 +314,7 @@ public class BackgroundTranslateService(
             activity?.Activity?.SetTag("Error", e.Message);
             logger.LogError(e, "Error translating {File} to {Language}", translateModel.OriginalFileName,
                 translateModel.Language);
-            
+            activity?.Complete(LogEventLevel.Error, e);
             tcs.SetException(e);
         }
     }
@@ -299,13 +328,24 @@ public class BackgroundTranslateService(
         return !entryExists || entryChanged;
     }
     
-    private async Task PersistTranslation(IServiceScope scope,string slug, PageTranslationModel translateModel, string translatedMarkdown)
+    private async Task PersistTranslation(IServiceScope scope,string slug, PageTranslationModel translateModel, string translatedMarkdown, LoggerActivity? activity)
     {
+        activity?.Activity?.SetTag("Persisting", slug);
+        try
+        {
+
+       
         var blogService = translateServiceConfig.Mode == AutoTranslateMode.SaveToDisk
             ? scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>()
             : scope.ServiceProvider.GetRequiredService<IBlogService>(); 
         _ = await blogService.SavePost(slug, translateModel.Language,
             translatedMarkdown);
+        }
+        catch (Exception e)
+        {
+           activity?.Activity?.SetTag("Error", e.Message);
+           throw;
+        }
     }
 }
 

@@ -15,11 +15,7 @@
         <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2 print:hidden">
             @foreach (var category in Model.Categories)
             {
-
-                <a hx-boost="true"   hx-target="#contentcontainer"  asp-action="Category" asp-controller="Blog" asp-route-category="@category">
-                    <span
-                        class="inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">@category</span>
-                </a>
+                <partial name="_Category" model="category"/>
             }
             <a asp-action="Edit" class="ml-4 text-sm  btn-sm btn btn-outline btn-primary" asp-controller="Editor" asp-route-slug="@Model.Slug" asp-route-language="@Model.Language" ><i class=" bx bx-edit"></i> edit</a>
         </div>

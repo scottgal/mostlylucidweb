@@ -1,0 +1,6 @@
+﻿@model string
+
+
+<a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@Model" href="#">
+    <span class="inline-block rounded-full bg-blue-light dark:bg-blue-dark bg-opacity-20 px-2 py-1 font-body text-sm text-black dark:text-white outline-1 outline outline-blue-light dark:outline-blue-dark " >@Model</span>
+</a>

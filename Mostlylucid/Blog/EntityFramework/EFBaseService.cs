@@ -6,32 +6,48 @@ namespace Mostlylucid.Blog.EntityFramework;
 
 public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService> logger)
 {
-    protected  readonly IMostlylucidDBContext Context = context;
+    protected readonly IMostlylucidDBContext Context = context;
     protected readonly ILogger<EFBaseService> Logger = logger;
 
-    public async Task<List<string>> GetCategories() => await Context.Categories.Select(x => x.Name).ToListAsync();
-    
-    protected IQueryable<BlogPostEntity> PostsQuery()=>Context.BlogPosts.Include(x => x.Categories)
-        .Include(x => x.LanguageEntity);
+    public async Task<List<string>> GetCategories()
+    {
+        return await Context.Categories.Select(x => x.Name).ToListAsync();
+    }
 
-    protected async Task<BlogPostEntity?> SavePost(BlogPostViewModel post, BlogPostEntity? currentPost =null ,
+    protected IQueryable<BlogPostEntity> PostsQuery()
+    {
+        return Context.BlogPosts.Include(x => x.Categories)
+            .Include(x => x.LanguageEntity);
+    }
+
+    protected async Task<BlogPostEntity?> SavePost(BlogPostViewModel post, BlogPostEntity? currentPost = null,
         List<CategoryEntity>? categories = null,
         List<LanguageEntity>? languages = null)
     {
         if (languages == null)
             languages = await Context.Languages.ToListAsync();
 
-    var postLanguageEntity = languages.FirstOrDefault(x => x.Name == post.Language);
+        var postLanguageEntity = languages.FirstOrDefault(x => x.Name == post.Language);
         if (postLanguageEntity == null)
         {
             Logger.LogError("Language {Language} not found", post.Language);
             return null;
         }
+
         categories ??= await Context.Categories.Where(x => post.Categories.Contains(x.Name)).ToListAsync();
-         currentPost ??= await PostsQuery().Where(x=>x.Slug == post.Slug && x.LanguageEntity == postLanguageEntity).FirstOrDefaultAsync();
+        currentPost ??= await PostsQuery().Where(x => x.Slug == post.Slug && x.LanguageEntity == postLanguageEntity)
+            .FirstOrDefaultAsync();
         try
         {
             var hash = post.Markdown.ContentHash();
+            //Add an inital check, if the current post is the same as the new post's hash, then we can skip the rest of the checks
+            if (hash == currentPost?.ContentHash)
+            {
+                Logger.LogInformation("Post Hash {Post} for language {Language} has not changed", post.Slug,
+                    post.Language);
+                return currentPost;
+            }
+
             var currentCategoryNames = currentPost?.Categories.Select(x => x.Name).ToArray() ?? Array.Empty<string>();
             var categoriesChanged = false;
             if (!currentCategoryNames.All(post.Categories.Contains) ||
@@ -43,13 +59,13 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
 
             var dateChanged = currentPost?.PublishedDate.UtcDateTime.Date != post.PublishedDate.ToUniversalTime().Date;
             var titleChanged = currentPost?.Title != post.Title;
-            if (!titleChanged && !dateChanged && hash == currentPost?.ContentHash && !categoriesChanged)
+            if (!titleChanged && !dateChanged && !categoriesChanged)
             {
                 Logger.LogInformation("Post {Post} has not changed", post.Slug);
                 return currentPost;
             }
 
-            
+
             var blogPost = currentPost ?? new BlogPostEntity();
             blogPost.Title = post.Title;
             blogPost.Slug = post.Slug;
@@ -71,6 +87,7 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
                 Logger.LogInformation("Adding new post {Post}", post.Slug);
                 Context.BlogPosts.Add(blogPost); // Add a new post
             }
+
             return blogPost;
         }
         catch (Exception e)
@@ -80,6 +97,4 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
 
         return null;
     }
-    
-
 }

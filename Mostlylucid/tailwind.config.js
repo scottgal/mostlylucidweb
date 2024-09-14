@@ -8,7 +8,7 @@ module.exports = {
         },
     },
     content: ["./Views/**/*.cshtml"],
-    safelist: ["dark"],
+    safelist: ["dark", "light"],
     darkMode: "class",
     theme: {        
         fontFamily: {
