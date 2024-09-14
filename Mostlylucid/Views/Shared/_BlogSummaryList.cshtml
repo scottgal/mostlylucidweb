@@ -23,17 +23,38 @@
     
     @if (ViewBag.Categories != null)
     {
-        <div class="pb-3">
-            <h4 class="font-body text-lg text-primary dark:text-white">Categories</h4>
-            <div class="flex flex-wrap gap-2 pt-2">
+        <div class="mb-8 mt-6 border-b-neutral-600 border rounded-xl" x-data="{ showCategories: false }">
+            <h4 
+                class="px-5 py-2 font-body text-lg text-primary dark:text-white w-full flex justify-between items-center cursor-pointer"
+                x-on:click="showCategories = !showCategories"
+            >
+                Categories
+                <span>
+                    <i
+                        class="bx text-xl"
+                        :class="showCategories ? 'bx-chevron-up' : 'bx-chevron-down'"
+                    ></i>
+                </span>
+            </h4>
+            <div 
+                class="flex flex-wrap gap-2 pt-2 pl-5 pr-5 pb-2"
+                x-show="showCategories" 
+                x-cloak
+                x-transition:enter="max-h-0 opacity-0"
+                x-transition:enter-end="max-h-screen opacity-100"
+                x-transition:leave="max-h-screen opacity-100"
+                x-transition:leave-end="max-h-0 opacity-0"
+            >
                 @foreach (var category in ViewBag.Categories)
                 {
-                    <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href>
-                        <span class="inline-block rounded-full dark bg-blue-dark px-2 py-1 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">@category</span>
+                    <a hx-controller="Blog" hx-action="Category" hx-push-url="true" hx-get hx-target="#contentcontainer" hx-route-category="@category" href="#">
+                        <span class="inline-block rounded-full bg-blue-light dark:bg-blue-dark px-2 py-1 font-body text-sm text-black dark:text-white outline-1 outline outline-blue-dark dark:outline-grey">@category</span>
                     </a>
                 }
+           
             </div>
         </div>
+
     }
     @foreach (var post in Model.Posts)
     {

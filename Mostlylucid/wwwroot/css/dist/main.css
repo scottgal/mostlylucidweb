@@ -2836,6 +2836,9 @@ html {
 .mt-3 {
   margin-top: 0.75rem;
 }
+.mt-6 {
+  margin-top: 1.5rem;
+}
 .block {
   display: block;
 }
@@ -2874,6 +2877,9 @@ html {
 }
 .h-\[39px\] {
   height: 39px;
+}
+.max-h-0 {
+  max-height: 0px;
 }
 .max-h-screen {
   max-height: 100vh;
@@ -3049,6 +3055,10 @@ html {
   padding-left: 1rem;
   padding-right: 1rem;
 }
+.px-5 {
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
 .py-0 {
   padding-top: 0px;
   padding-bottom: 0px;
@@ -3068,9 +3078,6 @@ html {
 .pb-2 {
   padding-bottom: 0.5rem;
 }
-.pb-3 {
-  padding-bottom: 0.75rem;
-}
 .pb-4 {
   padding-bottom: 1rem;
 }
@@ -3086,8 +3093,14 @@ html {
 .pl-4 {
   padding-left: 1rem;
 }
+.pl-5 {
+  padding-left: 1.25rem;
+}
 .pr-2 {
   padding-right: 0.5rem;
+}
+.pr-5 {
+  padding-right: 1.25rem;
 }
 .pr-6 {
   padding-right: 1.5rem;
@@ -3183,6 +3196,9 @@ html {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
+.opacity-0 {
+  opacity: 0;
+}
 .opacity-100 {
   opacity: 1;
 }
@@ -3209,6 +3225,9 @@ html {
 }
 .outline-1 {
   outline-width: 1px;
+}
+.outline-blue-dark {
+  outline-color: #072344;
 }
 .outline-green-dark {
   outline-color: #065a68;
@@ -3667,6 +3686,10 @@ html {
 .dark\:text-white:is(.dark *) {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.dark\:outline-grey:is(.dark *) {
+  outline-color: #adb6c4;
 }
 
 .dark\:outline-white:is(.dark *) {

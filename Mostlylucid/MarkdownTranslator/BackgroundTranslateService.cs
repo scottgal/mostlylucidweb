@@ -26,6 +26,7 @@ public class BackgroundTranslateService(
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        
         if (!await StartupHealthCheck(cancellationToken))
         {
             TranslationServiceUp = false;
@@ -59,17 +60,17 @@ public class BackgroundTranslateService(
                 isUp = true;
                 break;
             }
-
-            await Task.Delay(10000, cancellationToken);
+            await Task.Delay(5000, cancellationToken);
             count++;
             if (count > 3)
             {
-                logger.LogError("Translation service is not available trying again (count: {Count})", count);
+             logger.LogError("Translation service is not available");
                 _translations.Writer.Complete();
                 await cancellationTokenSource.CancelAsync();
                 isUp = false;
                 break;
             }
+            logger.LogWarning("Translation service is not available trying again (count: {Count})", count);
         }
 
         return isUp;
