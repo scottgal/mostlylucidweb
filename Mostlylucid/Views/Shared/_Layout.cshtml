@@ -119,7 +119,7 @@
                         height="30px"
                         alt="mostlylucid limited"
                         class="hidden lg:block img-filter-dark"
-                        :class="{ 'img-filter-dark': isDarkMode }"
+                        :class="{ 'img-filter-dark': !isDarkMode }"
                     />
 
                     <!-- Small screen logo (shown on small screens and hidden on large screens) -->
@@ -208,23 +208,31 @@
   <div class="container mx-auto" id="contentcontainer">
    @RenderBody()
     </div>
-    <div class="container pb-8 mx-auto">
-        <div
-            class="flex flex-col items-center justify-between  sm:flex-row sm:py-2">
-            <div class="mr-auto flex flex-col items-center sm:flex-row">
-                <a asp-action="Index" asp-controller="Home" hx-swap="show:window:top"  hx-target="#contentcontainer" hx-boost="true" class="mr-auto sm:mr-6">
-                    <div class="svg-container">
-                        <img src="/img/logo.svg" asp-append-version="true"  width="180px" height="30px"  alt="logo"  :class="{ 'img-filter-dark': isDarkMode }"/>
-                    </div>
-                </a>
-                <p class="pt-5 font-body font-light text-primary dark:text-white sm:pt-0">
-                    ©2024 Scott Galloway
-                </p>
-            </div>
-            <partial name="_Socials"/>
+<div class="container pb-8 mx-auto">
+    <div
+        class="flex flex-col items-center justify-between  sm:flex-row sm:py-2">
+        <div class="mr-auto flex flex-col items-center sm:flex-row">
+            <a asp-action="Index" asp-controller="Home" hx-swap="show:window:top"  hx-target="#contentcontainer" hx-boost="true" class="mr-auto sm:mr-6">
+                <div class="svg-container">
+                    <img src="/img/logo.svg" asp-append-version="true"  width="180px" height="30px"  alt="logo"  :class="{ 'img-filter-dark': !isDarkMode }"/>
+                </div>
+            </a>
+            <p class="pt-5 font-body font-light text-primary dark:text-white sm:pt-0">
+                ©2024 Scott Galloway
+            </p>
         </div>
-        
+        <partial name="_Socials"/>
     </div>
+        
+</div>
+<noscript>
+    <style>
+        [x-cloak] {
+            display: block !important;
+        }
+    </style>
+</noscript>
+
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script src="~/js/dist/main.js" asp-append-version="true"  data-cfasync="false" > </script>
 <script defer src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId"></script>

@@ -1,7 +1,7 @@
-﻿# HTMX (And a little Alpine.js) for a SPA-like experience in ASP.NET Core
+﻿# HTMX (and a little Alpine.js) for a SPA-like experience in ASP.NET Core
 
 # Introduction
-In this site UI use [HTMX](https://htmx.org/) extensively, this is a super easy way to make your site feel more responsive and smoother without having to write a lot of JavaScript.
+In this site I use [HTMX](https://htmx.org/) extensively, this is a super easy way to make your site feel more responsive and smoother without having to write a lot of JavaScript.
 
 <datetime class="hidden">2024-09-15T06:45</datetime>
 <!--category-- ASP.NET, HTMX, Apline.js -->

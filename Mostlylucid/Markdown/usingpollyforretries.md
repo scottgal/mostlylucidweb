@@ -4,11 +4,11 @@
 [Polly](https://www.pollydocs.org/) is a critical part of any .NET developer's toolkit. It is a library that allows you to define policies for handling exceptions and retries in your application. In this article, we will explore how to *I* use Polly to handle retries in this application.
 <!--category-- Polly,ASP.NET,C# -->
 <datetime class="hidden">2024-09-15T02:20</datetime>
-
 [TOC]
 # Polly
 While Polly does retries really well it's not all it can do, it's really a toolkit for adding resilience to your applications. Both making calls to outside services and internally.
 
+These are taken from the [Polly main page](https://www.pollydocs.org/) and are the main patterns you can use with Polly:
 
 * Retry: Try again if something fails. This can be useful when the problem is temporary and might go away.
 * Circuit Breaker: Stop trying if something is broken or busy. This can benefit you by avoiding wasting time and making things worse. It can also support the system to recover.
@@ -155,7 +155,7 @@ In general **always handle exceptions where you can** and **throw up** to a high
     }
 ```
 
-Again this is an example of my code interacting with an outside service, in this case the filesystem. Where I EXPECT certain error types to occur. I also log these using [SerilogTracing](https://www.mostlylucid.net/blog/selfhostingseqpt2) which sends them to Seq which THEN sends me an email when the errror is logged so I can identify any issues that might be occurring. 
+Again this is an example of my code interacting with an outside service, in this case the filesystem. Where I EXPECT certain error types to occur. I also log these using [SerilogTracing](/blog/selfhostingseqpt2) which sends them to Seq which THEN sends me an email when the errror is logged so I can identify any issues that might be occurring. 
 
 Again, the general approach is to handle exceptions where you can, log them when you can't and ensure you have a way to know what's happening. This can help to ensure that your application is resilient and can handle any issues that might occur.
 
@@ -242,4 +242,4 @@ This uses all the functioanlity in the wrapped policy to add resilience to the e
 
 # In Conclusion
 Polly is a powerful library that can help you to add resilience to your applications. By using Polly you can handle retries, circuit breakers, timeouts, rate limiters, fallbacks and hedging in your application. This can help to ensure that your application is reliable and can handle any issues that might occur.
-In this post I jsut covered one aspect of Polly; retries, these are a mechanism which can improve the resilience and reliability of your application. By using Polly you can handle retries in a consistent way and ensure that your application can handle any issues that might occur.
+In this post I really just covered one aspect of Polly; retries, these are a mechanism which can improve the resilience and reliability of your application. By using Polly you can handle retries in a consistent way and ensure that your application can handle any issues that might occur.

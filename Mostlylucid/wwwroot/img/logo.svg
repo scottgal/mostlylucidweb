@@ -4,6 +4,6 @@
             @import url('https://fonts.googleapis.com/css?family=Raleway:600,700italic);
         </style>
     </defs>
-    <text x="10" y="40" font-family="Raleway,Arial,sans-serif" font-size="50" font-style="italic" font-weight="700" fill="black">mostly</text>
-    <text x="168" y="40" font-weight="600" font-family="Raleway,Arial,sans-serif" font-size="50"  fill="black">lucid</text>
+    <text x="10" y="40" font-family="Raleway,Arial,sans-serif" font-size="50" font-style="italic" font-weight="700" fill="white">mostly</text>
+    <text x="168" y="40" font-weight="600" font-family="Raleway,Arial,sans-serif" font-size="50"  fill="white">lucid</text>
 </svg>
