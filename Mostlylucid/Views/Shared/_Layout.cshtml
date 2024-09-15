@@ -106,7 +106,7 @@
     <ul class="flex items-center w-full print:hidden">
         <!-- First list item (logo) stays on the left -->
         <li>
-            <a href="/" class="flex items-center">
+            <a asp-action="IndexPartial" asp-controller="Home" hx-swap="show:window:top" hx-push-url="/" hx-target="#contentcontainer" hx-boost="true" class="flex items-center">
                 <span class="bx bx-home text-l lg:text-2xl font-bold mr-2 transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary print:hidden"></span>
 
                 <div class="svg-container">
@@ -211,7 +211,7 @@
         <div
             class="flex flex-col items-center justify-between  sm:flex-row sm:py-2">
             <div class="mr-auto flex flex-col items-center sm:flex-row">
-                <a href="/" class="mr-auto sm:mr-6">
+                <a asp-action="IndexPartial" asp-controller="Home" hx-swap="show:window:top" hx-push-url="/" hx-target="#contentcontainer" hx-boost="true" class="mr-auto sm:mr-6">
                     <div class="svg-container">
                         <img src="/img/logo.svg" asp-append-version="true"  width="180px" height="30px"  alt="logo"  :class="{ 'img-filter-dark': isDarkMode }"/>
                     </div>

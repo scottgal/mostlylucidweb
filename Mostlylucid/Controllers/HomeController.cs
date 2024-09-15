@@ -27,8 +27,26 @@ public class HomeController(BaseControllerService baseControllerService, ILogger
             Posts = posts, Authenticated = authenticateResult.LoggedIn, Name = authenticateResult.Name,
             AvatarUrl = authenticateResult.AvatarUrl
         };
-
         return View(indexPageViewModel);
+    }
+
+    [Route("/IndexPartial")]
+    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request" })]
+    [ResponseCache(Duration = 300, VaryByHeader = "hx-request",
+        Location = ResponseCacheLocation.Any)]
+    public async Task<IActionResult> IndexPartial()
+    {
+        if(!Request.IsHtmx()) return RedirectToAction("Index");
+        var authenticateResult = await GetUserInfo();
+        var posts = await BlogService.GetPagedPosts(1, 5);
+        posts.LinkUrl = Url.Action("Index", "Home");
+     
+        var indexPageViewModel = new IndexPageViewModel
+        {
+            Posts = posts, Authenticated = authenticateResult.LoggedIn, Name = authenticateResult.Name,
+            AvatarUrl = authenticateResult.AvatarUrl
+        };
+        return PartialView("_HomePartial", indexPageViewModel);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
