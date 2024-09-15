@@ -23,6 +23,7 @@ import { globalSetup } from "./global";
 import  {comments} from  "./comments"; 
 import "./mdeswitch"; 
 
+import "./blogswapper";
 window.mostlylucid.comments = comments();
 
 // Attach imported modules to the mostlylucid namespace
@@ -67,6 +68,7 @@ window.onload = function(ev) {
         hljs.registerLanguage("cshtml-razor", hljsRazor);
         hljs.highlightAll();
         setLogoutLink();
+        blogswitcher();
         updateMetaUrls();
         console.log('Document is ready');
         document.body.addEventListener('htmx:afterSwap', function(evt) {
@@ -77,6 +79,7 @@ window.onload = function(ev) {
             hljs.highlightAll();
             updateMetaUrls();
             setLogoutLink();
+            blogswitcher();
         });
     }
 };
