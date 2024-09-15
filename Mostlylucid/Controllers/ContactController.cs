@@ -19,13 +19,16 @@ public class ContactController(
     public async Task<IActionResult> Index()
     {
         ViewBag.Title = "Contact";
-        ;
         var model = new ContactViewModel();
         var user = await GetUserInfo();
         model.Authenticated = user.LoggedIn;
         model.Name = user.Name;
         model.Email = user.Email;
         model.AvatarUrl = user.AvatarUrl;
+        if (Request.IsHtmx())
+        {
+            return PartialView("_ContactForm", model);
+        }
         return View("Contact", model);
     }
 

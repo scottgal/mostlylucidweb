@@ -1,39 +1,42 @@
 ﻿@model Mostlylucid.Models.Contact.ContactViewModel
+<div id="Comment">
+<title>@ViewBag.Title</title>
 <form asp-action="Submit" hx-boost="true" hx-push-url="false" hx-target="#Comment" method="post" x-data >
-        @Html.AntiForgeryToken()
-        <div class="max-w-none border-b border-grey-lighter py-2  sm:py-2" x-data="{ initializeEditor() { window.mostlylucid.simplemde.initialize('contactform', true)  } }"
-             x-init="initializeEditor()">
-            <div asp-validation-summary="All" class="text-red-500" id="validationsummary"></div>
+    @Html.AntiForgeryToken()
+    <div class="max-w-none border-b border-grey-lighter py-2  sm:py-2" x-data="{ initializeEditor() { window.mostlylucid.simplemde.initialize('contactform', true)  } }"
+         x-init="initializeEditor()">
+        <div asp-validation-summary="All" class="text-red-500" id="validationsummary"></div>
+        <!-- Username Input -->
+        <div class="flex space-x-4"> <!-- Flexbox to keep Name and Email on the same line -->
+
             <!-- Username Input -->
-            <div class="flex space-x-4"> <!-- Flexbox to keep Name and Email on the same line -->
+            <label class="input input-bordered flex items-center gap-2 mb-2 dark:bg-custom-dark-bg bg-white w-1/2">
+                <i class='bx bx-user'></i>
+                <input type="text" class="grow text-black dark:text-white bg-transparent border-0"
+                       asp-for="Name" placeholder="Name (optional)" />
+            </label>
 
-                <!-- Username Input -->
-                <label class="input input-bordered flex items-center gap-2 mb-2 dark:bg-custom-dark-bg bg-white w-1/2">
-                    <i class='bx bx-user'></i>
-                    <input type="text" class="grow text-black dark:text-white bg-transparent border-0"
-                           asp-for="Name" placeholder="Name (optional)" />
-                </label>
+            <!-- Email Input -->
+            <label class="input input-bordered flex items-center gap-2 mb-2 dark:bg-custom-dark-bg bg-white w-1/2">
+                <i class='bx bx-envelope'></i>
+                <input type="email" class="grow text-black dark:text-white bg-transparent border-0"
+                       asp-for="Email" placeholder="Email (optional)" />
+            </label>
 
-                <!-- Email Input -->
-                <label class="input input-bordered flex items-center gap-2 mb-2 dark:bg-custom-dark-bg bg-white w-1/2">
-                    <i class='bx bx-envelope'></i>
-                    <input type="email" class="grow text-black dark:text-white bg-transparent border-0"
-                           asp-for="Email" placeholder="Email (optional)" />
-                </label>
-
-            </div>
-
-
-            <input type="hidden" id="hiddenComment" name="comment"/>
-            <!-- Comment Textarea -->
-            <textarea  class="w-full mt-2 hidden" id="contactform"  >@Model.Comment</textarea>
-            <!-- Submit Button -->
-            <button class="btn btn-accent mt-2 text-black"
-                    type="submit"
-                    data-umami-event="Send Comment Click"
-                    x-on:click="document.getElementById('hiddenComment').value = window.mostlylucid.simplemde.getinstance('contactform').value()">
-                <i class="bx bx-mail-send text-2xl"></i>
-                Comment
-            </button>
         </div>
-    </form>
+
+
+        <input type="hidden" id="hiddenComment" name="comment"/>
+        <!-- Comment Textarea -->
+        <textarea  class="w-full mt-2 hidden" id="contactform"  >@Model.Comment</textarea>
+        <!-- Submit Button -->
+        <button class="btn btn-accent mt-2 text-black"
+                type="submit"
+                data-umami-event="Send Comment Click"
+                x-on:click="document.getElementById('hiddenComment').value = window.mostlylucid.simplemde.getinstance('contactform').value()">
+            <i class="bx bx-mail-send text-2xl"></i>
+            Comment
+        </button>
+    </div>
+</form>
+</div>
