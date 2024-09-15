@@ -5,7 +5,6 @@
 
 <!--category-- resume , introduction -->
 
-
 I'm a versatile and accomplished developer and lead with an over 25 year track record building teams and platforms and revitalising startups.
 Proficient in C#, ASP.NET, and modern web frameworks, with extensive experience in cloud computing, DevOps, database management and search technologies. Proven track record of leading successful development projects across diverse industries, from technology giants to innovative startups.
 
