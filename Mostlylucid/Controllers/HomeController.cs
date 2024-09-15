@@ -34,6 +34,7 @@ public class HomeController(BaseControllerService baseControllerService, ILogger
     [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request" })]
     [ResponseCache(Duration = 300, VaryByHeader = "hx-request",
         Location = ResponseCacheLocation.Any)]
+    [HttpGet]
     public async Task<IActionResult> IndexPartial()
     {
         ViewBag.Title = "mostlylucid";
