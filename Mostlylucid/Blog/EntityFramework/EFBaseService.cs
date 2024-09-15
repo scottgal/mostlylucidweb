@@ -57,6 +57,14 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
                 Logger.LogInformation("Categories have changed for post {Post}", post.Slug);
             }
 
+            foreach (var postCat in post.Categories)
+            {
+                if(categories.All(x => x.Name != postCat))
+                {
+                    categories.Add(new CategoryEntity(){Name = postCat});
+                }
+            }
+            
             var dateChanged = currentPost?.PublishedDate.UtcDateTime.Date != post.PublishedDate.ToUniversalTime().Date;
             var titleChanged = currentPost?.Title != post.Title;
             if (!titleChanged && !dateChanged && !categoriesChanged)

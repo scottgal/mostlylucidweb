@@ -1,5 +1,7 @@
-﻿using System.Threading.Channels;
+﻿using System.Net.Mail;
+using System.Threading.Channels;
 using Mostlylucid.Email.Models;
+using Polly;
 
 namespace Mostlylucid.Email
 {
@@ -8,12 +10,51 @@ namespace Mostlylucid.Email
         Task SendEmailAsync(BaseEmailModel message);
     }
 
-    public class EmailSenderHostedService(EmailService emailService, ILogger<EmailSenderHostedService> logger)
-        : IEmailSenderHostedService
+    public class EmailSenderHostedService : IEmailSenderHostedService
     {
         private readonly Channel<BaseEmailModel> _mailMessages = Channel.CreateUnbounded<BaseEmailModel>();
         private Task _sendTask = Task.CompletedTask;
         private CancellationTokenSource cancellationTokenSource = new();
+        private readonly EmailService _emailService;
+        private readonly ILogger<EmailSenderHostedService> _logger;
+        private readonly IAsyncPolicy _policyWrap;
+
+        public EmailSenderHostedService(EmailService emailService, ILogger<EmailSenderHostedService> logger)
+        {
+            _emailService = emailService;
+            _logger = logger;
+            
+            // Initialize the retry policy
+            var retryPolicy = Policy
+                .Handle<SmtpException>() 
+                .WaitAndRetryAsync(3, 
+                    attempt => TimeSpan.FromSeconds(2 * attempt),
+                    (exception, timeSpan, retryCount, context) =>
+                    {
+                        logger.LogWarning(exception, "Retry {RetryCount} for sending email failed", retryCount);
+                    });
+
+            // Initialize the circuit breaker policy
+            var circuitBreakerPolicy = Policy
+                .Handle<SmtpException>()
+                .CircuitBreakerAsync(
+                    5,
+                    TimeSpan.FromMinutes(1), 
+                    onBreak: (exception, timespan) =>
+                    {
+                        logger.LogError("Circuit broken due to too many failures. Breaking for {BreakDuration}", timespan);
+                    },
+                    onReset: () =>
+                    {
+                        logger.LogInformation("Circuit reset. Resuming email delivery.");
+                    },
+                    onHalfOpen: () =>
+                    {
+                        logger.LogInformation("Circuit in half-open state. Testing connection...");
+                    });
+            _policyWrap = Policy.WrapAsync(retryPolicy, circuitBreakerPolicy);
+            
+        }
 
         public async Task SendEmailAsync(BaseEmailModel message)
         {
@@ -22,7 +63,7 @@ namespace Mostlylucid.Email
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            logger.LogInformation("Starting background e-mail delivery");
+            _logger.LogInformation("Starting background e-mail delivery");
             // Start the background task
             _sendTask = DeliverAsync(cancellationTokenSource.Token);
             return Task.CompletedTask;
@@ -30,7 +71,7 @@ namespace Mostlylucid.Email
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            logger.LogInformation("Stopping background e-mail delivery");
+            _logger.LogInformation("Stopping background e-mail delivery");
 
             // Cancel the token to signal the background task to stop
             await cancellationTokenSource.CancelAsync();
@@ -40,52 +81,55 @@ namespace Mostlylucid.Email
             await Task.WhenAny(_sendTask, Task.Delay(Timeout.Infinite, cancellationToken));
         }
 
-        private async Task DeliverAsync(CancellationToken token)
-        {
-            logger.LogInformation("E-mail background delivery started");
+       private async Task DeliverAsync(CancellationToken token)
+{
+    _logger.LogInformation("E-mail background delivery started");
 
+
+
+    try
+    {
+        while (await _mailMessages.Reader.WaitToReadAsync(token))
+        {
+            BaseEmailModel? message = null;
             try
             {
-                while (await _mailMessages.Reader.WaitToReadAsync(token))
-                {
-                    BaseEmailModel? message = null;
-                    try
-                    {
-                        message = await _mailMessages.Reader.ReadAsync(token);
-                        switch (message)
-                        {
-                            case ContactEmailModel contactEmailModel:
-                                await emailService.SendContactEmail(contactEmailModel);
-                                break;
-                            case CommentEmailModel commentEmailModel:
-                                await emailService.SendCommentEmail(commentEmailModel);
-                                break;
-                        }
+                message = await _mailMessages.Reader.ReadAsync(token);
 
-                        logger.LogInformation("Email from {SenderEmail} sent", message.SenderEmail);
-                    }
-                    catch (OperationCanceledException)
+                // Execute retry policy and circuit breaker around the email sending logic
+                await _policyWrap.ExecuteAsync(async () =>
+                {
+                    switch (message)
                     {
-                        break;
+                        case ContactEmailModel contactEmailModel:
+                            await _emailService.SendContactEmail(contactEmailModel);
+                            break;
+                        case CommentEmailModel commentEmailModel:
+                            await _emailService.SendCommentEmail(commentEmailModel);
+                            break;
                     }
-                    catch (Exception exc)
-                    {
-                        logger.LogError(exc, "Couldn't send an e-mail from {SenderEmail}", message?.SenderEmail);
-                        await Task.Delay(1000, token); // Delay and respect the cancellation token
-                        if (message != null)
-                        {
-                            await _mailMessages.Writer.WriteAsync(message, token);
-                        }
-                    }
-                }
+                });
+
+                _logger.LogInformation("Email from {SenderEmail} sent", message.SenderEmail);
             }
             catch (OperationCanceledException)
             {
-                logger.LogWarning("E-mail background delivery canceled");
+                break;
             }
-
-            logger.LogInformation("E-mail background delivery stopped");
+            catch (Exception exc)
+            {
+                _logger.LogError(exc, "Couldn't send an e-mail from {SenderEmail}", message?.SenderEmail);
+            }
         }
+    }
+    catch (OperationCanceledException)
+    {
+        _logger.LogWarning("E-mail background delivery canceled");
+    }
+
+    _logger.LogInformation("E-mail background delivery stopped");
+}
+
 
         public void Dispose()
         {
