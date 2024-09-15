@@ -21,8 +21,6 @@
             })
                 .then(response => {
                     if(response.ok){
-
-
                         return  response.json();
                     }
                     return Promise.reject(response);
@@ -67,10 +65,12 @@
             htmx.ajax('get', result.url, {
                 target: '#contentcontainer',  // The container to update
                 swap: 'innerHTML',            // Replace the content inside the target
-
-
             }).then(function() {
                 history.pushState(null, '', result.url);
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
             });
 
             this.results = []; // Clear the results

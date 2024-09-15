@@ -84,7 +84,22 @@ window.onload = function(ev) {
     }
 };
 
-
+window.addEventListener("popstate",   (event) => {
+    // When the user navigates back, reload the content for the current URL
+    event.preventDefault();
+    let url = window.location.href;
+    // Perform the HTMX AJAX request to load the content for the current state
+    htmx.ajax('get', url, {
+        target: '#contentcontainer',
+        swap: 'innerHTML'
+    }).then(function () {
+        // Scroll to the top of the page
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+});
 
 function updateMetaUrls() {
     var currentUrl = window.location.href;
