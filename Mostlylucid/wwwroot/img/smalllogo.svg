@@ -1,4 +1,4 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" width="100" height="80" viewBox="0 0 100 80" preserveAspectRatio="xMidYMid meet">
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="40" height="30" viewBox="0 0 40 30" preserveAspectRatio="xMidYMid meet">
     <defs>
         <style type="text/css">
             @import url('https://fonts.googleapis.com/css?family=Raleway:600,700italic');
@@ -24,9 +24,9 @@
     </defs>
 
     <!-- Rounded rectangle background -->
-    <rect x="0" y="0" width="100" height="80" rx="10" ry="10" />
+    <rect x="0" y="0" width="40" height="30" rx="10" ry="10" />
 
     <!-- Text elements -->
-    <text x="5" y="65" font-family="Raleway" font-size="80" font-style="italic" font-weight="700">m</text>
-    <text x="70" y="65" font-weight="600" font-family="Raleway" font-size="80">l</text>
+    <text x="5" y="23" font-family="Raleway,Arial,sans-serif" font-size="27" font-style="italic" font-weight="700">m</text>
+    <text x="27" y="23" font-weight="600" font-family="Raleway,Arial,sans-serif" font-size="27">l</text>
 </svg>
