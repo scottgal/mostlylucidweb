@@ -22,6 +22,8 @@
     color: #2a2a2a;
 }
 
+[x-cloak] { display: none !important; }
+
 #contentcontainer {
     height: 100%;
 }
