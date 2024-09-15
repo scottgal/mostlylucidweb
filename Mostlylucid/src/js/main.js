@@ -166,6 +166,7 @@ window.changePageSize=   function changePageSize(linkUrl) {
     htmx.ajax('get', `${linkUrl}?page=1&pageSize=${pageSize}`, {
         target: '#content',
         swap: 'innerHTML',
+        headers:{"pagerequest": "true"}
     }).then(() => {
         history.pushState({}, null,  `${linkUrl}?page=1&pageSize=${pageSize}`);
     });
