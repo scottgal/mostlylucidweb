@@ -25,6 +25,15 @@
                 });
             });
         });
-        
+        window.addEventListener('popstate', function (event) {
+            // When the user navigates back, reload the content for the current URL
+            let url = window.location.href;
+
+            // Perform the HTMX AJAX request to load the content for the current state
+            htmx.ajax('get', url, {
+                target: '#contentcontainer',
+                swap: 'innerHTML'
+            });
+        });
     };
 })(window);
