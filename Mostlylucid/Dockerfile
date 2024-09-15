@@ -59,8 +59,6 @@ WORKDIR /app
 # Copy the published application from the build stage
 COPY --from=publish /app/publish .
 
-# Copy additional resources
-COPY ./Mostlylucid/Markdown /app/Markdown
 COPY ./Mostlylucid/Email/Templates /app/Email/Templates
 
 # Start the application

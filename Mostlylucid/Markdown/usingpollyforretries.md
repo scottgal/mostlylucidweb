@@ -3,11 +3,12 @@
 # Introduction
 [Polly](https://www.pollydocs.org/) is a critical part of any .NET developer's toolkit. It is a library that allows you to define policies for handling exceptions and retries in your application. In this article, we will explore how to *I* use Polly to handle retries in this application.
 <!--category-- Polly,ASP.NET,C# -->
-
 <datetime class="hidden">2024-09-15T02:20</datetime>
+
 [TOC]
 # Polly
-So while Polly does retries really well it's not all it can do, it's really a toolkit for adding resilience to your applications. Both making calls to outside services and internally.
+While Polly does retries really well it's not all it can do, it's really a toolkit for adding resilience to your applications. Both making calls to outside services and internally.
+
 
 * Retry: Try again if something fails. This can be useful when the problem is temporary and might go away.
 * Circuit Breaker: Stop trying if something is broken or busy. This can benefit you by avoiding wasting time and making things worse. It can also support the system to recover.
@@ -19,7 +20,7 @@ Hedging: Do more than one thing at the same time and take the fastest one. This 
 # How I Use Polly
 In this application I use Polly in multiple places.
 
-## BackgroundTransalteService
+## BackgroundTranslateService
 For starting up my translation service and checking the EasyNMT servers are available. Thsi allows me to check the service is available before starting to 'offer' the translation service in my app. You'll recall this is both used for [my Editor 'toy'](/blog/backgroundtranslationspt3) to enable you to translate markdown  and for my 'on the fly' [blog post translation engine](/blog/usingfilebasedhybridblogging). So it's critical I check EasyNMT hasn't gone down (and enable waiting until it comes up; which can take a few seconds).
 
 ```csharp

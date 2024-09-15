@@ -40,23 +40,14 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
         try
         {
             var hash = post.Markdown.ContentHash();
+            var hashChanged = currentPost?.ContentHash != hash;
             //Add an inital check, if the current post is the same as the new post's hash, then we can skip the rest of the checks
-            if (hash == currentPost?.ContentHash)
+            if (!hashChanged)
             {
                 Logger.LogInformation("Post Hash {Post} for language {Language} has not changed", post.Slug,
                     post.Language);
                 return currentPost;
             }
-
-            var currentCategoryNames = currentPost?.Categories.Select(x => x.Name).ToArray() ?? Array.Empty<string>();
-            var categoriesChanged = false;
-            if (!currentCategoryNames.All(post.Categories.Contains) ||
-                !post.Categories.All(currentCategoryNames.Contains))
-            {
-                categoriesChanged = true;
-                Logger.LogInformation("Categories have changed for post {Post}", post.Slug);
-            }
-
             foreach (var postCat in post.Categories)
             {
                 if(categories.All(x => x.Name != postCat))
@@ -64,16 +55,6 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
                     categories.Add(new CategoryEntity(){Name = postCat});
                 }
             }
-            
-            var dateChanged = currentPost?.PublishedDate.UtcDateTime.Date != post.PublishedDate.ToUniversalTime().Date;
-            var titleChanged = currentPost?.Title != post.Title;
-            if (!titleChanged && !dateChanged && !categoriesChanged)
-            {
-                Logger.LogInformation("Post {Post} has not changed", post.Slug);
-                return currentPost;
-            }
-
-
             var blogPost = currentPost ?? new BlogPostEntity();
             blogPost.Title = post.Title;
             blogPost.Slug = post.Slug;
