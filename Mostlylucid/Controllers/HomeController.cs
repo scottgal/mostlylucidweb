@@ -36,6 +36,7 @@ public class HomeController(BaseControllerService baseControllerService, ILogger
         Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> IndexPartial()
     {
+        ViewBag.Title = "mostlylucid";
         if(!Request.IsHtmx()) return RedirectToAction("Index");
         var authenticateResult = await GetUserInfo();
         var posts = await BlogService.GetPagedPosts(1, 5);
