@@ -25,11 +25,11 @@
                 var languageModel = (Model.Slug, Model.Languages, Model.Language);
                 <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2 print:hidden">
                     <p class="font-body  text-primary dark:text-white">NOTE: Apart from  
-                        <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="en"  class="outline outline-1 outline-white inline-block">
+                        <a hx-boost="true" hx-target="#contentcontainer" asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.Slug" asp-route-language="en"  class=" inline-block">
                             <img src="~/img/flags/en.svg" width="24px" height="16px" alt="@("en".ConvertCodeToLanguage())" class="rounded outline outline-1  outline-green-dark dark:outline-white inline-block w-6 h-4" />
                         </a>   (and even then it's questionable, I'm Scottish).  These are machine translated in languages I don't read. If they're terrible please <a asp-controller="Contact" class="text-blue-dark dark:text-blue" asp-action="Index">contact me. </a>  <br/>
                         You can see how this translation was done in <a href="/blog/autotranslatingmarkdownfiles" class="text-blue-dark dark:text-blue" >this article. </a> </p>
-                    <div class="flex space-x-2 items-center pb-4 pt-2">
+                    <div class="flex flex-wrap space-x-2 items-center pb-4 pt-2">
                    
                         <partial name="_LanguageList" model="languageModel"/>
                     </div>
