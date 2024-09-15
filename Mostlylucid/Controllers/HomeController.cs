@@ -11,45 +11,28 @@ namespace Mostlylucid.Controllers;
 public class HomeController(BaseControllerService baseControllerService, ILogger<HomeController> logger)
     : BaseController(baseControllerService, logger)
 {
-    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request" },
+    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request" ,"pagerequest"},
         VaryByQueryKeys = new[] { "page", "pageSize" })]
-    [ResponseCache(Duration = 300, VaryByHeader = "hx-request", VaryByQueryKeys = new[] { "page", "pageSize" },
-        Location = ResponseCacheLocation.Any)]
     [HttpGet]
-    public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
+    public async Task<IActionResult> Index(int page = 1, int pageSize = 5, [FromHeader] bool pagerequest = false)
     {
         var authenticateResult = await GetUserInfo();
         var posts = await BlogService.GetPagedPosts(page, pageSize);
         posts.LinkUrl = Url.Action("Index", "Home");
-        if (Request.IsHtmx()) return PartialView("_BlogSummaryList", posts);
+        if ( pagerequest && Request.IsHtmx()) return PartialView("_BlogSummaryList", posts);
         var indexPageViewModel = new IndexPageViewModel
         {
             Posts = posts, Authenticated = authenticateResult.LoggedIn, Name = authenticateResult.Name,
             AvatarUrl = authenticateResult.AvatarUrl
         };
+        if (Request.IsHtmx())
+        {
+           return PartialView("_HomePartial", indexPageViewModel);
+        }
         return View(indexPageViewModel);
     }
 
-    [Route("/IndexPartial")]
-    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request" })]
-    [ResponseCache(Duration = 300, VaryByHeader = "hx-request",
-        Location = ResponseCacheLocation.Any)]
-    [HttpGet]
-    public async Task<IActionResult> IndexPartial()
-    {
-        ViewBag.Title = "mostlylucid";
-        if(!Request.IsHtmx()) return RedirectToAction("Index");
-        var authenticateResult = await GetUserInfo();
-        var posts = await BlogService.GetPagedPosts(1, 5);
-        posts.LinkUrl = Url.Action("Index", "Home");
-     
-        var indexPageViewModel = new IndexPageViewModel
-        {
-            Posts = posts, Authenticated = authenticateResult.LoggedIn, Name = authenticateResult.Name,
-            AvatarUrl = authenticateResult.AvatarUrl
-        };
-        return PartialView("_HomePartial", indexPageViewModel);
-    }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     [HttpGet("typeahead")]

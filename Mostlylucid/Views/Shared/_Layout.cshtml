@@ -106,7 +106,7 @@
     <ul class="flex items-center w-full print:hidden">
         <!-- First list item (logo) stays on the left -->
         <li>
-            <a asp-action="IndexPartial" asp-controller="Home" hx-swap="show:window:top" hx-push-url="/" hx-target="#contentcontainer" hx-boost="true" class="flex items-center">
+            <a asp-action="Index" asp-controller="Home" hx-swap="show:window:top" hx-push-url="/" hx-target="#contentcontainer" hx-boost="true" class="flex items-center">
                 <span class="bx bx-home text-l lg:text-2xl font-bold mr-2 transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary print:hidden"></span>
 
                 <div class="svg-container">
@@ -174,11 +174,11 @@
         </li>
 
         <li class="group relative mb-1 ml-2">
-            <a href="/blog/aboutme" hx-boost="true" hx-target="#contentcontainer" class="relative z-30 block px-2 font-body text-l lg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Intro</a>
+            <a href="/blog/aboutme" hx-boost="true" hx-push-url="true" hx-target="#contentcontainer" class="relative z-30 block px-2 font-body text-l lg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Intro</a>
         </li>
 
         <li class="group relative mb-1 ml-2">
-            <a href="/blog" hx-boost="true" hx-target="#contentcontainer" class="relative z-30 block px-2 font-body text-l lg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Blog</a>
+            <a href="/blog" hx-boost="true" hx-push-url="true"  hx-target="#contentcontainer" class="relative z-30 block px-2 font-body text-l lg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Blog</a>
         </li>
 
         <li class="group relative mb-1 ml-2 hidden lg:block">
@@ -189,7 +189,7 @@
         </li>
 
         <li class="group relative mb-0.5 ml-2">
-            <a asp-action="Index" hx-boost="true" hx-target="#contentcontainer" asp-controller="Contact" class="flex items-center text-l lg:text-xl space-x-2 text-primary dark:text-white hover:text-secondary dark:hover:text-secondary transition-colors" data-umami-event="Contact Click">
+            <a asp-action="Index" hx-boost="true" hx-push-url="true"  hx-target="#contentcontainer" asp-controller="Contact" class="flex items-center text-l lg:text-xl space-x-2 text-primary dark:text-white hover:text-secondary dark:hover:text-secondary transition-colors" data-umami-event="Contact Click">
                 <i class='bx bx-mail-send text-l lg:text-2xl'></i>
                 <span class="ml-0.5">Contact</span>
             </a>
@@ -211,7 +211,7 @@
         <div
             class="flex flex-col items-center justify-between  sm:flex-row sm:py-2">
             <div class="mr-auto flex flex-col items-center sm:flex-row">
-                <a asp-action="IndexPartial" asp-controller="Home" hx-swap="show:window:top" hx-push-url="/" hx-target="#contentcontainer" hx-boost="true" class="mr-auto sm:mr-6">
+                <a asp-action="Index" asp-controller="Home" hx-swap="show:window:top" hx-push-url="/" hx-target="#contentcontainer" hx-boost="true" class="mr-auto sm:mr-6">
                     <div class="svg-container">
                         <img src="/img/logo.svg" asp-append-version="true"  width="180px" height="30px"  alt="logo"  :class="{ 'img-filter-dark': isDarkMode }"/>
                     </div>

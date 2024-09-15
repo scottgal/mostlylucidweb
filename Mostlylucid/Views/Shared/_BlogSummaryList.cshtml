@@ -14,7 +14,8 @@
             hx-swap="show:none"
             page="@Model.Page"
             page-size="@Model.PageSize"
-            total-items="@Model.TotalItems">
+            total-items="@Model.TotalItems"
+            hx-headers='{"pagerequest": "true"}'>
         </pager>
         }
 <partial name="_Pager" model="Model"/>

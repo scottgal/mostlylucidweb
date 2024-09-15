@@ -2,6 +2,9 @@
 
 # Introduction
 In this site UI use [HTMX](https://htmx.org/) extensively, this is a super easy way to make your site feel more responsive and smoother without having to write a lot of JavaScript.
+
+**NOTE:This post is still incomplete, managing the back button with this approach is non-trivial and I'm still working on it.**
+
 <datetime class="hidden">2024-09-15T06:45</datetime>
 <!--category-- ASP.NET, HTMX, Apline.js -->
 [TOC]
@@ -92,6 +95,21 @@ As you can see this is just a simple function that looks for all the links in th
 })(window);
 ```
 Additionally once the swap has been made I then push the new URL to the browser history and scroll to the top of the page. I use this approach in a few places (like search) to give a nice buttery smooth experience. 
+
+Note: To get the back button to work as expected we also need to listen for the `popState` event. This event is fired when the user navigates back or forward in the browser history. When this event is fired we can reload the content for the current URL.
+
+```javascript
+ window.addEventListener('popstate', function (event) {
+            // When the user navigates back, reload the content for the current URL
+            let url = window.location.href;
+
+            // Perform the HTMX AJAX request to load the content for the current state
+            htmx.ajax('get', url, {
+                target: '#contentcontainer',
+                swap: 'innerHTML'
+            });
+        });
+```
 
 # HTMX more generally (and Alpine.js)
 As you may have guessed I'm somewhat a fan of HTMX, combined with ASP.NET Core and a smattering of Alpine.js it empowers devs to create a really nice user experience with minimal effort. 
