@@ -101,98 +101,92 @@
     class="bg-custom-light-bg dark:bg-custom-dark-bg "
     
 >
-
-<div id="main">
-    <div class="container mx-auto">
-        <div class="flex flex-wrap items-center justify-between mb-3 pt-2 pb-2  w-full border-b border-grey-lighter" id="header">
-            <a href="/" class="flex items-center mt-2">
+<header class="sticky top-0 z-50 bg-white  dark:bg-custom-dark-bg shadow-md  container mx-auto flex flex-wrap items-center justify-between px-4 mb-3 py-2 w-full rounded border-b border-x border-l-neutral-600 border-r-neutral-600 border-b-neutral-600" id="header">
+        <a href="/" class="flex items-center">
                 <span class="bx bx-home text-2xl font-bold mr-2 transition-colors group-hover:text-green 
 dark:text-white dark:group-hover:text-secondary print:hidden" ></span>
-         
-                    <div class="svg-container">
-                        <img src="/img/logo.svg" asp-append-version="true"  width="180px" height="30px"  alt="mostlylucid limited" :class="{ 'img-filter-dark': isDarkMode }"/>
-                    </div>
-            </a>
 
-            <div class="w-full lg:w-auto print:hidden">
-                <ul class="flex flex-wrap items-center justify-end space-x-2">
-                    <li class="group relative mb-1">
-                        <div  hx-trigger="load" hx-get="/typeahead">
-                        </div>
-
-                    </li>
-
-                    <li class="group relative mb-1 ">
-                        <div class="flex items-center space-x-4">
-                            @if (Model != null)
-                            {
-                            if (Model.Authenticated)
-                            {
-                            <div class="flex items-center space-x-4">
-                               
-                                <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-outline btn-sm  text-blue-dark dark:text-white">
-                                    @if (Model.AvatarUrl != null)
-                                    {
-                                    <img src="@Model.AvatarUrl"  width="24px" height="24px" class="h-6 w-6 rounded-full" alt="User Avatar" />
-                                    }
-                                <span class="text-body text-blue-dark dark:text-white"> @Model.Name</span>
-                                
-                                    <i class="bx bx-log-out mr-2 text-xl"></i> 
-                                </a>
-                            </div>
-                            }
-                            else
-                            {
-                            <div class="w-[200px] h-[39px] overflow-hidden rounded">
-                                <div id="google_button"></div>
-                            </div>
-                            }
-                            }
-                        </div>
-                    </li>
-
-                    <li class="group relative mb-1 mt-1">
-                        <partial name="_Socials" />
-                    </li>
-
-                    <li class="group relative mb-1">
-                        <a href="/blog/aboutme" class="relative z-30 block px-2 font-body text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Intro</a>
-                    </li>
-
-                    <li class="group relative mb-1">
-                        <a href="/blog" class="relative z-30 block px-2 font-body text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">
-                            
-                            Blog
-                        </a>
-                    </li>
-
-                    <li class="group relative mb-1">
-                        <a href="/rss" target="_blank" class="flex items-center text-xl space-x-2 hover:text-secondary dark:hover:text-secondary transition-colors">
-                            <i class="text-2xl  bx bx-rss"></i>
-                            <span class="ml-2">RSS</span>
-                        </a>
-                    </li>
-
-                    <li class="group relative mb-0.5">
-                        <a asp-action="Index" asp-controller="Contact" class="flex items-center text-xl space-x-2 text-primary dark:text-white hover:text-secondary dark:hover:text-secondary transition-colors" data-umami-event="Contact Click">
-                            <i class='bx bx-mail-send text-2xl'></i>
-                            <span class="ml-0.5">Contact</span>
-                        </a>
-                    </li>
-
-                    <li class="group relative mb-1">
-                        <div class="flex items-center">
-                            <i class="bx cursor-pointer text-3xl text-primary dark:text-white transition-colors" x-on:click="themeSwitch()" :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"></i>
-                        </div>
-                    </li>
-                </ul>
-
+            <div class="svg-container">
+                <img src="/img/logo.svg" asp-append-version="true"  width="180px" height="30px"  alt="mostlylucid limited" :class="{ 'img-filter-dark': isDarkMode }"/>
             </div>
-        </div>
+        </a>
 
-    </div>
-</div>
-<div>
+        <div class="w-full lg:w-auto print:hidden">
+            <ul class="flex flex-wrap items-center justify-end space-x-2">
+                <li class="group relative mb-1">
+                    <div  hx-trigger="load" hx-get="/typeahead">
+                    </div>
+
+                </li>
+
+                <li class="group relative mb-1 ">
+                    <div class="flex items-center space-x-4">
+                        @if (Model != null)
+                        {
+                        if (Model.Authenticated)
+                        {
+                        <div class="flex items-center space-x-4">
+
+                            <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-outline btn-sm  text-blue-dark dark:text-white">
+                                @if (Model.AvatarUrl != null)
+                                {
+                                <img src="@Model.AvatarUrl"  width="24px" height="24px" class="h-6 w-6 rounded-full" alt="User Avatar" />
+                                }
+                                <span class="text-body text-blue-dark dark:text-white"> @Model.Name</span>
+
+                                <i class="bx bx-log-out mr-2 text-xl"></i>
+                            </a>
+                        </div>
+                        }
+                        else
+                        {
+                        <div class="w-[200px] h-[39px] overflow-hidden rounded">
+                            <div id="google_button"></div>
+                        </div>
+                        }
+                        }
+                    </div>
+                </li>
+
+                <li class="group relative mb-1 mt-1">
+                    <partial name="_Socials" />
+                </li>
+
+                <li class="group relative mb-1">
+                    <a href="/blog/aboutme" class="relative z-30 block px-2 font-body text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Intro</a>
+                </li>
+
+                <li class="group relative mb-1">
+                    <a href="/blog" class="relative z-30 block px-2 font-body text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">
+
+                        Blog
+                    </a>
+                </li>
+
+                <li class="group relative mb-1">
+                    <a href="/rss" target="_blank" class="flex items-center text-xl space-x-2 hover:text-secondary dark:hover:text-secondary transition-colors">
+                        <i class="text-2xl  bx bx-rss"></i>
+                        <span class="ml-2">RSS</span>
+                    </a>
+                </li>
+
+                <li class="group relative mb-0.5">
+                    <a asp-action="Index" asp-controller="Contact" class="flex items-center text-xl space-x-2 text-primary dark:text-white hover:text-secondary dark:hover:text-secondary transition-colors" data-umami-event="Contact Click">
+                        <i class='bx bx-mail-send text-2xl'></i>
+                        <span class="ml-0.5">Contact</span>
+                    </a>
+                </li>
+
+                <li class="group relative mb-1">
+                    <div class="flex items-center">
+                        <i class="bx cursor-pointer text-3xl text-primary dark:text-white transition-colors" x-on:click="themeSwitch()" :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"></i>
+                    </div>
+                </li>
+            </ul>
+
+        </div>
+</header>
+
   <div class="container mx-auto" id="contentcontainer">
    @RenderBody()
     </div>
@@ -213,10 +207,6 @@ dark:text-white dark:group-hover:text-secondary print:hidden" ></span>
         </div>
         
     </div>
-
-</div>
-
-
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script src="~/js/dist/main.js" asp-append-version="true"  data-cfasync="false" > </script>
 <script defer src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId"></script>

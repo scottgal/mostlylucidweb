@@ -14,7 +14,7 @@
     </label>
     <!-- Dropdown -->
     <ul x-show="results.length > 0"
-        class="absolute z-10 my-2 w-full bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-neutral-600  rounded-lg shadow-lg">
+        class="absolute z-100 my-2 w-full bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-neutral-600  rounded-lg shadow-lg">
         <template x-for="(result, index) in results" :key="result.slug">
             <li
                 x-on:click="selectResult(result)"
