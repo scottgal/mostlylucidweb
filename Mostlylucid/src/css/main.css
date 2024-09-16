@@ -1,6 +1,10 @@
+@import "raleway.css";
+@import "poppins.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
 
 .bg-red {
     --tw-bg-opacity: 1;

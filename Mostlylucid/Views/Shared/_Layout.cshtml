@@ -58,15 +58,7 @@
         rel="preconnect"
     />
 
-    <link
-        as="style"
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="preload"
-    />
-    <link
-        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet"
-    />
+ 
 
     <link
         rel="stylesheet"
@@ -77,18 +69,19 @@
     <link
         crossorigin="anonymous"
         href="/css/dist/main.css" asp-append-version="true"
+        
         media="screen, print"
         rel="stylesheet"
     />
-    <link id="light-mode" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/default.min.css">
+    <link id="light-mode" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/default.min.css" async>
 
     <!-- Dark Mode Stylesheet -->
-    <link id="dark-mode" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/atom-one-dark.min.css" disabled>
+    <link id="dark-mode" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/atom-one-dark.min.css" disabled async>
 
     <!-- Additional Dark Mode Stylesheet -->
-    <link id="simplemde-dark" rel="stylesheet" href="https://cdn.rawgit.com/xcatliu/simplemde-theme-dark/master/dist/simplemde-theme-dark.min.css" disabled>
+    <link id="simplemde-dark" rel="stylesheet" href="https://cdn.rawgit.com/xcatliu/simplemde-theme-dark/master/dist/simplemde-theme-dark.min.css" disabled async>
 
-    <link id="simplemde-light" rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <link id="simplemde-light" rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css" async>
 
 
     <link rel="manifest" href="~/manifest.json" />
@@ -134,11 +127,7 @@
                 </div>
             </a>
         </li>
-
-        <!-- Add ml-auto to this second <li> to push everything else to the right -->
         <li class="ml-auto"></li>
-
-        <!-- Other list items -->
         <li class="group relative mb-1 hidden lg:block ml-2">
             <div hx-trigger="load" hx-get="/typeahead"></div>
         </li>
@@ -233,9 +222,9 @@
     </style>
 </noscript>
 
-<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js" async></script>
 <script src="~/js/dist/main.js" asp-append-version="true"  data-cfasync="false" > </script>
-<script defer src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId"></script>
+<script defer src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId" async></script>
 
 @await RenderSectionAsync("Scripts", required: false)
 </body>

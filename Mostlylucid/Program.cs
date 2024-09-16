@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.AspNetCore.StaticFiles;
 using Mostlylucid.Services;
 using Umami.Net.Models;
 
@@ -127,6 +128,8 @@ try
     app.UseImageSharp();
 
     var cacheMaxAgeOneWeek = (60 * 60 * 24 * 7).ToString();
+
+
     app.UseStaticFiles(new StaticFileOptions
     {
         OnPrepareResponse = ctx =>

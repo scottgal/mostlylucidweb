@@ -1,8 +1,6 @@
 ﻿<svg xmlns="http://www.w3.org/2000/svg" width="40" height="30" viewBox="0 0 40 30" preserveAspectRatio="xMidYMid meet">
     <defs>
         <style type="text/css">
-            @import url('https://fonts.googleapis.com/css?family=Raleway:600,700italic');
-
             /* Default (light mode) */
             rect {
             fill: #e0e0e0; /* Light grey background */
