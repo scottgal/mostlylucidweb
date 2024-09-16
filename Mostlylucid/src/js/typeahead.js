@@ -28,6 +28,10 @@
                 .then(data => {
                     this.results = data;
                     this.highlightedIndex = -1; // Reset index on new search
+                    this.$nextTick(() => {
+                        htmx.logAll();
+                        htmx.process(document.getElementById('searchresults'));
+                    });
                 })
                 .catch((response) => {
                     console.log(response.status, response.statusText);
@@ -57,25 +61,21 @@
 
         selectHighlighted() {
             if (this.highlightedIndex >= 0 && this.highlightedIndex < this.results.length) {
-                this.selectResult(this.results[this.highlightedIndex]);
+                this.selectResult(this.highlightedIndex);
+                
             }
         },
 
-        selectResult(result) {
-            htmx.ajax('get', result.url, {
-                target: '#contentcontainer',  // The container to update
-                swap: 'innerHTML',            // Replace the content inside the target
-            }).then(function() {
-                history.pushState(null, '', result.url);
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+        selectResult(selectedIndex) {
+       let links = document.querySelectorAll('#searchresults a');
+           
+       links[selectedIndex].click();
+       
+            this.$nextTick(() => {
+                this.results = []; // Clear the results
+                this.highlightedIndex = -1; // Reset the highlighted index
+                this.query = ''; // Clear the query
             });
-
-            this.results = []; // Clear the results
-            this.highlightedIndex = -1; // Reset the highlighted index
-            this.query = ''; // Clear the query
         }
     }
 }

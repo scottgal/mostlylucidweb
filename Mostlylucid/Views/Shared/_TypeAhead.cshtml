@@ -1,6 +1,6 @@
-﻿<div x-data="window.mostlylucid.typeahead()" class="relative" id="searchelement"  x-on:click.outside="results = []">
+﻿<div x-data="window.mostlylucid.typeahead()" class="relative" id="searchelement" x-on:click.outside="results = []">
     @Html.AntiForgeryToken()
-    <label class="input input-sm bg-neutral-500  bg-opacity-10 input-bordered flex items-center gap-2">
+    <label class="input input-sm bg-neutral-500 bg-opacity-10 input-bordered flex items-center gap-2">
         <input
             type="text"
             x-model="query"
@@ -9,22 +9,31 @@
             x-on:keydown.up.prevent="moveUp"
             x-on:keydown.enter.prevent="selectHighlighted"
             placeholder="Search..."
-            class="border-0 grow  input-sm text-black dark:text-white bg-transparent w-full"/>
+            class="border-0 grow input-sm text-black dark:text-white bg-transparent w-full"/>
         <i class="bx bx-search"></i>
     </label>
     <!-- Dropdown -->
     <ul x-show="results.length > 0"
-        class="absolute z-100 my-2 w-full bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-neutral-600  rounded-lg shadow-lg">
+        id="searchresults"
+        class="absolute z-100 my-2 w-full bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-neutral-600 rounded-lg shadow-lg">
         <template x-for="(result, index) in results" :key="result.slug">
-            <li
-                x-on:click="selectResult(result)"
-                :class="{
-                    'dark:bg-blue-dark bg-blue-light': index === highlightedIndex,
-                    'dark:hover:bg-blue-dark hover:bg-blue-light': true
-                }"
-                class="cursor-pointer text-sm p-2 m-2"
-                x-text="result.title"
-            ></li>
+            <li :class="{
+                'dark:bg-blue-dark bg-blue-light': index === highlightedIndex,
+                'dark:hover:bg-blue-dark hover:bg-blue-light': true
+            }"
+                class="cursor-pointer text-sm p-2 m-2">
+                <a
+                    x-on:click="selectResult(index)"
+                    @* :href="result.url" *@
+                    :hx-get="result.url"
+                    hx-target="#contentcontainer"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                    x-text="result.title"
+                   >
+                </a>
+            </li>
         </template>
     </ul>
+
 </div>

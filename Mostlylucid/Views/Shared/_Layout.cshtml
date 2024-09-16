@@ -15,6 +15,7 @@
           title="RSS Feed for mostlylucid.net"
           href="https://@Context.Request.Host/rss" />
 
+    <link rel="prefetch" href="https://accounts.google.com/gsi/client"/>
     <!-- Dynamic RSS Feed Links for each category -->
     @if (ViewBag.Categories != null)
     {
@@ -50,50 +51,32 @@
         content="Scott Galloway is a lead developer and software engineer with a passion for building web applications."
     />
     <link rel="icon" type="image/png" href="/img/smalllogo.svg" />
+
     <script src="https://accounts.google.com/gsi/client"  data-cfasync="false" async defer></script>
-
-    <link
-        crossorigin="crossorigin"
-        href="https://fonts.gstatic.com"
-        rel="preconnect"
-    />
-
- 
-
     <link
         rel="stylesheet"
         href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
     />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/default.min.css"/>
  
+    <link rel="prefetch" href="/css/dist/main.css"  asp-append-version="true">
     <link
-        crossorigin="anonymous"
         href="/css/dist/main.css" asp-append-version="true"
-        
         media="screen, print"
         rel="stylesheet"
     />
     <link id="light-mode" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/default.min.css" async>
-
-    <!-- Dark Mode Stylesheet -->
     <link id="dark-mode" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/atom-one-dark.min.css" disabled async>
-
-    <!-- Additional Dark Mode Stylesheet -->
     <link id="simplemde-dark" rel="stylesheet" href="https://cdn.rawgit.com/xcatliu/simplemde-theme-dark/master/dist/simplemde-theme-dark.min.css" disabled async>
-
     <link id="simplemde-light" rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css" async>
-
-
     <link rel="manifest" href="~/manifest.json" />
 </head>
-
 <body
     x-cloak
     x-data="globalSetup()"
     x-init="themeInit()"
     :class="isMobileMenuOpen ? 'max-h-screen overflow-hidden relative' : ''"
     class="bg-custom-light-bg dark:bg-custom-dark-bg "
-    
 >
 <header class="sticky top-0 z-50 bg-white  dark:bg-custom-dark-bg shadow-md  container mx-auto flex flex-wrap items-center justify-between px-4 mb-3 py-1 w-full rounded border-b border-x border-l-neutral-600 border-r-neutral-600 border-b-neutral-600 print:!hidden" id="header">
 
@@ -221,11 +204,9 @@
         }
     </style>
 </noscript>
-
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js" async></script>
 <script src="~/js/dist/main.js" asp-append-version="true"  data-cfasync="false" > </script>
 <script defer src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId" async></script>
-
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
