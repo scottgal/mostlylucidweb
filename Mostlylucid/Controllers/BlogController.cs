@@ -20,7 +20,7 @@ public class BlogController(BaseControllerService baseControllerService,
     [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request" },
         VaryByQueryKeys = new[] { nameof(page), nameof(pageSize) })]
     [HttpGet]
-    public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
+    public async Task<IActionResult> Index(int page = 1, int pageSize = 20)
     {
         var posts = await blogService.GetPagedPosts(page, pageSize);
         if (Request.IsHtmx()) return PartialView("_BlogSummaryList", posts);
@@ -44,9 +44,11 @@ public class BlogController(BaseControllerService baseControllerService,
         post.Name = user.Name;
         post.Email = user.Email;
         post.AvatarUrl = user.AvatarUrl;
-        var commentViewList = new CommentViewList();
-        commentViewList.PostId = int.Parse(post.Id);
-        commentViewList.IsAdmin = user.IsAdmin;
+        var commentViewList = new CommentViewList
+        {
+            PostId = int.Parse(post.Id),
+            IsAdmin = user.IsAdmin
+        };
 
         if (user.IsAdmin)
             commentViewList.Comments = await commentViewService.GetAllComments(int.Parse(post.Id));
@@ -66,7 +68,7 @@ public class BlogController(BaseControllerService baseControllerService,
         Location = ResponseCacheLocation.Any)]
     [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request" },
         VaryByQueryKeys = new[] { nameof(category), nameof(page), nameof(pageSize) })]
-    public async Task<IActionResult> Category(string category, int page = 1, int pageSize = 5)
+    public async Task<IActionResult> Category(string category, int page = 1, int pageSize = 10)
     {
         ViewBag.Category = category;
         var posts = await blogService.GetPostsByCategory(category, page, pageSize);

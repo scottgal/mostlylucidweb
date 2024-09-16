@@ -14,7 +14,7 @@ public class HomeController(BaseControllerService baseControllerService, ILogger
     [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request" ,"pagerequest"},
         VaryByQueryKeys = new[] { "page", "pageSize" })]
     [HttpGet]
-    public async Task<IActionResult> Index(int page = 1, int pageSize = 5, [FromHeader] bool pagerequest = false)
+    public async Task<IActionResult> Index(int page = 1, int pageSize = 10, [FromHeader] bool pagerequest = false)
     {
         var authenticateResult = await GetUserInfo();
         var posts = await BlogService.GetPagedPosts(page, pageSize);

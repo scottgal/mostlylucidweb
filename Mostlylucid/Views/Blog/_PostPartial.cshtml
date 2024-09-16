@@ -17,7 +17,7 @@
             {
                 <partial name="_Category" model="category"/>
             }
-            <a asp-action="Edit" class="ml-4 text-sm  btn-sm btn btn-outline btn-primary" asp-controller="Editor" asp-route-slug="@Model.Slug" asp-route-language="@Model.Language" ><i class=" bx bx-edit"></i> edit</a>
+            <a asp-action="Edit" hx-boost="false" class="ml-4 text-sm  btn-sm btn btn-outline btn-primary" asp-controller="Editor" asp-route-slug="@Model.Slug" asp-route-language="@Model.Language" ><i class=" bx bx-edit"></i> edit</a>
         </div>
      
             @if (Model.Languages.Length > 1)
