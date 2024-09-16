@@ -1,17 +1,18 @@
 ﻿@using MarkdownBaseService = Mostlylucid.Blog.MarkdownBaseService
 @model Mostlylucid.Models.Editor.EditorModel
 
-<div class="min-h-screen bg-gray-100">
+<div class="min-h-screen bg-gray-100"  x-data
+     x-init="$nextTick(() =>{ window.mostlylucid.simplemde.setupCodeEditor('markdowneditor') })">
     @if (!string.IsNullOrEmpty(Model.PostViewModel.Slug))
     {
-        @if (Model.PostViewModel.Language != MarkdownBaseService.EnglishLanguage)
-        {
-            <a asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.PostViewModel.Slug" asp-route-language="@Model.PostViewModel.Language" class="text-green-dark dark:text-green"><i class="bx bx-chevron-left"></i> Back to "@Model.PostViewModel.Title"</a>
-        }
-        else
-        {
-            <a asp-action="Show" asp-controller="Blog" asp-route-slug="@Model.PostViewModel.Slug" class="text-green-dark dark:text-green"><i class="bx bx-chevron-left"></i> Back to "@Model.PostViewModel.Title"</a>
-        }
+    @if (Model.PostViewModel.Language != MarkdownBaseService.EnglishLanguage)
+    {
+    <a asp-action="Language" asp-controller="Blog" asp-route-slug="@Model.PostViewModel.Slug" asp-route-language="@Model.PostViewModel.Language" class="text-green-dark dark:text-green"><i class="bx bx-chevron-left"></i> Back to "@Model.PostViewModel.Title"</a>
+    }
+    else
+    {
+    <a asp-action="Show" asp-controller="Blog" asp-route-slug="@Model.PostViewModel.Slug" class="text-green-dark dark:text-green"><i class="bx bx-chevron-left"></i> Back to "@Model.PostViewModel.Title"</a>
+    }
     }
 
 
@@ -20,7 +21,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Column 1 -->
-            <div class="bg-white dark:bg-custom-dark-bg  p-0 rounded shadow-md">
+            <div class="bg-white dark:bg-custom-dark-bg  p-0 pb-4 rounded shadow-md">
                 <p class="text-blue-dark dark:text-blue-light">To update the preview hit Ctrl-Alt-R (or ⌘-Alt-R on Mac) or Enter to refresh. The Save <i class="bx bx-save"></i> icon lets you save the markdown file to disk </p>
                 <textarea class="markdowneditor hidden" id="markdowneditor">@Model.Markdown</textarea>
 
@@ -31,25 +32,25 @@
                 <p class="text-blue-dark dark:text-blue-light">This is a preview from the server running through my markdig pipeline</p>
                 @if (Model.IsNew)
                 {
-                    var translationHidden = Model.TranslationTasks.Any() ? "" : "hidden";
-              
-                    <p class="text-blue-dark dark:text-blue-light inline-flex  items-center justify-center space-x-2">
-                        <partial name="_LanguageDropDown" for="Languages"/>
-                        <button class="btn btn-outline btn-sm mt-1" x-on:click="window.mostlylucid.translations.submitTranslation"><i class='bx bx-send'></i>Translate</button>
-                    </p>
-                    <div id="translations" class="@translationHidden">
-                        <partial name="_GetTranslations" model="Model.TranslationTasks" />
-                    </div>
-                    <div id="translatedcontent" class="hidden">
-                        <textarea class="hidden w-full h-44 dark:bg-custom-dark-bg bg-white text-black dark:text-white rounded-2xl " id="translatedcontentarea"></textarea>
-                    </div>
+                var translationHidden = Model.TranslationTasks.Any() ? "" : "hidden";
+
+                <p class="text-blue-dark dark:text-blue-light inline-flex  items-center justify-center space-x-2">
+                    <partial name="_LanguageDropDown" for="Languages"/>
+                    <button class="btn btn-outline btn-sm mt-1" x-on:click="window.mostlylucid.translations.submitTranslation"><i class='bx bx-send'></i>Translate</button>
+                </p>
+                <div id="translations" class="@translationHidden">
+                    <partial name="_GetTranslations" model="Model.TranslationTasks" />
+                </div>
+                <div id="translatedcontent" class="hidden">
+                    <textarea class="hidden w-full h-44 dark:bg-custom-dark-bg bg-white text-black dark:text-white rounded-2xl " id="translatedcontentarea"></textarea>
+                </div>
                 }
                 <div id="htmlcontent">
                     <div class="border-b border-grey-lighter pb-2 pt-2 sm:pb-2 " id="categories">
                         @foreach (var category in Model.PostViewModel.Categories)
                         {
-                            <span
-                                class="inline-block rounded-full dark bg-blue-dark px-2 py-1 mr-2 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">
+                        <span
+                            class="inline-block rounded-full dark bg-blue-dark px-2 py-1 mr-2 font-body text-sm text-white outline-1 outline outline-green-dark dark:outline-white">
                                 @category
                             </span>
                         }
@@ -65,12 +66,3 @@
     </div>
 
 </div>
-
-@section Scripts
-{
-    <script>
-        window.addEventListener('load', function () {
-            window.mostlylucid.simplemde.setupCodeEditor("markdowneditor");
-        });
-    </script>
-}

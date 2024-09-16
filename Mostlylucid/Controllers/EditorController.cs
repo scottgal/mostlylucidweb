@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Htmx;
+using Microsoft.AspNetCore.Mvc;
 using Mostlylucid.MarkdownTranslator.Models;
 using Mostlylucid.Models.Editor;
 using Mostlylucid.Services;
@@ -32,7 +33,12 @@ public class EditorController(
         };
         if (slug == null)
         {
+            
             editorModel.IsNew = true;
+            if(Request.IsHtmx())
+            {
+                return PartialView("Editor", editorModel);
+            }
             return View("Editor", editorModel);
         }
 
@@ -41,6 +47,10 @@ public class EditorController(
 
         editorModel.Markdown = blogPost.Markdown;
         editorModel.PostViewModel = blogPost;
+        if(Request.IsHtmx())
+        {
+            return PartialView("Editor", editorModel);
+        }
         return View("Editor", editorModel);
     }
 
