@@ -3,6 +3,8 @@
 # Introduction
 In this site I use [HTMX](https://htmx.org/) extensively, this is a super easy way to make your site feel more responsive and smoother without having to write a lot of JavaScript.
 
+**NOTE: I'm not entirely happy with this yet, HTMX has some elements which make this tricky**
+
 <datetime class="hidden">2024-09-15T06:45</datetime>
 <!--category-- ASP.NET, HTMX, Apline.js -->
 [TOC]
@@ -97,7 +99,7 @@ As you can see this is just a simple function that looks for all the links in th
 ```
 Additionally once the swap has been made I then push the new URL to the browser history and scroll to the top of the page. I use this approach in a few places (like search) to give a nice buttery smooth experience. 
 
-## Back Button
+## Back Button (This is tricky to get working)
 The back button in this type of app can be problematic; MANY 'proper' SPAs either disable the back button or put up with this incorrect behaviour. However I wanted to make sure the back button worked as expected.
 Note: To get the back button to work as expected we also need to listen for the `popState` event. This event is fired when the user navigates back or forward in the browser history. When this event is fired we can reload the content for the current URL.
 
@@ -122,6 +124,17 @@ window.addEventListener("popstate",   (event) => {
 In this code we prevent the default browser popstate behaviour with the `event.preventDefault()` call. We then extract the current URL from the `window.location.href` property and perform an HTMX AJAX request to load the content for the current state. Once the content has been loaded we scroll to the top of the page.
 
 As mentioned previosly you cannot ALSO use `hx-pushurl` as this will cause the browser to reload the page on backbutton twice.
+
+## Backbutton the Simpler Way
+So the method above CAN be made to work however it's super tricky and a bit awkward. Instead what I'm now doing is just adding `hx-boost` to the tag which contains blog content. This STILL doesn't seem to be perfect but it's a lot less fiddly. 
+
+```html
+   <div class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2" hx-boost="true"  hx-target="#contentcontainer">
+        @Html.Raw(Model.HtmlContent)
+    </div>
+```
+This seems to work just as well as `hx-boost` can be placed on parent methods and apply to all child links. It's also more standard HTMX without messing with history etc.
+
 
 # HTMX more generally (and Alpine.js)
 As you may have guessed I'm somewhat a fan of HTMX, combined with ASP.NET Core and a smattering of Alpine.js it empowers devs to create a really nice user experience with minimal effort. 

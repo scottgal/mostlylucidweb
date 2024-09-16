@@ -21,9 +21,7 @@ import { submitTranslation, viewTranslation } from "./translations";
 import { codeeditor } from "./simplemde";
 import { globalSetup } from "./global";
 import  {comments} from  "./comments"; 
-import "./mdeswitch"; 
-
-import "./blogswapper";
+import "./mdeswitch";
 window.mostlylucid.comments = comments();
 
 // Attach imported modules to the mostlylucid namespace
@@ -68,38 +66,30 @@ window.onload = function(ev) {
         hljs.registerLanguage("cshtml-razor", hljsRazor);
         hljs.highlightAll();
         setLogoutLink();
-        blogswitcher();
+
         updateMetaUrls();
         console.log('Document is ready');
-        document.body.addEventListener('htmx:afterSwap', function(evt) {
+
+        // Only trigger updates after HTMX swaps content in #contentcontainer or #commentlist
+        document.body.addEventListener('htmx:afterSettle', function(evt) {
             const targetId = evt.detail.target.id;
-            if (targetId !== 'contentcontainer' && targetId !== 'commentlist') return;
-            console.log('HTMX afterSwap triggered', evt);
+            if (targetId !== 'contentcontainer' && targetId !== 'commentlist' && targetId!=="blogpost") {
+             console.log("Ignoring swap event for target:", targetId);
+                return;
+            }
+            initGoogleSignIn();
+            console.log('HTMX afterSettle triggered', evt);
             mermaidinit();
             hljs.highlightAll();
-            updateMetaUrls();
-            setLogoutLink();
-            blogswitcher();
+             setLogoutLink();
         });
     }
 };
 
-window.addEventListener("popstate",   (event) => {
-    // When the user navigates back, reload the content for the current URL
-    event.preventDefault();
-    let url = window.location.href;
-    // Perform the HTMX AJAX request to load the content for the current state
-    htmx.ajax('get', url, {
-        target: '#contentcontainer',
-        swap: 'innerHTML'
-    }).then(function () {
-        // Scroll to the top of the page
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    });
-});
+
+
+
+
 
 function updateMetaUrls() {
     var currentUrl = window.location.href;
