@@ -2,7 +2,7 @@
 @using Mostlylucid.Helpers
 @model Mostlylucid.Models.Blog.BlogPostViewModel
 <title>@($"{Model.Title} ({Model.Language.ConvertCodeToLanguage()})")</title>
-<div class="pt-2 lg:pt-2" id="blogpost" >
+<div class="pt-2 lg:pt-2" id="blogpost" hx-boost="true"  hx-target="#contentcontainer" hx-swap="show:window:top">
     <div class="border-b border-grey-lighter pb-2 sm:pb-2">
 
         <h2 class="pb-2 block font-body text-3xl font-semibold leading-tight text-primary dark:text-white">
@@ -45,7 +45,7 @@
             </p>
         </div>
     </div>
-    <div class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2" hx-boost="true"  hx-target="#contentcontainer">
+    <div class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2" >
         @Html.Raw(Model.HtmlContent)
     </div>
     <div x-data="{ showNewElement: false }" x-init="
