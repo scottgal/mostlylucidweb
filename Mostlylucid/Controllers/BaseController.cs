@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Mostlylucid.Helpers;
+using Mostlylucid.Models;
 using Mostlylucid.Services;
 
 namespace Mostlylucid.Controllers;
@@ -18,6 +19,18 @@ public class BaseController(BaseControllerService baseControllerService, ILogger
     protected string UserId => Request.GetUserId(Response);
 
 
+    protected async Task<T> PopulateBaseModel<T>(T model) where T : BaseViewModel
+    {
+        if(!User.Identity?.IsAuthenticated ==true) return model;
+      var userInfo = await GetUserInfo();
+        model.Authenticated = userInfo.LoggedIn;
+        model.IsAdmin = userInfo.IsAdmin;
+        model.AvatarUrl = userInfo.AvatarUrl;
+        model.Name = userInfo.Name;
+        model.Email = userInfo.Email;
+        return model;
+    }
+    
 
     public override async Task OnActionExecutionAsync(ActionExecutingContext filterContext,
         ActionExecutionDelegate next)

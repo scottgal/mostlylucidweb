@@ -26,6 +26,9 @@ public static class BlogPostMapper
         };
     }
 
+    public static PostListModel ToListModel(this BlogPostEntity postEntity) => postEntity.ToListModel(null);
+
+
     public static PostListModel ToListModel(this BlogPostEntity postEntity, string[]? languages)
     {
         var introductionText = "Introduction\n";

@@ -1,0 +1,28 @@
+﻿@model Mostlylucid.Models.Search.SearchResultsModel
+
+@{
+    ViewBag.Title = "Search Results";
+}
+
+<title>@ViewBag.Title</title>
+
+<div class="flex items-center gap-2 bg-neutral-500 bg-opacity-10 p-2 rounded-lg">
+    <button
+        hx-get="@Url.Action("SearchResults", "Search")"
+        hx-target="#content"
+        hx-include="[name='query']"
+        hx-swap="outerHTML"
+        class="btn btn-outline btn-sm flex items-center gap-2 text-black dark:text-white">
+        Search
+        <i class="bx bx-search text-lg"></i>
+    </button>
+    <input
+        type="text"
+        placeholder="Search..."
+        value="@Model.Query"
+        name="query"
+        class="input input-sm border-0 grow text-black dark:text-white bg-transparent focus:outline-none"/>
+
+</div>
+
+<partial name="_SearchResultsPartial" model="Model.SearchResults"></partial>
