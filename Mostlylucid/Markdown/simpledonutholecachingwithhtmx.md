@@ -18,19 +18,17 @@ I already blogged about [using AntiForgeryRequest Tokens with Javascript](/blog/
 NOW I can reinstate this functionality when using HTMX to dynamically load partials.
 
 ```razor
-<li class="group relative mb-1">
-    <div  hx-trigger="load" hx-get="/typeahead">
-    </div>
+  <li class="group relative mb-1 hidden lg:block ml-2" id="typeaheadelement">
+    <div  hx-trigger="load" hx-get="/typeahead" hx-target="#typeaheadelement" hx-swap="innerHTML"></div>
 </li>
 ```
 Dead simple, right? All this does is call into the one line of code in the controller that returns the partial view. This means that the Anti-forgery token is generated on the server and the page can be cached as normal. The partial view is loaded dynamically so the token is still unique to each request.
 
 NOTE: You if you use a 'SPA' like approach as I do with HTMX you need to ensure that the `load` event doesn't fire again on the back button. I make this happen by setting the typeahead to overwrite the target on the first load.
 
-```html
-  <div id="typeaheadelement" hx-trigger="load" hx-get="/typeahead" hx-swap="outerHTML"></div>
-```
-This means that the first time it runs it clears the originating div and replaces it with the new content from the partial returned by the controller below. As the Anto-forgery token is generated on the server and stored in a session cookie it should still work with this approach (until I redeploy the app). ~~~~
+This means that the first time it runs it clears the originating div and replaces it with the new content from the partial returned by the controller below. As the Anto-forgery token is generated on the server and stored in a session cookie it should still work with this approach (until I redeploy the app). 
+
+We set the `hx-target` to the outer element mainly to avoid a JS error; as HTMX needs a valid target when completing the request. So you can't remove the element which triggered the HTMX request.
 
 ```csharp
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
