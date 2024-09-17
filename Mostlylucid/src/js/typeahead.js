@@ -29,7 +29,6 @@
                     this.results = data;
                     this.highlightedIndex = -1; // Reset index on new search
                     this.$nextTick(() => {
-                        htmx.logAll();
                         htmx.process(document.getElementById('searchresults'));
                     });
                 })
@@ -68,14 +67,11 @@
 
         selectResult(selectedIndex) {
        let links = document.querySelectorAll('#searchresults a');
-           
        links[selectedIndex].click();
-       
-            this.$nextTick(() => {
                 this.results = []; // Clear the results
                 this.highlightedIndex = -1; // Reset the highlighted index
                 this.query = ''; // Clear the query
-            });
+            
         }
     }
 }

@@ -66,7 +66,6 @@ window.onload = function(ev) {
         hljs.registerLanguage("cshtml-razor", hljsRazor);
         hljs.highlightAll();
         setLogoutLink();
-
         updateMetaUrls();
         console.log('Document is ready');
 
