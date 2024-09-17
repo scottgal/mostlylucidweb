@@ -12,7 +12,7 @@ module.exports = {
     darkMode: "class",
     theme: {        
         fontFamily: {
-            body: ["Poppins", "sans-serif"],
+            body: ["Raleway", "sans-serif"],
         },
 
         screens: {
