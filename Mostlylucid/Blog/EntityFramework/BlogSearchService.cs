@@ -13,18 +13,8 @@ public class BlogSearchService(MostlylucidDbContext context)
         {
             return new PostListViewModel();
         }
-        IQueryable<BlogPostEntity> blogPostQuery;
-        if (!query.Contains(" "))
-        {
-            blogPostQuery = QueryForSpaces(query);
-        }
-        else
-        {
-            blogPostQuery = QueryForWildCard(query);
-        }
-        
+        IQueryable<BlogPostEntity> blogPostQuery = query.Contains(" ") ? QueryForSpaces(query) : QueryForWildCard(query);
         var totalPosts = await blogPostQuery.CountAsync();
-  
         var results = await blogPostQuery
             .Select(x => x.ToListModel())
             .Skip((page - 1) * pageSize)
