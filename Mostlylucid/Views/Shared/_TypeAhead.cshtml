@@ -1,4 +1,4 @@
-﻿<div x-data="window.mostlylucid.typeahead()" x-init="results=[]"  class="relative" id="searchelement" x-on:click.outside="results = []">
+﻿<div x-data="window.mostlylucid.typeahead()"  class="relative" id="searchelement" x-on:click.outside="results = []">
     @Html.AntiForgeryToken()
     <label class="input input-sm bg-neutral-500 bg-opacity-10 input-bordered flex items-center gap-2">
         <input
@@ -13,7 +13,7 @@
         <i class="bx bx-search"></i>
     </label>
     <!-- Dropdown -->
-    <ul  x-show="results.length > 0"
+    <ul  x-show="results.length > 0 && query.length > 1"
         x-cloak
         id="searchresults"
         class="absolute z-100 my-2 w-full bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-neutral-600 rounded-lg shadow-lg">
