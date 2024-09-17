@@ -241,5 +241,92 @@ I Include the query in the request using `hx-include` and target the `#content` 
 </div>
 ```
 
+# Update
+So following some comments from [Khalid](https://khalidabuhakmeh.com/)  I decided to enhance this functionality to enable the search to be:
+1. Triggered on Enter key press
+2. Triggered on entering more than two characters (so becomes a loose typeahead).
+
+In future I need to add the page size functionality back in; it's a biit of a hack and needs to support further requirements.
+
+## Updated Search Form
+
+To do this I first wrapped the input in a form and used Alpine.js to submit the form when a user is typing.
+You can see that I use `x-data` to create a reactive variable for the query and then I check the length of the query to determine whether to submit the form.
+
+```razor
+<form
+    x-data="{ query: '@Model.Query', checkSubmit() { if (this.query.length > 2) { $refs.searchButton.click(); } } }"
+    class="flex items-center gap-2 bg-neutral-500 bg-opacity-10 p-2 rounded-lg"
+    action="@Url.Action("Search", "Search")"
+    hx-push-url="true"
+    hx-boost="true"
+    hx-target="#content"
+    hx-swap="outerHTML show:window:top"
+    hx-headers='{"pagerequest": "true"}'>
+    <button
+        type="submit"
+        x-ref="searchButton"
+        class="btn btn-outline btn-sm flex items-center gap-2 text-black dark:text-white">
+        Search
+        <i class="bx bx-search text-lg"></i>
+    </button>
+    <input
+        type="text"
+        placeholder="Search..."
+        name="query"
+        value="@Model.Query"
+        x-model="query"
+        x-on:input.debounce.200ms="checkSubmit"
+        x-on:keydown.enter.prevent="$refs.searchButton.click()"
+        class="input input-sm border-0 grow text-black dark:text-white bg-transparent focus:outline-none"
+    />
+</form>
+```
+
+In order to reuse the same controller action I also set the `pagerequest` header to indicate that this is a paginated request.
+
+I also use the Alpine.js `x-on:keydown.enter.prevent` to trigger the button click when the Enter key is pressed and a debounce on the input to prevent too many requests.
+
+## Controller Update
+In the controller I removed the SearchResults action and instead added more 'intelligence' to the main `Search` action to handle both the initial search and the paginated requests.
+
+Here you can see I add an extra parameter called `pagerequest` to determine whether this is a paginated request or not and indicate that this should be populated from the header collection.
+
+```csharp
+
+    [HttpGet]
+    [Route("")]
+    public async Task<IActionResult> Search(string? query, int page = 1, int pageSize = 10,[FromHeader] bool pagerequest=false)
+    {
+        var searchResults = await searchService.GetPosts(query, page, pageSize);
+        var searchModel = new SearchResultsModel
+        {
+            Query = query,
+            SearchResults = searchResults
+        };
+        searchModel = await PopulateBaseModel(searchModel);
+        var linkUrl = Url.Action("Search", "Search");
+        searchModel.SearchResults.LinkUrl = linkUrl;
+        if(pagerequest && Request.IsHtmx()) return PartialView("_SearchResultsPartial", searchModel.SearchResults);
+        
+        if (Request.IsHtmx()) return PartialView("SearchResults", searchModel);
+        return View("SearchResults", searchModel);
+    }
+```
+
+I then get the results and detect this header to determine which view / partialview to return.
+
+I further added a seperate retirect action to handle the likes of `/search/umami` to redirect to the main search page with the query.
+
+```csharp
+   [HttpGet]
+    [Route("{query}")]
+    public  IActionResult InitialSearch([FromRoute] string query)
+    {
+        return RedirectToAction("Search", new { query });
+    }
+```
+
+
 # In Conclusion
 So, pretty simple right? This is a straightforward implementation of a search page using HTMX and EF Core in an ASP.NET Core application. You can easily extend this to include more features like filtering, sorting, or even integrating with other search services. The key takeaway is how to leverage HTMX for a smooth user experience while keeping the backend logic clean and efficient. 

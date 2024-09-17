@@ -6,12 +6,18 @@
 
 <title>@ViewBag.Title</title>
 
-<div class="flex items-center gap-2 bg-neutral-500 bg-opacity-10 p-2 rounded-lg">
+<form
+    x-data="{ query: '@Model.Query', checkSubmit() { if (this.query.length > 2) { $refs.searchButton.click(); } } }"
+    class="flex items-center gap-2 bg-neutral-500 bg-opacity-10 p-2 rounded-lg"
+    action="@Url.Action("Search", "Search")"
+    hx-push-url="true"
+    hx-boost="true"
+    hx-target="#content"
+    hx-swap="outerHTML show:window:top"
+    hx-headers='{"pagerequest": "true"}'>
     <button
-        hx-get="@Url.Action("SearchResults", "Search")"
-        hx-target="#content"
-        hx-include="[name='query']"
-        hx-swap="outerHTML"
+        type="submit"
+        x-ref="searchButton"
         class="btn btn-outline btn-sm flex items-center gap-2 text-black dark:text-white">
         Search
         <i class="bx bx-search text-lg"></i>
@@ -19,10 +25,22 @@
     <input
         type="text"
         placeholder="Search..."
-        value="@Model.Query"
         name="query"
-        class="input input-sm border-0 grow text-black dark:text-white bg-transparent focus:outline-none"/>
+        value="@Model.Query"
+        x-model="query"
+        x-on:input.debounce.200ms="checkSubmit"
+        x-on:keydown.enter.prevent="$refs.searchButton.click()"
+        class="input input-sm border-0 grow text-black dark:text-white bg-transparent focus:outline-none"
+    />
+</form>
 
-</div>
-
-<partial name="_SearchResultsPartial" model="Model.SearchResults"></partial>
+@if(Model.Query?.Length > 0)
+{
+    <partial name="_SearchResultsPartial" model="Model.SearchResults"></partial>
+} 
+else
+{
+    <div id="content" class="pt-2 h-1/2 text-center text-lg text-black dark:text-white">
+        Please enter a search term.
+    </div>
+}

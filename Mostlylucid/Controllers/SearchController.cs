@@ -15,24 +15,8 @@ public class SearchController(
     : BaseController(baseControllerService, logger)
 {
     [HttpGet]
-    [Route("{query?}")]
-    public async Task<IActionResult> Search([FromRoute] string? query)
-    {
-        var searchResults = await searchService.GetPosts(query);
-        var searchModel = new SearchResultsModel
-        {
-            Query = query,
-            SearchResults = searchResults
-        };
-        searchModel = await PopulateBaseModel(searchModel);
-        searchModel.SearchResults.LinkUrl = Url.Action("SearchResults", "Search");
-        if (Request.IsHtmx()) return PartialView("SearchResults", searchModel);
-        return View("SearchResults", searchModel);
-    }
-
-    [HttpGet]
-    [Route("results")]
-    public async Task<IActionResult> SearchResults([Required] string query, int page = 1, int pageSize = 10)
+    [Route("")]
+    public async Task<IActionResult> Search(string? query, int page = 1, int pageSize = 10,[FromHeader] bool pagerequest=false)
     {
         var searchResults = await searchService.GetPosts(query, page, pageSize);
         var searchModel = new SearchResultsModel
@@ -41,8 +25,19 @@ public class SearchController(
             SearchResults = searchResults
         };
         searchModel = await PopulateBaseModel(searchModel);
-        searchModel.SearchResults.LinkUrl = Url.Action("SearchResults", "Search");
-        if (Request.IsHtmx()) return PartialView("_SearchResultsPartial", searchModel.SearchResults);
+        var linkUrl = Url.Action("Search", "Search");
+        searchModel.SearchResults.LinkUrl = linkUrl;
+        if(pagerequest && Request.IsHtmx()) return PartialView("_SearchResultsPartial", searchModel.SearchResults);
+        
+        if (Request.IsHtmx()) return PartialView("SearchResults", searchModel);
         return View("SearchResults", searchModel);
     }
+
+    [HttpGet]
+    [Route("{query}")]
+    public  IActionResult InitialSearch([FromRoute] string query)
+    {
+        return RedirectToAction("Search", new { query });
+    }
+
 }
