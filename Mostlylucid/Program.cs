@@ -37,9 +37,6 @@ try
         {
             builder.AddPrometheusExporter();
             builder.AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Server.Kestrel");
-            builder.AddRuntimeInstrumentation();
-            builder.AddAspNetCoreInstrumentation();
-            builder.AddHttpClientInstrumentation();
         });
 
 // Add services to
