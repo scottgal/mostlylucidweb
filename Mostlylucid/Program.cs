@@ -36,6 +36,7 @@ try
         .WithMetrics(builder =>
         {
             builder.AddPrometheusExporter();
+            builder.AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Server.Kestrel");
             builder.AddRuntimeInstrumentation();
             builder.AddAspNetCoreInstrumentation();
             builder.AddHttpClientInstrumentation();
