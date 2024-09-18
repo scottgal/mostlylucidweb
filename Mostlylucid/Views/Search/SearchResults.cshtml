@@ -7,7 +7,15 @@
 <title>@ViewBag.Title</title>
 
 <form
-    x-data="{ query: '@Model.Query', checkSubmit() { if (this.query.length > 2) { $refs.searchButton.click(); } } }"
+    x-data="{
+        query: '@Model.Query',
+        autoSearch: true, 
+        checkSubmit() { 
+            if (this.autoSearch && this.query.length > 2) { 
+                $refs.searchButton.click(); 
+            } 
+        }
+    }"
     class="flex items-center gap-2 bg-neutral-500 bg-opacity-10 p-2 rounded-lg"
     action="@Url.Action("Search", "Search")"
     hx-push-url="true"
@@ -15,6 +23,7 @@
     hx-target="#content"
     hx-swap="outerHTML show:window:top"
     hx-headers='{"pagerequest": "true"}'>
+
     <button
         type="submit"
         x-ref="searchButton"
@@ -22,6 +31,7 @@
         Search
         <i class="bx bx-search text-lg"></i>
     </button>
+
     <input
         type="text"
         placeholder="Search..."
@@ -32,7 +42,17 @@
         x-on:keydown.enter.prevent="$refs.searchButton.click()"
         class="input input-sm border-0 grow text-black dark:text-white bg-transparent focus:outline-none"
     />
+
+    <label class="flex items-center gap-2">
+        <input
+            type="checkbox"
+            x-model="autoSearch"
+            class="checkbox checkbox-primary"
+        />
+        <span class="text-black dark:text-white">Auto</span>
+    </label>
 </form>
+
 
 @if(Model.Query?.Length > 0)
 {

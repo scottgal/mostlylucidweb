@@ -29,7 +29,7 @@ try
     var services = builder.Services;
 // Add services to
 // the container.
-    services.AddOutputCache(); // Remove duplicate call later in your code
+    services.AddOutputCache();
     services.AddResponseCaching();
     services.AddEndpointsApiExplorer();
     services.AddSwaggerGen();

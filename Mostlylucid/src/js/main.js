@@ -150,13 +150,23 @@ function handleCredentialResponse(response) {
     }
 }
 
-window.changePageSize=   function changePageSize(linkUrl) {
+window.changePageSize = function changePageSize(linkUrl = null) {
     const pageSize = document.getElementById('pageSize').value;
-    htmx.ajax('get', `${linkUrl}?page=1&pageSize=${pageSize}`, {
+    let url = new URL(linkUrl || window.location.href);
+    if (url.pathname.endsWith('/')) {
+        url.pathname = url.pathname.slice(0, -1);
+    }
+    url.searchParams.delete('page');
+    url.searchParams.delete('pageSize');
+    url.searchParams.set('page', '1');
+    url.searchParams.set('pageSize', pageSize);
+    
+    const newUrl = url.toString();
+    htmx.ajax('get', newUrl, {
         target: '#content',
         swap: 'innerHTML',
-        headers:{"pagerequest": "true"}
+        headers: { "pagerequest": "true" }
     }).then(() => {
-        history.pushState({}, null,  `${linkUrl}?page=1&pageSize=${pageSize}`);
+        history.pushState({}, null, newUrl);
     });
 }

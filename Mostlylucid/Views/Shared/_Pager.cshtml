@@ -15,7 +15,7 @@
         <div class="ml-4">
 
             <label for="pageSize" class="font-body text-sm text-primary dark:text-white">Posts per page</label>
-            <select id="pageSize" class="select select-bordered select-sm text-black dark:bg-custom-dark-bg bg-white dark:text-white py-0 " x-on:change="changePageSize('@Model.LinkUrl')">
+            <select id="pageSize" class="select select-bordered select-sm text-black dark:bg-custom-dark-bg bg-white dark:text-white py-0 " x-on:change="changePageSize()">
                 @foreach (var size in pageSizeOptions)
                 {
                     var selectedValue = size == selected;

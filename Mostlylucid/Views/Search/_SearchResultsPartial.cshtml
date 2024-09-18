@@ -17,7 +17,7 @@
                     hx-headers='{"pagerequest": "true"}'>
                 </pager>
             }
-
+            <partial name="_Pager" model="Model" />
         </div>
         @foreach (var post in Model.Posts)
         {

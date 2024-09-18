@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Htmx;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Blog.EntityFramework;
 using Mostlylucid.Models.Search;
 using Mostlylucid.Services;
@@ -16,6 +17,8 @@ public class SearchController(
 {
     [HttpGet]
     [Route("")]
+
+    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request","pagerquest" },VaryByQueryKeys = new[] {"query", "page", "pageSize" })]
     public async Task<IActionResult> Search(string? query, int page = 1, int pageSize = 10,[FromHeader] bool pagerequest=false)
     {
         var searchResults = await searchService.GetPosts(query, page, pageSize);
