@@ -32,6 +32,8 @@ try
         {
             builder.AddPrometheusExporter();
             builder.AddAspNetCoreInstrumentation();
+            builder.AddRuntimeInstrumentation();
+            builder.AddHttpClientInstrumentation();
         });
 
 // Add services to
