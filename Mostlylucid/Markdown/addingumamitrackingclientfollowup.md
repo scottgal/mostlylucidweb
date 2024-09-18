@@ -3,7 +3,7 @@
 <datetime class="hidden">2024-08-27T02:00</datetime>
 
 # Introduction
-In an [earlier post](/blog/addingumamitrackingclient.md) I sketched out how a Tracking Client for Umami in C# could work.
+In an [earlier post](/blog/addingumamitrackingclient) I sketched out how a Tracking Client for Umami in C# could work.
 Well I've finally had a chance to test it extensively and improve it's operation (yes ANOTHER `IHostedService`).
 
 [TOC]

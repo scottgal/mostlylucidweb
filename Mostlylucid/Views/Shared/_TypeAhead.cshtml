@@ -14,7 +14,7 @@
     </label>
     <!-- Dropdown -->
     <ul  x-cloak 
-        x-show="results.length > 0 && query.length > 1"
+        x-show="results && results.length > 0 && query && query.length > 2"
         id="searchresults"
         class="absolute z-100 my-2 w-full bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-neutral-600 rounded-lg shadow-lg">
         <template x-for="(result, index) in results" :key="result.slug">
