@@ -35,10 +35,8 @@ try
    services.AddOpenTelemetry()
         .WithMetrics(builder =>
         {
-            builder.AddPrometheusExporter()
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                .AddRuntimeInstrumentation();
+            builder.AddPrometheusExporter();
+            builder.AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Server.Kestrel");
         });
 
 // Add services to
