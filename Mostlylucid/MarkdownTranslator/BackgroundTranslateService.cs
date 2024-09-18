@@ -61,10 +61,11 @@ public class BackgroundTranslateService(
 
     private async Task StartupHealthCheck(CancellationToken cancellationToken)
     {
+       
         var retryPolicy = Policy
             .HandleResult<bool>(result => !result) // Retry when Ping returns false (service not available)
-            .WaitAndRetryAsync(3, // Retry 3 times
-                attempt => TimeSpan.FromSeconds(5), // Wait 5 seconds between retries
+            .WaitAndRetryAsync(10, // Retry 3 times
+                attempt => TimeSpan.FromSeconds(10), // Wait 10 seconds between retries
                 (result, timeSpan, retryCount, context) =>
                 {
                     logger.LogWarning("Translation service is not available, retrying attempt {RetryCount}", retryCount);
@@ -72,10 +73,7 @@ public class BackgroundTranslateService(
 
         try
         {
-            var isUp = await retryPolicy.ExecuteAsync(async () =>
-            {
-                return await Ping(cancellationToken); // Ping to check if the service is up
-            });
+            var isUp = await retryPolicy.ExecuteAsync(async () => await Ping(cancellationToken));
 
             if (isUp)
             {
