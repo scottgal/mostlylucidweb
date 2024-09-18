@@ -16,12 +16,18 @@
       - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
       - Analytics__UmamiPath=${ANALYTICS_UMAMIPATH}
       - Analytics__WebsiteId=${ANALYTICS_WEBSITEID}
+      - Analytics__User=${ANALYTICS_USER}
+      - Analytics__Password=${ANALYTICS_PASSWORD}
       - ConnectionStrings__DefaultConnection=${POSTGRES_CONNECTIONSTRING}
       - TranslateService__ServiceIPs=${EASYNMT_IPS}
+      - Serilog__WriteTo__0__Args__apiKey=${SEQ_API_KEY}
+      - Markdown__MarkdownPath=${MARKDOWN_MARKDOWNPATH}
+      - Markdown__MarkdownTranslatedPath=${MARKDOWN_MARKDOWNTRANSLATEDPATH}
     volumes:
       - /mnt/imagecache:/app/wwwroot/cache
-      - /mnt/markdown/comments:/app/Markdown/comments
       - /mnt/logs:/app/logs
+      - /mnt/markdown:/app/markdown
+      - /mnt/articleimages:/app/wwwroot/articleimages
     networks:
       - app_network
   watchtower:
@@ -59,16 +65,10 @@
     restart: always
     networks:
       - app_network
-  cloudflaredumami:
-    image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_UMAMI_TOKEN}
-    env_file:
-      - .env
-    restart: always
-    networks:
-      - app_network
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     env_file: .env
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -102,12 +102,43 @@
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - app_network
     restart: always
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    ports:
+      - "9090:9090"
+    networks:
+      - app_network
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - app_network
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=testpassword1234
+
 networks:
   app_network:
     driver: bridge
 volumes:
+  grafana-data:
   caddy_data:
   caddy_config:
+  prometheus-data:

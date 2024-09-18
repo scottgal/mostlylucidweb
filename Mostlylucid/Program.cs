@@ -1,6 +1,8 @@
 using System.Reflection;
 using Microsoft.AspNetCore.StaticFiles;
 using Mostlylucid.Services;
+using OpenTelemetry.Metrics;
+using Prometheus;
 using Umami.Net.Models;
 
 try
@@ -27,6 +29,14 @@ try
     var auth = builder.Configure<AuthSettings>();
     var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
     var services = builder.Services;
+    
+   services.AddOpenTelemetry()
+        .WithMetrics(builder =>
+        {
+            builder.AddPrometheusExporter();
+            builder.AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Server.Kestrel");
+        });
+
 // Add services to
 // the container.
     services.AddOutputCache();
@@ -35,7 +45,7 @@ try
     services.AddSwaggerGen();
     services.SetupTranslateService();
     services.SetupOpenSearch(config);
- 
+    services.AddHealthChecks();
     services.SetupUmamiData(config);
     services.AddScoped<IUmamiDataSortService, UmamiDataSortService>();
     services.AddScoped<IUmamiUserInfoService, UmamiUserInfoService>();
@@ -89,7 +99,8 @@ try
     });
     var app = builder.Build();
     app.UseSerilogRequestLogging();
-
+    app.UseHealthChecks("/healthz");
+    app.MapPrometheusScrapingEndpoint();
     using (var scope = app.Services.CreateScope())
     {
         var blogContext = scope.ServiceProvider.GetRequiredService<IMostlylucidDBContext>();

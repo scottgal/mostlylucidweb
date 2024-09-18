@@ -31,7 +31,14 @@
         Search
         <i class="bx bx-search text-lg"></i>
     </button>
-
+    <label class="flex items-center gap-2">
+        <input
+            type="checkbox"
+            x-model="autoSearch"
+            class="checkbox checkbox-primary"
+        />
+        <span class="text-black dark:text-white">Auto</span>
+    </label>
     <input
         type="text"
         placeholder="Search..."
@@ -43,14 +50,7 @@
         class="input input-sm border-0 grow text-black dark:text-white bg-transparent focus:outline-none"
     />
 
-    <label class="flex items-center gap-2">
-        <input
-            type="checkbox"
-            x-model="autoSearch"
-            class="checkbox checkbox-primary"
-        />
-        <span class="text-black dark:text-white">Auto</span>
-    </label>
+
 </form>
 
 
