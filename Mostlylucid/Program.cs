@@ -1,3 +1,4 @@
+using System.Security.Cryptography.X509Certificates;
 using Mostlylucid.Services;
 using OpenTelemetry.Metrics;
 using Serilog.Debugging;
@@ -5,8 +6,29 @@ using Serilog.Debugging;
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    var config = builder.Configuration;
+    config.AddEnvironmentVariables();
+    var certExists = File.Exists("mostlylucid.pfx");
+    var certPassword = config["CertPassword"];
+ 
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(8080); // HTTP endpoint
 
-
+        // HTTPS endpoint using SSL certificate
+        options.ListenAnyIP(7240, listenOptions =>
+        {
+            if (certExists)
+            {
+                var certificate = new X509Certificate2("mostlylucid.pfx", certPassword);
+                listenOptions.UseHttps(options => options.ServerCertificate = certificate);
+            }
+            else
+            //Local development without certificate.
+                listenOptions.UseHttps();
+            
+        });
+    });;
     builder.Host.UseSerilog((context, configuration) =>
     {
         configuration.ReadFrom.Configuration(context.Configuration);
@@ -20,8 +42,8 @@ try
         .AspNetCoreRequests()
         .TraceToSharedLogger();
 
-    var config = builder.Configuration;
-    builder.Configuration.AddEnvironmentVariables();
+
+
     builder.Configure<AnalyticsSettings>();
     var auth = builder.Configure<AuthSettings>();
     var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
