@@ -1,12 +1,12 @@
 ﻿
 
-<h1>500 - Server Errpr</h1>
+<h1>@ViewData["StatusCode"] - Server Errpr</h1>
 <p>Sorry there seems to be an error with that page.</p>
 @section Scripts {
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             if (!window.hasTracked) {
-                umami.track('500', { page:'@ViewData["OriginalUrl"]'});
+                umami.track(@ViewData["StatusCode"], { page:'@ViewData["OriginalUrl"]'});
                 window.hasTracked = true;
             }
         });

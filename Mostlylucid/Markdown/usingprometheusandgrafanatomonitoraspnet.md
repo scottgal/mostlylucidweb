@@ -3,7 +3,7 @@
 <datetime class="hidden">2024-09-18T04:45</datetime>
 
 # Introduction
-Monitoring is an essential part of maintaining the health and performance of your applications. I already have this site monitoring user visits using Umami and exceptions and errors using Seq but now I wanted to add performance monitoring to the mix.
+Monitoring is an essential part of maintaining the health and performance of your applications. I already have this site monitoring user visits using [Umami](/blog/category/Umami) and exceptions and errors using [Seq](/blog/category/Seq) but now I wanted to add performance monitoring to the mix.
 In this guide, we will explore how to set up monitoring for your ASP.NET Core applications using Grafana and Prometheus.
 
 You can of course use the Grafana Cloud service, but for this guide, we will focus on setting up everything locally so you can have full control over your monitoring stack.

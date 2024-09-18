@@ -10,7 +10,7 @@ In this post, I will show you how to implement a simple search page using HTMX a
 [TOC]
 
 ## Don't I already have a search?
-Well yes, in the header of the site I have a search function which provides typeahead (where as you type the results come in real time). However I hide that in mobile mode and I also wanted to be able to link the search results (like [/search/umami](/search/umami)) to a dedicated search page.
+Well yes, in the header of the site I have a search function which provides typeahead (where as you type the results come in real time). However I hide that in mobile mode and I also wanted to be able to link the search results (like [/search/umami](/search/umami)) to a dedicated search page. This gives a better user experience as well as working on mobile devices.
 
 # Search Service
 To do this I modified how I did my searches. I created a `BlogSearchService`, this is based on my two Full Text query methods. These unfortunately need to be split into two methods because of the way the queries are structured with the Postgres Full Text Search extensions, `EF.Functions.WebSearchToTsQuery("english",

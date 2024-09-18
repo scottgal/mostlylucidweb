@@ -38,6 +38,9 @@
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
       <PackageReference Include="OpenSearch.Client" Version="1.8.0" />
       <PackageReference Include="OpenSearch.Client.JsonNetSerializer" Version="1.8.0" />
+      <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
+      <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
+      <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
       <PackageReference Include="PaginationTagHelper.AspNetCore" Version="1.0.1" />
       <PackageReference Include="PreMailer.Net" Version="2.6.0" />
       <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />

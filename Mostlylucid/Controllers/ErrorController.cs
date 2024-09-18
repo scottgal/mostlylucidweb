@@ -19,9 +19,9 @@ public class ErrorController(BaseControllerService baseControllerService, ILogge
             var originalPath = statusCodeReExecuteFeature.OriginalPath;
             var originalQueryString = statusCodeReExecuteFeature.OriginalQueryString;
 
-
             // Optionally log the original URL or pass it to the view
             ViewData["OriginalUrl"] = $"{originalPath}{originalQueryString}";
+            ViewData["StatusCode"] = statusCode;
         }
 
         // Handle specific status codes and return corresponding views
