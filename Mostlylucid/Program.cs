@@ -1,11 +1,6 @@
-using System.Reflection;
-using Microsoft.AspNetCore.StaticFiles;
 using Mostlylucid.Services;
 using OpenTelemetry.Metrics;
-
-
-using Prometheus;
-using Umami.Net.Models;
+using Serilog.Debugging;
 
 try
 {
@@ -16,8 +11,8 @@ try
     {
         configuration.ReadFrom.Configuration(context.Configuration);
 #if DEBUG
-    Serilog.Debugging.SelfLog.Enable(Console.Error);
-    Console.WriteLine($"Serilog Minimum Level: {configuration.MinimumLevel.ToString()}");
+        SelfLog.Enable(Console.Error);
+        Console.WriteLine($"Serilog Minimum Level: {configuration.MinimumLevel}");
 #endif
     });
     using var listener = new ActivityListenerConfiguration()
@@ -31,8 +26,8 @@ try
     var auth = builder.Configure<AuthSettings>();
     var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
     var services = builder.Services;
-    
-   services.AddOpenTelemetry()
+
+    services.AddOpenTelemetry()
         .WithMetrics(builder =>
         {
             builder.AddPrometheusExporter();
@@ -95,7 +90,7 @@ try
     services.AddProgressiveWebApp(new PwaOptions
     {
         RegisterServiceWorker = true,
-        RegisterWebmanifest = false,  // (Manually register in Layout file)
+        RegisterWebmanifest = false, // (Manually register in Layout file)
         Strategy = ServiceWorkerStrategy.NetworkFirst,
         OfflineRoute = "Offline.html"
     });
@@ -129,9 +124,8 @@ try
         var path = context.Request.Path.Value;
         if (path.EndsWith("RSS", StringComparison.OrdinalIgnoreCase))
         {
-          var rss = context.RequestServices.GetRequiredService<UmamiBackgroundSender>();
-           await rss.Track("RSS",useDefaultUserAgent: true);
-      
+            var rss = context.RequestServices.GetRequiredService<UmamiBackgroundSender>();
+            await rss.Track("RSS", useDefaultUserAgent: true);
         }
 
         await next();
@@ -169,7 +163,7 @@ try
             $"User-agent: *\nDisallow: \nDisallow: /cgi-bin/\nSitemap: https://{httpContext.Request.Host}/sitemap.xml";
         httpContext.Response.ContentType = "text/plain";
         await httpContext.Response.WriteAsync(robotsContent);
-    }).CacheOutput(policy: policyBuilder =>
+    }).CacheOutput(policyBuilder =>
     {
         policyBuilder.Expire(TimeSpan.FromDays(60));
         policyBuilder.Cache();
@@ -177,9 +171,9 @@ try
 
 
     app.MapControllerRoute(
-        name: "sitemap",
-        pattern: "sitemap.xml",
-        defaults: new { controller = "Sitemap", action = "Index" });
+        "sitemap",
+        "sitemap.xml",
+        new { controller = "Sitemap", action = "Index" });
     app.MapControllerRoute(
         "default",
         "{controller=Home}/{action=Index}/{id?}");
