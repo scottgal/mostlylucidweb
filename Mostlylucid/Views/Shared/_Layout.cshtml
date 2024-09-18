@@ -213,7 +213,7 @@
 </noscript>
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js" async></script>
 <script src="~/js/dist/main.js" asp-append-version="true"  data-cfasync="false" > </script>
-<script defer src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId" async></script>
+<script  src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
