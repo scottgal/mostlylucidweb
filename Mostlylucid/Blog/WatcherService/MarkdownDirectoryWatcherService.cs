@@ -68,7 +68,7 @@ public class MarkdownDirectoryWatcherService(
     {
         if (e.Name == null) return;
 
-        var activity = Log.Logger.StartActivity("Markdown File Changed {Name}", e.Name);
+        using var activity = Log.Logger.StartActivity("Markdown File Changed {Name}", e.Name);
         var retryPolicy = Policy
             .Handle<IOException>() // Only handle IO exceptions (like file in use)
             .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromMilliseconds(500 * retryAttempt),
@@ -109,7 +109,7 @@ public class MarkdownDirectoryWatcherService(
                 await blogService.SavePost(blogModel);
                 if (language == MarkdownBaseService.EnglishLanguage)
                 {
-                    var translateService = scope.ServiceProvider.GetRequiredService<BackgroundTranslateService>();
+                    var translateService = scope.ServiceProvider.GetRequiredService<IBackgroundTranslateService>();
                     await translateService.TranslateForAllLanguages(
                         new PageTranslationModel()
                             { OriginalFileName = filePath, OriginalMarkdown = blogModel.Markdown, Persist = true });

@@ -3,6 +3,7 @@ using Htmx;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.Helpers;
 using Mostlylucid.Models;
 using Mostlylucid.Services;
@@ -31,6 +32,18 @@ public class BaseController(BaseControllerService baseControllerService, ILogger
         return model;
     }
     
+    private const string CacheKey = "Categories";
+    private async Task<List<string>> GetCategories()
+    {
+        baseControllerService.MemoryCache.TryGetValue(CacheKey, out var value);
+        
+        if (value is List<string> categories) return categories;
+        logger.LogInformation("Fetching categories from BlogService");
+        categories = (await BlogService.GetCategories(true)).OrderBy(x => x).ToList();
+        baseControllerService.MemoryCache.Set(CacheKey, categories, TimeSpan.FromMinutes(30));
+        return categories;
+    }
+    
 
     public override async Task OnActionExecutionAsync(ActionExecutingContext filterContext,
         ActionExecutionDelegate next)
@@ -44,7 +57,7 @@ public class BaseController(BaseControllerService baseControllerService, ILogger
         }
 
         logger.LogInformation("Adding categories to viewbag");
-        ViewBag.Categories = (await BlogService.GetCategories()).OrderBy(x => x).ToList();
+        ViewBag.Categories = await GetCategories();
 
         await base.OnActionExecutionAsync(filterContext, next);
     }

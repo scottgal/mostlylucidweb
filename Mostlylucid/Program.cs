@@ -6,8 +6,17 @@ using Serilog.Debugging;
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    
     var config = builder.Configuration;
     config.AddEnvironmentVariables();
+    builder.Host.UseSerilog((context, configuration) =>
+    {
+        configuration.ReadFrom.Configuration(context.Configuration);
+#if DEBUG
+        SelfLog.Enable(Console.Error);
+        Console.WriteLine($"Serilog Minimum Level: {configuration.MinimumLevel}");
+#endif
+    });
     var certExists = File.Exists("mostlylucid.pfx");
     var certPassword = config["CertPassword"];
  
@@ -29,26 +38,16 @@ try
             
         });
     });;
-    builder.Host.UseSerilog((context, configuration) =>
-    {
-        configuration.ReadFrom.Configuration(context.Configuration);
-#if DEBUG
-        SelfLog.Enable(Console.Error);
-        Console.WriteLine($"Serilog Minimum Level: {configuration.MinimumLevel}");
-#endif
-    });
+
     using var listener = new ActivityListenerConfiguration()
         .Instrument.HttpClientRequests().Instrument
         .AspNetCoreRequests()
         .TraceToSharedLogger();
-
-
-
+    
     builder.Configure<AnalyticsSettings>();
     var auth = builder.Configure<AuthSettings>();
     var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
     var services = builder.Services;
-
     services.AddOpenTelemetry()
         .WithMetrics(builder =>
         {

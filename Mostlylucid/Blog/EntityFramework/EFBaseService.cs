@@ -9,10 +9,13 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
     protected readonly IMostlylucidDBContext Context = context;
     protected readonly ILogger<EFBaseService> Logger = logger;
 
-    public async Task<List<string>> GetCategories()
+    public async Task<List<string>> GetCategories(bool noTracking = false)
     {
+        if (noTracking)
+            return await Context.Categories.AsNoTracking().Select(x => x.Name).ToListAsync();
         return await Context.Categories.Select(x => x.Name).ToListAsync();
     }
+  
 
     protected IQueryable<BlogPostEntity> PostsQuery()
     {

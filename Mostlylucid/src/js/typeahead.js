@@ -10,13 +10,11 @@
                 this.highlightedIndex = -1;
                 return;
             }
-            let token = document.querySelector('#searchelement input[name="__RequestVerificationToken"]').value;
-            console.log(token);
+            
             fetch(`/api/search/${encodeURIComponent(this.query)}`, { // Fixed the backtick and closing bracket
                 method: 'GET', // or 'POST' depending on your needs
                 headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token // Attach the AntiForgery token in the headers
+                    'Content-Type': 'application/json'
                 }
             })
                 .then(response => {

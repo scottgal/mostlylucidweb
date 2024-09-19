@@ -1,9 +1,13 @@
-﻿namespace Mostlylucid.Services;
+﻿using Microsoft.Extensions.Caching.Memory;
 
-public class BaseControllerService(IBlogService blogService, AnalyticsSettings analyticsSettings, AuthSettings authSettings)
+namespace Mostlylucid.Services;
+
+public class BaseControllerService(IBlogService blogService, AnalyticsSettings analyticsSettings, AuthSettings authSettings,IMemoryCache cache)
 {
     public IBlogService BlogService => blogService;
     public AnalyticsSettings AnalyticsSettings => analyticsSettings;
     public AuthSettings AuthSettings => authSettings;
+    
+    public IMemoryCache MemoryCache=> cache;
     
 }

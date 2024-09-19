@@ -9,6 +9,10 @@ public class BlogSearchService(MostlylucidDbContext context)
 
     public async Task<PostListViewModel> GetPosts(string? query, int page = 1, int pageSize = 10)
     {
+       using var activity = Log.Logger.StartActivity("GetPosts");
+       activity.AddProperty("Query", query);
+        activity.AddProperty("Page", page);
+        activity.AddProperty("PageSize", pageSize);
         if(string.IsNullOrEmpty(query))
         {
             return new PostListViewModel();
@@ -37,6 +41,7 @@ public class BlogSearchService(MostlylucidDbContext context)
             .Include(x => x.Categories)
             .Include(x => x.LanguageEntity)
             .AsNoTrackingWithIdentityResolution()
+            //.AsSplitQuery()
             .Where(x =>
                 // Search using the precomputed SearchVector
                 (x.SearchVector.Matches(EF.Functions.WebSearchToTsQuery("english",
@@ -57,6 +62,7 @@ public class BlogSearchService(MostlylucidDbContext context)
             .Include(x => x.Categories)
             .Include(x => x.LanguageEntity)
             .AsNoTrackingWithIdentityResolution()
+            //.AsSplitQuery()
             .Where(x =>
                 // Search using the precomputed SearchVector
                 (x.SearchVector.Matches(EF.Functions.ToTsQuery("english",

@@ -1,4 +1,4 @@
-﻿# Using Grafana and Prometheus to Monitor ASP.NET Core Applications
+﻿# Using Grafana and Prometheus to Monitor ASP.NET Core 8+ Applications
 <!--category-- ASP.NET, Grafana, Prometheus, Docker -->
 <datetime class="hidden">2024-09-18T04:45</datetime>
 
@@ -14,7 +14,7 @@ The goal is to get a dashboard something like this:
 
 [TOC]
 # Docker
-As usual with this site I wanted to add the Grafana and Proioimetheus elements to my docker compose file, this allows me to spin everything up and down in a single command and keep it all encapsulated. 
+As usual with this site I wanted to add the Grafana and Prometheus elements to my docker compose file, this allows me to spin everything up and down in a single command and keep it all encapsulated. 
 
 Here you can see I set up prometheus and grafana services. These use my common app_network and have docker volumes to persist data.
 
@@ -136,10 +136,51 @@ Next, you need to configure your application to expose metrics. In your `Program
     app.MapPrometheusScrapingEndpoint();
 ```
 
-This provides the endpoint and data for Prometheus to scrape.
+This provides the endpoint and data for Prometheus to scrape and sets up two 'Meters' which provide performance data for ASP.NET Core and Kestrel.
+
+## Update
+I spent some time messing with. This is a new feature in .NET 8 and is still a little flaky it seems. The config above gives the basic features you need for the ASP.NET dashboard but there's more information you can pass to Prometheus.
+
+First the latest Beta of OpenTelemetry.Exporter.Prometheus.AspNetCore seems to be more stable than the beta 1 version (at the time of writing at least). So I recommend you use that.
+
+```bash
+dotnet add package OpenTelemetry.Exporter.Prometheus.AspNetCore --version 1.9.0-beta.2
+```
+
+Then you can add a more complete set of Meters to your application like so:
+
+```csharp
+    services.AddOpenTelemetry()
+        .WithMetrics(builder =>
+        {
+            builder.AddPrometheusExporter();
+            builder.AddAspNetCoreInstrumentation();
+            builder.AddRuntimeInstrumentation();
+            builder.AddHttpClientInstrumentation();
+        }); 
+```    
+If you F12 into these you can see that these add the packages as before:
+
+For instance `AddAspNetCoreInstrumentation` add all the built in metrics for ASP.NET Core.
+
+```csharp
+return builder
+             .AddMeter("Microsoft.AspNetCore.Hosting")
+             .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+             .AddMeter("Microsoft.AspNetCore.Http.Connections")
+             .AddMeter("Microsoft.AspNetCore.Routing")
+             .AddMeter("Microsoft.AspNetCore.Diagnostics")
+             .AddMeter("Microsoft.AspNetCore.RateLimiting");
+```
+etc. 
+
+Once these are enabled you can get more information in your dashboards.
+For example I added a GC meter in mine to show memory usage (and quickly track down memorly leaks).
+
+![Memory Usage](grafana-gcmemory.png)
 
 # Caddy
-Now we have Grafana up and runnign I added some Caddy configuration to my Caddyfile to expose the Grafana service to the outside world.
+Now we have Grafana up and running I added some Caddy configuration to my Caddyfile to expose the Grafana service to the outside world.
 
 ```json
 grafana.mostlylucid.net

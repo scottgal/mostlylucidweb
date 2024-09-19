@@ -1,6 +1,7 @@
 ﻿using System.Web;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 using Mostlylucid.Blog.EntityFramework;
 using Serilog.Events;
 using Umami.Net.Models;
@@ -14,6 +15,7 @@ public class SearchApi(
     UmamiBackgroundSender umamiBackgroundSender,
     SearchService indexService) : ControllerBase
 {
+    
     [HttpGet]
     [Route("osearch/{query}")]
     [ValidateAntiForgeryToken]
@@ -30,7 +32,7 @@ public class SearchApi(
 
     [HttpGet]
     [Route("search/{query}")]
-    [ValidateAntiForgeryToken]
+    [OutputCache(Duration = 3600 , VaryByQueryKeys = new[] { "query" })]
     public async Task<Results<JsonHttpResult<List<BlogSearchService.SearchResults>>, BadRequest<string>>>
         Search(string query)
     {

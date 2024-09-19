@@ -85,6 +85,10 @@
         <Link>.dockerignore</Link>
       </Content>    
     </ItemGroup>
+    <ItemGroup>
+      <None Remove="Markdown\translated\addingumamitrackingclientnuget.es.md" />
+      <None Remove="Markdown\translated\addingascsharpclientforumamiapi.zh.hash" />
+    </ItemGroup>
   
 
 

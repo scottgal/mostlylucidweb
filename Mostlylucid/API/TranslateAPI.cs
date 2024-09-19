@@ -9,7 +9,7 @@ namespace Mostlylucid.API;
 [ApiController]
 [Route("api/translate")]
 public class TranslateAPI(
-    BackgroundTranslateService backgroundTranslateService,
+    IBackgroundTranslateService backgroundTranslateService,
     TranslateCacheService translateCacheService, UmamiBackgroundSender umamiClient) : ControllerBase
 {
     [HttpPost("start-translation")]

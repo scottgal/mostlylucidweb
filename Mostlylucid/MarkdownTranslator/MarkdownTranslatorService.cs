@@ -1,4 +1,5 @@
-﻿using Markdig;
+﻿using System.Diagnostics;
+using Markdig;
 using Markdig.Helpers;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
@@ -7,8 +8,8 @@ namespace Mostlylucid.MarkdownTranslator;
 
 public class MarkdownTranslatorService(
     TranslateServiceConfig translateServiceConfig,
-    ILogger<MarkdownTranslatorService> logger,
-    HttpClient client)
+    ILogger<IMarkdownTranslatorService> logger,
+    HttpClient client) : IMarkdownTranslatorService
 {
     private record PostRecord(
         string target_lang,
@@ -61,8 +62,7 @@ public class MarkdownTranslatorService(
 
     private async Task<string[]> Post(string[] elements, string targetLang, CancellationToken cancellationToken)
     {
-        try
-        {
+      
             if (!IPs.Any())
             {
                 logger.LogError("No IPs available for translation");
@@ -82,19 +82,14 @@ public class MarkdownTranslatorService(
 
             logger.LogInformation("Translation took {Time} seconds", result.translation_time);
             return result.translated;
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, "Error translating markdown: {Message} for strings {Strings}", e.Message,
-                string.Concat(elements, Environment.NewLine));
-            throw;
-        }
     }
 
 
-    public async Task<string> TranslateMarkdown(string markdown, string targetLang, CancellationToken cancellationToken)
+    public async Task<string> TranslateMarkdown(string markdown, string targetLang, CancellationToken cancellationToken,
+        Activity? activity)
     {
-        var pipeline = new MarkdownPipelineBuilder().UsePreciseSourceLocation().ConfigureNewLine(Environment.NewLine).Build();
+        var pipeline = new MarkdownPipelineBuilder().UsePreciseSourceLocation().ConfigureNewLine(Environment.NewLine)
+            .Build();
         var document = Markdig.Markdown.Parse(markdown, pipeline);
         var textStrings = ExtractTextStrings(document);
         var batchSize = 5;
@@ -102,13 +97,26 @@ public class MarkdownTranslatorService(
         List<string> translatedStrings = new();
         for (int i = 0; i < stringLength; i += batchSize)
         {
-            var batch = textStrings.Skip(i).Take(batchSize).ToArray();
-            translatedStrings.AddRange(await Post(batch, targetLang, cancellationToken));
+            try
+            {
+                var batch = textStrings.Skip(i).Take(batchSize).ToArray();
+                var translatedBatch = await Post(batch, targetLang, cancellationToken);
+                activity?.SetTag("BatchSize", batch.Length);
+                activity?.SetTag("Starting time", DateTime.UtcNow);
+                translatedStrings.AddRange(translatedBatch);
+                activity?.SetTag("Ending time", DateTime.UtcNow);
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error translating markdown: {Message} for strings {Strings}", e.Message,
+                    string.Concat(Environment.NewLine, textStrings.Skip(i).Take(batchSize)));
+                throw new TranslateException(e.Message, textStrings.Skip(i).Take(batchSize).ToArray());
+            }
         }
 
 
         ReinsertTranslatedStrings(document, translatedStrings.ToArray());
-        var outString= document.ToMarkdownString();
+        var outString = document.ToMarkdownString();
         outString = outString.Replace("</summary>", $"</summary>{Environment.NewLine}");
         return outString;
     }
@@ -122,9 +130,9 @@ public class MarkdownTranslatorService(
             if (node is LiteralInline literalInline)
             {
                 if (literalInline?.Parent?.FirstChild is HtmlInline { Tag: "<datetime class=\"hidden\">" }) continue;
-                
+
                 var content = literalInline?.Content.ToString();
-                if(content == null) continue;
+                if (content == null) continue;
                 if (!IsWord(content)) continue;
 
                 textStrings.Add(content);
@@ -137,7 +145,6 @@ public class MarkdownTranslatorService(
 
     private bool IsWord(string text)
     {
-        
         var imageExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".svg" };
         if (imageExtensions.Any(text.Contains)) return false;
 
@@ -154,7 +161,7 @@ public class MarkdownTranslatorService(
             if (node is LiteralInline literalInline && index < translatedStrings.Length)
             {
                 if (literalInline?.Parent?.FirstChild is HtmlInline { Tag: "<datetime class=\"hidden\">" }) continue;
-                if(literalInline==null) continue;
+                if (literalInline == null) continue;
                 var content = literalInline.Content.ToString();
                 if (!IsWord(content)) continue;
                 var translatedContent = translatedStrings[index];
@@ -163,6 +170,9 @@ public class MarkdownTranslatorService(
             }
         }
     }
-    
+}
 
+public class TranslateException(string message, string[] strings)
+    : Exception($"Error translating markdown: {message} for strings {string.Join(", ", strings)}")
+{
 }

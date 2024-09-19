@@ -4,7 +4,7 @@ namespace Mostlylucid.Blog;
 
 public interface IBlogService : IMarkdownFileBlogService
 {
-   Task<List<string>> GetCategories();
+   Task<List<string>> GetCategories(bool noTracking = false);
    
    Task<List<BlogPostViewModel>> GetAllPosts();
     Task<List<BlogPostViewModel>> GetPosts(DateTime? startDate = null, string category = "");

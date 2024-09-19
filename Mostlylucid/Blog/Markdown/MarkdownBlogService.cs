@@ -13,7 +13,7 @@ public class MarkdownBlogService : MarkdownBaseService, IBlogService
         _logger = logger;
     }
 
-    public async Task<List<string>> GetCategories()
+    public async Task<List<string>> GetCategories(bool noTracking = false)
     {
         var pages = GetPageCache();
         var categories = pages.Values.SelectMany(x => x.Categories).Distinct().ToList();
