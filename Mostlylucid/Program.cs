@@ -51,10 +51,12 @@ try
     services.AddOpenTelemetry()
         .WithMetrics(builder =>
         {
-            builder.AddPrometheusExporter();
+     
             builder.AddAspNetCoreInstrumentation();
             builder.AddRuntimeInstrumentation();
             builder.AddHttpClientInstrumentation();
+            builder.AddProcessInstrumentation();
+            builder.AddPrometheusExporter();
         });
 
 // Add services to

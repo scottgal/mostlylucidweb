@@ -44,6 +44,7 @@
       <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.9.0-beta.2" />
       <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
       <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
+      <PackageReference Include="OpenTelemetry.Instrumentation.Process" Version="0.5.0-beta.6" />
       <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
       <PackageReference Include="PaginationTagHelper.AspNetCore" Version="1.0.1" />
       <PackageReference Include="PreMailer.Net" Version="2.6.0" />
