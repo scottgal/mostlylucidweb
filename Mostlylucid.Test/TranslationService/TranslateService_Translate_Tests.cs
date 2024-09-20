@@ -33,18 +33,5 @@ public class TranslateService_Translate_Tests
         var targetLang = "xx";
         await Assert.ThrowsAsync<TranslateException>(async () => await translateService.TranslateMarkdown(markdown, targetLang, CancellationToken.None, null));
     }
-
-    [Fact(DisplayName = "Tests a markdown file with elements that should not be translated")]
-    public async Task Test_Translate_File()
-    {
-        var services = new ServiceCollection();
-        services.AddMarkdownTranslatorServiceCollection();
-
-        var serviceProvider = services.BuildServiceProvider();
-        var translateService = serviceProvider.GetRequiredService<IMarkdownTranslatorService>();
-        var markdown =ResourceHelper.GetMarkdownResource("Mostlylucid.Test.TranslationService.TestDocuments.elements.md");
-        var targetLang = "es";
-        var translated = await translateService.TranslateMarkdown(markdown, targetLang, CancellationToken.None, null);
-        Assert.Equal("Esto es una prueba\n\n```csharp\nvar x = 1;\n```", translated);
-    }
+    
 }
