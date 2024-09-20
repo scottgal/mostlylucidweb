@@ -30,4 +30,5 @@ public class UmamiData_PageViewsRequest_Test : UmamiDataBase
 
         Assert.NotNull(result);
     }
+    
 }

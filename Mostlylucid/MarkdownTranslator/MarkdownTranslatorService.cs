@@ -40,6 +40,10 @@ public class MarkdownTranslatorService(
                     {
                         workingIPs.Add(ip);
                     }
+                    else
+                    {
+                        logger.LogWarning("Service at {IP} is not available", ip);
+                    }
                 }
                 catch (Exception)
                 {
@@ -88,6 +92,7 @@ public class MarkdownTranslatorService(
     public async Task<string> TranslateMarkdown(string markdown, string targetLang, CancellationToken cancellationToken,
         Activity? activity)
     {
+        
         var pipeline = new MarkdownPipelineBuilder().UsePreciseSourceLocation().ConfigureNewLine(Environment.NewLine)
             .Build();
         var document = Markdig.Markdown.Parse(markdown, pipeline);

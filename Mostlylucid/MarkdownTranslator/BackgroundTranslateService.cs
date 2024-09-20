@@ -243,9 +243,9 @@ public class BackgroundTranslateService(
                     if (retryCount >= 3)
                     {
                         activity?.Activity?.SetTag("Error", exception.Message);
-                        tcs.SetException(new Exception("Translation service is not available after 3 attempts"));
+                        tcs.SetException(new Exception("Translation failed available after 3 attempts"));
                         activity?.Complete(LogEventLevel.Error, exception);
-                        logger.LogError(exception, "Translation service is not available after {RetryCount} attempts",
+                        logger.LogError(exception, "Translation failed after {RetryCount} attempts",
                             retryCount);
                     }
                     else
@@ -299,6 +299,7 @@ public class BackgroundTranslateService(
                 var translatedMarkdown =
                     await markdownTranslatorService.TranslateMarkdown(translateModel.OriginalMarkdown,
                         translateModel.Language, cancellationToken, activity.Activity);
+                logger.LogInformation("Translated to {Language}", translateModel.Language);
                 if (item.Item1.Persist)
                 {
                     await PersistTranslation(scope, slug, translateModel, translatedMarkdown, activity);

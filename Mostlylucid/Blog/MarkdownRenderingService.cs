@@ -10,11 +10,7 @@ public class MarkdownRenderingService : MarkdownBaseService
     private static readonly Regex DateRegex = new(
         @"<datetime class=""hidden"">(\d{4}-\d{2}-\d{2}T\d{2}:\d{2})</datetime>",
         RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.NonBacktracking);
-
     private static readonly Regex CategoryRegex = new(@"<!--\s*category\s*--\s*(.+?)\s*-->", RegexOptions.Compiled);
-
-    
-    
     private static string[] GetCategories(string markdownText)
     {
         var matches = CategoryRegex.Match(markdownText);
@@ -23,11 +19,11 @@ public class MarkdownRenderingService : MarkdownBaseService
         return Array.Empty<string>();
     }
 
-    private Regex SplitRegex => new(@"\r\n|\r|\n", RegexOptions.Compiled);
-    public BlogPostViewModel GetPageFromMarkdown(string markdownLines, DateTime publishedDate, string filePath)
+    private static Regex SplitRegex => new(@"\r\n|\r|\n", RegexOptions.Compiled);
+    public BlogPostViewModel GetPageFromMarkdown(string markdown, DateTime publishedDate, string filePath)
     {
         var pipeline = Pipeline();
-        var lines =  SplitRegex.Split(markdownLines);
+        var lines =  SplitRegex.Split(markdown);
         // Get the title from the first line
         var title = lines.Length > 0 ? Markdig.Markdown.ToPlainText(lines[0].Trim()) : string.Empty;
 
@@ -55,7 +51,7 @@ public class MarkdownRenderingService : MarkdownBaseService
         // Return the parsed and processed content
         return new BlogPostViewModel
         {
-            Markdown =  string.Join(Environment.NewLine, lines),
+            Markdown =  markdown,
             Categories = categories,
             WordCount = restOfTheLines.WordCount(),
             HtmlContent = processed,

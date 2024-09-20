@@ -1,4 +1,5 @@
-﻿using Mostlylucid.EntityFramework.Models;
+﻿using System.Diagnostics;
+using Mostlylucid.EntityFramework.Models;
 using Mostlylucid.Helpers;
 using Mostlylucid.Models.Blog;
 
@@ -25,7 +26,7 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
 
     protected async Task<BlogPostEntity?> SavePost(BlogPostViewModel post, BlogPostEntity? currentPost = null,
         List<CategoryEntity>? categories = null,
-        List<LanguageEntity>? languages = null)
+        List<LanguageEntity>? languages = null, Activity? activity = null)
     {
         if (languages == null)
             languages = await Context.Languages.ToListAsync();
@@ -33,6 +34,7 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
         var postLanguageEntity = languages.FirstOrDefault(x => x.Name == post.Language);
         if (postLanguageEntity == null)
         {
+            activity?.AddTag("Language Not Found", post.Language);
             Logger.LogError("Language {Language} not found", post.Language);
             return null;
         }
@@ -47,6 +49,7 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
             //Add an inital check, if the current post is the same as the new post's hash, then we can skip the rest of the checks
             if (!hashChanged)
             {
+                activity?.AddTag("Post Hash Not Changed", post.Slug);
                 Logger.LogInformation("Post Hash {Post} for language {Language} has not changed", post.Slug,
                     post.Language);
                 return currentPost;
@@ -71,12 +74,13 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
             blogPost.UpdatedDate = DateTimeOffset.UtcNow;
             if (currentPost != null)
             {
+                activity?.AddTag("Updating Post", post.Slug);
                 Logger.LogInformation("Updating post {Post}", post.Slug);
                 Context.BlogPosts.Update(blogPost); // Update the existing post
             }
             else
             {
-                Logger.LogInformation("Adding new post {Post}", post.Slug);
+                logger.LogInformation("Adding new post {Post}", post.Slug);
                 Context.BlogPosts.Add(blogPost); // Add a new post
             }
 
@@ -84,7 +88,8 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
         }
         catch (Exception e)
         {
-            Logger.LogError(e, "Error adding post {Post}", post.Slug);
+            activity?.AddTag("Error Adding Post", post.Slug);
+            logger.LogError(e, "Error adding post {Post}", post.Slug);
         }
 
         return null;

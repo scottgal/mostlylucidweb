@@ -24,6 +24,7 @@ Here you can see I set up prometheus and grafana services. These use my common a
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
+      - prometheus-data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'

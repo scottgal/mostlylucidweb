@@ -96,49 +96,72 @@ public class EFBlogService(
 
     public async Task<BlogPostViewModel> SavePost(string slug, string language, string markdown)
     {
-        var model = markdownRenderingService.GetPageFromMarkdown(markdown, DateTime.Now, slug);
-        return await SavePost(model);
+        try
+        {
+            var model = markdownRenderingService.GetPageFromMarkdown(markdown, DateTime.Now, slug);
+            return await SavePost(model);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Error saving post {Slug} in {Language}", slug, language);
+        }
+        return new BlogPostViewModel();
     }
 
     public async Task<BlogPostViewModel> SavePost(BlogPostViewModel model)
     {
-        var post = await PostsQuery().FirstOrDefaultAsync(x => x.Slug == model.Slug && x.LanguageEntity.Name == model.Language);
-        await base.SavePost(model, post);
-        await Context.SaveChangesAsync();
+        using var activity =
+            Log.Logger.StartActivity("SavePost {Slug}, {Language}",  model.Slug, model.Language );
+        try
+        {
+            var post = await PostsQuery()
+                .FirstOrDefaultAsync(x => x.Slug == model.Slug && x.LanguageEntity.Name == model.Language);
+            await base.SavePost(model, post, activity: activity?.Activity);
+            await Context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            activity?.Complete(LogEventLevel.Error, e);
+            logger.LogError(e, "Error saving post {Slug} in {Language}", model.Slug, model.Language);
+        }
+
         return model;
     }
 
     public async Task<bool> Delete(string slug, string language)
     {
+        using var activity = Log.Logger.StartActivity("Delete {Slug}, {Language}", new { slug, language });
         try
         {
-       
-        if (language == MarkdownBaseService.EnglishLanguage)
-        {
-            var posts = await PostsQuery().Where(x => x.Slug == slug).ToListAsync();
-            logger.LogInformation("Deleting {Count} posts", posts.Count);
-            if (posts?.Any() != true) return false;
-            Context.BlogPosts.RemoveRange(posts);
-        }
-        else
-        {
-            var post = await PostsQuery().FirstOrDefaultAsync(x => x.Slug == slug && x.LanguageEntity.Name == language);
-            logger.LogInformation("Deleting post {Slug} in {Language}", slug, language);
-            if (post == null) return false;
-            Context.BlogPosts.Remove(post);
-        }
-      
-        await Context.SaveChangesAsync();
-        return true;
+            if (language == MarkdownBaseService.EnglishLanguage)
+            {
+                var posts = await PostsQuery().Where(x => x.Slug == slug).ToListAsync();
+                logger.LogInformation("Deleting {Count} posts", posts.Count);
+                activity?.Activity?.AddTag("Post Count", posts.Count);
+                if (posts?.Any() != true) return false;
+                Context.BlogPosts.RemoveRange(posts);
+            }
+            else
+            {
+                var post = await PostsQuery()
+                    .FirstOrDefaultAsync(x => x.Slug == slug && x.LanguageEntity.Name == language);
+                logger.LogInformation("Deleting post {Slug} in {Language}", slug, language);
+                activity?.Activity?.AddTag("Post", post);
+                if (post == null) return false;
+                Context.BlogPosts.Remove(post);
+            }
+
+            await Context.SaveChangesAsync();
+            return true;
         }
         catch (Exception e)
         {
-            
-           logger.LogError(e, "Error deleting post {Slug} in {Language}", slug, language);
-           return false;
+            activity?.Complete(LogEventLevel.Error, e);
+            logger.LogError(e, "Error deleting post {Slug} in {Language}", slug, language);
+            return false;
         }
     }
-    
+
     public async Task<BlogPostViewModel?> GetPost(string slug, string language = "")
     {
         if (string.IsNullOrEmpty(language)) language = MarkdownBaseService.EnglishLanguage;
@@ -205,23 +228,23 @@ public class EFBlogService(
             postModels.Add(postResult.ToListModel(langArr));
         }
 
-        var popularityData =(await umamiDataSortService.GetMetrics(DateTime.Now.AddDays(-30), DateTime.Now, "/blog/"))?.ToList();
+        var popularityData = (await umamiDataSortService.GetMetrics(DateTime.Now.AddDays(-30), DateTime.Now, "/blog/"))
+            ?.ToList();
 
         if (popularityData?.Any() == true)
         {
-          
-        var blogDictionary = popularityData.ToDictionary(x => x.x, x => x.y);
-        
-        foreach (var post in postModels)
-        {
-            var views = blogDictionary.Where(x => x.Key.EndsWith(post.Slug))?.Sum(x=>x.Value);
-            if (views != null)
+            var blogDictionary = popularityData.ToDictionary(x => x.x, x => x.y);
+
+            foreach (var post in postModels)
             {
-                post.Views = views.Value;
+                var views = blogDictionary.Where(x => x.Key.EndsWith(post.Slug))?.Sum(x => x.Value);
+                if (views != null)
+                {
+                    post.Views = views.Value;
+                }
             }
         }
-          
-        }
+
         var postListViewModel = new PostListViewModel
         {
             Page = page,
