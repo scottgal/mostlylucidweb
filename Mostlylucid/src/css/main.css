@@ -11,6 +11,15 @@
     background-color: rgb(128 0 0 / var(--tw-bg-opacity));
 }
 
+.prose ul {
+    list-style-type: none; /* This hides the bullet points */
+    padding-left: 0; /* Optional: Removes the default indentation */
+}
+
+.prose ul ul {
+    padding-left: 1rem; /* Keeps indentation for nested lists if needed */
+}
+
 
 .text-red-500 {
     --tw-text-opacity: 1;
