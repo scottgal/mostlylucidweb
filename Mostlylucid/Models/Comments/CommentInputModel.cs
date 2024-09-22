@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Mostlylucid.EntityFramework.Models;
+using Mostlylucid.Shared;
 
 namespace Mostlylucid.Models.Comments;
 

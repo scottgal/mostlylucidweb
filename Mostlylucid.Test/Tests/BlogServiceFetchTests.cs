@@ -2,9 +2,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Mostlylucid.Blog;
-using Mostlylucid.Blog.EntityFramework;
-using Mostlylucid.EntityFramework;
-using Mostlylucid.EntityFramework.Models;
+using Mostlylucid.Blog.ViewServices;
+using Mostlylucid.DbContext.EntityFramework;
+using Mostlylucid.Services.Markdown;
+using Mostlylucid.Services.Umami;
+using Mostlylucid.Shared.Entities;
 using Mostlylucid.Test.Extensions;
 
 namespace Mostlylucid.Test.Tests;
@@ -24,7 +26,7 @@ public class BlogServiceFetchTests
         services.AddSingleton(_dbContextMock.Object);
         // Optionally register other services
         services.AddScoped<IUmamiDataSortService, UmamiDataSortFake>();
-        services.AddScoped<IBlogService, EFBlogService>(); // Example service that depends on IMostlylucidDbContext
+        services.AddScoped<IBlogViewService, BlogPostViewService>(); // Example service that depends on IMostlylucidDbContext
         services.AddLogging(configure => configure.AddConsole());
         services.AddScoped<MarkdownRenderingService>();
         // 4. Build the service provider
@@ -32,7 +34,7 @@ public class BlogServiceFetchTests
     }
 
 
-    private IBlogService SetupBlogService(List<BlogPostEntity>? blogPosts = null)
+    private IBlogViewService SetupBlogService(List<BlogPostEntity>? blogPosts = null)
     {
         blogPosts ??= BlogEntityExtensions.GetBlogPostEntities(5);
 
@@ -40,7 +42,7 @@ public class BlogServiceFetchTests
         _dbContextMock.SetupDbSet(blogPosts, x => x.BlogPosts);
 
         // Resolve the IBlogService from the service provider
-        return _serviceProvider.GetRequiredService<IBlogService>();
+        return _serviceProvider.GetRequiredService<IBlogViewService>();
     }
 
     [Fact]
@@ -52,7 +54,7 @@ public class BlogServiceFetchTests
         var result = await blogService.GetPostsByCategory("BOOP");
 
         // Assert
-        Assert.Empty(result.Posts);
+        Assert.Empty(result.Data);
     }
 
     [Fact]
@@ -65,7 +67,7 @@ public class BlogServiceFetchTests
         var result = await blogService.GetPostsByCategory("Category 1");
 
         // Assert
-        Assert.Single(result.Posts);
+        Assert.Single(result.Data);
     }
 
     [Fact]
@@ -78,7 +80,7 @@ public class BlogServiceFetchTests
         var result = await blogService.GetPagedPosts(2, 5);
 
         // Assert
-        Assert.Equal(5, result.Posts.Count);
+        Assert.Equal(5, result.TotalItems);
     }
 
     [Fact]
@@ -91,7 +93,7 @@ public class BlogServiceFetchTests
         var result = await blogService.GetPagedPosts(10, 5);
 
         // Assert
-        Assert.Empty(result.Posts);
+        Assert.Empty(result.Data);
     }
 
     [Fact]

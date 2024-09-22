@@ -1,4 +1,6 @@
 ﻿using Mostlylucid.Blog.Markdown;
+using Mostlylucid.Blog.ViewServices;
+using Mostlylucid.Services.Interfaces;
 
 namespace Mostlylucid.MarkdownTranslator;
 
@@ -15,6 +17,6 @@ public static class TranslateServiceConfigExtension
         services.AddHostedService(provider => provider.GetRequiredService<IBackgroundTranslateService>());
 
         services.AddSingleton<TranslateCacheService>();
-        services.AddScoped<IMarkdownFileBlogService, MarkdownBlogService>();
+        services.AddScoped<IMarkdownFileBlogService, MarkdownBlogViewService>();
     }
 }

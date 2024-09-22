@@ -1,4 +1,8 @@
-﻿using Mostlylucid.Config.Markdown;
+﻿using Mostlylucid.Blog.ViewServices;
+using Mostlylucid.Config.Markdown;
+using Mostlylucid.Services.Blog;
+using Mostlylucid.Services.Interfaces;
+using Mostlylucid.Services.Markdown;
 using Polly;
 using Serilog.Events;
 
@@ -154,7 +158,7 @@ public class MarkdownDirectoryWatcherService(
             }
 
             var scope = serviceScopeFactory.CreateScope();
-            var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
+            var blogService = scope.ServiceProvider.GetRequiredService<IBlogViewService>();
             blogService.Delete(slug, language);
             activity?.Activity?.SetTag("Page Deleted", slug);
             activity?.Complete();

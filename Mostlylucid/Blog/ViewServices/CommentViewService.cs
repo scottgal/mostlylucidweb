@@ -1,6 +1,6 @@
-﻿using Mostlylucid.Blog.EntityFramework;
-using Mostlylucid.EntityFramework.Models;
-using Mostlylucid.Models.Comments;
+﻿using Mostlylucid.Models.Comments;
+using Mostlylucid.Services.Interfaces;
+using Mostlylucid.Shared;
 
 namespace Mostlylucid.Blog.ViewServices;
 

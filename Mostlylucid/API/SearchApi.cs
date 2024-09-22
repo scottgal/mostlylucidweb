@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
-using Mostlylucid.Blog.EntityFramework;
+using Mostlylucid.Services.Blog;
+using Mostlylucid.Services.Markdown;
 using Serilog.Events;
 using Umami.Net.Models;
 

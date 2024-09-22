@@ -1,4 +1,5 @@
 ﻿using Mostlylucid.Models.Blog;
+using Mostlylucid.Shared.Entities;
 
 namespace Mostlylucid.Models.Search;
 

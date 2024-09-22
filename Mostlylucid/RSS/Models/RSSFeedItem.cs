@@ -1,4 +1,5 @@
 ﻿using Mostlylucid.Helpers;
+using Mostlylucid.Shared.Helpers;
 
 namespace Mostlylucid.RSS.Models;
 

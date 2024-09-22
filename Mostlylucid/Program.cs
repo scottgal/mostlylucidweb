@@ -1,10 +1,15 @@
 using System.Security.Cryptography.X509Certificates;
+using Mostlylucid.DbContext.EntityFramework;
 using Mostlylucid.Services;
 using OpenTelemetry.Metrics;
 using Serilog.Debugging;
+using Mostlylucid.EmailSubscription;
+using Mostlylucid.Services.Umami;
 
 try
-{
+{  Log.Logger = new LoggerConfiguration()
+             .WriteTo.Console()
+             .CreateBootstrapLogger();
     var builder = WebApplication.CreateBuilder(args);
     
     var config = builder.Configuration;
@@ -13,6 +18,8 @@ try
     {
         configuration.ReadFrom.Configuration(context.Configuration);
 #if DEBUG
+        configuration.MinimumLevel.Debug();
+        configuration.WriteTo.Console();
         SelfLog.Enable(Console.Error);
         Console.WriteLine($"Serilog Minimum Level: {configuration.MinimumLevel}");
 #endif
@@ -77,6 +84,8 @@ try
     services.SetupRSS();
     services.SetupBlog(config, builder.Environment);
     services.SetupUmamiClient(config);
+    
+    services.ConfigureEmailProcessor();
     services.AddAntiforgery(options =>
     {
         options.HeaderName = "X-CSRF-TOKEN";

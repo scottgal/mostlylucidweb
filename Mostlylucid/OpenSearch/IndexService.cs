@@ -1,6 +1,7 @@
 ﻿using Mostlylucid.Helpers;
 using Mostlylucid.Models.Blog;
 using Mostlylucid.OpenSearch.Models;
+using Mostlylucid.Shared.Helpers;
 using OpenSearch.Client;
 using OpenSearch.Net;
 

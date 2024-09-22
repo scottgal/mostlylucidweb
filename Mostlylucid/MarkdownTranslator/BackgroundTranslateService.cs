@@ -1,7 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Threading.Channels;
+using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Config.Markdown;
 using Mostlylucid.Helpers;
+using Mostlylucid.Services.Interfaces;
+using Mostlylucid.Shared.Helpers;
 using Polly;
 using Polly.Contrib.WaitAndRetry;
 using Serilog.Events;
@@ -337,7 +340,7 @@ public class BackgroundTranslateService(
         {
             var blogService = translateServiceConfig.Mode == AutoTranslateMode.SaveToDisk
                 ? scope.ServiceProvider.GetRequiredService<IMarkdownFileBlogService>()
-                : scope.ServiceProvider.GetRequiredService<IBlogService>();
+                : scope.ServiceProvider.GetRequiredService<IBlogViewService>();
             _ = await blogService.SavePost(slug, translateModel.Language,
                 translatedMarkdown);
         }

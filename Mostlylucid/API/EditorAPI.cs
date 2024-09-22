@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Mostlylucid.Services.Markdown;
 using Umami.Net.Models;
 
 namespace Mostlylucid.API;

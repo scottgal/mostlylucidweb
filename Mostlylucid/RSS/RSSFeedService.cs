@@ -1,11 +1,13 @@
 ﻿using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.RSS.Models;
+using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucid.RSS;
 
-public class RSSFeedService(IBlogService blogService, IHttpContextAccessor httpContextAccessor, ILogger<RSSFeedService> logger)
+public class RSSFeedService(IBlogViewService blogViewService, IHttpContextAccessor httpContextAccessor, ILogger<RSSFeedService> logger)
 {
     private string GetSiteUrl()
     {
@@ -20,7 +22,7 @@ public class RSSFeedService(IBlogService blogService, IHttpContextAccessor httpC
     
     public async Task<string> GenerateFeed(DateTime? startDate=null, string? category = null)
     {
-        var items =await  blogService.GetPostsForLanguage(startDate, category, MarkdownBaseService.EnglishLanguage);
+        var items =await  blogViewService.GetPostsForLanguage(startDate, category, MarkdownBaseService.EnglishLanguage);
         items = items.OrderByDescending(x => x.PublishedDate).ToList();
         List<RssFeedItem> rssFeedItems = new();
         foreach (var item in items)

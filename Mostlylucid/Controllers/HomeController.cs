@@ -17,7 +17,7 @@ public class HomeController(BaseControllerService baseControllerService, ILogger
     public async Task<IActionResult> Index(int page = 1, int pageSize = 10, [FromHeader] bool pagerequest = false)
     {
         var authenticateResult = await GetUserInfo();
-        var posts = await BlogService.GetPagedPosts(page, pageSize);
+        var posts = await BlogViewService.GetPagedPosts(page, pageSize);
         posts.LinkUrl = Url.Action("Index", "Home");
         if ( pagerequest && Request.IsHtmx()) return PartialView("_BlogSummaryList", posts);
         var indexPageViewModel = new IndexPageViewModel

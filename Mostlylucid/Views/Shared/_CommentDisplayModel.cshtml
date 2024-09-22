@@ -1,6 +1,6 @@
 ﻿@using Htmx.TagHelpers
 @using Humanizer
-@using Mostlylucid.EntityFramework.Models
+@using Mostlylucid.Shared
 @model Mostlylucid.Models.Comments.CommentViewModel
 
 @{
@@ -29,7 +29,7 @@
             } else {
                 @:bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200
             }">
-                @comment.Status
+                @comment.Status.ToString()
             </div>
         </div>
 

@@ -2,11 +2,13 @@
 using System.Xml.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Mostlylucid.Blog.ViewServices;
+using Mostlylucid.Services.Markdown;
 
 namespace Mostlylucid.Controllers;
 
 public class SiteMapController(
-    IBlogService blogService,
+    IBlogViewService blogViewService,
     UmamiBackgroundSender backgroundSender,
     IHttpContextAccessor httpContextAccessor,
     ILogger<SiteMapController> logger) : Controller
@@ -30,7 +32,7 @@ public class SiteMapController(
     {
         try
         {
-            var pages = await blogService.GetPosts();
+            var pages = await blogViewService.GetPosts();
 
             List<SiteMapPage> siteMapPages = new();
             siteMapPages.Add(new SiteMapPage(Url.Action("Index", "Home"), DateTime.UtcNow, 1, ChangeFrequency.Daily));

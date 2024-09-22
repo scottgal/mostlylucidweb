@@ -1,5 +1,4 @@
 @import "raleway.css";
-@import "poppins.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -64,7 +63,10 @@ html {
 }
 
 
-
+.text-red-500 {
+    --tw-text-opacity: 1;
+    color: rgb(209 0 0 / var(--tw-text-opacity));
+}
 
 .twitter-card {
     @apply mt-8 mb-8 rounded bg-yellow-lighter px-6 py-8 sm:mt-10 sm:mb-10 md:px-10;

@@ -2,9 +2,11 @@
 using Htmx;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
-using Mostlylucid.Blog.EntityFramework;
+using Mostlylucid.Mapper;
+using Mostlylucid.Mappers;
 using Mostlylucid.Models.Search;
 using Mostlylucid.Services;
+using Mostlylucid.Services.Blog;
 
 namespace Mostlylucid.Controllers;
 
@@ -22,10 +24,11 @@ public class SearchController(
     public async Task<IActionResult> Search(string? query, int page = 1, int pageSize = 10,[FromHeader] bool pagerequest=false)
     {
         var searchResults = await searchService.GetPosts(query, page, pageSize);
+ 
         var searchModel = new SearchResultsModel
         {
             Query = query,
-            SearchResults = searchResults
+            SearchResults = searchResults.ToPostListViewModel()
         };
         searchModel = await PopulateBaseModel(searchModel);
         var linkUrl = Url.Action("Search", "Search");

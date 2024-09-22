@@ -9,7 +9,7 @@ namespace Mostlylucid.Controllers;
 
 [Route("contact")]
 public class ContactController(
-    CommentService commentService,
+
     IEmailSenderHostedService sender,
     BaseControllerService baseControllerService,
     ILogger<BaseController> logger) : BaseController(baseControllerService, logger)
@@ -43,7 +43,7 @@ public class ContactController(
 
         if (!ModelState.IsValid) return PartialView("_ContactForm", comment);
 
-        var commentHtml = commentService.ProcessComment(comment.Comment);
+        var commentHtml = Markdig.Markdown.ToHtml(comment.Comment!);
         var contactModel = new ContactEmailModel
         {
             SenderEmail = string.IsNullOrEmpty(comment.Email) ? "Anonymous" : comment.Email,

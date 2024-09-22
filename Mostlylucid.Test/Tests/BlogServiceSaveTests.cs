@@ -2,8 +2,11 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using Mostlylucid.Blog;
-using Mostlylucid.Blog.EntityFramework;
-using Mostlylucid.EntityFramework;
+using Mostlylucid.Blog.ViewServices;
+using Mostlylucid.DbContext.EntityFramework;
+using Mostlylucid.Services.Blog;
+using Mostlylucid.Services.Markdown;
+using Mostlylucid.Services.Umami;
 using Mostlylucid.Test.Extensions;
 
 namespace Mostlylucid.Test.Tests;
@@ -25,14 +28,14 @@ public class BlogServiceSaveTests
         services.AddSingleton(_dbContextMock.Object);
         services.AddScoped<IUmamiDataSortService, UmamiDataSortFake>();
         // Optionally register other services
-        services.AddScoped<IBlogService, EFBlogService>(); // Example service that depends on IMostlylucidDbContext
+        services.AddScoped<IBlogViewService, BlogPostViewService>(); // Example service that depends on IMostlylucidDbContext
         services.AddLogging(configure => configure.AddConsole());
         services.AddScoped<MarkdownRenderingService>();
         // 4. Build the service provider
         _serviceProvider = services.BuildServiceProvider();
     }
 
-    private IBlogService SetupBlogService()
+    private IBlogViewService SetupBlogService()
     {
         var blogPosts = BlogEntityExtensions.GetBlogPostEntities(1);
         _dbContextMock.SetupDbSet(blogPosts, x => x.BlogPosts);
@@ -43,7 +46,7 @@ public class BlogServiceSaveTests
         _dbContextMock.SetupDbSet(languages, x => x.Languages);
 
         // Resolve the IBlogService from the service provider
-        return _serviceProvider.GetRequiredService<IBlogService>();
+        return _serviceProvider.GetRequiredService<IBlogViewService>();
     }
 
     [Fact]

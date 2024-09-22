@@ -1,12 +1,14 @@
 ﻿using Mostlylucid.Helpers;
 using Mostlylucid.Models.Blog;
+using Mostlylucid.Shared.Helpers;
+using Mostlylucid.Shared.Models;
 
 namespace Mostlylucid.OpenSearch.Models;
 
 public class BlogIndexModel
 {
     public BlogIndexModel() { }
-    public BlogIndexModel(BlogPostViewModel post)
+    public BlogIndexModel(BlogPostDto post)
     {
         Id = string.IsNullOrEmpty(post.Id) ? $"{post.Slug}-{post.Language}" : post.Id;
         Language = post.Language;

@@ -1,4 +1,5 @@
 ﻿using Mostlylucid.Blog;
+using Mostlylucid.Services.Umami;
 using Umami.Net.UmamiData.Models.ResponseObjects;
 
 namespace Mostlylucid.Test.Extensions;

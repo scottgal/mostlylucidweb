@@ -1,10 +1,45 @@
-﻿using Mostlylucid.EntityFramework.Models;
+﻿
 using Mostlylucid.Models.Comments;
+using Mostlylucid.Shared;
+using Mostlylucid.Shared.Models;
 
 namespace Mostlylucid.Models.Blog;
 
 public class BlogPostViewModel : BaseViewModel
 {
+    public PostListModel ToPostListModel()
+    {
+        return new PostListModel
+        {
+            Id = Id,
+            Categories = Categories,
+            Title = Title,
+            Language = Language,
+            UpdatedDate = UpdatedDate.DateTime,
+            Languages = Languages,
+            Slug = Slug,
+            WordCount = WordCount,
+            PublishedDate = PublishedDate
+        };
+    }
+    public BlogPostDto ToBlogPostDto()
+    {
+        return new BlogPostDto
+        {
+            Id = Id,
+            Categories = Categories,
+            Title = Title,
+            Language = Language,
+            Markdown = Markdown,
+            UpdatedDate = UpdatedDate,
+            Languages = Languages,
+            HtmlContent = HtmlContent,
+            PlainTextContent = PlainTextContent,
+            Slug = Slug,
+            WordCount = WordCount,
+            PublishedDate = PublishedDate
+        };
+    }
     public string Id { get; set; }
     public string[] Categories { get; set; } = Array.Empty<string>();
     

@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Mostlylucid.Blog.EntityFramework;
 using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Email.Models;
-using Mostlylucid.EntityFramework.Models;
 using Mostlylucid.Models.Comments;
 using Mostlylucid.Services;
+using Mostlylucid.Services.Interfaces;
+using Mostlylucid.Shared;
 
 namespace Mostlylucid.Controllers;
 
@@ -60,7 +60,7 @@ public class CommentController(
             return PartialView("_CommentForm", model);
         }
 
-        var slug = await BlogService.GetSlug(postId);
+        var slug = await BlogViewService.GetSlug(postId);
         var url = Url.Action("Show", "Blog", new { slug }, Request.Scheme);
         var commentModel = new CommentEmailModel
         {
@@ -125,7 +125,7 @@ public class CommentController(
         var email = model.Email ?? "Anonymous";
         var htmlContent = await commentService.Add(postId, model.ParentId, name, model.Content);
         if (string.IsNullOrEmpty(htmlContent)) return BadRequest();
-        var slug = await BlogService.GetSlug(postId);
+        var slug = await BlogViewService.GetSlug(postId);
         var url = Url.Action("Show", "Blog", new { slug }, Request.Scheme);
         var commentModel = new CommentEmailModel
         {

@@ -32,6 +32,7 @@
     "highlight.js": "^11.10.0",
     "highlightjs-cshtml-razor": "^2.1.1",
     "htmx.org": "^2.0.1",
+    "juice": "^11.0.0",
     "mermaid": "^11.0.2",
     "simplemde": "^1.11.2"
   }

@@ -7,7 +7,7 @@ module.exports = {
             display: ['print']
         },
     },
-    content: ["./Views/**/*.cshtml"],
+    content: ["./Views/**/*.cshtml","./EmailSubscription/**/*.cshtml"],
     safelist: ["dark", "light"],
     darkMode: "class",
     theme: {        

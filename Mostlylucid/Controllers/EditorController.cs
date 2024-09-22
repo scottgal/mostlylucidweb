@@ -42,7 +42,7 @@ public class EditorController(
             return View("Editor", editorModel);
         }
 
-        var blogPost = await BlogService.GetPost(slug, language);
+        var blogPost = await BlogViewService.GetPost(slug, language);
         if (blogPost == null) return NotFound();
 
         editorModel.Markdown = blogPost.Markdown;

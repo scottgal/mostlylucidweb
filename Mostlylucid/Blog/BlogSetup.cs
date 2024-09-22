@@ -1,9 +1,11 @@
-﻿using AngleSharp.Dom;
-using Mostlylucid.Blog.EntityFramework;
-using Mostlylucid.Blog.Markdown;
+﻿using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Blog.WatcherService;
 using Mostlylucid.Config.Markdown;
+using Mostlylucid.DbContext.EntityFramework;
+using Mostlylucid.Services.Blog;
+using Mostlylucid.Services.Interfaces;
+using Mostlylucid.Services.Markdown;
 using Npgsql;
 
 namespace Mostlylucid.Blog;
@@ -14,12 +16,11 @@ public static class BlogSetup
     {
         var config = services.ConfigurePOCO<BlogConfig>(configuration.GetSection(BlogConfig.Section));
        services.ConfigurePOCO<MarkdownConfig>(configuration.GetSection(MarkdownConfig.Section));
-       services.AddScoped<CommentService>();
         switch (config.Mode)
         {
             case BlogMode.File:
                 Log.Information("Using file based blog");
-                services.AddScoped<IBlogService, MarkdownBlogService>();
+                services.AddScoped<IBlogViewService, MarkdownBlogViewService>();
                 services.AddScoped<IBlogPopulator, MarkdownBlogPopulator>();
                 break;
             case BlogMode.Database:
@@ -38,12 +39,13 @@ public static class BlogSetup
                         };
                     options.UseNpgsql(connectionStringBuilder.ConnectionString);
                 });
-                services.AddScoped<IBlogService, EFBlogService>();
+                services.AddScoped<IBlogViewService, BlogPostViewService>();
                 services.AddScoped<ICommentService, EFCommentService>();
                 services.AddScoped<IBlogPopulator, EFBlogPopulator>();
                 services.AddScoped<BlogSearchService>();
                 services.AddScoped<CommentViewService>();
                 services.AddSingleton<EFBlogUpdater>();
+                services.AddScoped<IBlogService, BlogService>();
                 services.AddHostedService<MarkdownDirectoryWatcherService>();
                 break;
         }

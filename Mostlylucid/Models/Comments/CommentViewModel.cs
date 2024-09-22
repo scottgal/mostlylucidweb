@@ -1,4 +1,4 @@
-﻿using Mostlylucid.EntityFramework.Models;
+﻿using Mostlylucid.Shared;
 
 namespace Mostlylucid.Models.Comments;
 

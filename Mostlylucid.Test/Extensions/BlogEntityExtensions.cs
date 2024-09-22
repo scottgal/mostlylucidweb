@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using Mostlylucid.EntityFramework.Models;
+using Mostlylucid.Shared.Entities;
 
 namespace Mostlylucid.Test.Extensions;
 

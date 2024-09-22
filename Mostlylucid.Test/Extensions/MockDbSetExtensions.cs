@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using MockQueryable.Moq;
 using Moq;
-using Mostlylucid.EntityFramework;
+using Mostlylucid.DbContext.EntityFramework;
 
 namespace Mostlylucid.Test.Extensions;
 

@@ -1,0 +1,19 @@
+﻿@using Mostlylucid.Helpers
+@using Mostlylucid.Shared.Helpers
+@model Mostlylucid.EmailSubscription.Models.EmailSubscribeViewModel
+
+Check your email.
+
+You have been sent an email to confirm your subscription.
+
+You have subscribed to the following:
+Mail for @Model.SubscriptionType.EnumDisplayName()
+
+
+For the language: @Model.Language.ConvertCodeToLanguage()
+@if (Model.Categories?.Any() == true)
+{
+    <p>For these categories: @string.Join(" , ", Model.Categories) </p>
+}
+
+Please check your email and click the link to confirm your subscription.

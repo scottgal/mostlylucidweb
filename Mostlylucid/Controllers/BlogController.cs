@@ -5,13 +5,13 @@ using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Controllers;
 using Mostlylucid.Models.Comments;
 using Mostlylucid.Services;
-using MarkdownBaseService = Mostlylucid.Blog.MarkdownBaseService;
+using MarkdownBaseService = Mostlylucid.Services.Markdown.MarkdownBaseService;
 
 namespace Mostlylucidblog.Controllers;
 
 [Route("blog")]
 public class BlogController(BaseControllerService baseControllerService, 
-    IBlogService blogService,
+    IBlogViewService blogViewService,
     CommentViewService commentViewService,
     ILogger<BlogController> logger) : BaseController(baseControllerService, logger)
 {
@@ -22,7 +22,7 @@ public class BlogController(BaseControllerService baseControllerService,
     [HttpGet]
     public async Task<IActionResult> Index(int page = 1, int pageSize = 20)
     {
-        var posts = await blogService.GetPagedPosts(page, pageSize);
+        var posts = await blogViewService.GetPagedPosts(page, pageSize);
         if (Request.IsHtmx()) return PartialView("_BlogSummaryList", posts);
         posts.LinkUrl = Url.Action("Index", "Blog");
         return View("Index", posts);
@@ -36,7 +36,7 @@ public class BlogController(BaseControllerService baseControllerService,
         VaryByQueryKeys = new[] { nameof(slug), nameof(language) })]
     public async Task<IActionResult> Show(string slug, string language = MarkdownBaseService.EnglishLanguage)
     {
-        var post = await blogService.GetPost(slug, language);
+        var post = await blogViewService.GetPost(slug, language);
         if (post == null) return NotFound();
 
         var user = await GetUserInfo();
@@ -71,7 +71,7 @@ public class BlogController(BaseControllerService baseControllerService,
     public async Task<IActionResult> Category(string category, int page = 1, int pageSize = 10)
     {
         ViewBag.Category = category;
-        var posts = await blogService.GetPostsByCategory(category, page, pageSize);
+        var posts = await blogViewService.GetPostsByCategory(category, page, pageSize);
         var user = await GetUserInfo();
         posts.Authenticated = user.LoggedIn;
         posts.Name = user.Name;

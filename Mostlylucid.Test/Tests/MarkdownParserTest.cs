@@ -1,8 +1,9 @@
 ﻿using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Mostlylucid.Blog;
 using Mostlylucid.Models.Blog;
+using Mostlylucid.Services.Markdown;
+using Mostlylucid.Shared.Models;
 
 namespace Mostlylucid.Test.Tests;
 
@@ -24,7 +25,7 @@ public class MarkdownParserTest
         _serviceProvider = services.BuildServiceProvider();
     }
 
-    public BlogPostViewModel GetBlogPostViewModel(BlogEntryType type = BlogEntryType.Good)
+    public BlogPostDto GetBlogPostViewModel(BlogEntryType type = BlogEntryType.Good)
     {
         var resource = "";
         resource = type == BlogEntryType.Bad
