@@ -1,4 +1,6 @@
-﻿namespace Mostlylucid.OpenSearch.Config;
+﻿using Mostlylucid.Shared.Config;
+
+namespace Mostlylucid.OpenSearch.Config;
 
 public class OpenSearchConfig : IConfigSection
 {

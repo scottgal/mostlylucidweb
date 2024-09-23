@@ -13,9 +13,27 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="FluentEmail.Razor" Version="3.0.2" />
+      <PackageReference Include="FluentEmail.Smtp" Version="3.0.2" />
       <PackageReference Include="Leisn.MarkdigToc" Version="0.1.3" />
       <PackageReference Include="Markdig" Version="0.37.0" />
       <PackageReference Include="Umami.Net" Version="0.4.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Email\Templates\CommentMailTemplate.template" />
+      <None Include="Email\Templates\CommentMailTemplate.cshtml" />
+      <None Remove="Email\Templates\ConfirmMailTemplate.template" />
+      <None Include="Email\Templates\ConfirmMailTemplate.cshtml" />
+      <None Remove="Email\Templates\ContactEmailModel.template" />
+      <None Include="Email\Templates\ContactEmailModel.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="Email\Templates\NewsletterTemplate.cshtml">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

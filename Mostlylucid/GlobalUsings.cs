@@ -4,8 +4,6 @@ global using Microsoft.AspNetCore.Authentication.Cookies;
 global using Microsoft.AspNetCore.Authentication.Google;
 global using Microsoft.EntityFrameworkCore;
 global using Mostlylucid.Blog;
-global using Mostlylucid.Config;
-global using Mostlylucid.Email;
 global using Mostlylucid.Helpers;
 global using Mostlylucid.MarkdownTranslator;
 global using Mostlylucid.OpenSearch;

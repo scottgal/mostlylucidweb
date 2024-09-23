@@ -1,4 +1,4 @@
-﻿namespace Mostlylucid.Config.Markdown;
+﻿namespace Mostlylucid.Shared.Config.Markdown;
 
 public class MarkdownConfig : IConfigSection
 {

@@ -1,9 +1,10 @@
 ﻿using System.Diagnostics;
 using System.Threading.Channels;
 using Mostlylucid.Blog.ViewServices;
-using Mostlylucid.Config.Markdown;
 using Mostlylucid.Helpers;
 using Mostlylucid.Services.Interfaces;
+using Mostlylucid.Shared.Config;
+using Mostlylucid.Shared.Config.Markdown;
 using Mostlylucid.Shared.Helpers;
 using Polly;
 using Polly.Contrib.WaitAndRetry;

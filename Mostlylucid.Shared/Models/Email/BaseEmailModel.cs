@@ -1,4 +1,4 @@
-﻿namespace Mostlylucid.Email.Models;
+﻿namespace Mostlylucid.Shared.Models.Email;
 
 public class BaseEmailModel
 {
@@ -6,7 +6,7 @@ public class BaseEmailModel
     
     public string SenderName { get; set; }
     
-    public string Comment { get; set; }
+    public string Content { get; set; }
     
     protected virtual string Subject { get; set; }
     

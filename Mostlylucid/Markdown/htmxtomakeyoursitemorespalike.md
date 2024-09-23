@@ -6,7 +6,7 @@ In this site I use [HTMX](https://htmx.org/) extensively, this is a super easy w
 **NOTE: I'm not entirely happy with this yet, HTMX has some elements which make this tricky**
 
 <datetime class="hidden">2024-09-15T06:45</datetime>
-<!--category-- ASP.NET, HTMX, Apline.js -->
+<!--category-- ASP.NET, HTMX, Alpine.js -->
 [TOC]
 
 # HTMX and ASP.NET Core

@@ -1,0 +1,41 @@
+﻿
+
+@{
+    ViewBag.Title = "Confirm";
+   
+}
+<title>@ViewBag.Title</title>
+
+<button @click="showModal = true" class="btn btn-primary">Show Preview</button>
+
+<!-- Alpine.js and HTMX Modal -->
+<div x-data="{ showModal: false, contentLoaded: false }" x-cloak>
+    <!-- The Modal (conditionally visible) -->
+    <div x-show="showModal" class="modal modal-open">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Dynamically Loaded Content</h3>
+      
+            <!-- Loading indicator (visible before content loads) -->
+            <div x-show="!contentLoaded" class="py-4 text-center">
+                <div class="loader"></div>
+                <p>Loading content, please wait...</p>
+            </div>
+      
+            <!-- Content loaded by HTMX -->
+            <div id="modal-content" 
+                 hx-action="Preview"
+                 hx-controller="EmailSubscription"
+                 hx-trigger="revealed" 
+                 hx-route-token="true"
+                 hx-target="#modal-content" 
+                 @htmx:afterRequest="contentLoaded = true">
+                <!-- This will be replaced by HTMX content -->
+            </div>
+
+            <!-- Modal actions (Close button) -->
+            <div class="modal-action">
+                <button @click="showModal = false" class="btn">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -13,7 +13,7 @@ public static class BlogPostMapper
     {
         return new PostListViewModel
         {
-         Data = postEntity.Data.Select(x => x.ToListModel()).ToList(),
+         Data = postEntity.Data.Select(x => x.ToListModel(x.Languages)).ToList(),
          TotalItems = postEntity.TotalItems,
          Page = postEntity.Page,
             PageSize = postEntity.PageSize

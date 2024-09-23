@@ -1,4 +1,4 @@
-﻿namespace Mostlylucid.Config;
+﻿namespace Mostlylucid.Shared.Config;
 
 public class AnalyticsSettings : IConfigSection
 {

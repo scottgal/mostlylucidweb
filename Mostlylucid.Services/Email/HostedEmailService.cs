@@ -1,9 +1,11 @@
 ﻿using System.Net.Mail;
 using System.Threading.Channels;
-using Mostlylucid.Email.Models;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Mostlylucid.Shared.Models.Email;
 using Polly;
 
-namespace Mostlylucid.Email
+namespace Mostlylucid.Services.Email
 {
     public interface IEmailSenderHostedService : IHostedService, IDisposable
     {
@@ -106,6 +108,9 @@ namespace Mostlylucid.Email
                             break;
                         case CommentEmailModel commentEmailModel:
                             await _emailService.SendCommentEmail(commentEmailModel);
+                            break;
+                        case ConfirmEmailModel confirmEmailModel:
+                            await _emailService.SendConfirmationEmail(confirmEmailModel);
                             break;
                     }
                 });

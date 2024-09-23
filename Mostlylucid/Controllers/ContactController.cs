@@ -1,9 +1,10 @@
 ﻿using Htmx;
 using Microsoft.AspNetCore.Mvc;
 using Mostlylucid.Blog.Markdown;
-using Mostlylucid.Email.Models;
 using Mostlylucid.Models.Contact;
 using Mostlylucid.Services;
+using Mostlylucid.Services.Email;
+using Mostlylucid.Shared.Models.Email;
 
 namespace Mostlylucid.Controllers;
 
@@ -48,7 +49,7 @@ public class ContactController(
         {
             SenderEmail = string.IsNullOrEmpty(comment.Email) ? "Anonymous" : comment.Email,
             SenderName = string.IsNullOrEmpty(comment.Name) ? "Anonymous" : comment.Name,
-            Comment = commentHtml
+            Content = commentHtml
         };
         await sender.SendEmailAsync(contactModel);
         return PartialView("_Response",

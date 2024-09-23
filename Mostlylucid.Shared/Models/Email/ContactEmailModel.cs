@@ -1,4 +1,4 @@
-﻿namespace Mostlylucid.Email.Models;
+﻿namespace Mostlylucid.Shared.Models.Email;
 
 public class ContactEmailModel : BaseEmailModel
 

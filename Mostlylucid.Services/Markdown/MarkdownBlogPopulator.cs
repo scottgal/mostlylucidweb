@@ -1,12 +1,10 @@
 ﻿using System.Collections.Concurrent;
-using Mostlylucid.Config.Markdown;
-
 using Mostlylucid.Services.Interfaces;
-using Mostlylucid.Services.Markdown;
 using Mostlylucid.Shared;
+using Mostlylucid.Shared.Config.Markdown;
 using Mostlylucid.Shared.Models;
 
-namespace Mostlylucid.Blog.Markdown;
+namespace Mostlylucid.Services.Markdown;
 
 public class MarkdownBlogPopulator(MarkdownConfig markdownConfig, MarkdownRenderingService markdownRenderingService)
     : IBlogPopulator, IMarkdownBlogService

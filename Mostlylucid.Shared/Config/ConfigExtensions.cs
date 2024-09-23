@@ -1,9 +1,4 @@
-﻿
-
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-
-namespace Mostlylucid.Config;
+﻿namespace Mostlylucid.Shared.Config;
 
 public static class ConfigExtensions {
     public static TConfig ConfigurePOCO<TConfig>(this IServiceCollection services, IConfiguration configuration)

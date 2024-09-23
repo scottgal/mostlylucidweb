@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Mostlylucid.MarkdownTranslator.Models;
 using Mostlylucid.Models.Editor;
 using Mostlylucid.Services;
+using Mostlylucid.Shared.Config;
 
 namespace Mostlylucid.Controllers;
 

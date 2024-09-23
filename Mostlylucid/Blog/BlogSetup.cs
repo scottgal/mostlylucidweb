@@ -1,11 +1,12 @@
 ﻿using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Blog.WatcherService;
-using Mostlylucid.Config.Markdown;
 using Mostlylucid.DbContext.EntityFramework;
 using Mostlylucid.Services.Blog;
 using Mostlylucid.Services.Interfaces;
 using Mostlylucid.Services.Markdown;
+using Mostlylucid.Shared.Config;
+using Mostlylucid.Shared.Config.Markdown;
 using Npgsql;
 
 namespace Mostlylucid.Blog;

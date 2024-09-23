@@ -10,7 +10,7 @@ public enum SubscriptionType
     Daily,
     [Display(Name = "Weekly")]
     Weekly,
-    [Display(Name = "Every Post")]
+    [Display(Name = "Each Post")]
     EveryPost,
     [Display(Name = "Monthly")]
     Monthly

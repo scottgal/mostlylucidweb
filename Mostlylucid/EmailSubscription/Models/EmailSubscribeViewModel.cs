@@ -37,6 +37,9 @@ public class EmailSubscribeViewModel : BaseViewModel
         return model;
     }
     
+    public int? Id { get; set; }
+    public string? Token { get; set; }
+    
     [Required(ErrorMessage = "Email is required", AllowEmptyStrings = false)]
     [EmailAddress(ErrorMessage = "Invalid email address")]
     [MaxLength(100, ErrorMessage = "Email is too long")]
@@ -59,4 +62,12 @@ public class EmailSubscribeViewModel : BaseViewModel
     public List<DayOfWeek> DaysOfWeek { get; set; } = new List<DayOfWeek>();
     
     public bool IsManageSubscription { get; set; } = false;
+    
+    public PageType PageType { get; set; } = PageType.Subscribe;
+}
+
+public enum PageType
+{
+    Subscribe,
+    Manage
 }

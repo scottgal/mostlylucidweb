@@ -1,9 +1,29 @@
-﻿@using Mostlylucid.Shared
+﻿@using Mostlylucid.EmailSubscription.Models
+@using Mostlylucid.Shared
 @using Mostlylucid.Shared.Helpers
 @model Mostlylucid.EmailSubscription.Models.EmailSubscribeViewModel
 
-<form x-data="{schedule :'@Model.SubscriptionType'}" x-init="$watch('schedule', value => console.log(value))" hx-boost="true" asp-action="Save" asp-controller="EmailSubscription" 
+@if (Model.PageType == PageType.Subscribe)
+{
+    <title>Newsletter Subscription</title>
+    <div class="text-black dark:text-white mb-4 ml-2">
+        <h1 class="text-2xl font-bold">Subscribe to my Newsletter</h1>
+        <p class="text-lg">Subscribe to my newsletter to get the latest posts direct to your mailbox.</p>
+        <p >You can choose the frequency of emails, the language and the categories you are interested in.</p>
+    </div>
+}
+else
+{
+    <title>Manage Your Subscription</title>
+    <div class="text-black dark:text-white mb-4 ml-2">
+        <h1 class="text-2xl font-bold">Subscribe to my Newsletter</h1>
+        <p class="text-lg">Subscribe to my newsletter to get the latest posts direct to your mailbox.</p>
+        <p >You can choose the frequency of emails, the language and the categories you are interested in.</p>
+    </div>
+}
+<form x-data="{schedule :'@Model.SubscriptionType'}" x-init="$watch('schedule', value => console.log(value))" hx-boost="true" asp-action="Save" asp-controller="EmailSubscription"
       hx-target="#contentcontainer" hx-swap="#outerHTML">
+    <input type="hidden" asp-for="Id"/>
     <div class="flex flex-col mb-4">
         <div class="flex flex-wrap lg:flex-nowrap lg:space-x-4 space-y-4 lg:space-y-0 items-start">
             <label class="input input-bordered flex items-center gap-2 mb-2 dark:bg-custom-dark-bg bg-white w-full lg:w-2/3">
@@ -32,14 +52,14 @@
             var languages = LanguageConverter.LanguageMap;
         }
 
-        <div class="grid grid-cols-[repeat(auto-fit,minmax(85px,1fr))] mt-4 gap-2 pl-6 large:pl-0 w-auto">
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(55px,1fr))] mt-4 gap-2 pl-6 large:pl-0 w-auto">
             @foreach (var language in languages)
             {
-                var isChecked=@Model.Language == language.Key ? "checked" : "";
-                <div class="tooltip lg:mb-0 mb-2" data-tip="@language.Value)"  >
-                    <div class="flex items-center justify-center w-[85px] h-full min-h-[70px]">
+                var isChecked = @Model.Language == language.Key ? "checked" : "";
+                <div class="tooltip lg:mb-0 mb-2" data-tip="@language.Value)">
+                    <div class="flex items-center justify-center w-[85px] h-full min-h-[55px]">
                         <input id="@language.Key" type="radio" value="@language.Key" @isChecked name="language" class="hidden peer">
-                        <label for="@language.Key" class="flex flex-col items-center justify-center text-sm font-medium text-white bg-blue-dark opacity-50 peer-checked:opacity-100 w-full h-full">
+                        <label for="@language.Key" class="flex flex-col items-center justify-center text-sm font-medium text-white bg-blue-dark opacity-50 hover:opacity-100 peer-checked:opacity-100 w-full h-full">
                             <img src="/img/flags/@(language.Key).svg" asp-append-version="true" class="border-gray-light border rounded-l w-full h-full object-cover" alt="@language.Value">
                         </label>
                     </div>
@@ -47,38 +67,45 @@
                 </div>
             }
         </div>
-        <div class="mt-3 border-neutral-400 dark:border-neutral-600 border rounded-lg" x-data="{ hideCategories: false, showCategories: false }">
+        <div class="mt-3 border-neutral-400 dark:border-neutral-600 border rounded-lg" x-init="hideCategories = @Model.AllCategories.ToString().ToLowerInvariant()" x-data="{ hideCategories: false, showCategories: false }">
             <h4
                 class="px-5 py-1 bg-neutral-500 bg-opacity-10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer"
-                x-on:click="if(!hideCategories) { showCategories = !showCategories }">
+                x-on:click="hideCategories = !hideCategories; showCategories = !hideCategories">
                 <span class="flex flex-row items-center space-x-1">
                     Categories
                     <label class="label cursor-pointer ml-4" x-on:click.stop="">
                         all
                     </label>
-                    <input type="checkbox" x-on:click.stop="" x-model="hideCategories" asp-for="AllCategories" class="toggle toggle-info toggle-sm" />
+                    <input
+                        type="checkbox"
+                        x-on:click.stop=""
+                        :checked="hideCategories; showCategories = !hideCategories"
+                        x-model="hideCategories"
+                        name="@nameof(Model.AllCategories)"
+                        class="toggle toggle-info toggle-sm"/>
                 </span>
                 <span>
-                    <i
-                        class="bx text-2xl"
-                        x-show="!hideCategories"
-                        :class="showCategories ? 'bx-chevron-up' : 'bx-chevron-down'"></i>
+                    <i class="bx text-2xl"
+
+                       :class="showCategories ? 'bx-chevron-up' : 'bx-chevron-down'">
+                    </i>
                 </span>
             </h4>
 
+
             <div class="flex flex-wrap gap-2 pt-2 pl-5 pr-5 pb-2"
-                x-show="showCategories"
-                x-cloak
-                x-transition:enter="max-h-0 opacity-0"
-                x-transition:enter-end="max-h-screen opacity-100"
-                x-transition:leave="max-h-screen opacity-100"
-                x-transition:leave-end="max-h-0 opacity-0">
+                 x-show="showCategories"
+                 x-cloak
+                 x-transition:enter="max-h-0 opacity-0"
+                 x-transition:enter-end="max-h-screen opacity-100"
+                 x-transition:leave="max-h-screen opacity-100"
+                 x-transition:leave-end="max-h-0 opacity-0">
                 <div class="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] mt-4 w-full">
                     @foreach (var category in Model.Categories)
                     {
                         var categoryKey = category.Replace(" ", "_").Replace(".", "_").Replace("-", "_");
                         <div class="flex items-center w-auto h-full min-h-[50px]">
-                            <input id="@categoryKey" type="checkbox" value="@category"  name="@nameof(Model.SelectedCategories)" class="hidden peer">
+                            <input id="@categoryKey" type="checkbox" value="@category" name="@nameof(Model.SelectedCategories)" class="hidden peer">
                             <label for="@categoryKey" class="ml-2 text-sm font-medium text-white 
             bg-blue-dark border-gray-light border rounded-xl px-1 py-2 w-full 
             peer-checked:text-blue-600 peer-checked:dark:bg-green text-center justify-center">
@@ -90,35 +117,34 @@
             </div></div>
 
 
-        <div :class="{ 'opacity-50 pointer-events-none': schedule !== 'Weekly' }" class=" mt-2 border-neutral-400 dark:border-neutral-600 border rounded-lg" >
+        <div :class="{ 'opacity-50 pointer-events-none': schedule !== 'Weekly' }" class=" mt-2 border-neutral-400 dark:border-neutral-600 border rounded-lg">
             <h4
-                class="px-5 py-1 bg-neutral-500 bg-opacity-10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer"
-               >
+                class="px-5 py-1 bg-neutral-500 bg-opacity-10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer">
                 <span class="flex flex-row items-center space-x-1 ">
                     Day of Week to Send On
-                    
-                  
+
+
                 </span>
-               
+
             </h4>
 
-        <div class="grid grid-cols-3 sm:grid-cols-[repeat(auto-fit,minmax(80px,1fr))] my-2 w-full lg:w-1/2" x-show="schedule === 'Weekly'">
-            @foreach (var day in Model.DaysOfWeek)
-            {
-                var checkedDay = day.ToString() == Model.Day ? "checked" : "";
-                <div class="flex items-center w-auto h-full min-h-[50px]">
-                    <input id="@day" type="radio" value="@day" name="day" @checkedDay class="hidden peer">
-                    <label for="@day" class="ml-2 text-sm font-medium text-white 
+            <div class="grid grid-cols-3 sm:grid-cols-[repeat(auto-fit,minmax(80px,1fr))] my-2 w-full lg:w-1/2" x-show="schedule === 'Weekly'">
+                @foreach (var day in Model.DaysOfWeek)
+                {
+                    var checkedDay = day.ToString() == Model.Day ? "checked" : "";
+                    <div class="flex items-center w-auto h-full min-h-[50px]">
+                        <input id="@day" type="radio" value="@day" name="day" @checkedDay class="hidden peer">
+                        <label for="@day" class="ml-2 text-sm font-medium text-white 
             bg-blue-dark border-gray-light border rounded-xl px-1 py-2 w-full 
             peer-checked:text-blue-600 peer-checked:dark:bg-green text-center justify-center">
-                        @day.ToString()
-                    </label>
-                </div>
-            }
-        </div>
-
+                            @day.ToString()
+                        </label>
+                    </div>
+                }
             </div>
-        <div :class="{ 'opacity-50 pointer-events-none': schedule !== 'Monthly' }" class=" mt-2 border-neutral-400 dark:border-neutral-600 border rounded-lg" >
+
+        </div>
+        <div :class="{ 'opacity-50 pointer-events-none': schedule !== 'Monthly' }" class=" mt-2 border-neutral-400 dark:border-neutral-600 border rounded-lg">
             <h4
                 class="px-5 py-1 bg-neutral-500 bg-opacity-10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer">
                 <span class="flex flex-row items-center space-x-1 ">
@@ -126,7 +152,7 @@
                 </span>
             </h4>
             <div class="grid grid-cols-[repeat(auto-fit,minmax(35px,1fr))] w-full mx-2" x-show="schedule === 'Monthly'">
-                @for(int i=1; i<32; i++)
+                @for (int i = 1; i < 32; i++)
                 {
                     var checkedMonthDay = i == Model.DayOfMonth ? "checked" : "";
                     <div class="flex items-center w-auto my-2 h-full min-h-[35px]">
@@ -134,7 +160,7 @@
                         <label for="Day_@i" class="ml-2 text-sm font-medium text-white 
             bg-blue-dark border-gray-light border rounded-xl px-1 py-2 w-full 
             peer-checked:text-blue-600 peer-checked:dark:bg-green text-center justify-center">
-                             @i.GetOrdinal()
+                            @i.GetOrdinal()
                         </label>
                     </div>
                 }

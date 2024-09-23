@@ -4,13 +4,32 @@ using Microsoft.EntityFrameworkCore;
 using Mostlylucid.DbContext.EntityFramework;
 using Mostlylucid.SchedulerService.Services;
 using Npgsql;
+using Serilog;
+using Serilog.Debugging;
 
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.AddEnvironmentVariables();
+    
+var config = builder.Configuration;
+config.AddEnvironmentVariables();
+builder.Host.UseSerilog((context, configuration) =>
+{
+    configuration.ReadFrom.Configuration(context.Configuration);
+#if DEBUG
+    configuration.MinimumLevel.Debug();
+    configuration.WriteTo.Console();
+    SelfLog.Enable(Console.Error);
+    Console.WriteLine($"Serilog Minimum Level: {configuration.MinimumLevel}");
+#endif
+});
 var configuration = builder.Configuration;
 var env= builder.Environment;
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<NewsletterManagementService>();
+builder.Services.AddScoped<NewsletterSendingService>();
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddHangfire(x =>
     x.UsePostgreSqlStorage(connectionString));

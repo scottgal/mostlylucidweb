@@ -1,19 +1,60 @@
-﻿@using Mostlylucid.Helpers
+﻿@using Mostlylucid.Shared
 @using Mostlylucid.Shared.Helpers
 @model Mostlylucid.EmailSubscription.Models.EmailSubscribeViewModel
 
-Check your email.
+<div class="max-w-2xl mx-auto p-6 bg-white shadow-md rounded-lg">
+    <h1 class="text-xl font-bold mb-4">Check your email</h1>
+    <p class="mb-4">
+        You have been sent an email to confirm your subscription.
+    </p>
+    
+    <p class="mb-4">
+        You have subscribed to the following:
+        <span class="font-semibold">@Model.SubscriptionType.EnumDisplayName()</span>
+    </p>
 
-You have been sent an email to confirm your subscription.
+    <div class="mb-4">
+        @if (Model.SubscriptionType == SubscriptionType.Monthly)
+        {
+            <p>On the <span class="font-semibold">@Model.DayOfMonth?.GetOrdinal()</span> of each month</p>
+        }
+        else if (Model.SubscriptionType == SubscriptionType.Weekly)
+        {
+            <p>Each <span class="font-semibold">@Model.Day</span></p>
+        }
+        else if (Model.SubscriptionType == SubscriptionType.EveryPost)
+        {
+            <p>For each post</p>
+        }
+        else if (Model.SubscriptionType == SubscriptionType.Daily)
+        {
+            <p>Each day</p>
+        }
+    </div>
 
-You have subscribed to the following:
-Mail for @Model.SubscriptionType.EnumDisplayName()
+    <p class="mb-4">
+        For the language: 
+        <span class="font-semibold">@Model.Language.ConvertCodeToLanguage()</span>
+    </p>
 
+    @if (Model.Categories?.Any() == true)
+    {
+        <p>For these categories: 
+            <span class="font-semibold">@string.Join(" , ", Model.Categories)</span>
+        </p>
+    }
+    else if (Model.AllCategories)
+    {
+        <p>For all categories</p>
+    }
 
-For the language: @Model.Language.ConvertCodeToLanguage()
-@if (Model.Categories?.Any() == true)
-{
-    <p>For these categories: @string.Join(" , ", Model.Categories) </p>
-}
-
-Please check your email and click the link to confirm your subscription.
+    <p class="mt-6">
+        Please check your email and click the link to confirm your subscription. After confirming you can manage your subscription from the email footer.
+    </p>
+    <div>
+        <p class="mt-6">
+            If you want to unsubscribe, click the button below.
+        </p>
+        <a class="btn btn-warning mt-4" hx-boost="true" href="@Url.Action("Unsubscribe", "EmailSubscription", new { Model.Token })">Unsubscribe</a>
+    </div>
+</div>

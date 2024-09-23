@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.Blog.ViewServices;
+using Mostlylucid.Shared.Config;
 
 namespace Mostlylucid.Services;
 

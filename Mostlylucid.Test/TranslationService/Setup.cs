@@ -5,9 +5,9 @@ using Microsoft.Extensions.Logging.Testing;
 using Mostlylucid.Blog;
 using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Blog.ViewServices;
-using Mostlylucid.Config;
-using Mostlylucid.Config.Markdown;
 using Mostlylucid.MarkdownTranslator;
+using Mostlylucid.Shared.Config;
+using Mostlylucid.Shared.Config.Markdown;
 
 namespace Mostlylucid.Test.TranslationService;
 

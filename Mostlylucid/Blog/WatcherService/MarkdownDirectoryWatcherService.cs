@@ -1,8 +1,8 @@
 ﻿using Mostlylucid.Blog.ViewServices;
-using Mostlylucid.Config.Markdown;
 using Mostlylucid.Services.Blog;
 using Mostlylucid.Services.Interfaces;
 using Mostlylucid.Services.Markdown;
+using Mostlylucid.Shared.Config.Markdown;
 using Polly;
 using Serilog.Events;
 

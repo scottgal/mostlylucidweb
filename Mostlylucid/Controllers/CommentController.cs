@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Mostlylucid.Blog.ViewServices;
-using Mostlylucid.Email.Models;
 using Mostlylucid.Models.Comments;
 using Mostlylucid.Services;
+using Mostlylucid.Services.Email;
 using Mostlylucid.Services.Interfaces;
 using Mostlylucid.Shared;
+using Mostlylucid.Shared.Models.Email;
 
 namespace Mostlylucid.Controllers;
 
@@ -65,7 +66,7 @@ public class CommentController(
         var commentModel = new CommentEmailModel
         {
             SenderEmail = email ?? "",
-            Comment = htmlContent,
+            Content = htmlContent,
             PostUrl = url ?? string.Empty
         };
         await sender.SendEmailAsync(commentModel);
@@ -130,7 +131,7 @@ public class CommentController(
         var commentModel = new CommentEmailModel
         {
             SenderEmail = email ?? "",
-            Comment = htmlContent,
+            Content = htmlContent,
             PostUrl = url ?? string.Empty
         };
         await sender.SendEmailAsync(commentModel);

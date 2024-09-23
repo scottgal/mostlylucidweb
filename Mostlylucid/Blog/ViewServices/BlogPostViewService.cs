@@ -1,5 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using Mostlylucid.Mapper;
+﻿using Mostlylucid.Mapper;
 using Mostlylucid.Mappers;
 using Mostlylucid.Models.Blog;
 using Mostlylucid.Services.Blog;
@@ -8,7 +7,7 @@ using Constants = Mostlylucid.Shared.Constants;
 
 namespace Mostlylucid.Blog.ViewServices;
 
-public class BlogPostViewService(IBlogService blogPostService,ILogger<BlogPostViewService> logger) : IBlogViewService
+public class BlogPostViewService(IBlogService blogPostService) : IBlogViewService
 {
     public async Task<bool> EntryChanged(string slug, string language, string hash)
     {
@@ -34,8 +33,7 @@ public class BlogPostViewService(IBlogService blogPostService,ILogger<BlogPostVi
     private async Task<List<BlogPostViewModel>> GetPosts(PostListQueryModel model)
     {
         var posts =await blogPostService.Get(model);
-        if(posts?.Data == null) return new List<BlogPostViewModel>();
-        return posts.Data.Select(x => x.ToViewModel()).ToList();
+        return posts?.Data == null ? new List<BlogPostViewModel>() : posts.Data.Select(x => x.ToViewModel()).ToList();
     }
     
     private async Task<List<PostListModel>> GetListPosts(PostListQueryModel model)

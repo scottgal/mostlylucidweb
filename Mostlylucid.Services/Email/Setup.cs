@@ -2,8 +2,11 @@
 using System.Net.Mail;
 using FluentEmail.Core.Interfaces;
 using FluentEmail.Smtp;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Mostlylucid.Shared.Config;
 
-namespace Mostlylucid.Email;
+namespace Mostlylucid.Services.Email;
 
 public static class Setup
 {

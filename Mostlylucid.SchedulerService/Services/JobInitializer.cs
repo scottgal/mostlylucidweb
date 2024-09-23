@@ -1,4 +1,5 @@
 ﻿using Hangfire;
+using Mostlylucid.Shared;
 
 namespace Mostlylucid.SchedulerService.Services;
 
@@ -6,7 +7,7 @@ namespace Mostlylucid.SchedulerService.Services;
 public static class JobInitializer
 {
     
-    private const string HourlyNewsletterJob = "HourlyNewsletterJob";
+    private const string AutoNewsletterJob = "AutoNewsletterJob";
     private const string DailyNewsletterJob = "DailyNewsletterJob";
     private const string WeeklyNewsletterJob = "WeeklyNewsletterJob";
     private const string MonthlyNewsletterJob = "MonthlyNewsletterJob";
@@ -18,9 +19,9 @@ public static class JobInitializer
       var scope=  app.ApplicationServices.CreateScope();
         var recurringJobManager = scope.ServiceProvider.GetRequiredService<RecurringJobManager>();
       
-        recurringJobManager.AddOrUpdate<NewsletterSendingService>(HourlyNewsletterJob, x => x.SendHourlyNewsletter(), Cron.Hourly);
-        recurringJobManager.AddOrUpdate<NewsletterSendingService>(DailyNewsletterJob, x => x.SendDailyNewsletter(), Cron.Daily);
-        recurringJobManager.AddOrUpdate<NewsletterSendingService>(WeeklyNewsletterJob, x => x.SendWeeklyNewsletter(), Cron.Weekly);
-        recurringJobManager.AddOrUpdate<NewsletterSendingService>(MonthlyNewsletterJob, x => x.SendMonthlyNewsletter(), Cron.Monthly);
+        recurringJobManager.AddOrUpdate<NewsletterSendingService>(AutoNewsletterJob,  x =>  x.SendNewsletter(SubscriptionType.EveryPost), Cron.Hourly);
+        recurringJobManager.AddOrUpdate<NewsletterSendingService>(DailyNewsletterJob,  x =>  x.SendNewsletter(SubscriptionType.Daily), "0 17 * * *");
+        recurringJobManager.AddOrUpdate<NewsletterSendingService>(WeeklyNewsletterJob,  x =>  x.SendNewsletter(SubscriptionType.Weekly), "0 17 * * *");
+        recurringJobManager.AddOrUpdate<NewsletterSendingService>(MonthlyNewsletterJob,  x => x.SendNewsletter(SubscriptionType.Monthly), "0 17 * * *");
     }
 }

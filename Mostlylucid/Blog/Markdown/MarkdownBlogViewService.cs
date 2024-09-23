@@ -1,10 +1,10 @@
 ﻿using Mostlylucid.Blog.ViewServices;
-using Mostlylucid.Config.Markdown;
 using Mostlylucid.Mapper;
 using Mostlylucid.Models.Blog;
 using Mostlylucid.Services.Interfaces;
 using Mostlylucid.Services.Markdown;
 using Mostlylucid.Shared;
+using Mostlylucid.Shared.Config.Markdown;
 using Mostlylucid.Shared.Models;
 
 namespace Mostlylucid.Blog.Markdown;

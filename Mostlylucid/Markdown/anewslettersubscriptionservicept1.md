@@ -34,7 +34,7 @@ The impact of this is that I have a lot of work to do.
 # The Subscription Page
 I started off with the fun part, writing a subscription page. I wanted this to work well on desktop as well as mobile browsers (and even the [SPA](/blog/aspnetcorepwa)); from [my Umami analytics](/blog/category/Umami) I can see a fair proportion of users access this stire from mobile devices.
 
-![Umamu Platforms](umamiplatforms.png)
+![Umamu Platforms](umamiplatforms.png?format=webp&quality=50&width=600)
 
 I also wanted the Subscription page to be obvious how to use; I'm a big believer in [Steve Krug's "Don't make me think"](https://amzn.to/3XSFGoz) philosophy where a page should be obvious to use and not require the user to think about how to use it.
 

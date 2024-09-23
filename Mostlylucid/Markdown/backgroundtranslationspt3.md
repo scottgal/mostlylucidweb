@@ -1,7 +1,7 @@
 ﻿# Background Translations Pt. 3
 
 <datetime class="hidden">2024-08-25T03:20</datetime>
-<!--category-- EasyNMT, ASP.NET, WebAPI, Alpine, HTMX -->
+<!--category-- EasyNMT, ASP.NET, WebAPI, Alpine.js, HTMX -->
 
 # Introduction
 In previous articles, we have discussed the importance of translation in the context of web applications. We have also explored the use of the EasyNMT library to perform translations in an ASP.NET Core application. In this post I'll cover how I added a background service to the application to allow you to submit translation request~~~~s that are processed in the background.

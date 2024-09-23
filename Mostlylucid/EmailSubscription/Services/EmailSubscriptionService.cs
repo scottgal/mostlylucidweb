@@ -58,4 +58,16 @@ public class EmailSubscriptionService(MostlylucidDbContext context, ILogger<Emai
         await context.SaveChangesAsync();
         return true;
     }
+    
+    public async Task<bool> Delete(string token)
+    {
+        var entity = await context.EmailSubscriptions.FirstOrDefaultAsync(e => e.Token == token);
+        if (entity == null)
+        {
+            return false;
+        }
+        context.EmailSubscriptions.Remove(entity);
+        await context.SaveChangesAsync();
+        return true;
+    }
 }

@@ -18,6 +18,8 @@ public class MostlylucidDbContext : Microsoft.EntityFrameworkCore.DbContext, IMo
 
     public DbSet<LanguageEntity> Languages { get; set; }
     
+    public DbSet<EmailSubscriptionSendLogEntity> EmailSubscriptionSendLogs { get; set; }
+    
     public DbSet<EmailSubscriptionEntity> EmailSubscriptions { get; set; }
 
 
@@ -31,7 +33,13 @@ public class MostlylucidDbContext : Microsoft.EntityFrameworkCore.DbContext, IMo
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("mostlylucid");
-
+        
+        modelBuilder.Entity<EmailSubscriptionSendLogEntity>(entity =>
+        {
+            entity.HasKey(x => x.SubscriptionType);
+            entity.Property(x => x.LastSent).HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
+        
         modelBuilder.Entity<EmailSubscriptionEntity>(entity =>
             {
                 entity.ToTable("EmailSubscriptions");

@@ -1,4 +1,4 @@
-﻿using Mostlylucid.Config.Markdown;
+﻿using Mostlylucid.Shared.Config.Markdown;
 using Mostlylucid.Shared.Models;
 
 namespace Mostlylucid.Blog.Markdown;

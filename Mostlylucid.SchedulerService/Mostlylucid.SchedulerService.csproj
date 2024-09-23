@@ -3,6 +3,7 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <Nullable>enable</Nullable>
+        <MvcRazorExcludeRefAssembliesFromPublish>false</MvcRazorExcludeRefAssembliesFromPublish>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
         <UserSecretsId>f465224e-fbdc-4c99-8c3e-f31f3fc84670</UserSecretsId>
@@ -25,11 +26,24 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.2" />
       <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="8.0.0" />
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.0" />
       <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+      <PackageReference Include="Serilog" Version="4.0.1" />
+      <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
+      <PackageReference Include="Serilog.Enrichers.Process" Version="3.0.0" />
+      <PackageReference Include="Serilog.Exceptions.EntityFrameworkCore" Version="8.4.0" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0" />
+      <PackageReference Include="Serilog.Extensions.Logging" Version="8.0.0" />
+      <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.2" />
+      <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+      <PackageReference Include="SerilogTracing" Version="2.1.0" />
+      <PackageReference Include="SerilogTracing.Expressions" Version="2.1.0" />
+      <PackageReference Include="SerilogTracing.Instrumentation.AspNetCore" Version="2.1.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\Mostlylucid.DbContext\Mostlylucid.DbContext.csproj" />
+      <ProjectReference Include="..\Mostlylucid.Services\Mostlylucid.Services.csproj" />
       <ProjectReference Include="..\Mostlylucid.Shared\Mostlylucid.Shared.csproj" />
     </ItemGroup>
 

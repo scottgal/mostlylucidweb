@@ -4,7 +4,9 @@ using Mostlylucid.Services;
 using OpenTelemetry.Metrics;
 using Serilog.Debugging;
 using Mostlylucid.EmailSubscription;
+using Mostlylucid.Services.Email;
 using Mostlylucid.Services.Umami;
+using Mostlylucid.Shared.Config;
 
 try
 {  Log.Logger = new LoggerConfiguration()

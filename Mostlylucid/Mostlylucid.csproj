@@ -73,7 +73,6 @@
 
     <ItemGroup>
       <Folder Include="Blog\Models\" />
-      <Folder Include="EmailSubscription\Models\Entities\" />
       <Folder Include="Markdown\comments\" />
       <Folder Include="Markdown\notmoderatedcomments\" />
       <Folder Include="wwwroot\css\dist\" />
@@ -90,6 +89,10 @@
       <ProjectReference Include="..\Mostlylucid.DbContext\Mostlylucid.DbContext.csproj" />
       <ProjectReference Include="..\Mostlylucid.Services\Mostlylucid.Services.csproj" />
       <ProjectReference Include="..\Mostlylucid.Shared\Mostlylucid.Shared.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="EmailSubscription\EmailTemplate\DailyTemplate.cshtml" />
+      <_ContentIncludedByDefault Remove="EmailSubscription\EmailTemplate\WeeklyTemplate.cshtml" />
     </ItemGroup>
   
 

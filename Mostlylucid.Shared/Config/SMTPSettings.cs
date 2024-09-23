@@ -1,4 +1,4 @@
-﻿namespace Mostlylucid.Email;
+﻿namespace Mostlylucid.Shared.Config;
 
 public class SmtpSettings : IConfigSection
 {

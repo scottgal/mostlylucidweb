@@ -3,6 +3,7 @@ using Markdig;
 using Markdig.Helpers;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
+using Mostlylucid.Shared.Config;
 
 namespace Mostlylucid.MarkdownTranslator;
 
