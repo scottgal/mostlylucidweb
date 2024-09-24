@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Mostlylucid.DbContext.EntityFramework;
+using Mostlylucid.Services.Blog;
 using Mostlylucid.Shared;
 using Mostlylucid.Shared.Entities;
 using Mostlylucid.Shared.Mapper;
 using Mostlylucid.Shared.Models;
-using Mostlylucid.Services.Blog;
 
-namespace Mostlylucid.SchedulerService.Services;
+namespace Mostlylucid.Services.EmailSubscription;
 
 public class NewsletterManagementService(MostlylucidDbContext dbContext, IBlogService blogService)
 {
@@ -71,7 +71,18 @@ public class NewsletterManagementService(MostlylucidDbContext dbContext, IBlogSe
       return posts.Data.ToList();
     }
 
+    public async Task UpdateLastSendForSubscription(int subscriptionId, DateTimeOffset date)
+    {
+        var subscription = await dbContext.EmailSubscriptions.FindAsync(subscriptionId);
+        if(subscription==null)
+        {
+            return;
+        }
+        subscription.LastSent = date;
+        await dbContext.SaveChangesAsync();
+    }
 
+    
     public async Task UpdateLastSend(SubscriptionType subscriptionType, DateTime date)
     {
         var subscriptions = dbContext.EmailSubscriptionSendLogs.Where(x => x.SubscriptionType == subscriptionType);

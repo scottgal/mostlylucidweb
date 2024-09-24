@@ -1,8 +1,6 @@
 ﻿services:
   mostlylucid:
     image: scottgal/mostlylucid:latest
-    ports:
-      - 8080:8080
     restart: always
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
@@ -23,10 +21,12 @@
       - Serilog__WriteTo__0__Args__apiKey=${SEQ_API_KEY}
       - Markdown__MarkdownPath=${MARKDOWN_MARKDOWNPATH}
       - Markdown__MarkdownTranslatedPath=${MARKDOWN_MARKDOWNTRANSLATEDPATH}
+      - CertPassword=${CERT_PASSWORD}
     volumes:
       - /mnt/imagecache:/app/wwwroot/cache
       - /mnt/logs:/app/logs
       - /mnt/markdown:/app/markdown
+      - ./mostlylucid.pfx:/app/mostlylucid.pfx
       - /mnt/articleimages:/app/wwwroot/articleimages
     networks:
       - app_network
@@ -67,8 +67,6 @@
       - app_network
   umami:
     image: ghcr.io/umami-software/umami:postgresql-latest
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
     env_file: .env
     environment:
       DATABASE_URL: ${DATABASE_URL}
@@ -77,10 +75,10 @@
       APP_SECRET: ${APP_SECRET}
       TRACKER_SCRIPT_NAME: getinfo
       API_COLLECT_ENDPOINT: all
-    ports:
-      - "3000:3000"
     depends_on:
       - db
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - app_network
     restart: always
@@ -98,29 +96,37 @@
     image: caddy:latest
     ports:
       - 80:80
+      - 443:443
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - caddy_data:/data
       - caddy_config:/config
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
     networks:
       - app_network
     restart: always
+  seq:
+    image: datalust/seq
+    container_name: seq
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_ADMINPASSWORDHASH: ${SEQ_DEFAULT_HASH}
+    volumes:
+      - /mnt/seq:/data
+    networks:
+      - app_network
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
+      - prometheus-data:/prometheus
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
-    ports:
-      - "9090:9090"
     networks:
       - app_network
-
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -133,12 +139,21 @@
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=testpassword1234
-
-networks:
-  app_network:
-    driver: bridge
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+    networks:
+      - app_network
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
 volumes:
   grafana-data:
   caddy_data:
   caddy_config:
   prometheus-data:
+networks:
+  app_network:
+    driver: bridge

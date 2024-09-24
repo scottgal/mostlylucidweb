@@ -73,6 +73,7 @@
 
     <ItemGroup>
       <Folder Include="Blog\Models\" />
+      <Folder Include="EmailSubscription\Services\" />
       <Folder Include="Markdown\comments\" />
       <Folder Include="Markdown\notmoderatedcomments\" />
       <Folder Include="wwwroot\css\dist\" />

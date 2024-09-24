@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Razor;
-using Mostlylucid.EmailSubscription.Services;
+using Mostlylucid.Services.EmailSubscription;
 
 namespace Mostlylucid.EmailSubscription;
 
@@ -7,8 +7,6 @@ namespace Mostlylucid.EmailSubscription;
     {
         public static void ConfigureEmailProcessor(this IServiceCollection services)
         {
-       
-            services.AddTransient<TemplateProcessorService>();
             services.AddScoped<EmailSubscriptionService>();
         }
     }

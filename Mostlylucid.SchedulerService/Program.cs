@@ -1,17 +1,21 @@
 using Hangfire;
 using Hangfire.PostgreSql;
-using Microsoft.EntityFrameworkCore;
-using Mostlylucid.DbContext.EntityFramework;
+using Mostlylucid.DbContext;
+using Mostlylucid.SchedulerService.API;
 using Mostlylucid.SchedulerService.Services;
-using Npgsql;
+using Mostlylucid.Services.Blog;
+using Mostlylucid.Services.Email;
+using Mostlylucid.Services.EmailSubscription;
+using Mostlylucid.Services.Markdown;
 using Serilog;
 using Serilog.Debugging;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
+    .WriteTo.Seq(Environment.GetEnvironmentVariable("SEQ_URL") ?? "http://localhost:5341")
     .CreateBootstrapLogger();
 var builder = WebApplication.CreateBuilder(args);
-    
+
 var config = builder.Configuration;
 config.AddEnvironmentVariables();
 builder.Host.UseSerilog((context, configuration) =>
@@ -25,33 +29,31 @@ builder.Host.UseSerilog((context, configuration) =>
 #endif
 });
 var configuration = builder.Configuration;
-var env= builder.Environment;
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<NewsletterManagementService>();
-builder.Services.AddScoped<NewsletterSendingService>();
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddHangfire(x =>
-    x.UsePostgreSqlStorage(connectionString));
-builder.Services.AddHangfireServer();
+var env = builder.Environment;
+var services = builder.Services;
+services.AddEndpointsApiExplorer();
+services.AddSwaggerGen();
 
-builder.Services.AddSingleton<RecurringJobManager>();
-builder.Services.AddDbContext<IMostlylucidDBContext, MostlylucidDbContext>(options =>
-{
-    if (env.IsDevelopment())
+services.AddScoped<NewsletterManagementService>();
+services.AddScoped<NewsletterSendingService>();
+services.AddScoped<IBlogService, BlogService>();
+services.SetupEmail(configuration);
+services.AddScoped<MarkdownRenderingService>();
+var connectionString = configuration.GetConnectionString("DefaultConnection");
+services.AddHangfire(x =>
+    x.UsePostgreSqlStorage(options =>
     {
-        options.EnableDetailedErrors(true);
-        options.EnableSensitiveDataLogging(true);
-    }
-    var connectionString = configuration.GetConnectionString("DefaultConnection");
-    var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString)
-    {
-        ApplicationName = "mostlylucid"
-    };
-    options.UseNpgsql(connectionStringBuilder.ConnectionString);
-});
+        options.UseNpgsqlConnection(connectionString);
+    }));
+services.AddHangfireServer();
+
+services.AddSingleton<RecurringJobManager>();
+services.SetupDatabase(configuration, env,"mostlylucid-scheduler");
+
 var app = builder.Build();
 
+
+app.UseHealthChecks("/healthz");
 app.InitializeJobs();
 app.UseHangfireDashboard("/dashboard");
 
@@ -69,10 +71,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
+app.UseSwagger();
+app.UseSwaggerUI();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+var root = app.MapGroup("api").MapTodosApi().WithTags("email");
 
 app.Run();

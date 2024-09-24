@@ -4,11 +4,12 @@ using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Controllers;
 using Mostlylucid.EmailSubscription.Mappers;
 using Mostlylucid.EmailSubscription.Models;
-using Mostlylucid.EmailSubscription.Services;
 using Mostlylucid.Services;
 using Mostlylucid.Services.Email;
 using Mostlylucid.Services.Markdown;
 using Mostlylucid.Shared.Models.Email;
+using Mostlylucid.Shared.Models.EmailSubscription;
+using EmailSubscriptionService = Mostlylucid.Services.EmailSubscription.EmailSubscriptionService;
 
 namespace Mostlylucid.EmailSubscription.Controller;
 

@@ -6,14 +6,10 @@ namespace Mostlylucid.SchedulerService.Services;
 
 public static class JobInitializer
 {
-    
     private const string AutoNewsletterJob = "AutoNewsletterJob";
     private const string DailyNewsletterJob = "DailyNewsletterJob";
     private const string WeeklyNewsletterJob = "WeeklyNewsletterJob";
     private const string MonthlyNewsletterJob = "MonthlyNewsletterJob";
-    
-
-    
     public static void InitializeJobs(this IApplicationBuilder app)
     {
       var scope=  app.ApplicationServices.CreateScope();

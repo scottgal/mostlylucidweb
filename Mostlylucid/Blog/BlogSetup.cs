@@ -1,6 +1,7 @@
 ﻿using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Blog.WatcherService;
+using Mostlylucid.DbContext;
 using Mostlylucid.DbContext.EntityFramework;
 using Mostlylucid.Services.Blog;
 using Mostlylucid.Services.Interfaces;
@@ -26,20 +27,7 @@ public static class BlogSetup
                 break;
             case BlogMode.Database:
                 Log.Information("Using Database based blog");
-                services.AddDbContext<IMostlylucidDBContext, MostlylucidDbContext>(options =>
-                {
-                    if (env.IsDevelopment())
-                    {
-                        options.EnableDetailedErrors(true);
-                        options.EnableSensitiveDataLogging(true);
-                    }
-                    var connectionString = configuration.GetConnectionString("DefaultConnection");
-                    var connectionStringBuilder = new NpgsqlConnectionStringBuilder(connectionString)
-                        {
-                            ApplicationName = "mostlylucid"
-                        };
-                    options.UseNpgsql(connectionStringBuilder.ConnectionString);
-                });
+           services.SetupDatabase(configuration, env);
                 services.AddScoped<IBlogViewService, BlogPostViewService>();
                 services.AddScoped<ICommentService, EFCommentService>();
                 services.AddScoped<IBlogPopulator, EFBlogPopulator>();

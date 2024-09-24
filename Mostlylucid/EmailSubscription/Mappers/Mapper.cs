@@ -1,5 +1,6 @@
 ﻿using Mostlylucid.EmailSubscription.Models;
 using Mostlylucid.Shared.Entities;
+using Mostlylucid.Shared.Models.EmailSubscription;
 
 namespace Mostlylucid.EmailSubscription.Mappers;
 

@@ -7,10 +7,6 @@ import mermaid from "mermaid";
 import htmx from "htmx.org";
 import hljs from "highlight.js";
 
-
-import Alpine from 'alpinejs'
-window.Alpine = Alpine
-
 window.hljs=hljs;
 window.htmx = htmx;
 window.mermaid=mermaid;

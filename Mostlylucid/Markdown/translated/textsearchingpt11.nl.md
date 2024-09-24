@@ -1,6 +1,6 @@
 # Volledige tekst zoeken (Pt 1.1)
 
-<!--category-- Postgres, Alpine -->
+<!--category-- Postgres, Alpine.js -->
 <datetime class="hidden">2024-08-21T20:30</datetime>
 
 ## Inleiding

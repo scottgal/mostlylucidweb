@@ -6,7 +6,7 @@
 }
 <title>@ViewBag.Title</title>
 
-<button @click="showModal = true" class="btn btn-primary">Show Preview</button>
+<button x-on:click="showModal = true" class="btn btn-primary">Show Preview</button>
 
 <!-- Alpine.js and HTMX Modal -->
 <div x-data="{ showModal: false, contentLoaded: false }" x-cloak>
@@ -28,13 +28,13 @@
                  hx-trigger="revealed" 
                  hx-route-token="true"
                  hx-target="#modal-content" 
-                 @htmx:afterRequest="contentLoaded = true">
+                 htmx:afterRequest="contentLoaded = true">
                 <!-- This will be replaced by HTMX content -->
             </div>
 
             <!-- Modal actions (Close button) -->
             <div class="modal-action">
-                <button @click="showModal = false" class="btn">Close</button>
+                <button x-on:click="showModal = false" class="btn">Close</button>
             </div>
         </div>
     </div>

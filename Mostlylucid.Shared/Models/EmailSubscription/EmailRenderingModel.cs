@@ -1,9 +1,8 @@
-﻿using Mostlylucid.Shared;
-using Mostlylucid.Shared.Models;
+﻿using Mostlylucid.Shared.Models.Email;
 
-namespace Mostlylucid.EmailSubscription.Models;
+namespace Mostlylucid.Shared.Models.EmailSubscription;
 
-public class EmailRenderingModel
+public class EmailRenderingModel : BaseEmailModel
 {
     public List<EmailPostModel> Posts { get; set; } = new List<EmailPostModel>();
     

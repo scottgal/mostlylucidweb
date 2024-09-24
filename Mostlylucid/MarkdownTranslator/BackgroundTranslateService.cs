@@ -57,6 +57,7 @@ public class BackgroundTranslateService(
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
+        
         // Cancel the token to signal the background task to stop
         await cancellationTokenSource.CancelAsync();
         _translations.Writer.Complete();

@@ -1,7 +1,9 @@
-﻿using Mostlylucid.DbContext.EntityFramework;
-using Mostlylucid.EmailSubscription.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Mostlylucid.DbContext.EntityFramework;
+using Mostlylucid.Shared.Models.EmailSubscription;
 
-namespace Mostlylucid.EmailSubscription.Services;
+namespace Mostlylucid.Services.EmailSubscription;
 
 public class EmailSubscriptionService(MostlylucidDbContext context, ILogger<EmailSubscriptionService> logger)
 {

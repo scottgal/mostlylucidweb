@@ -1,8 +1,6 @@
-﻿using Mostlylucid.Services.Markdown;
-using Mostlylucid.Shared;
-using Mostlylucid.Shared.Entities;
+﻿using Mostlylucid.Shared.Entities;
 
-namespace Mostlylucid.EmailSubscription.Models;
+namespace Mostlylucid.Shared.Models.EmailSubscription;
 
 public class EmailSubscriptionModel
 {
@@ -47,7 +45,7 @@ public class EmailSubscriptionModel
     
     public SubscriptionType SubscriptionType { get; set; }
 
-    public string Language { get; set; } = MarkdownBaseService.EnglishLanguage;
+    public string Language { get; set; } = Constants.EnglishLanguage;
     
     public required string Email { get; set; } 
     

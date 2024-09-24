@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using FluentEmail.Core;
-using Mostlylucid.EmailSubscription.Models;
 using Mostlylucid.Shared.Config;
 using Mostlylucid.Shared.Models.Email;
 using Mostlylucid.Shared.Models.EmailSubscription;

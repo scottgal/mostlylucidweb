@@ -16,11 +16,25 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
 
     public async Task<List<string>> GetCategories(bool noTracking = false)
     {
+        // Fetch blog posts in English and get their associated categories
+        var catQuery = Context.BlogPosts
+            .Where(x => x.LanguageEntity.Name == Constants.EnglishLanguage)
+            .SelectMany(x => x.Categories)
+            .GroupBy(x => x.Name)
+            .Select(g => g.Key); // Select distinct category names
+
+        // Apply no-tracking if specified
         if (noTracking)
-            return await Context.Categories.AsNoTracking().Select(x => x.Name).ToListAsync();
-        return await Context.Categories.Select(x => x.Name).ToListAsync();
+        {
+            return await catQuery
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
+        return await catQuery.ToListAsync();
     }
-  
+
+
 
     protected IQueryable<BlogPostEntity> PostsQuery()
     {

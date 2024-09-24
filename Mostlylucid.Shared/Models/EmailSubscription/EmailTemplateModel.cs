@@ -3,7 +3,7 @@
 namespace Mostlylucid.Shared.Models.EmailSubscription;
 
 
-public class EmailTemplateModel : BaseEmailModel
+public class EmailTemplateModel : EmailRenderingModel
 {
     public string ToEmail { get; set; } = string.Empty;
 }

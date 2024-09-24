@@ -2,6 +2,7 @@
 using Mostlylucid.Models;
 using Mostlylucid.Services.Markdown;
 using Mostlylucid.Shared;
+using Mostlylucid.Shared.Models.EmailSubscription;
 
 namespace Mostlylucid.EmailSubscription.Models;
 
