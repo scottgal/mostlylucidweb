@@ -3,7 +3,7 @@
 public record BlogPostQueryModel(string Slug, string Language);
 
 public record PostListQueryModel(
-    string Language = Constants.EnglishLanguage,
+    string? Language = Constants.EnglishLanguage,
     int? Page = null,
     int? PageSize = null,
     DateTime? StartDate = null,

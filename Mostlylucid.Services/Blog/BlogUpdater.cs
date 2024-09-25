@@ -6,7 +6,7 @@ using SerilogTracing;
 
 namespace Mostlylucid.Services.Blog;
 
-public class EFBlogUpdater(IServiceScopeFactory scopeFactory, ILogger<EFBlogUpdater> logger)
+public class BlogUpdater(IServiceScopeFactory scopeFactory, ILogger<BlogUpdater> logger)
 {
 
 

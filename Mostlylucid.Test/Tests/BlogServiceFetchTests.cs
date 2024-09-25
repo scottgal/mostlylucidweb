@@ -4,6 +4,7 @@ using Moq;
 using Mostlylucid.Blog;
 using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.DbContext.EntityFramework;
+using Mostlylucid.Services.Blog;
 using Mostlylucid.Services.Markdown;
 using Mostlylucid.Services.Umami;
 using Mostlylucid.Shared.Entities;
@@ -26,7 +27,8 @@ public class BlogServiceFetchTests
         services.AddSingleton(_dbContextMock.Object);
         // Optionally register other services
         services.AddScoped<IUmamiDataSortService, UmamiDataSortFake>();
-        services.AddScoped<IBlogViewService, BlogPostViewService>(); // Example service that depends on IMostlylucidDbContext
+        services.AddScoped<IBlogViewService, BlogPostViewService>();
+        services.AddScoped<IBlogService, BlogService>();
         services.AddLogging(configure => configure.AddConsole());
         services.AddScoped<MarkdownRenderingService>();
         // 4. Build the service provider
@@ -79,8 +81,11 @@ public class BlogServiceFetchTests
         // Act
         var result = await blogService.GetPagedPosts(2, 5);
 
+        Assert.NotNull(result);
+        Assert.NotEmpty(result.Data);
         // Assert
-        Assert.Equal(5, result.TotalItems);
+        Assert.Equal(10, result.TotalItems);
+        Assert.Equal(5, result.Data.Count);
     }
 
     [Fact]
@@ -100,10 +105,10 @@ public class BlogServiceFetchTests
     public async Task TestBlogService_GetBlogsByLanguage_ReturnsBlogs()
     {
         var blogService = SetupBlogService();
-
         // Act
         var result = await blogService.GetPostsForLanguage(language: "es");
 
+        Assert.NotEmpty(result);
         // Assert
         Assert.Single(result);
     }

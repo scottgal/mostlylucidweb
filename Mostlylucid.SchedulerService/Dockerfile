@@ -8,14 +8,25 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Mostlylucid.SchedulerService/Mostlylucid.SchedulerService.csproj", "Mostlylucid.SchedulerService/"]
+COPY ["Mostlylucid.Shared/Mostlylucid.Shared.csproj", "Mostlylucid.Shared/"]
+COPY ["Mostlylucid.DbContext/Mostlylucid.DbContext.csproj", "Mostlylucid.DbContext/"]
+COPY ["Mostlylucid.Services/Mostlylucid.Services.csproj", "Mostlylucid.Services/"]
+
 RUN dotnet restore "Mostlylucid.SchedulerService/Mostlylucid.SchedulerService.csproj"
-COPY . .
+
+# Copy the entire source code to the container
+COPY ./Mostlylucid/ ./Mostlylucid/
+COPY ./Mostlylucid.Test/ ./Mostlylucid.Test/
+COPY ./Mostlylucid.Shared/ ./Mostlylucid.Shared/
+COPY ./Mostlylucid.Services/ ./Mostlylucid.Services/
+COPY ./Mostlylucid.DbContext/ ./Mostlylucid.DbContext/
+
 WORKDIR "/src/Mostlylucid.SchedulerService"
 RUN dotnet build "Mostlylucid.SchedulerService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "Mostlylucid.SchedulerService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Mostlylucid.SchedulerService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false --no-restore
 
 FROM base AS final
 WORKDIR /app

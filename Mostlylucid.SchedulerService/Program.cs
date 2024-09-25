@@ -33,7 +33,7 @@ var env = builder.Environment;
 var services = builder.Services;
 services.AddEndpointsApiExplorer();
 services.AddSwaggerGen();
-
+services.AddHealthChecks();
 services.AddScoped<NewsletterManagementService>();
 services.AddScoped<NewsletterSendingService>();
 services.AddScoped<IBlogService, BlogService>();
@@ -51,8 +51,6 @@ services.AddSingleton<RecurringJobManager>();
 services.SetupDatabase(configuration, env,"mostlylucid-scheduler");
 
 var app = builder.Build();
-
-
 app.UseHealthChecks("/healthz");
 app.InitializeJobs();
 app.UseHangfireDashboard("/dashboard");

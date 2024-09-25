@@ -14,7 +14,7 @@ public static class BlogPostEntityMapper
             Categories = entity.Categories.Select(x=>x.Name).OrderBy(z=>z).ToArray(),
             Language = entity.LanguageEntity?.Name ?? string.Empty,
             Markdown = entity.Markdown,
-            UpdatedDate = entity.UpdatedDate.DateTime,
+            UpdatedDate = entity.UpdatedDate,
             HtmlContent = entity.HtmlContent,
             PlainTextContent = entity.PlainTextContent,
             Slug = entity.Slug,

@@ -16,7 +16,7 @@ public class BlogService(
     IMostlylucidDBContext context,
     MarkdownRenderingService markdownRenderingService,
     ILogger<BlogService> logger)
-    : EFBaseService(context, logger), IBlogService
+    : BaseService(context, logger), IBlogService
 {
     private IQueryable<BlogPostEntity> NoTrackingQuery() => PostsQuery().AsNoTrackingWithIdentityResolution();
 
@@ -31,9 +31,14 @@ public class BlogService(
             var pageSize = model.PageSize;
             var language = model.Language;
 
-            var count = await NoTrackingQuery()
-                .Where(x => x.Categories.Any(c => categories.Contains(c.Name)) && x.LanguageEntity.Name == language)
-                .CountAsync();
+            var countQuery = NoTrackingQuery();
+                
+                if(model.Language != null) 
+                    countQuery= countQuery.Where(x=>x.LanguageEntity.Name == language);
+            if (categories?.Any(x=>!string.IsNullOrEmpty(x)) == true)
+                countQuery = countQuery.Where(x =>
+                    x.Categories.Any(c => categories.Contains(c.Name)));
+                      var count =await  countQuery.CountAsync();
             var postQuery = PostsQuery();
 
             if (model.StartDate != null)
@@ -46,7 +51,7 @@ public class BlogService(
                 postQuery = postQuery.Where(x => x.PublishedDate.DateTime <= model.EndDate);
             }
 
-            if (categories.Any())
+            if (categories?.Any(x=>!string.IsNullOrEmpty(x))==true)
             {
                 postQuery = postQuery.Where(x => x.Categories.Any(c => categories.Contains(c.Name)));
             }
@@ -72,13 +77,14 @@ public class BlogService(
                 var categoriesDict = await GetCategories(slugs);
                 posts.ForEach(x =>
                 {
-                    x.Categories = categoriesDict[x.Slug];
+                    if(categoriesDict.TryGetValue(x.Slug, out var entityCategories))
+                        x.Categories = entityCategories;
                 });
             }
             var postListViewModel = new BasePagingModel<BlogPostDto>()
             {
                 Page = page ?? 1,
-                PageSize = pageSize ?? 0,
+                PageSize = pageSize ?? count,
                 TotalItems = count,
                 Data = posts.Select(x => x.ToDto(langSlugs[x.Slug].ToArray())).ToList()
             };
@@ -211,6 +217,7 @@ public class BlogService(
     {
         var query = noTracking ? PostsQuery().AsNoTracking() : PostsQuery();
         var posts=await query.Where(x=>x.LanguageEntity.Name == Constants.EnglishLanguage && slugs.Contains(x.Slug)).ToListAsync();
+        if(posts.Count==0) return new Dictionary<string, List<CategoryEntity>>();
         return posts.ToDictionary(x=>x.Slug,x=>x.Categories.OrderBy(z=>z.Name).ToList());
     }
 

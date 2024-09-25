@@ -29,11 +29,11 @@ public static class BlogSetup
                 Log.Information("Using Database based blog");
            services.SetupDatabase(configuration, env);
                 services.AddScoped<IBlogViewService, BlogPostViewService>();
-                services.AddScoped<ICommentService, EFCommentService>();
-                services.AddScoped<IBlogPopulator, EFBlogPopulator>();
+                services.AddScoped<ICommentService, CommentService>();
+                services.AddScoped<IBlogPopulator, BlogPopulator>();
                 services.AddScoped<BlogSearchService>();
                 services.AddScoped<CommentViewService>();
-                services.AddSingleton<EFBlogUpdater>();
+                services.AddSingleton<BlogUpdater>();
                 services.AddScoped<IBlogService, BlogService>();
                 services.AddHostedService<MarkdownDirectoryWatcherService>();
                 break;

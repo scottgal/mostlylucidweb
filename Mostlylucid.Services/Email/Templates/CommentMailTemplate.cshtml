@@ -1,4 +1,5 @@
-﻿@model Mostlylucid.Email.Models.CommentEmailModel
+﻿@using RazorLight
+@inherits TemplatePage<Mostlylucid.Shared.Models.Email.CommentEmailModel>
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,7 +8,7 @@
 <body>
 <h1>Comment Email</h1>
 <p>New comment from email @Model.SenderEmail</p>
-<div>@Raw(@Model.Comment)</div>
+<div>@Raw(@Model.Content)</div>
 
 <a href="@Model.PostUrl">View Post</a>
 

@@ -72,7 +72,7 @@ public class BlogPostViewService(IBlogService blogPostService) : IBlogViewServic
 
     public async Task<PostListViewModel> GetPostsByCategory(string category, int page = 1, int pageSize = 10, string language =Constants.EnglishLanguage)
     {
-        var queryModel = new PostListQueryModel(language,Categories: new []{category});
+        var queryModel = new PostListQueryModel(language,Categories: new []{category},Page:page,PageSize:pageSize);
       return await GetListPostsViewModel(queryModel);
     }
 

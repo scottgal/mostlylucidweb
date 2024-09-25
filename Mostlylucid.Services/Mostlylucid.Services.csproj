@@ -22,11 +22,13 @@
 
     <ItemGroup>
       <None Remove="Email\Templates\CommentMailTemplate.template" />
-      <None Include="Email\Templates\CommentMailTemplate.cshtml" />
+      <EmbeddedResource Include="Email\Templates\CommentMailTemplate.cshtml" />
       <None Remove="Email\Templates\ConfirmMailTemplate.template" />
-      <None Include="Email\Templates\ConfirmMailTemplate.cshtml" />
+      <EmbeddedResource Include="Email\Templates\ConfirmMailTemplate.cshtml" />
       <None Remove="Email\Templates\ContactEmailModel.template" />
-      <None Include="Email\Templates\ContactEmailModel.cshtml" />
+      <EmbeddedResource Include="Email\Templates\ContactEmailModel.cshtml" />
+      <None Remove="Email\Templates\NewsletterTemplate.cshtml" />
+      <EmbeddedResource Include="Email\Templates\NewsletterTemplate.cshtml" />
     </ItemGroup>
 
     <ItemGroup>

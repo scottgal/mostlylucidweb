@@ -19,9 +19,12 @@ RUN apt-get update && apt-get install -y curl \
 # Set the working directory to /src
 WORKDIR /src
 
-# Copy the solution file and csproj files to the container
+#  csproj files to the container
 COPY ["Mostlylucid/Mostlylucid.csproj", "Mostlylucid/"]
 COPY ["Mostlylucid.Test/Mostlylucid.Test.csproj", "Mostlylucid.Test/"]
+COPY ["Mostlylucid.Shared/Mostlylucid.Shared.csproj", "Mostlylucid.Shared/"]
+COPY ["Mostlylucid.DbContext/Mostlylucid.DbContext.csproj", "Mostlylucid.DbContext/"]
+COPY ["Mostlylucid.Services/Mostlylucid.Services.csproj", "Mostlylucid.Services/"]
 
 # Restore .NET dependencies
 RUN dotnet restore "./Mostlylucid/Mostlylucid.csproj"
@@ -29,6 +32,9 @@ RUN dotnet restore "./Mostlylucid/Mostlylucid.csproj"
 # Copy the entire source code to the container
 COPY ./Mostlylucid/ ./Mostlylucid/
 COPY ./Mostlylucid.Test/ ./Mostlylucid.Test/
+COPY ./Mostlylucid.Shared/ ./Mostlylucid.Shared/
+COPY ./Mostlylucid.Services/ ./Mostlylucid.Services/
+COPY ./Mostlylucid.DbContext/ ./Mostlylucid.DbContext/
 
 # Install NPM dependencies (do this before the build step)
 WORKDIR "/src/Mostlylucid"
@@ -59,7 +65,6 @@ WORKDIR /app
 # Copy the published application from the build stage
 COPY --from=publish /app/publish .
 
-COPY ./Mostlylucid/Email/Templates /app/Email/Templates
 
 # Start the application
 ENTRYPOINT ["dotnet", "Mostlylucid.dll"]

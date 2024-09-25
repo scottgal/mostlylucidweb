@@ -8,53 +8,43 @@ namespace Mostlylucid.Services.Email;
 
 public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail)
 {
-    private readonly string NameSpace= typeof(EmailService).Namespace;
-    public async Task SendCommentEmail(string commenterEmail, string commenterName, string comment)
-    {
-        var commentModel = new CommentEmailModel
-        {
-            SenderEmail = commenterEmail,
-            SenderName = commenterName,
-            Content = comment
-        };
-        await SendCommentEmail(commentModel);
-    }
+    private readonly string _nameSpace= typeof(EmailService).Namespace! + ".Templates.";
 
     public async Task SendCommentEmail(CommentEmailModel commentModel)
     {
         // Load the template
-        var templatePath = NameSpace + ".Templates.CommentMailTemplate.cshtml";
+        var templatePath = _nameSpace + "CommentMailTemplate.cshtml";
         await SendMail(commentModel, templatePath);
     }
 
     public async Task SendContactEmail(ContactEmailModel contactModel)
     {
-        var templatePath = NameSpace +".Templates.ContactEmailModel.cshtml";
+        var templatePath = _nameSpace +"ContactEmailModel.cshtml";
 
         await SendMail(contactModel, templatePath);
     }
 
     public async Task SendConfirmationEmail(ConfirmEmailModel confirmEmailModel)
     {
-        var templatePath = NameSpace +".Templates.ConfirmationMailTemplate.cshtml";
+        var templatePath = _nameSpace +"ConfirmationMailTemplate.cshtml";
 
         await SendMail(confirmEmailModel, templatePath, confirmEmailModel.ToEmail);
     }
     
     public async Task SendNewsletterEmail(EmailTemplateModel newsletterEmailModel)
     {
-        var templatePath = NameSpace +".Templates.NewsletterTemplate.cshtml";
+        var templatePath = _nameSpace +"NewsletterTemplate.cshtml";
 
         await SendMail(newsletterEmailModel, templatePath, newsletterEmailModel.ToEmail);
     }
 
-    public async Task SendMail(BaseEmailModel model, string templatePath, string? toEmail = null)
+    private async Task SendMail(BaseEmailModel model, string template, string? toEmail = null)
     {
         var assembly = Assembly.GetAssembly(typeof(EmailService));
-        var template = await File.ReadAllTextAsync(templatePath);
+
         // Use FluentEmail to send the email
         var email = fluentEmail.UsingTemplateFromEmbedded(template, model, assembly);
-        await email.To(smtpSettings.ToMail)
+        await email.To(toEmail?? smtpSettings.ToMail)
             .SetFrom(smtpSettings.SenderEmail, smtpSettings.SenderName)
             .Subject("New Comment")
             .SendAsync();

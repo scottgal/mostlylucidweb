@@ -2,6 +2,11 @@
   mostlylucid:
     image: scottgal/mostlylucid:latest
     restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f -K", "https://mostlylucid:7240/healthy" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
     env_file:
@@ -30,6 +35,25 @@
       - /mnt/articleimages:/app/wwwroot/articleimages
     networks:
       - app_network
+    depends_on:
+      - db
+  mostlylucid-scheduler:
+    image: scottgal/mostlylucid-scheduler:latest
+    restart: always
+    environment:
+      - SmtpSettings__UserName=${SMTPSETTINGS_USERNAME}
+      - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
+      - ConnectionStrings__DefaultConnection=${POSTGRES_CONNECTIONSTRING}
+      - Serilog__WriteTo__0__Args__apiKey=${SEQ_API_KEY}
+      - CertPassword=${CERT_PASSWORD}
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+    env_file:
+      - .env
+    volumes:
+      - /mnt/logs:/app/logs
+    depends_on:
+      - mostlylucid
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
@@ -56,7 +80,6 @@
     volumes:
       - /mnt/umami/postgres:/var/lib/postgresql/data
     restart: always
-
   cloudflared:
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}

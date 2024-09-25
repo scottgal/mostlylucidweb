@@ -9,10 +9,10 @@ using Mostlylucid.Shared.Models;
 
 namespace Mostlylucid.Services.Blog;
 
-public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService> logger)
+public class BaseService(IMostlylucidDBContext context, ILogger<BaseService> logger)
 {
     protected readonly IMostlylucidDBContext Context = context;
-    protected readonly ILogger<EFBaseService> Logger = logger;
+    protected readonly ILogger<BaseService> Logger = logger;
 
     public async Task<List<string>> GetCategories(bool noTracking = false)
     {
@@ -33,7 +33,6 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
 
         return await catQuery.ToListAsync();
     }
-
 
 
     protected IQueryable<BlogPostEntity> PostsQuery()
@@ -63,6 +62,12 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
         try
         {
             var hash = post.Markdown.ContentHash();
+            if(string.IsNullOrEmpty(hash))
+            {
+                activity?.AddTag("Empty Hash", post.Slug);
+                Logger.LogError("Empty hash for post {Post}", post.Slug);
+                return null;
+            }
             var hashChanged = currentPost?.ContentHash != hash;
             //Add an inital check, if the current post is the same as the new post's hash, then we can skip the rest of the checks
             if (!hashChanged)
@@ -72,13 +77,15 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
                     post.Language);
                 return currentPost;
             }
+
             foreach (var postCat in post.Categories)
             {
-                if(categories.All(x => x.Name != postCat))
+                if (categories.All(x => x.Name != postCat))
                 {
-                    categories.Add(new CategoryEntity(){Name = postCat});
+                    categories.Add(new CategoryEntity() { Name = postCat });
                 }
             }
+
             var blogPost = currentPost ?? new BlogPostEntity();
             blogPost.Title = post.Title;
             blogPost.Slug = post.Slug;
@@ -89,7 +96,8 @@ public class EFBaseService(IMostlylucidDBContext context, ILogger<EFBaseService>
             blogPost.PublishedDate = post.PublishedDate;
             blogPost.LanguageEntity = postLanguageEntity;
             blogPost.Categories = categories.Where(x => post.Categories.Contains(x.Name)).ToList();
-            blogPost.UpdatedDate = DateTimeOffset.UtcNow;
+            if (currentPost != null)
+                blogPost.UpdatedDate = DateTimeOffset.UtcNow;
             if (currentPost != null)
             {
                 activity?.AddTag("Updating Post", post.Slug);

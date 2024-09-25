@@ -6,7 +6,7 @@ namespace Mostlylucid.API;
 
 [Route("api/blog")]
 [ApiController]
-public class BlogUpdaterAPI(EFBlogUpdater efBlogEfBlogUpdater, ILogger<BlogUpdaterAPI> logger) : ControllerBase
+public class BlogUpdaterAPI(BlogUpdater blogBlogUpdater, ILogger<BlogUpdaterAPI> logger) : ControllerBase
 {
     
     [HttpGet]
@@ -16,7 +16,7 @@ public class BlogUpdaterAPI(EFBlogUpdater efBlogEfBlogUpdater, ILogger<BlogUpdat
         try
         {
             logger.LogInformation("Triggering EF Blog Updater");
-            await efBlogEfBlogUpdater.TriggerUpdate(cancellationToken);
+            await blogBlogUpdater.TriggerUpdate(cancellationToken);
             return TypedResults.Ok();
         }
         catch (Exception e)

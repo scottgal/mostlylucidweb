@@ -1,6 +1,5 @@
 ﻿
 using Mostlylucid.Models.Comments;
-using Mostlylucid.Shared;
 using Mostlylucid.Shared.Models;
 
 namespace Mostlylucid.Models.Blog;
@@ -15,7 +14,7 @@ public class BlogPostViewModel : BaseViewModel
             Categories = Categories,
             Title = Title,
             Language = Language,
-            UpdatedDate = UpdatedDate.DateTime,
+            UpdatedDate = UpdatedDate?.DateTime,
             Languages = Languages,
             Slug = Slug,
             WordCount = WordCount,
@@ -40,7 +39,7 @@ public class BlogPostViewModel : BaseViewModel
             PublishedDate = PublishedDate
         };
     }
-    public string Id { get; set; }
+    public string? Id { get; set; }
     public string[] Categories { get; set; } = Array.Empty<string>();
     
     public CommentViewList Comments { get; set; } = new();
@@ -50,7 +49,7 @@ public class BlogPostViewModel : BaseViewModel
     
     public string Markdown { get; set; }= string.Empty;
     
-    public DateTimeOffset UpdatedDate { get; set; }
+    public DateTimeOffset? UpdatedDate { get; set; }
     
     public string[] Languages { get; set; } = Array.Empty<string>();
     

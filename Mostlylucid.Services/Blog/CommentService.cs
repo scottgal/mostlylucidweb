@@ -9,7 +9,7 @@ using SerilogTracing;
 
 namespace Mostlylucid.Services.Blog;
 
-public class EFCommentService(IMostlylucidDBContext context,  ILogger<EFCommentService> logger) : ICommentService
+public class CommentService(IMostlylucidDBContext context,  ILogger<CommentService> logger) : ICommentService
 {
     
     

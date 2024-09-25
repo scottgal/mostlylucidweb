@@ -8,14 +8,14 @@ using Mostlylucid.Shared.Models;
 
 namespace Mostlylucid.Services.Blog;
 
-public class EFBlogPopulator : EFBaseService, IBlogPopulator
+public class BlogPopulator : BaseService, IBlogPopulator
 {
 
     private readonly IMarkdownBlogService _markdownBlogService;
 
-    public EFBlogPopulator(IMarkdownBlogService markdownBlogService,
+    public BlogPopulator(IMarkdownBlogService markdownBlogService,
         IMostlylucidDBContext context,
-        ILogger<EFBlogPopulator> logger) : base(context, logger)
+        ILogger<BlogPopulator> logger) : base(context, logger)
     {
         _markdownBlogService = markdownBlogService;
 

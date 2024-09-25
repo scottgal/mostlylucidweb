@@ -28,6 +28,7 @@ public class BlogServiceSaveTests
         services.AddSingleton(_dbContextMock.Object);
         services.AddScoped<IUmamiDataSortService, UmamiDataSortFake>();
         // Optionally register other services
+        services.AddScoped<IBlogService, BlogService>();
         services.AddScoped<IBlogViewService, BlogPostViewService>(); // Example service that depends on IMostlylucidDbContext
         services.AddLogging(configure => configure.AddConsole());
         services.AddScoped<MarkdownRenderingService>();

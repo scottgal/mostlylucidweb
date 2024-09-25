@@ -6,6 +6,7 @@ using Mostlylucid.Blog;
 using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.MarkdownTranslator;
+using Mostlylucid.Services.Blog;
 using Mostlylucid.Shared.Config;
 using Mostlylucid.Shared.Config.Markdown;
 
@@ -67,6 +68,7 @@ public static class Setup
         services.AddMarkdownTranslatorServiceCollection(handler);
         services.AddSingleton<IBackgroundTranslateService, BackgroundTranslateService>(); 
         services.AddSingleton<TranslateCacheService>();
+        services.AddScoped<IBlogService, BlogService>();
         services.AddScoped<IMarkdownFileBlogService, MarkdownBlogViewService>();
         return services;
     }

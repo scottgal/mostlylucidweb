@@ -1,5 +1,5 @@
-﻿@model Mostlylucid.Email.Models.ContactEmailModel
-
+﻿@using RazorLight
+@inherits TemplatePage<Mostlylucid.Shared.Models.Email.ContactEmailModel>
 <!DOCTYPE html>
 <html class="dark">
 <head>
@@ -12,7 +12,7 @@
 
 <p>Here is the comment:</p>
 <div>
-    @Raw( @Model.Comment)</div>
+    @Raw( @Model.Content)</div>
 <p>Thanks,</p>
 
 

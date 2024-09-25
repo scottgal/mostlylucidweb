@@ -14,7 +14,7 @@ public class BlogIndexModel
         Language = post.Language;
         Title = post.Title;
         Hash = post.PlainTextContent.ContentHash();
-        LastUpdated = post.UpdatedDate.DateTime;
+        LastUpdated = post.UpdatedDate?.DateTime;
         Published = post.PublishedDate;
         Categories = post.Categories.ToList();
         Content = post.PlainTextContent;
@@ -27,7 +27,7 @@ public class BlogIndexModel
     public string Slug { get; set; }
     public string Title { get; set; }
     
-    public DateTime LastUpdated { get; set; }
+    public DateTime? LastUpdated { get; set; }
     
     public DateTime Published { get; set; }
     

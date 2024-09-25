@@ -17,7 +17,7 @@ public class BlogPostEntity
 
     public string Slug { get; set; }
 
-    public DateTimeOffset UpdatedDate { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset? UpdatedDate { get; set; }
 
     public string Markdown { get; set; } = string.Empty;
     
