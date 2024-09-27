@@ -2,7 +2,7 @@
 
 public class ConfirmEmailModel : BaseEmailModel
 {
-    protected override string Subject => "Confirm mostlylucid subscription";
+    public override string Subject => "Confirm mostlylucid subscription";
     public string ToEmail { get; set; } = string.Empty;
     public string ConfirmUrl { get; set; } = string.Empty;
     public string UnsubscribeUrl { get; set; } = string.Empty;

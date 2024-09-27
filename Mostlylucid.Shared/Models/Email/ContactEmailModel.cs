@@ -3,5 +3,5 @@
 public class ContactEmailModel : BaseEmailModel
 
 { 
-    protected override string Subject => "New Contact";
+    public override string Subject => "New Contact";
 }

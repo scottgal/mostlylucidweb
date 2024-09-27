@@ -14,7 +14,7 @@ public class EmailSubscriptionService(MostlylucidDbContext context, ILogger<Emai
     }
     public async Task<bool> Create(EmailSubscriptionModel model)
     {
-        var entity = EmailSubscriptionModel.ToEntity(model);
+        var entity =model.ToEntity();
         if (model.Categories?.Any() == true)
         {
             var categories = await context.Categories.Where(c => model.Categories.Contains(c.Name)).ToListAsync();
@@ -37,7 +37,7 @@ public class EmailSubscriptionService(MostlylucidDbContext context, ILogger<Emai
         var entity = await context.EmailSubscriptions
             .Include(e => e.Categories)
             .FirstOrDefaultAsync(e => e.Email == email);
-        return entity == null ? null : EmailSubscriptionModel.FromEntity(entity);
+        return entity == null ? null : entity.FromEntity();
     }
     
     public async Task<EmailSubscriptionModel?> GetByToken(string token)
@@ -45,12 +45,12 @@ public class EmailSubscriptionService(MostlylucidDbContext context, ILogger<Emai
         var entity = await context.EmailSubscriptions
             .Include(e => e.Categories)
             .FirstOrDefaultAsync(e => e.Token == token);
-        return entity == null ? null : EmailSubscriptionModel.FromEntity(entity);
+        return entity == null ? null : entity.FromEntity();
     }
     
     public async Task<bool> Update(EmailSubscriptionModel model)
     {
-        var entity = EmailSubscriptionModel.ToEntity(model);
+        var entity =model.ToEntity();
         if (model.Categories?.Any() == true)
         {
         var categories = await context.Categories.Where(c => model.Categories.Contains(c.Name)).ToListAsync();

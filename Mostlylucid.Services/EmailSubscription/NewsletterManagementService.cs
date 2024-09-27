@@ -5,20 +5,22 @@ using Mostlylucid.Shared;
 using Mostlylucid.Shared.Entities;
 using Mostlylucid.Shared.Mapper;
 using Mostlylucid.Shared.Models;
+using Mostlylucid.Shared.Models.EmailSubscription;
 
 namespace Mostlylucid.Services.EmailSubscription;
 
 public class NewsletterManagementService(MostlylucidDbContext dbContext, IBlogService blogService)
 {
-    public IQueryable<EmailSubscriptionEntity> Query(SubscriptionType subscriptionType)
+    private IQueryable<EmailSubscriptionEntity> Query(SubscriptionType subscriptionType)
     {
         return dbContext.EmailSubscriptions.Where(x=>x.SubscriptionType==subscriptionType);
     }
     
-    public async Task<List<EmailSubscriptionEntity>> GetSubscriptions( SubscriptionType subscriptionType)
+    public async Task<List<EmailSubscriptionModel>> GetSubscriptions( SubscriptionType subscriptionType)
     {
         var date = DateTime.Now;
-        var subscriptions = Query(subscriptionType);
+        var subscriptionEntities = Query(subscriptionType);
+       var subscriptions = subscriptionEntities.Select(x=>x.FromEntity());
         switch (subscriptionType)
         {
             case SubscriptionType.Daily:

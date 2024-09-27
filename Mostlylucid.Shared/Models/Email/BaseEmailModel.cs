@@ -8,6 +8,6 @@ public class BaseEmailModel
     
     public string Content { get; set; }
     
-    protected virtual string Subject { get; set; }
+    public virtual string Subject { get; set; }
     
 }

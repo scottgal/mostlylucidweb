@@ -8,5 +8,6 @@ namespace Mostlylucid.EmailSubscription;
         public static void ConfigureEmailProcessor(this IServiceCollection services)
         {
             services.AddScoped<EmailSubscriptionService>();
+            services.AddHttpClient<NewsletterClient>();
         }
     }

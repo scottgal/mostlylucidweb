@@ -49,6 +49,8 @@ public class EmailSubscribeViewModel : BaseViewModel
     public bool AllCategories { get; set; } = true;
     public  List<string> Categories { get; set; } = new List<string>();
     
+    public bool SendNow { get; set; } = true;
+    
     public List<string> SelectedCategories { get; set; } = new List<string>();
     public SubscriptionType SubscriptionType { get; set; } = SubscriptionType.Weekly;
     

@@ -15,7 +15,7 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-        <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="9.0.0-preview.8.24460.1" />
+        <PackageReference Include="Microsoft.Extensions.Diagnostics.Testing" Version="8.9.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
         <PackageReference Include="MockQueryable.Moq" Version="7.0.3" />
         <PackageReference Include="Moq" Version="4.20.72" />

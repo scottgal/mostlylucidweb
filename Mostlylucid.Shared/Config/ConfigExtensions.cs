@@ -1,7 +1,7 @@
 ﻿namespace Mostlylucid.Shared.Config;
 
 public static class ConfigExtensions {
-    public static TConfig ConfigurePOCO<TConfig>(this IServiceCollection services, IConfiguration configuration)
+    public static TConfig ConfigurePOCO<TConfig>(this IServiceCollection services, IConfigurationSection configuration)
         where TConfig : class, new() {
         if (services == null) throw new ArgumentNullException(nameof(services));
         if (configuration == null) throw new ArgumentNullException(nameof(configuration));
@@ -10,6 +10,14 @@ public static class ConfigExtensions {
         configuration.Bind(config);
         services.AddSingleton(config);
         return config;
+    }
+
+    public static TConfig ConfigurePOCO<TConfig>(this IServiceCollection services, ConfigurationManager configuration)
+        where TConfig : class, IConfigSection, new()
+    {
+        var sectionName = TConfig.Section;
+        var section = configuration.GetSection(sectionName);
+        return services.ConfigurePOCO<TConfig>(section);
     }
     
     public static TConfig Configure<TConfig>(this WebApplicationBuilder builder)

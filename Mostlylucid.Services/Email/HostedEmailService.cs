@@ -17,11 +17,11 @@ namespace Mostlylucid.Services.Email
         private readonly Channel<BaseEmailModel> _mailMessages = Channel.CreateUnbounded<BaseEmailModel>();
         private Task _sendTask = Task.CompletedTask;
         private CancellationTokenSource cancellationTokenSource = new();
-        private readonly EmailService _emailService;
+        private readonly IEmailService _emailService;
         private readonly ILogger<EmailSenderHostedService> _logger;
         private readonly IAsyncPolicy _policyWrap;
 
-        public EmailSenderHostedService(EmailService emailService, ILogger<EmailSenderHostedService> logger)
+        public EmailSenderHostedService(IEmailService emailService, ILogger<EmailSenderHostedService> logger)
         {
             _emailService = emailService;
             _logger = logger;

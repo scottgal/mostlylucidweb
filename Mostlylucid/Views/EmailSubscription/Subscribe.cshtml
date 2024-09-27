@@ -31,6 +31,13 @@ else
                 <input type="email" class="grow text-black dark:text-white bg-transparent border-0"
                        asp-for="Email" placeholder="Email (optional)"/>
             </label>
+            
+            <div class="form-control w-full lg:w-40 justify-center">
+                <label class="label cursor-pointer">
+                    <span class="label-text font-bold">Send Now</span>
+                    <input type="checkbox" class="toggle toggle-info" asp-for="SendNow"  />
+                </label>
+                </div>
             <div class="grid grid-cols-2 sm:grid-cols-[repeat(auto-fit,minmax(100px,1fr))] w-full lg:w-1/3">
                 @{
                     var frequency = Enum.GetValues(typeof(SubscriptionType)).Cast<SubscriptionType>().ToList();
@@ -73,7 +80,7 @@ else
                 x-on:click="hideCategories = !hideCategories; showCategories = !hideCategories">
                 <span class="flex flex-row items-center space-x-1">
                     Categories
-                    <label class="label cursor-pointer ml-4" x-on:click.stop="">
+                    <label class="label cursor-pointer ml-4" for="@nameof(Model.AllCategories)" x-on:click.stop="">
                         all
                     </label>
                     <input
@@ -81,6 +88,7 @@ else
                         x-on:click.stop=""
                         :checked="hideCategories; showCategories = !hideCategories"
                         x-model="hideCategories"
+                        id="@nameof(Model.AllCategories)"
                         name="@nameof(Model.AllCategories)"
                         class="toggle toggle-info toggle-sm"/>
                 </span>
@@ -91,15 +99,10 @@ else
                     </i>
                 </span>
             </h4>
-
-
             <div class="flex flex-wrap gap-2 pt-2 pl-5 pr-5 pb-2"
                  x-show="showCategories"
                  x-cloak
-                 x-transition:enter="max-h-0 opacity-0"
-                 x-transition:enter-end="max-h-screen opacity-100"
-                 x-transition:leave="max-h-screen opacity-100"
-                 x-transition:leave-end="max-h-0 opacity-0">
+            >
                 <div class="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] mt-4 w-full">
                     @foreach (var category in Model.Categories)
                     {
@@ -115,19 +118,13 @@ else
                     }
                 </div>
             </div></div>
-
-
         <div :class="{ 'opacity-50 pointer-events-none': schedule !== 'Weekly' }" class=" mt-2 border-neutral-400 dark:border-neutral-600 border rounded-lg">
             <h4
                 class="px-5 py-1 bg-neutral-500 bg-opacity-10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer">
                 <span class="flex flex-row items-center space-x-1 ">
                     Day of Week to Send On
-
-
                 </span>
-
             </h4>
-
             <div class="grid grid-cols-3 sm:grid-cols-[repeat(auto-fit,minmax(80px,1fr))] my-2 w-full lg:w-1/2" x-show="schedule === 'Weekly'">
                 @foreach (var day in Model.DaysOfWeek)
                 {
@@ -142,7 +139,6 @@ else
                     </div>
                 }
             </div>
-
         </div>
         <div :class="{ 'opacity-50 pointer-events-none': schedule !== 'Monthly' }" class=" mt-2 border-neutral-400 dark:border-neutral-600 border rounded-lg">
             <h4

@@ -14,7 +14,7 @@ using EmailSubscriptionService = Mostlylucid.Services.EmailSubscription.EmailSub
 namespace Mostlylucid.EmailSubscription.Controller;
 
 [Route("/newsletter")]
-public class EmailSubscriptionController(BaseControllerService baseControllerService,EmailSenderHostedService emailService,
+public class EmailSubscriptionController(BaseControllerService baseControllerService,IEmailSenderHostedService emailService,
     EmailSubscriptionService emailSubscriptionService, IBlogViewService blogViewService, ILogger<EmailSubscriptionController> logger) 
     : BaseController(baseControllerService,logger)
 {

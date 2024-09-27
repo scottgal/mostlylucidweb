@@ -7,6 +7,7 @@ using Mostlylucid.Services.Blog;
 using Mostlylucid.Services.Email;
 using Mostlylucid.Services.EmailSubscription;
 using Mostlylucid.Services.Markdown;
+using Mostlylucid.Shared.Config;
 using Serilog;
 using Serilog.Debugging;
 
@@ -36,6 +37,8 @@ services.AddSwaggerGen();
 services.AddHealthChecks();
 services.AddScoped<NewsletterManagementService>();
 services.AddScoped<NewsletterSendingService>();
+
+services.ConfigurePOCO<NewsletterConfig>(config);
 services.AddScoped<IBlogService, BlogService>();
 services.SetupEmail(configuration);
 services.AddScoped<MarkdownRenderingService>();

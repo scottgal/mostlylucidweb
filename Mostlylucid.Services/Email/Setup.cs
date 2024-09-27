@@ -28,7 +28,7 @@ public static class Setup
             UseDefaultCredentials = false
         }));
         // Register your EmailService as a scoped service if it uses scoped dependencies
-        services.AddSingleton<EmailService>();
+        services.AddSingleton<IEmailService,EmailService>();
         services.AddSingleton<IEmailSenderHostedService, EmailSenderHostedService>();
         services.AddHostedService<IEmailSenderHostedService>(provider => provider.GetRequiredService<IEmailSenderHostedService>());
     }

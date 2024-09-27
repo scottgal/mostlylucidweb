@@ -2,42 +2,9 @@
 
 namespace Mostlylucid.Shared.Models.EmailSubscription;
 
-public class EmailSubscriptionModel
+public  class EmailSubscriptionModel
 {
-    public static EmailSubscriptionModel FromEntity(EmailSubscriptionEntity entity)
-    {
-        return new EmailSubscriptionModel
-        {
-            Id = entity.Id,
-            Token = entity.Token,
-            SubscriptionType = entity.SubscriptionType,
-            Language = entity.Language,
-            Email = entity.Email,
-            CreatedDate = entity.CreatedDate,
-            Day = entity.Day,
-            DayOfMonth = entity.DayOfMonth,
-            LastSent = entity.LastSent,
-            Categories = entity.Categories?.Select(c => c.Name).ToList(),
-            EmailConfirmed = entity.EmailConfirmed
-        };
-    }
-    
-    public static EmailSubscriptionEntity ToEntity(EmailSubscriptionModel model)
-    {
-        return new EmailSubscriptionEntity
-        {
-            Id = model.Id,
-            Token = model.Token,
-            SubscriptionType = model.SubscriptionType,
-            Language = model.Language,
-            Email = model.Email,
-            CreatedDate = model.CreatedDate,
-            LastSent = model.LastSent,
-            Categories = model.Categories?.Select(c => new CategoryEntity { Name = c }).ToList(),
-            EmailConfirmed = model.EmailConfirmed,
-            Day = model.Day
-        };
-    }
+   
     
     public int Id { get; set; }
     
@@ -60,4 +27,11 @@ public class EmailSubscriptionModel
     public string?  Day { get; set; } 
     
     public bool EmailConfirmed { get; set; } = false;
+
+    public override string ToString()
+    {
+        return $"Id: {Id}, Token: {Token}, SubscriptionType: {SubscriptionType}, Language: {Language}," +
+               $" Email: {Email}, CreatedDate: {CreatedDate}, LastSent: {LastSent}, Categories: {Categories}," +
+               $" DayOfMonth: {DayOfMonth}, Day: {Day}, EmailConfirmed: {EmailConfirmed}";
+    }
 }

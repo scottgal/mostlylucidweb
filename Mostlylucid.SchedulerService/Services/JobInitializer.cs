@@ -15,9 +15,9 @@ public static class JobInitializer
       var scope=  app.ApplicationServices.CreateScope();
         var recurringJobManager = scope.ServiceProvider.GetRequiredService<RecurringJobManager>();
       
-        recurringJobManager.AddOrUpdate<NewsletterSendingService>(AutoNewsletterJob,  x =>  x.SendNewsletter(SubscriptionType.EveryPost), Cron.Hourly);
-        recurringJobManager.AddOrUpdate<NewsletterSendingService>(DailyNewsletterJob,  x =>  x.SendNewsletter(SubscriptionType.Daily), "0 17 * * *");
-        recurringJobManager.AddOrUpdate<NewsletterSendingService>(WeeklyNewsletterJob,  x =>  x.SendNewsletter(SubscriptionType.Weekly), "0 17 * * *");
-        recurringJobManager.AddOrUpdate<NewsletterSendingService>(MonthlyNewsletterJob,  x => x.SendNewsletter(SubscriptionType.Monthly), "0 17 * * *");
+        recurringJobManager.AddOrUpdate<NewsletterSendingService>(AutoNewsletterJob,  x =>  x.SendScheduledNewsletter(SubscriptionType.EveryPost), Cron.Hourly);
+        recurringJobManager.AddOrUpdate<NewsletterSendingService>(DailyNewsletterJob,  x =>  x.SendScheduledNewsletter(SubscriptionType.Daily), "0 17 * * *");
+        recurringJobManager.AddOrUpdate<NewsletterSendingService>(WeeklyNewsletterJob,  x =>  x.SendScheduledNewsletter(SubscriptionType.Weekly), "0 17 * * *");
+        recurringJobManager.AddOrUpdate<NewsletterSendingService>(MonthlyNewsletterJob,  x => x.SendScheduledNewsletter(SubscriptionType.Monthly), "0 17 * * *");
     }
 }
