@@ -76,14 +76,14 @@
     x-data="globalSetup()"
     x-init="themeInit()"
     :class="isMobileMenuOpen ? 'max-h-screen overflow-hidden relative' : ''"
-    class="bg-custom-light-bg dark:bg-custom-dark-bg "
->
-<header class="sticky top-0 z-50 bg-white  dark:bg-custom-dark-bg shadow-md  container mx-auto flex flex-wrap items-center justify-between px-4 mb-3 py-1 w-full rounded border-b border-x border-l-neutral-600 border-r-neutral-600 border-b-neutral-600 print:!hidden" id="header">
+    class="bg-custom-light-bg dark:bg-custom-dark-bg ">
+<partial name="_Toast"  />
+<header class="sticky top-0 z-40 bg-white  dark:bg-custom-dark-bg shadow-md  container mx-auto flex flex-wrap items-center justify-between px-4 mb-3 py-1 w-full rounded border-b border-x border-l-neutral-600 border-r-neutral-600 border-b-neutral-600 print:!hidden" id="header">
 
     <ul class="flex items-center w-full print:hidden">
         <!-- First list item (logo) stays on the left -->
         <li>
-            <a asp-action="Index" asp-controller="Home" hx-swap="show:window:top"  hx-target="#contentcontainer" hx-boost="true" class="flex items-center">
+            <a asp-action="Index" asp-controller="Home" hx-swap="show:window:top" hx-target="#contentcontainer" hx-boost="true" class="flex items-center">
                 <span class="bx bx-home-alt-2 lg:text-2xl font-semibold mr-2 transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary print:hidden"></span>
 
                 <div class="svg-container">
@@ -95,8 +95,7 @@
                         height="30px"
                         alt="mostlylucid limited"
                         class="hidden lg:block img-filter-dark"
-                        :class="{ 'img-filter-dark': !isDarkMode }"
-                    />
+                        :class="{ 'img-filter-dark': !isDarkMode }"/>
 
                     <!-- Small screen logo (shown on small screens and hidden on large screens) -->
                     <img
@@ -105,62 +104,61 @@
                         width="30px"
                         height="20px"
                         alt="mostlylucid limited"
-                        class="block lg:hidden"
-                    />
+                        class="block lg:hidden"/>
                 </div>
             </a>
         </li>
         <li class="ml-auto"></li>
         <li class="group relative mb-1 hidden lg:block ml-2" id="typeaheadelement">
-            <div  hx-trigger="load" hx-get="/typeahead" hx-target="#typeaheadelement" hx-swap="innerHTML"></div>
+            <div hx-trigger="load" hx-get="/typeahead" hx-target="#typeaheadelement" hx-swap="innerHTML"></div>
         </li>
 
         <li class="group relative mb-1 hidden lg:block ml-2">
             <div class="flex items-center space-x-4">
                 @if (Model != null)
                 {
-                if (Model.Authenticated)
-                {
-                <div class="flex items-center space-x-4">
-                    <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-outline btn-sm text-blue-dark dark:text-white">
-                        @if (Model.AvatarUrl != null)
-                        {
-                        <img src="@Model.AvatarUrl" width="24px" height="24px" class="h-6 w-6 rounded-full" alt="User Avatar" />
-                        }
-                        <span class="text-body text-blue-dark dark:text-white">@Model.Name</span>
-                        <i class="bx bx-log-out mr-2 text-l lg:text-xl"></i>
-                    </a>
-                </div>
-                }
-                else
-                {
-                <div class="w-[200px] h-[39px] overflow-hidden rounded">
-                    <div id="google_button"></div>
-                </div>
-                }
+                    if (Model.Authenticated)
+                    {
+                        <div class="flex items-center space-x-4">
+                            <a data-logout-link asp-action="Logout" asp-controller="Login" target="_blank" class="btn btn-outline btn-sm text-blue-dark dark:text-white">
+                                @if (Model.AvatarUrl != null)
+                                {
+                                    <img src="@Model.AvatarUrl" width="24px" height="24px" class="h-6 w-6 rounded-full" alt="User Avatar"/>
+                                }
+                                <span class="text-body text-blue-dark dark:text-white">@Model.Name</span>
+                                <i class="bx bx-log-out mr-2 text-l lg:text-xl"></i>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="w-[200px] h-[39px] overflow-hidden rounded">
+                            <div id="google_button"></div>
+                        </div>
+                    }
                 }
             </div>
         </li>
 
         <li class="group relative my-1 mx-4 px-2 hidden lg:block border-neutral-400 dark:border-neutral-600 border rounded-lg">
-            <partial name="_Socials" />
+            <partial name="_Socials"/>
         </li>
         <li class="group relative mb-1 ml-2">
-            <a href="/search"  hx-boost="true"  hx-target="#contentcontainer" hx-swap="show:window:top" class="flex items-center text-l lg:text-xl font-medium text-primary group-hover:text-green dark:text-white space-x-2 hover:text-secondary dark:hover:text-secondary transition-colors">
+            <a href="/search" hx-boost="true" hx-target="#contentcontainer" hx-swap="show:window:top" class="flex items-center text-l lg:text-xl font-medium text-primary group-hover:text-green dark:text-white space-x-2 hover:text-secondary dark:hover:text-secondary transition-colors">
                 <i class="text-l lg:text-2xl bx bx-search"></i>
                 <span class="ml-2 hidden lg:block">Search</span>
             </a>
         </li>
-        
+
         <li class="group relative mb-1 ml-2">
-            <a href="/blog/aboutme" hx-boost="true"  hx-target="#contentcontainer" hx-swap="show:window:top" class="relative z-30 block px-2 font-body text-l lg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Intro</a>
+            <a href="/blog/aboutme" hx-boost="true" hx-target="#contentcontainer" hx-swap="show:window:top" class="relative z-30 block px-2 font-body text-l lg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Intro</a>
         </li>
 
         <li class="group relative mb-1 ml-2">
-            <a href="/blog" hx-boost="true"  hx-target="#contentcontainer" hx-swap="show:window:top" class="relative z-30 block px-2 font-body text-l lg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Blog</a>
+            <a href="/blog" hx-boost="true" hx-target="#contentcontainer" hx-swap="show:window:top" class="relative z-30 block px-2 font-body text-l lg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Blog</a>
         </li>
 
-     
+
         <li class="group relative mb-1 ml-2 hidden lg:block">
             <a href="/rss" target="_blank" class="flex items-center text-l lg:text-xl space-x-2 hover:text-secondary dark:hover:text-secondary transition-colors">
                 <i class="text-l lg:text-2xl bx bx-rss"></i>
@@ -169,7 +167,7 @@
         </li>
 
         <li class="group relative mb-0.5 ml-2">
-            <a asp-action="Index" hx-boost="true"  hx-swap="show:window:top"  hx-target="#contentcontainer" asp-controller="Contact" class="flex items-center text-l lg:text-xl space-x-2 text-primary dark:text-white hover:text-secondary dark:hover:text-secondary transition-colors" data-umami-event="Contact Click">
+            <a asp-action="Index" hx-boost="true" hx-swap="show:window:top" hx-target="#contentcontainer" asp-controller="Contact" class="flex items-center text-l lg:text-xl space-x-2 text-primary dark:text-white hover:text-secondary dark:hover:text-secondary transition-colors" data-umami-event="Contact Click">
                 <i class='bx bx-mail-send text-l lg:text-2xl'></i>
                 <span class="ml-0.5 hidden lg:block">Contact</span>
             </a>
@@ -184,16 +182,16 @@
 
 </header>
 
-  <div class="container mx-auto" id="contentcontainer">
-   @RenderBody()
-    </div>
+<div class="container mx-auto" id="contentcontainer">
+    @RenderBody()
+</div>
 <div class="container pb-8 mx-auto">
     <div
         class="flex flex-col items-center justify-between  sm:flex-row sm:py-2">
         <div class="mr-auto flex flex-col items-center sm:flex-row">
-            <a asp-action="Index" asp-controller="Home" hx-swap="show:window:top"  hx-target="#contentcontainer" hx-boost="true" class="mr-auto sm:mr-6">
+            <a asp-action="Index" asp-controller="Home" hx-swap="show:window:top" hx-target="#contentcontainer" hx-boost="true" class="mr-auto sm:mr-6">
                 <div class="svg-container">
-                    <img src="/img/logo.svg" asp-append-version="true"  width="180px" height="30px"  alt="logo"  :class="{ 'img-filter-dark': !isDarkMode }"/>
+                    <img src="/img/logo.svg" asp-append-version="true" width="180px" height="30px" alt="logo" :class="{ 'img-filter-dark': !isDarkMode }"/>
                 </div>
             </a>
             <p class="pt-5 font-body font-light text-primary dark:text-white sm:pt-0">
@@ -202,7 +200,7 @@
         </div>
         <partial name="_Socials"/>
     </div>
-        
+
 </div>
 <noscript>
     <style>
@@ -212,8 +210,8 @@
     </style>
 </noscript>
 <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js" async></script>
-<script src="~/js/dist/main.js" asp-append-version="true"  data-cfasync="false" > </script>
-<script  src="@(ViewBag.UmamiPath + "/" +ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId"></script>
+<script src="~/js/dist/main.js" asp-append-version="true" data-cfasync="false"> </script>
+<script src="@(ViewBag.UmamiPath + "/" + ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

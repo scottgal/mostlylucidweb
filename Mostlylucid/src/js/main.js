@@ -166,3 +166,64 @@ window.changePageSize = function changePageSize(linkUrl = null) {
         history.pushState({}, null, newUrl);
     });
 }
+
+hljs.addPlugin({
+    "after:highlightElement": ({ el, text }) => {
+        /**
+         * el is the <code> element that was highlighted
+         * el.parentElement is the <pre> element
+         */
+        const wrapper = el.parentElement;
+        if (wrapper == null) {
+            return;
+        }
+
+        /**
+         * Make the parent relative so we can absolutely
+         * position the copy button
+         */
+        wrapper.classList.add("relative");
+        //wrapper.classList.add("overflow-y-hidden");
+
+        const copyButton = document.createElement("button");
+        copyButton.classList.add(
+            "absolute",
+            "top-2",
+            "right-1",
+            "p-2",
+            "text-gray-500",
+            "hover:text-gray-700",
+        );
+        // Lucide copy icon
+        copyButton.innerHTML = `<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
+
+        copyButton.onclick = () => {
+            navigator.clipboard.writeText(text);
+
+            // Notify user that the content has been copied
+            showToast("The code block content has been copied to the clipboard.", 3000, "success");
+        
+        };
+
+        // Append the copy button to the wrapper
+        wrapper.prepend(copyButton);
+    },
+});
+
+window.showToast = function(message, duration = 3000, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastText = document.getElementById('toast-text');
+    const toastMessage = document.getElementById('toast-message');
+
+    // Set message and type
+    toastText.innerText = message;
+    toastMessage.className = `alert alert-${type}`; // Change alert type (success, warning, error)
+
+    // Show the toast
+    toast.classList.remove('hidden');
+
+    // Hide the toast after specified duration
+    setTimeout(() => {
+        toast.classList.add('hidden');
+    }, duration);
+}
