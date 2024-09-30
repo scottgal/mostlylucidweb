@@ -33,27 +33,28 @@
       - /mnt/markdown:/app/markdown
       - ./mostlylucid.pfx:/app/mostlylucid.pfx
       - /mnt/articleimages:/app/wwwroot/articleimages
+      - /mnt/mostlylucid/uploads:/app/wwwroot/uploads
     networks:
       - app_network
     depends_on:
       - db
-  mostlylucid-scheduler:
-    image: scottgal/mostlylucid-scheduler:latest
-    restart: always
-    environment:
-      - SmtpSettings__UserName=${SMTPSETTINGS_USERNAME}
-      - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
-      - ConnectionStrings__DefaultConnection=${POSTGRES_CONNECTIONSTRING}
-      - Serilog__WriteTo__0__Args__apiKey=${SEQ_API_KEY}
-      - CertPassword=${CERT_PASSWORD}
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"
-    env_file:
-      - .env
-    volumes:
-      - /mnt/logs:/app/logs
-    depends_on:
-      - mostlylucid
+#  mostlylucid-scheduler:
+#    image: scottgal/mostlylucid-scheduler:latest
+#    restart: always
+#    environment:
+#      - SmtpSettings__UserName=${SMTPSETTINGS_USERNAME}
+#      - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
+#      - ConnectionStrings__DefaultConnection=${POSTGRES_CONNECTIONSTRING}
+#      - Serilog__WriteTo__0__Args__apiKey=${SEQ_API_KEY}
+#      - CertPassword=${CERT_PASSWORD}
+#    labels:
+#      - "com.centurylinklabs.watchtower.enable=true"
+#    env_file:
+#      - .env
+#    volumes:
+#      - /mnt/logs:/app/logs
+#    depends_on:
+#      - mostlylucid
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower

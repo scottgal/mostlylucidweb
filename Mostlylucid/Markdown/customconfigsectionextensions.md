@@ -60,6 +60,17 @@ var newsletterConfig = services.ConfigurePOCO<NewsletterConfig>(config);
 
 ```
 
+Or even for the `WebApplicationBuilder` like so:
+
+```csharp
+var newsletterConfig = builder.Configure<NewsletterConfig>();
+```
+Note: As the builder has access to the `ConfigurationManager` it doesn't need to have that passed in.
+
+Meaning you now have options about how to bind config. 
+
+Another advantage is that if you need to use these values later in your `Program.cs` file then the object is available to you.
+
 # The Extension Method
 To enable all this we have a fairly simple extension method that does the work of binding the configuration to the class. 
 

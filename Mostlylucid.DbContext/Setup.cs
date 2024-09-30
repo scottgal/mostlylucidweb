@@ -25,7 +25,10 @@ public static class Setup
             {
                 ApplicationName = applicationName
             };
-            options.UseNpgsql(connectionStringBuilder.ConnectionString);
+            options.UseNpgsql(connectionStringBuilder.ConnectionString, npgsqlOptions =>
+            {
+                npgsqlOptions.MigrationsAssembly(typeof(MostlylucidDbContext).Assembly.FullName); // Set your migration assembly here
+            });
         });
     }
 }

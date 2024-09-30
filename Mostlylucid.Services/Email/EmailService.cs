@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Net.Mail;
+using System.Reflection;
 using FluentEmail.Core;
 using FluentEmail.Core.Models;
 using Microsoft.Extensions.Logging;
@@ -16,37 +17,41 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail, I
 {
     private readonly string _nameSpace = typeof(EmailService).Namespace! + ".Templates.";
 
-    public async Task SendCommentEmail(CommentEmailModel commentModel)
+    public async Task<bool> SendCommentEmail(CommentEmailModel commentModel)
     {
         // Load the template
         var templatePath = _nameSpace + "CommentMailTemplate.cshtml";
-        await SendMail(commentModel, templatePath);
+      var response=  await SendMail(commentModel, templatePath);
+        return response?.Successful ?? false;
     }
 
-    public async Task SendContactEmail(ContactEmailModel contactModel)
+    public async Task<bool> SendContactEmail(ContactEmailModel contactModel)
     {
         var templatePath = _nameSpace + "ContactEmailModel.cshtml";
 
-        await SendMail(contactModel, templatePath);
+       var response = await SendMail(contactModel, templatePath);
+        return response?.Successful ?? false;
     }
 
-    public async Task SendConfirmationEmail(ConfirmEmailModel confirmEmailModel)
+    public async Task<bool> SendConfirmationEmail(ConfirmEmailModel confirmEmailModel)
     {
         var templatePath = _nameSpace + "ConfirmationMailTemplate.cshtml";
 
-        await SendMail(confirmEmailModel, templatePath, confirmEmailModel.ToEmail);
+        var response =await SendMail(confirmEmailModel, templatePath, confirmEmailModel.ToEmail);
+        return response?.Successful ?? false;
     }
 
-    public async Task SendNewsletterEmail(EmailTemplateModel newsletterEmailModel)
+    public async Task<bool> SendNewsletterEmail(EmailTemplateModel newsletterEmailModel)
     {
         var templatePath = _nameSpace + "NewsletterTemplate.cshtml";
 
-        await SendMail(newsletterEmailModel, templatePath, newsletterEmailModel.ToEmail);
+        var response = await SendMail(newsletterEmailModel, templatePath, newsletterEmailModel.ToEmail);
+        return response?.Successful ?? false;
     }
 
     private async Task<SendResponse?> SendMail(BaseEmailModel model, string template, string? toEmail = null)
     {
-      using var activity =  Log.Logger.StartActivity("SendMail");
+        using var activity = Log.Logger.StartActivity("SendMail");
         try
         {
             activity.AddProperty("ToEmail", toEmail);
@@ -72,9 +77,15 @@ public class EmailService(SmtpSettings smtpSettings, IFluentEmail fluentEmail, I
 
             return response;
         }
+        catch (SmtpException se)
+        {
+            activity.Complete(LogEventLevel.Error, se);
+            logger.LogError(se, "Error sending email");
+            throw;
+        }
         catch (Exception e)
         {
-            activity.Complete(LogEventLevel.Error,e);
+            activity.Complete(LogEventLevel.Error, e);
             logger.LogError(e, "Error sending email");
             return null;
         }

@@ -16,7 +16,7 @@ namespace Mostlylucid.Services.Email
     {
         private readonly Channel<BaseEmailModel> _mailMessages = Channel.CreateUnbounded<BaseEmailModel>();
         private Task _sendTask = Task.CompletedTask;
-        private CancellationTokenSource cancellationTokenSource = new();
+        private readonly CancellationTokenSource _cancellationTokenSource = new();
         private readonly IEmailService _emailService;
         private readonly ILogger<EmailSenderHostedService> _logger;
         private readonly IAsyncPolicy _policyWrap;
@@ -67,7 +67,7 @@ namespace Mostlylucid.Services.Email
         {
             _logger.LogInformation("Starting background e-mail delivery");
             // Start the background task
-            _sendTask = DeliverAsync(cancellationTokenSource.Token);
+            _sendTask = DeliverAsync(_cancellationTokenSource.Token);
             return Task.CompletedTask;
         }
 
@@ -76,7 +76,7 @@ namespace Mostlylucid.Services.Email
             _logger.LogInformation("Stopping background e-mail delivery");
 
             // Cancel the token to signal the background task to stop
-            await cancellationTokenSource.CancelAsync();
+            await _cancellationTokenSource.CancelAsync();
             _mailMessages.Writer.Complete();
 
             // Wait until the background task completes or the cancellation token triggers
@@ -138,7 +138,7 @@ namespace Mostlylucid.Services.Email
 
         public void Dispose()
         {
-            cancellationTokenSource.Dispose();
+            _cancellationTokenSource.Dispose();
         }
     }
 }

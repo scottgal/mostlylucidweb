@@ -5,8 +5,8 @@ namespace Mostlylucid.Services.Email;
 
 public interface IEmailService
 {
-    Task SendCommentEmail(CommentEmailModel commentModel);
-    Task SendContactEmail(ContactEmailModel contactModel);
-    Task SendConfirmationEmail(ConfirmEmailModel confirmEmailModel);
-    Task SendNewsletterEmail(EmailTemplateModel newsletterEmailModel);
+    Task<bool> SendCommentEmail(CommentEmailModel commentModel);
+    Task<bool> SendContactEmail(ContactEmailModel contactModel);
+    Task<bool> SendConfirmationEmail(ConfirmEmailModel confirmEmailModel);
+    Task<bool> SendNewsletterEmail(EmailTemplateModel newsletterEmailModel);
 }

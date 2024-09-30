@@ -79,6 +79,7 @@
       <Folder Include="wwwroot\css\dist\" />
       <Folder Include="wwwroot\js\dist\" />
       <Folder Include="wwwroot\lib\" />
+      <Folder Include="wwwroot\uploads\" />
     </ItemGroup>
     <ItemGroup>
 

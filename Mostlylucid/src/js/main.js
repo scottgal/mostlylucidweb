@@ -1,8 +1,6 @@
 ﻿// Initialize the mostlylucid namespace if not already defined
 import hljsRazor from "highlightjs-cshtml-razor";
-
 window.mostlylucid = window.mostlylucid || {};
-
 import mermaid from "mermaid";
 import htmx from "htmx.org";
 import hljs from "highlight.js";
@@ -55,7 +53,6 @@ window.mermaidinit = function() {
 
 window.onload = function(ev) {
     if(document.readyState === 'complete') {
-        Alpine.start();
         initGoogleSignIn();
         mermaidinit();
         const hljsRazor = require('highlightjs-cshtml-razor');
@@ -169,10 +166,6 @@ window.changePageSize = function changePageSize(linkUrl = null) {
 
 hljs.addPlugin({
     "after:highlightElement": ({ el, text }) => {
-        /**
-         * el is the <code> element that was highlighted
-         * el.parentElement is the <pre> element
-         */
         const wrapper = el.parentElement;
         if (wrapper == null) {
             return;
@@ -183,8 +176,6 @@ hljs.addPlugin({
          * position the copy button
          */
         wrapper.classList.add("relative");
-        //wrapper.classList.add("overflow-y-hidden");
-
         const copyButton = document.createElement("button");
         copyButton.classList.add(
             "absolute",
@@ -193,9 +184,13 @@ hljs.addPlugin({
             "p-2",
             "text-gray-500",
             "hover:text-gray-700",
+            "bx",
+            "bx-copy",
+            "text-xl",
+            "cursor-pointer"
         );
-        // Lucide copy icon
-        copyButton.innerHTML = `<svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>`;
+        copyButton.setAttribute("aria-label", "Copy code to clipboard");
+        copyButton.setAttribute("title", "Copy code to clipboard");
 
         copyButton.onclick = () => {
             navigator.clipboard.writeText(text);
@@ -204,7 +199,6 @@ hljs.addPlugin({
             showToast("The code block content has been copied to the clipboard.", 3000, "success");
         
         };
-
         // Append the copy button to the wrapper
         wrapper.prepend(copyButton);
     },

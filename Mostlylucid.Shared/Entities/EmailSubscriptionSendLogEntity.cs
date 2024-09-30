@@ -9,7 +9,7 @@ public class EmailSubscriptionSendLogEntity
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.None)]
-    [Column(TypeName = "nvarchar(24)")]
+    [Column(TypeName = "varchar(24)")]
  
     public SubscriptionType SubscriptionType { get; set; }
     

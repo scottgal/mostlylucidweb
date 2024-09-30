@@ -82,12 +82,12 @@ try
     services.AddScoped<IUmamiUserInfoService, UmamiUserInfoService>();
     services.AddScoped<BaseControllerService>();
     services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
-    services.SetupEmail(builder.Configuration);
+    services.SetupEmail(config);
     services.SetupRSS();
     services.SetupBlog(config, builder.Environment);
     services.SetupUmamiClient(config);
     
-    services.ConfigureEmailProcessor();
+    services.ConfigureEmailProcessor(config);
     services.AddAntiforgery(options =>
     {
         options.HeaderName = "X-CSRF-TOKEN";
@@ -219,6 +219,11 @@ try
 
 catch (Exception ex)
 {
+    if(args.Contains("migrate"))
+    {
+        Log.Information("Migration complete");
+        return;
+    }
     Log.Fatal(ex, "Application terminated unexpectedly");
 }
 finally

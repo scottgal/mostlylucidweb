@@ -39,59 +39,7 @@ namespace Mostlylucid.Migrations
                     b.ToTable("EmailSubscription_Category", "mostlylucid");
                 });
 
-            modelBuilder.Entity("Mostlylucid.EmailSubscription.Models.Entities.EmailSubscriptionEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTimeOffset>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Day")
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<int?>("DayOfMonth")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Language")
-                        .IsRequired()
-                        .HasMaxLength(2)
-                        .HasColumnType("character varying(2)");
-
-                    b.Property<DateTimeOffset?>("LastSent")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("SubscriptionType")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Token")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email");
-
-                    b.HasIndex("Token")
-                        .IsUnique();
-
-                    b.ToTable("EmailSubscriptions", "mostlylucid");
-                });
-
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.BlogPostEntity", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.BlogPostEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -135,7 +83,7 @@ namespace Mostlylucid.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTimeOffset>("UpdatedDate")
+                    b.Property<DateTimeOffset?>("UpdatedDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -161,7 +109,7 @@ namespace Mostlylucid.Migrations
                     b.ToTable("BlogPosts", "mostlylucid");
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CategoryEntity", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.CategoryEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -183,7 +131,7 @@ namespace Mostlylucid.Migrations
                     b.ToTable("Categories", "mostlylucid");
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentClosure", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.CommentClosure", b =>
                 {
                     b.Property<int>("AncestorId")
                         .HasColumnType("integer")
@@ -204,7 +152,7 @@ namespace Mostlylucid.Migrations
                     b.ToTable("comment_closures", "mostlylucid");
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentEntity", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.CommentEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -251,7 +199,75 @@ namespace Mostlylucid.Migrations
                     b.ToTable("Comments", "mostlylucid");
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.LanguageEntity", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.EmailSubscriptionEntity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasMaxLength(100)
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Day")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<int?>("DayOfMonth")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Language")
+                        .IsRequired()
+                        .HasMaxLength(2)
+                        .HasColumnType("character varying(2)");
+
+                    b.Property<DateTimeOffset?>("LastSent")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("SubscriptionType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email");
+
+                    b.HasIndex("Token")
+                        .IsUnique();
+
+                    b.ToTable("EmailSubscriptions", "mostlylucid");
+                });
+
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.EmailSubscriptionSendLogEntity", b =>
+                {
+                    b.Property<string>("SubscriptionType")
+                        .HasColumnType("varchar(24)");
+
+                    b.Property<DateTimeOffset>("LastSent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("SubscriptionType");
+
+                    b.ToTable("EmailSubscriptionSendLogs", "mostlylucid");
+                });
+
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.LanguageEntity", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -285,22 +301,22 @@ namespace Mostlylucid.Migrations
 
             modelBuilder.Entity("EmailSubscription_Category", b =>
                 {
-                    b.HasOne("Mostlylucid.EntityFramework.Models.CategoryEntity", null)
+                    b.HasOne("Mostlylucid.Shared.Entities.CategoryEntity", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Mostlylucid.EmailSubscription.Models.Entities.EmailSubscriptionEntity", null)
+                    b.HasOne("Mostlylucid.Shared.Entities.EmailSubscriptionEntity", null)
                         .WithMany()
                         .HasForeignKey("EmailSubscriptionId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.BlogPostEntity", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.BlogPostEntity", b =>
                 {
-                    b.HasOne("Mostlylucid.EntityFramework.Models.LanguageEntity", "LanguageEntity")
+                    b.HasOne("Mostlylucid.Shared.Entities.LanguageEntity", "LanguageEntity")
                         .WithMany("BlogPosts")
                         .HasForeignKey("LanguageId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -309,15 +325,15 @@ namespace Mostlylucid.Migrations
                     b.Navigation("LanguageEntity");
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentClosure", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.CommentClosure", b =>
                 {
-                    b.HasOne("Mostlylucid.EntityFramework.Models.CommentEntity", "Ancestor")
+                    b.HasOne("Mostlylucid.Shared.Entities.CommentEntity", "Ancestor")
                         .WithMany("Descendants")
                         .HasForeignKey("AncestorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("Mostlylucid.EntityFramework.Models.CommentEntity", "Descendant")
+                    b.HasOne("Mostlylucid.Shared.Entities.CommentEntity", "Descendant")
                         .WithMany("Ancestors")
                         .HasForeignKey("DescendantId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -328,13 +344,13 @@ namespace Mostlylucid.Migrations
                     b.Navigation("Descendant");
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentEntity", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.CommentEntity", b =>
                 {
-                    b.HasOne("Mostlylucid.EntityFramework.Models.CommentEntity", "ParentComment")
+                    b.HasOne("Mostlylucid.Shared.Entities.CommentEntity", "ParentComment")
                         .WithMany()
                         .HasForeignKey("ParentCommentId");
 
-                    b.HasOne("Mostlylucid.EntityFramework.Models.BlogPostEntity", "Post")
+                    b.HasOne("Mostlylucid.Shared.Entities.BlogPostEntity", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -347,32 +363,32 @@ namespace Mostlylucid.Migrations
 
             modelBuilder.Entity("blogpostcategory", b =>
                 {
-                    b.HasOne("Mostlylucid.EntityFramework.Models.BlogPostEntity", null)
+                    b.HasOne("Mostlylucid.Shared.Entities.BlogPostEntity", null)
                         .WithMany()
                         .HasForeignKey("BlogPostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Mostlylucid.EntityFramework.Models.CategoryEntity", null)
+                    b.HasOne("Mostlylucid.Shared.Entities.CategoryEntity", null)
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.BlogPostEntity", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.BlogPostEntity", b =>
                 {
                     b.Navigation("Comments");
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.CommentEntity", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.CommentEntity", b =>
                 {
                     b.Navigation("Ancestors");
 
                     b.Navigation("Descendants");
                 });
 
-            modelBuilder.Entity("Mostlylucid.EntityFramework.Models.LanguageEntity", b =>
+            modelBuilder.Entity("Mostlylucid.Shared.Entities.LanguageEntity", b =>
                 {
                     b.Navigation("BlogPosts");
                 });

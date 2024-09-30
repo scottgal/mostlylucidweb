@@ -1,12 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
 
 #nullable disable
 
-namespace Mostlylucid.Migrations
+namespace Mostlylucid.DbContext.Migrations
 {
     /// <inheritdoc />
-    public partial class RemoveCasing : Migration
+    public partial class EmailSubscriptions : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -282,6 +284,17 @@ namespace Mostlylucid.Migrations
                 table: "BlogPosts",
                 newName: "IX_BlogPosts_ContentHash");
 
+            migrationBuilder.AlterColumn<DateTimeOffset>(
+                name: "UpdatedDate",
+                schema: "mostlylucid",
+                table: "BlogPosts",
+                type: "timestamp with time zone",
+                nullable: true,
+                defaultValueSql: "CURRENT_TIMESTAMP",
+                oldClrType: typeof(DateTimeOffset),
+                oldType: "timestamp with time zone",
+                oldDefaultValueSql: "CURRENT_TIMESTAMP");
+
             migrationBuilder.AlterColumn<NpgsqlTsVector>(
                 name: "SearchVector",
                 schema: "mostlylucid",
@@ -318,6 +331,85 @@ namespace Mostlylucid.Migrations
                 schema: "mostlylucid",
                 table: "BlogPosts",
                 column: "Id");
+
+            migrationBuilder.CreateTable(
+                name: "EmailSubscriptions",
+                schema: "mostlylucid",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Token = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    SubscriptionType = table.Column<int>(type: "integer", nullable: false),
+                    Language = table.Column<string>(type: "character varying(2)", maxLength: 2, nullable: false),
+                    CreatedDate = table.Column<DateTimeOffset>(type: "timestamp with time zone", maxLength: 100, nullable: false),
+                    LastSent = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DayOfMonth = table.Column<int>(type: "integer", nullable: true),
+                    Day = table.Column<string>(type: "character varying(10)", maxLength: 10, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailSubscriptions", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailSubscriptionSendLogs",
+                schema: "mostlylucid",
+                columns: table => new
+                {
+                    SubscriptionType = table.Column<string>(type: "varchar(24)", nullable: false),
+                    LastSent = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailSubscriptionSendLogs", x => x.SubscriptionType);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EmailSubscription_Category",
+                schema: "mostlylucid",
+                columns: table => new
+                {
+                    CategoryId = table.Column<int>(type: "integer", nullable: false),
+                    EmailSubscriptionId = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EmailSubscription_Category", x => new { x.CategoryId, x.EmailSubscriptionId });
+                    table.ForeignKey(
+                        name: "FK_EmailSubscription_Category_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalSchema: "mostlylucid",
+                        principalTable: "Categories",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_EmailSubscription_Category_EmailSubscriptions_EmailSubscrip~",
+                        column: x => x.EmailSubscriptionId,
+                        principalSchema: "mostlylucid",
+                        principalTable: "EmailSubscriptions",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailSubscription_Category_EmailSubscriptionId",
+                schema: "mostlylucid",
+                table: "EmailSubscription_Category",
+                column: "EmailSubscriptionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailSubscriptions_Email",
+                schema: "mostlylucid",
+                table: "EmailSubscriptions",
+                column: "Email");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EmailSubscriptions_Token",
+                schema: "mostlylucid",
+                table: "EmailSubscriptions",
+                column: "Token",
+                unique: true);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_blogpostcategory_BlogPosts_BlogPostId",
@@ -426,6 +518,18 @@ namespace Mostlylucid.Migrations
                 name: "FK_Comments_Comments_parent_comment_id",
                 schema: "mostlylucid",
                 table: "Comments");
+
+            migrationBuilder.DropTable(
+                name: "EmailSubscription_Category",
+                schema: "mostlylucid");
+
+            migrationBuilder.DropTable(
+                name: "EmailSubscriptionSendLogs",
+                schema: "mostlylucid");
+
+            migrationBuilder.DropTable(
+                name: "EmailSubscriptions",
+                schema: "mostlylucid");
 
             migrationBuilder.DropPrimaryKey(
                 name: "PK_Languages",
@@ -662,6 +766,18 @@ namespace Mostlylucid.Migrations
                 schema: "mostlylucid",
                 table: "blogposts",
                 newName: "IX_blogposts_content_hash");
+
+            migrationBuilder.AlterColumn<DateTimeOffset>(
+                name: "updated_date",
+                schema: "mostlylucid",
+                table: "blogposts",
+                type: "timestamp with time zone",
+                nullable: false,
+                defaultValueSql: "CURRENT_TIMESTAMP",
+                oldClrType: typeof(DateTimeOffset),
+                oldType: "timestamp with time zone",
+                oldNullable: true,
+                oldDefaultValueSql: "CURRENT_TIMESTAMP");
 
             migrationBuilder.AlterColumn<NpgsqlTsVector>(
                 name: "search_vector",

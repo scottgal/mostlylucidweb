@@ -17,13 +17,15 @@ public class NewsletterSendingService(
 {
     private string GetPostUrl(string language, string slug)
     {
-        return language == Constants.EnglishLanguage ? $"{newsletterConfig.AppHostUrl}/post/{slug}" : $"{newsletterConfig.AppHostUrl}/{language}/post/{slug}";
+        return language == Constants.EnglishLanguage
+            ? $"{newsletterConfig.AppHostUrl}/post/{slug}"
+            : $"{newsletterConfig.AppHostUrl}/{language}/post/{slug}";
     }
 
     public async Task SendScheduledNewsletter(SubscriptionType subscriptionType)
     {
-       using var scope = scopeFactory.CreateScope();
-       var activity = Log.Logger.StartActivity("SendScheduledNewsletter");
+        using var scope = scopeFactory.CreateScope();
+        var activity = Log.Logger.StartActivity("SendScheduledNewsletter");
         var newsletterManagementService = scope.ServiceProvider.GetRequiredService<NewsletterManagementService>();
         var subscriptions = await newsletterManagementService.GetSubscriptions(subscriptionType);
         foreach (var subscription in subscriptions)
@@ -31,8 +33,9 @@ public class NewsletterSendingService(
             logger.LogInformation("Sending newsletter for subscription {Subscription}", subscription);
             await SendNewsletterForSubscription(subscription, activity);
         }
+
         logger.LogInformation("Updating last send for subscription type {SubscriptionType}", subscriptionType);
-       await newsletterManagementService.UpdateLastSend(subscriptionType, DateTime.Now);
+        await newsletterManagementService.UpdateLastSend(subscriptionType, DateTime.Now);
     }
 
     private async Task<bool> SendNewsletterForSubscription(EmailSubscriptionModel subscription, LoggerActivity activity)
@@ -40,33 +43,32 @@ public class NewsletterSendingService(
         activity?.Activity?.SetTag("subscription", subscription);
         try
         {
-       
-        using var scope = scopeFactory.CreateScope();
-        var newsletterManagementService = scope.ServiceProvider.GetRequiredService<NewsletterManagementService>();
-        var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSenderHostedService>();
-        var posts = await newsletterManagementService.GetPostsToSend(subscription.SubscriptionType);
-        var emailModel = new EmailTemplateModel()
-        {
-            ToEmail = subscription.Email,
-            Subject = "mostlylucid newsletter",
-            Posts = posts.Select(p => new EmailPostModel()
+            using var scope = scopeFactory.CreateScope();
+            var newsletterManagementService = scope.ServiceProvider.GetRequiredService<NewsletterManagementService>();
+            var emailSender = scope.ServiceProvider.GetRequiredService<IEmailSenderHostedService>();
+            var posts = await newsletterManagementService.GetPostsToSend(subscription.SubscriptionType);
+            var emailModel = new EmailTemplateModel()
             {
-                Title = p.Title,
-                Language = p.Language,
-                PlainTextContent = p.PlainTextContent.TruncateAtWord(200),
-                Url = GetPostUrl(p.Language, p.Slug),
-                PublishedDate = p.PublishedDate
-            }).ToList(),
-        };
-        await emailSender.SendEmailAsync(emailModel);
-        activity?.Activity?.SetTag("email", subscription.Email);
-        activity?.Complete(LogEventLevel.Information);
-        await newsletterManagementService.UpdateLastSendForSubscription(subscription.Id, DateTime.Now);
-        return true;
+                ToEmail = subscription.Email,
+                Subject = "mostlylucid newsletter",
+                Posts = posts.Select(p => new EmailPostModel()
+                {
+                    Title = p.Title,
+                    Language = p.Language,
+                    PlainTextContent = p.PlainTextContent.TruncateAtWord(200),
+                    Url = GetPostUrl(p.Language, p.Slug),
+                    PublishedDate = p.PublishedDate
+                }).ToList(),
+            };
+            await emailSender.SendEmailAsync(emailModel);
+            activity?.Activity?.SetTag("email", subscription.Email);
+            activity?.Complete(LogEventLevel.Information);
+            await newsletterManagementService.UpdateLastSendForSubscription(subscription.Id, DateTime.Now);
+            return true;
         }
         catch (Exception e)
         {
-           activity?.Complete(LogEventLevel.Error, e);
+            activity?.Complete(LogEventLevel.Error, e);
             logger.LogError(e, "Error sending newsletter for subscription {Subscription}", subscription);
             return false;
         }
@@ -98,6 +100,7 @@ public class NewsletterSendingService(
             {
                 return false;
             }
+
             return true;
         }
         catch (Exception e)
@@ -107,5 +110,4 @@ public class NewsletterSendingService(
             return false;
         }
     }
-
 }
