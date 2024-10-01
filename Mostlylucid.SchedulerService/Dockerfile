@@ -23,7 +23,6 @@ WORKDIR "/src/Mostlylucid.SchedulerService"
 RUN dotnet build "Mostlylucid.SchedulerService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "Mostlylucid.SchedulerService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false --no-restore
 
 FROM base AS final
