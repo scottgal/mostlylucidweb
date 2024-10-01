@@ -1,4 +1,4 @@
-rname: Scheduler Image CI
+name: Scheduler Image CI
 
 on:
   push:
