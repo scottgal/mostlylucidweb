@@ -1,9 +1,9 @@
-name: Scheduler Image CI
+rname: Scheduler Image CI
 
 on:
   push:
     tags:
-      - 'scheduler-*'  # Only trigger on tags that start with 'release-'
+      - 'scheduler-*'  # Only trigger on tags that start with 'scheduler-'
     branches:
       - "main"
       - "local"
