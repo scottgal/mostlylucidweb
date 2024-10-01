@@ -1,0 +1,55 @@
+name: Scheduler Image CI
+
+on:
+  push:
+    tags:
+      - 'scheduler-*'  # Only trigger on tags that start with 'release-'
+    branches:
+      - "main"
+      - "local"
+  pull_request:
+    branches:
+      - "main"
+      - "local"
+
+jobs:
+  build-and-push:
+    if: startsWith(github.ref, 'refs/tags/scheduler-')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}" | docker login -u "${{ secrets.DOCKER_HUB_USER_NAME }}" --password-stdin
+
+      - name: Build and tag the Docker image
+        id: build
+        run: |
+          TIMESTAMP=$(date +%s)
+          echo "TIMESTAMP=$TIMESTAMP" >> $GITHUB_ENV
+          
+          # Define the default tags for the main branch
+          TAGS="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid-scheduler:latest"
+          ADDITIONAL_TAG="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid-scheduler:$TIMESTAMP"
+          
+          # If the branch is 'local', modify the tags
+          if [ "${{ github.ref }}" == "refs/heads/local" ]; then
+            TAGS="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid-scheduler:local"
+            ADDITIONAL_TAG="${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid-scheduler:$TIMESTAMP-local"
+          fi
+          
+          # Build the Docker image with the appropriate tags
+          docker build . --file Mostlylucid.SchedulerService/Dockerfile --tag $TAGS --tag $ADDITIONAL_TAG
+
+      - name: Push the Docker image to Docker Hub
+        run: |
+          # Push the appropriate tags based on the branch
+          if [ "${{ github.ref }}" == "refs/heads/local" ]; then
+            docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid-scheduler:local
+            docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid-scheduler:${{ env.TIMESTAMP }}-local
+          else
+            docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid-scheduler:latest
+            docker push ${{ secrets.DOCKER_HUB_USER_NAME }}/mostlylucid-scheduler:${{ env.TIMESTAMP }}
+          fi
