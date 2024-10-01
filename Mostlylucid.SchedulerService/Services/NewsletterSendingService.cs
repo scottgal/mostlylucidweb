@@ -21,7 +21,7 @@ public class NewsletterSendingService(
             ? $"{newsletterConfig.AppHostUrl}/post/{slug}"
             : $"{newsletterConfig.AppHostUrl}/{language}/post/{slug}";
     }
-
+ 
     public async Task SendScheduledNewsletter(SubscriptionType subscriptionType)
     {
         using var scope = scopeFactory.CreateScope();

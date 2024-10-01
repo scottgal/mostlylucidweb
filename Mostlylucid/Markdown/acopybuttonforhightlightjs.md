@@ -5,8 +5,7 @@
 # Introduction
 In this site I use Hightlight.js to render code snippets client side. I like this as it keeps my server side code clean and simple. However, I wanted to add a copy button to each code snippet so that users could easily copy the code to their clipboard. This is a simple task but I thought I would document it here for anyone else who might want to do the same.
 
-Oh and this is all waiting to me adding the newsletter functionality to actually show up on the site. As soon as I get the energy to do that I'll add this in.
-
+# The Goal
 The endpoint is that we have a copy button like this on the site:
 ![Copy Button](copybutton.png)
 
