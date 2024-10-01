@@ -1,5 +1,4 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -15,8 +14,7 @@ COPY ["Mostlylucid.Services/Mostlylucid.Services.csproj", "Mostlylucid.Services/
 RUN dotnet restore "Mostlylucid.SchedulerService/Mostlylucid.SchedulerService.csproj"
 
 # Copy the entire source code to the container
-COPY ./Mostlylucid/ ./Mostlylucid/
-COPY ./Mostlylucid.Test/ ./Mostlylucid.Test/
+COPY ./Mostlylucid.SchedulerService/ ./Mostlylucid.SchedulerService/
 COPY ./Mostlylucid.Shared/ ./Mostlylucid.Shared/
 COPY ./Mostlylucid.Services/ ./Mostlylucid.Services/
 COPY ./Mostlylucid.DbContext/ ./Mostlylucid.DbContext/
