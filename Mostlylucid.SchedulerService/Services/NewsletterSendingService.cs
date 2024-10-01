@@ -14,7 +14,7 @@ public class NewsletterSendingService(
     IServiceScopeFactory scopeFactory,
     NewsletterConfig newsletterConfig,
     ILogger<NewsletterSendingService> logger)
-{
+{ 
     private string GetPostUrl(string language, string slug)
     {
         return language == Constants.EnglishLanguage
