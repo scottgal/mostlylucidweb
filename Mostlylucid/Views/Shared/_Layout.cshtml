@@ -120,7 +120,7 @@
                                     <img src="@Model.AvatarUrl" width="24px" height="24px" class="h-6 w-6 rounded-full" alt="User Avatar"/>
                                 }
                                 <span class="text-body text-blue-dark dark:text-white">@Model.Name</span>
-                                <i class="bx bx-log-out mr-2 text-l lg:text-xl"></i>
+                                <i class="bx bx-log-out mr-2 text-lglg:text-xl"></i>
                             </a>
                         </div>
                     }
@@ -137,38 +137,43 @@
             <partial name="_Socials"/>
         </li>
         <li class="group relative mb-1 ml-2">
-            <a href="/search" hx-boost="true" hx-target="#contentcontainer" hx-swap="show:window:top" class="flex items-center text-l lg:text-xl font-medium text-primary group-hover:text-green dark:text-white space-x-2 hover:text-secondary dark:hover:text-secondary transition-colors">
-                <i class="text-l lg:text-2xl bx bx-search"></i>
+            <a href="/search" hx-boost="true" hx-target="#contentcontainer" hx-swap="show:window:top" class="flex items-center text-lglg:text-xl font-medium text-primary group-hover:text-green dark:text-white space-x-2 hover:text-secondary dark:hover:text-secondary transition-colors">
+                <i class="text-lglg:text-2xl bx bx-search"></i>
                 <span class="ml-2 hidden lg:block">Search</span>
             </a>
         </li>
 
         <li class="group relative mb-1 ml-2">
-            <a href="/blog/aboutme" hx-boost="true" hx-target="#contentcontainer" hx-swap="show:window:top" class="relative z-30 block px-2 font-body text-l lg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Résumé</a>
+            <a href="/blog/aboutme" hx-boost="true" hx-target="#contentcontainer" hx-swap="show:window:top" class="relative z-30 block px-2 font-body text-lglg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Résumé</a>
         </li>
 
         <li class="group relative mb-1 ml-2">
-            <a href="/blog" hx-boost="true" hx-target="#contentcontainer" hx-swap="show:window:top" class="relative z-30 block px-2 font-body text-l lg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Blog</a>
+            <a href="/blog" hx-boost="true" hx-target="#contentcontainer" hx-swap="show:window:top" class="relative z-30 block px-2 font-body text-lglg:text-xl font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary">Blog</a>
+        </li>
+        <li class="group relative mb-1 ml-2 hidden lg:block">
+            <a href="https://www.nuget.org/profiles/mostlylucid" target="_blank" rel="noopener" class="flex items-center text-lglg:text-xl space-x-2 hover:text-secondary dark:hover:text-secondary transition-colors" data-umami-event="NuGet Profile Click">
+                <i class="text-lglg:text-2xl bx bxs-package"></i>
+                <span class="ml-2">NuGet</span>
+            </a>
         </li>
 
-
         <li class="group relative mb-1 ml-2 hidden lg:block">
-            <a href="/rss" target="_blank" class="flex items-center text-l lg:text-xl space-x-2 hover:text-secondary dark:hover:text-secondary transition-colors">
-                <i class="text-l lg:text-2xl bx bx-rss"></i>
+            <a href="/rss" target="_blank" class="flex items-center text-lglg:text-xl space-x-2 hover:text-secondary dark:hover:text-secondary transition-colors">
+                <i class="text-lglg:text-2xl bx bx-rss"></i>
                 <span class="ml-2">RSS</span>
             </a>
         </li>
 
         <li class="group relative mb-0.5 ml-2">
-            <a asp-action="Index" hx-boost="true" hx-swap="show:window:top" hx-target="#contentcontainer" asp-controller="Contact" class="flex items-center text-l lg:text-xl space-x-2 text-primary dark:text-white hover:text-secondary dark:hover:text-secondary transition-colors" data-umami-event="Contact Click">
-                <i class='bx bx-mail-send text-l lg:text-2xl'></i>
+            <a asp-action="Index" hx-boost="true" hx-swap="show:window:top" hx-target="#contentcontainer" asp-controller="Contact" class="flex items-center text-lglg:text-xl space-x-2 text-primary dark:text-white hover:text-secondary dark:hover:text-secondary transition-colors" data-umami-event="Contact Click">
+                <i class='bx bx-mail-send text-lglg:text-2xl'></i>
                 <span class="ml-0.5 hidden lg:block">Contact</span>
             </a>
         </li>
 
         <li class="group relative mb-1 ml-2">
             <div class="flex items-center">
-                <i class="bx cursor-pointer text-l lg:text-3xl text-primary dark:text-white transition-colors" x-on:click="themeSwitch()" :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"></i>
+                <i class="bx cursor-pointer text-lglg:text-3xl text-primary dark:text-white transition-colors" x-on:click="themeSwitch()" :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"></i>
             </div>
         </li>
     </ul>

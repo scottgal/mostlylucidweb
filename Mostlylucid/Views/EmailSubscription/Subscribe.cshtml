@@ -76,7 +76,7 @@ else
         </div>
         <div class="mt-3 border-neutral-400 dark:border-neutral-600 border rounded-lg" x-init="hideCategories = @Model.AllCategories.ToString().ToLowerInvariant()" x-data="{ hideCategories: false, showCategories: false }">
             <h4
-                class="px-5 py-1 bg-neutral-500 bg-opacity-10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer"
+                class="px-5 py-1 bg-neutral-500/10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer"
                 x-on:click="hideCategories = !hideCategories; showCategories = !hideCategories">
                 <span class="flex flex-row items-center space-x-1">
                     Categories
@@ -120,7 +120,7 @@ else
             </div></div>
         <div :class="{ 'opacity-50 pointer-events-none': schedule !== 'Weekly' }" class=" mt-2 border-neutral-400 dark:border-neutral-600 border rounded-lg">
             <h4
-                class="px-5 py-1 bg-neutral-500 bg-opacity-10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer">
+                class="px-5 py-1 bg-neutral-500/10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer">
                 <span class="flex flex-row items-center space-x-1 ">
                     Day of Week to Send On
                 </span>
@@ -142,7 +142,7 @@ else
         </div>
         <div :class="{ 'opacity-50 pointer-events-none': schedule !== 'Monthly' }" class=" mt-2 border-neutral-400 dark:border-neutral-600 border rounded-lg">
             <h4
-                class="px-5 py-1 bg-neutral-500 bg-opacity-10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer">
+                class="px-5 py-1 bg-neutral-500/10 rounded-lg font-body text-primary dark:text-white w-full flex justify-between items-center cursor-pointer">
                 <span class="flex flex-row items-center space-x-1 ">
                     Day of Month to Send On
                 </span>

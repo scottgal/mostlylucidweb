@@ -1,8 +1,54 @@
-@import "raleway.css";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/aspect-ratio";
+@import "./raleway.css";
+@plugin "daisyui";
 
+@variant dark (.dark &);
+
+@reference utilities;
+
+/* Tailwind CSS v4 design tokens migrated from tailwind.config.js */
+@theme {
+    --font-body: "Raleway", sans-serif;
+
+    /* Custom color tokens */
+    --color-custom-light-bg: #ffffff;
+    --color-custom-dark-bg: #1d232a;
+    --color-primary: #072344;
+    --color-secondary: #00aaa1;
+    --color-green-light: #cceeec;
+    --color-green: #007c85;
+    --color-green-dark: #065a68;
+    --color-blue-light: #b3d6f1;
+    --color-blue: #0074d1;
+    --color-blue-dark: #072344;
+    --color-black: #000000;
+    --color-white: #ffffff;
+    --color-yellow-lighter: #f6e8c6;
+    --color-yellow-light: #f8edd0;
+    --color-yellow: #f4d06f;
+    --color-yellow-dark: #daa512;
+    --color-grey-lightest: #eff0f3;
+    --color-grey-lighter: #eceef1;
+    --color-grey-light: #ccd7e0;
+    --color-orange-light: #f9e8e2;
+    --color-orange: #f9a825;
+    --color-orange-dark: #f58f1e;
+    --color-grey: #adb6c4;
+
+    /* Add missing gray/neutral shades that are used in views */
+    /* These extend the default Tailwind colors */
+    --color-gray-light: #d1d5db;
+
+    /* Breakpoints (optional, add if you use these) */
+    --breakpoint-xs: 375px;
+}
+
+.text-white {
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255 / var(--tw-text-opacity));
+}
 
 .bg-red {
     --tw-bg-opacity: 1;
@@ -18,6 +64,11 @@
     padding-left: 1rem; /* Keeps indentation for nested lists if needed */
 }
 
+
+.text-white {
+    --tw-text-opacity: 1;
+    color: rgb(255 255 255 / var(--tw-text-opacity));
+}
 
 .text-red-500 {
     --tw-text-opacity: 1;
@@ -47,7 +98,23 @@
 
 
 .borderbutton {
-    @apply flex items-center ml-4 mb-2 bg-blue-dark outline outline-1 p-2 mt-4 text-center rounded-btn font-body text-xl font-semibold text-white transition-colors hover:bg-red sm:inline-block sm:text-left sm:text-xl;
+    /* Removed responsive variants from @apply due to Tailwind v4 change */
+    /* Avoid plugin-specific utilities in @apply (e.g., rounded-btn), and custom font alias */
+    @apply flex items-center ml-4 mb-2 outline outline-1 p-2 mt-4 text-center text-xl font-semibold text-white transition-colors;
+    border-radius: var(--rounded-btn, 0.5rem);
+    font-family: var(--font-body);
+    background-color: var(--color-blue-dark);
+}
+
+.borderbutton:hover {
+    background-color: rgb(128 0 0 / var(--tw-bg-opacity, 1)); /* matches .bg-red */
+}
+
+/* Re-introduce the former `sm:` responsive styles using a media query */
+@media (min-width: 640px) {
+    .borderbutton {
+        @apply inline-block text-left text-xl;
+    }
 }
 
 
@@ -58,7 +125,8 @@
 
 
 html {
-    @apply font-body antialiased;
+    font-family: var(--font-body);
+    @apply antialiased;
 }
 
 
