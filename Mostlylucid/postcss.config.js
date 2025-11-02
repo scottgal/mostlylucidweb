@@ -1,6 +1,6 @@
 module.exports = {
     plugins: {
-        tailwindcss: {},  // <-- Tailwind is loaded here
+        "@tailwindcss/postcss": {},  // <-- Tailwind is loaded here
         autoprefixer: {},
         cssnano: { preset: 'default' }
     }
