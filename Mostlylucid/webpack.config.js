@@ -14,11 +14,7 @@ module.exports = (env, argv) => {
             chunkFilename: '[name].[contenthash].js',
             path: path.resolve(__dirname, 'wwwroot/js/dist'),
             publicPath: '/js/dist/',
-            module: true,
             clean: true,
-        },
-        experiments:{
-            outputModule: true,
         },
         module: {
             rules: [

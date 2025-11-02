@@ -214,7 +214,7 @@ bg-white    dark:border-gray-600 dark:bg-gray-800 bg-gray-800
         }
     </style>
 </noscript>
-<script src="~/js/dist/main.js" type="module"  data-cfasync="false"> </script>
+<script src="~/js/dist/main.js" asp-append-version="true" type="module" data-cfasync="false"></script>
 <script src="@(ViewBag.UmamiPath + "/" + ViewBag.UmamiScript)" data-website-id="@ViewBag.UmamiWebsiteId"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
