@@ -55,9 +55,7 @@ module.exports = (env, argv) => {
                 maxSize: 100000,
                 name: false,
             },
-            runtimeChunk: {
-                name: 'runtime', // ✅ avoid filename conflict
-            },
+            runtimeChunk: false, // Inline runtime into main.js
             minimize: isProduction,
             minimizer: isProduction ? [
                 new TerserPlugin({
