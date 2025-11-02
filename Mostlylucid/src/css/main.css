@@ -7,7 +7,7 @@
 
 @config "../../tailwind.config.js";
 
-@variant dark (.dark &);
+@custom-variant dark (&:where(.dark, .dark *));
 
 @reference utilities;
 
@@ -176,21 +176,4 @@ html {
     background-color:  var(--color-blue-dark) ;
 }
 
-/* Manual dark mode classes for header and common elements */
-@layer utilities {
-    .dark .dark\:text-white {
-        color: var(--color-white);
-    }
-
-    .dark .dark\:text-primary {
-        color: var(--color-primary);
-    }
-
-    .dark .dark\:bg-custom-dark-bg {
-        background-color: var(--color-custom-dark-bg);
-    }
-
-    .dark .dark\:outline-gray-700 {
-        outline-color: var(--color-gray-700);
-    }
-}
+/* Manual dark mode classes removed - handled by @variant dark (.dark &); */

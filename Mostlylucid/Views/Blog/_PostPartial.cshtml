@@ -44,9 +44,9 @@
             </p>
         </div>
     </div>
-    <div class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2" >
+    <article class="prose prose-slate  max-w-none border-b py-2 sm:py-2" >
         @Html.Raw(Model.HtmlContent)
-    </div>
+    </article>
     <div x-data="{ showNewElement: false }" x-init="
     document.addEventListener('htmx:afterSwap', (event) => {
         if (event.detail.target.id === 'contentformarea') {
