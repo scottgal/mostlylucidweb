@@ -65,6 +65,10 @@ WORKDIR /app
 # Copy the published application from the build stage
 COPY --from=publish /app/publish .
 
+# Copy the built static assets (JS/CSS) from the build stage
+COPY --from=build /src/Mostlylucid/wwwroot/js/dist ./wwwroot/js/dist
+COPY --from=build /src/Mostlylucid/wwwroot/css/dist ./wwwroot/css/dist
+COPY --from=build /src/Mostlylucid/wwwroot/css/highlight ./wwwroot/css/highlight
 
 # Start the application
 ENTRYPOINT ["dotnet", "Mostlylucid.dll"]
