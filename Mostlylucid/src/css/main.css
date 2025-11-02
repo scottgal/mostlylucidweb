@@ -1,8 +1,11 @@
 @import "tailwindcss";
+@import "./raleway.css";
+
 @plugin "@tailwindcss/typography";
 @plugin "@tailwindcss/aspect-ratio";
-@import "./raleway.css";
 @plugin "daisyui";
+
+@config "../../tailwind.config.js";
 
 @variant dark (.dark &);
 
@@ -45,10 +48,7 @@
     --breakpoint-xs: 375px;
 }
 
-.text-white {
-    --tw-text-opacity: 1;
-    color: rgb(255 255 255 / var(--tw-text-opacity));
-}
+
 
 .bg-red {
     --tw-bg-opacity: 1;
@@ -65,10 +65,7 @@
 }
 
 
-.text-white {
-    --tw-text-opacity: 1;
-    color: rgb(255 255 255 / var(--tw-text-opacity));
-}
+
 
 .text-red-500 {
     --tw-text-opacity: 1;
@@ -79,10 +76,6 @@
     background-color: rgb(128 0 0 / var(--tw-bg-opacity));
 }
 
-.text-primary {
-    --tw-text-opacity: 1;
-    color: #2a2a2a;
-}
 
 [x-cloak] { display: none !important; }
 
@@ -101,7 +94,7 @@
     /* Removed responsive variants from @apply due to Tailwind v4 change */
     /* Avoid plugin-specific utilities in @apply (e.g., rounded-btn), and custom font alias */
     @apply flex items-center ml-4 mb-2 outline outline-1 p-2 mt-4 text-center text-xl font-semibold text-white transition-colors;
-    border-radius: var(--rounded-btn, 0.5rem);
+    border-radius: var(10, 0.5rem);
     font-family: var(--font-body);
     background-color: var(--color-blue-dark);
 }
@@ -130,14 +123,15 @@ html {
 }
 
 
-.text-red-500 {
-    --tw-text-opacity: 1;
-    color: rgb(209 0 0 / var(--tw-text-opacity));
+.twitter-card {
+    @apply mt-8 mb-8 rounded bg-yellow-lighter px-6 py-8;
 }
 
-.twitter-card {
-    @apply mt-8 mb-8 rounded bg-yellow-lighter px-6 py-8 sm:mt-10 sm:mb-10 md:px-10;
-    
+@media (min-width: 640px) {
+    .twitter-card { margin-top: 2.5rem; margin-bottom: 2.5rem; }
+}
+@media (min-width: 768px) {
+    .twitter-card { padding-left: 2.5rem; padding-right: 2.5rem; }
 }
 
 
@@ -167,4 +161,36 @@ html {
 
 .collapse-arrow > input:checked ~ .collapse-title:after {
     transform: translateY(-60%) rotate(225deg) !important;
+}
+
+.category-pill {
+    /* Tailwind v4: use @apply only with base utilities (no variants like dark:, sm:, etc.) */
+    @apply inline-block rounded-full px-2 py-1 text-sm text-black outline-1 outline-blue-light;
+
+}
+
+/* Dark mode styles in a separate selector (don't use `dark:` inside @apply in v4) */
+.dark .category-pill {
+    
+    @apply text-white  outline-gray-700;
+    background-color:  var(--color-blue-dark) ;
+}
+
+/* Manual dark mode classes for header and common elements */
+@layer utilities {
+    .dark .dark\:text-white {
+        color: var(--color-white);
+    }
+
+    .dark .dark\:text-primary {
+        color: var(--color-primary);
+    }
+
+    .dark .dark\:bg-custom-dark-bg {
+        background-color: var(--color-custom-dark-bg);
+    }
+
+    .dark .dark\:outline-gray-700 {
+        outline-color: var(--color-gray-700);
+    }
 }
