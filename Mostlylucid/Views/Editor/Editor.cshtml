@@ -57,7 +57,7 @@
                     </div>
                     <h2 class="pb-2 block font-body text-3xl font-semibold leading-tight text-primary dark:text-white sm:text-3xl md:text-3xl" id="title">@Model.PostViewModel?.Title</h2>
                     <date id="publishedDate" class="py-2">@(Model.PostViewModel?.PublishedDate  > default(DateTime) ? Model.PostViewModel?.PublishedDate.ToString("D")  : "")</date>
-                    <div class="prose prose max-w-none border-b py-2 text-black dark:prose-dark sm:py-2" id="renderedcontent">
+                    <div class="prose prose max-w-none border-b py-2 dark:prose-invert sm:py-2" id="renderedcontent">
                         @Html.Raw(Model.PostViewModel?.HtmlContent)
                     </div>
                 </div>

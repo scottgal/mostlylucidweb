@@ -10,7 +10,7 @@ ARG BUILD_CONFIGURATION=Release
 
 # Install Node.js v20.x
 RUN apt-get update && apt-get install -y curl \
-    && curl -fsSL https://deb.nodesource.com/setup_20.x -o nodesource_setup.sh \
+    && curl -fsSL https://deb.nodesource.com/setup_25.x -o nodesource_setup.sh \
     && bash nodesource_setup.sh \
     && apt-get install -y nodejs \
     && rm -f nodesource_setup.sh \
@@ -65,6 +65,10 @@ WORKDIR /app
 # Copy the published application from the build stage
 COPY --from=publish /app/publish .
 
+# Copy the built static assets (JS/CSS) from the build stage
+COPY --from=build /src/Mostlylucid/wwwroot/js/dist ./wwwroot/js/dist
+COPY --from=build /src/Mostlylucid/wwwroot/css/dist ./wwwroot/css/dist
+COPY --from=build /src/Mostlylucid/wwwroot/css/highlight ./wwwroot/css/highlight
 
 # Start the application
 ENTRYPOINT ["dotnet", "Mostlylucid.dll"]
