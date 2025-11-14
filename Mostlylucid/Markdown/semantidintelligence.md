@@ -89,6 +89,14 @@ While this series is philosophical in nature, it's grounded in practical reality
 
 You *can* build these things. The code exists. The patterns work.
 
+**Crucially:** This isn't about needing a GPU farm. The architecture is simple:
+- **Agents** are lightweight code (Python/Node.js) running on normal servers
+- **They call LLM APIs** (OpenAI, Anthropic, local models) - the cost is API credits, not hardware
+- **They use tools** - executing code, testing against reality, measuring actual results
+- **Objective feedback** - not just "does this sound right?" but "does this code actually work?"
+
+This tool use - code execution and reality testing - is what separates this from pure LLM hallucination. The system can write code, execute it, check if it works, learn from failures, and iterate until it succeeds.
+
 The question is: what are we really building?
 
 ## The Journey Begins

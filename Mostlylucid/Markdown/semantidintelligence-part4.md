@@ -139,9 +139,19 @@ Searle's argument: The room doesn't "understand" Chinese. It's just symbol manip
 
 It **rewrites its own rule book**.
 
-It recognizes when rules don't work. Modifies them. Tests new strategies. Keeps what works. Discards what doesn't.
+And more importantly: **It tests its rules against objective reality**.
 
-At what point does "following rules" plus "rewriting rules based on what works" become understanding?
+The system generates code. Executes it. Gets actual errors: "TypeError on line 42." Not subjective opinions, but objective failures. Then it fixes the code based on that real feedback and tries again.
+
+This isn't just symbol manipulation. This is:
+1. Hypothesis generation (write code)
+2. Experimental testing (execute code)
+3. Objective measurement (did it work?)
+4. Learning from results (cache successes, fix failures)
+
+The room isn't just shuffling Chinese characters. It's making predictions about reality and checking if they're correct.
+
+At what point does "following rules" plus "rewriting rules based on what works" plus "testing against objective reality" become understanding?
 
 ## The Emergence Thesis
 
