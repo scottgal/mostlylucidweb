@@ -78,6 +78,30 @@ docker-compose logs -f mostlylucid
 docker-compose up -d --build mostlylucid
 ```
 
+### Podman (Docker Alternative)
+
+```bash
+# Start all services with Podman
+podman-compose -f podman-compose.yml up -d
+
+# Start only development dependencies
+podman-compose -f devdeps-podman-compose.yml up -d
+
+# View logs
+podman-compose -f podman-compose.yml logs -f mostlylucid
+
+# Build images with Podman (Dockerfiles work unchanged)
+podman build -t scottgal/mostlylucid:latest -f Mostlylucid/Dockerfile .
+
+# Setup systemd services (for production)
+podman generate systemd --new --files --name mostlylucid
+
+# Enable auto-updates
+sudo systemctl enable --now podman-auto-update.timer
+
+# See PODMAN.md for complete migration guide
+```
+
 ## Solution Architecture
 
 ### Project Structure
@@ -286,8 +310,11 @@ When processing markdown files, metadata is extracted via specific patterns:
 
 ## Infrastructure
 
-### Docker Services (docker-compose.yml)
+### Container Services (docker-compose.yml / podman-compose.yml)
 
+This platform supports both Docker and Podman for running containerized services:
+
+**Services:**
 - **mostlylucid** - Main web app (scottgal/mostlylucid:latest)
 - **db** - PostgreSQL 16 (port 5266 externally)
 - **umami** - Umami analytics
@@ -296,9 +323,16 @@ When processing markdown files, metadata is extracted via specific patterns:
 - **seq** - Structured log aggregation
 - **prometheus** - Metrics collection
 - **grafana** - Metrics visualization
-- **watchtower** - Automatic container updates
+- **watchtower** - Automatic container updates (Docker only)
 - **cloudflared** - Cloudflare tunnel
 - **node_exporter** - Host metrics
+
+**Podman-Specific Notes:**
+- Watchtower is replaced by `podman auto-update` with systemd timers
+- Volume mounts use `:Z` suffix for SELinux labeling
+- Rootless operation by default for enhanced security
+- See `PODMAN.md` for complete Podman migration guide
+- See `Mostlylucid/Markdown/DOCKER-VS-PODMAN.md` for detailed comparison article
 
 ### Monitoring Endpoints
 

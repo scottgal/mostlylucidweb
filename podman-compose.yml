@@ -1,0 +1,176 @@
+﻿services:
+  mostlylucid:
+    image: scottgal/mostlylucid:latest
+    restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "-k", "https://mostlylucid:7240/healthy" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    env_file:
+      - .env
+    environment:
+      - Auth__GoogleClientId=${AUTH_GOOGLECLIENTID}
+      - Auth__GoogleClientSecret=${AUTH_GOOGLECLIENTSECRET}
+      - Auth__AdminUserGoogleId=${AUTH_ADMINUSERGOOGLEID}
+      - SmtpSettings__UserName=${SMTPSETTINGS_USERNAME}
+      - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
+      - Analytics__UmamiPath=${ANALYTICS_UMAMIPATH}
+      - Analytics__WebsiteId=${ANALYTICS_WEBSITEID}
+      - Analytics__User=${ANALYTICS_USER}
+      - Analytics__Password=${ANALYTICS_PASSWORD}
+      - ConnectionStrings__DefaultConnection=${POSTGRES_CONNECTIONSTRING}
+      - TranslateService__ServiceIPs=${EASYNMT_IPS}
+      - Serilog__WriteTo__0__Args__apiKey=${SEQ_API_KEY}
+      - Markdown__MarkdownPath=${MARKDOWN_MARKDOWNPATH}
+      - Markdown__MarkdownTranslatedPath=${MARKDOWN_MARKDOWNTRANSLATEDPATH}
+      - CertPassword=${CERT_PASSWORD}
+    volumes:
+      - /mnt/imagecache:/app/wwwroot/cache:Z
+      - /mnt/logs:/app/logs:Z
+      - /mnt/markdown:/app/markdown:Z
+      - ./mostlylucid.pfx:/app/mostlylucid.pfx:Z
+      - /mnt/articleimages:/app/wwwroot/articleimages:Z
+      - /mnt/mostlylucid/uploads:/app/wwwroot/uploads:Z
+    networks:
+      - app_network
+    depends_on:
+      - db
+#  mostlylucid-scheduler:
+#    image: scottgal/mostlylucid-scheduler:latest
+#    restart: always
+#    environment:
+#      - SmtpSettings__UserName=${SMTPSETTINGS_USERNAME}
+#      - SmtpSettings__Password=${SMTPSETTINGS_PASSWORD}
+#      - ConnectionStrings__DefaultConnection=${POSTGRES_CONNECTIONSTRING}
+#      - Serilog__WriteTo__0__Args__apiKey=${SEQ_API_KEY}
+#      - CertPassword=${CERT_PASSWORD}
+#    env_file:
+#      - .env
+#    volumes:
+#      - /mnt/logs:/app/logs:Z
+#    depends_on:
+#      - mostlylucid
+  # NOTE: Watchtower doesn't work with Podman in the same way as Docker
+  # For auto-updates with Podman, consider using podman auto-update with systemd
+  # See: https://docs.podman.io/en/latest/markdown/podman-auto-update.1.html
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   container_name: watchtower
+  #   restart: always
+  #   volumes:
+  #     - /run/podman/podman.sock:/var/run/docker.sock:Z
+  #   environment:
+  #     - WATCHTOWER_CLEANUP=true
+  #     - WATCHTOWER_LABEL_ENABLE=true
+  #   command: --interval 300
+  db:
+    image: postgres:16-alpine
+    ports:
+      - 5266:5432
+    env_file:
+      - .env
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /mnt/umami/postgres:/var/lib/postgresql/data:Z
+    restart: always
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
+    env_file:
+      - .env
+    restart: always
+    networks:
+      - app_network
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    env_file: .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_TYPE: ${DATABASE_TYPE}
+      HASH_SALT: ${HASH_SALT}
+      APP_SECRET: ${APP_SECRET}
+      TRACKER_SCRIPT_NAME: getinfo
+      API_COLLECT_ENDPOINT: all
+    depends_on:
+      - db
+    networks:
+      - app_network
+    restart: always
+  easynmt:
+    image: easynmt/api:2.0.2-cpu
+    volumes:
+      - /mnt/easynmt:/cache/:Z
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+    networks:
+      - app_network
+  caddy:
+    image: caddy:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:Z
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - app_network
+    restart: always
+  seq:
+    image: datalust/seq
+    container_name: seq
+    restart: unless-stopped
+    environment:
+      ACCEPT_EULA: "Y"
+      SEQ_FIRSTRUN_ADMINPASSWORDHASH: ${SEQ_DEFAULT_HASH}
+    volumes:
+      - /mnt/seq:/data:Z
+    networks:
+      - app_network
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - prometheus-data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:Z
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - app_network
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - app_network
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=testpassword1234
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+    networks:
+      - app_network
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+volumes:
+  grafana-data:
+  caddy_data:
+  caddy_config:
+  prometheus-data:
+networks:
+  app_network:
+    driver: bridge
