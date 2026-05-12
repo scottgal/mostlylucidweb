@@ -559,13 +559,13 @@ Florence-2 auto-downloads its models (~450MB) on first use to `{ModelDirectory}/
 
 ## How the NER Pipeline Works Internally
 
-The NER pipeline follows the same three-step process covered in detail in [Part 1](/blog/simple-ocr-ner-extraction): **tokenize → infer → decode**. Part 1 walks through every concept — WordPiece tokenization, ONNX tensor inference, BIO tag decoding, softmax confidence — from scratch with a complete buildable example.
+The NER pipeline follows the same three-step process covered in detail in [Part 1](/blog/simple-ocr-ner-extraction): **tokenize → infer → decode**. Part 1 walks through every concept - WordPiece tokenization, ONNX tensor inference, BIO tag decoding, softmax confidence - from scratch with a complete buildable example.
 
 Here's what the package adds beyond the manual approach:
 
 ### Offset Tracking
 
-Part 1's tokenizer converts text to token IDs. The package's `BertNerTokenizer` also tracks **character offsets** — so you know exactly where in the source text each entity was found:
+Part 1's tokenizer converts text to token IDs. The package's `BertNerTokenizer` also tracks **character offsets** - so you know exactly where in the source text each entity was found:
 
 ```csharp
 // From BertNerTokenizer.cs
@@ -579,11 +579,11 @@ Part 1's tokenizer converts text to token IDs. The package's `BertNerTokenizer` 
 // "##soft"   → chars 20-29  (same source range)
 ```
 
-This is how `NerEntity.StartOffset` and `EndOffset` work — they map back to exact character positions in your original text.
+This is how `NerEntity.StartOffset` and `EndOffset` work - they map back to exact character positions in your original text.
 
 ### Confidence-Filtered Entity Extraction
 
-Part 1's decoder produces all entities. The package filters during decoding — low-confidence noise never reaches your code:
+Part 1's decoder produces all entities. The package filters during decoding - low-confidence noise never reaches your code:
 
 ```csharp
 // From NerService.cs
@@ -799,7 +799,7 @@ ocrner ner "Shelby Lucier from SCS Agency in Cambridge, UK sent an invoice on 13
   Phone      07981423683
 ```
 
-BERT finds the people, organizations, and locations. The recognizers catch the date and phone number — structured patterns that a neural network would be unreliable at extracting.
+BERT finds the people, organizations, and locations. The recognizers catch the date and phone number - structured patterns that a neural network would be unreliable at extracting.
 
 **OCR from a scanned document** (an Amazon shareholder letter, scanned with hole-punch marks):
 
@@ -833,11 +833,11 @@ Same scanned shareholder letter processed by both engines:
 | **NER entities** | Jeff (PER), Amazon (ORG), AWS (ORG), America (LOC) | N/A (text too garbled for reliable NER) |
 | **Caption** | N/A | "A paper with some text" |
 
-Florence-2 is a **vision** model — it understands scenes, objects, and spatial relationships. It was never designed to compete with Tesseract at reading document text. Use it when you need image *understanding* (what's in this photo?), not text *extraction* (what does this document say?).
+Florence-2 is a **vision** model - it understands scenes, objects, and spatial relationships. It was never designed to compete with Tesseract at reading document text. Use it when you need image *understanding* (what's in this photo?), not text *extraction* (what does this document say?).
 
 ### JSON Output for Automation & LLM Tools
 
-The `--json` flag outputs structured JSON to stdout with all logging suppressed — designed for piping into other tools, LLM function calling, or automation scripts:
+The `--json` flag outputs structured JSON to stdout with all logging suppressed - designed for piping into other tools, LLM function calling, or automation scripts:
 
 ```bash
 ocrner ner "Shelby Lucier from SCS Agency in Cambridge, UK sent an invoice on 13/02/15. Call 07981423683." -r --json
@@ -862,7 +862,7 @@ ocrner ner "Shelby Lucier from SCS Agency in Cambridge, UK sent an invoice on 13
 }
 ```
 
-This makes the CLI usable as a **tool** for LLMs and agents. An LLM can call `ocrner ner "..." --json`, parse the JSON response, and reason over the structured entities — no custom code needed. Pipe into `jq`, feed to an agent framework, or read from any language:
+This makes the CLI usable as a **tool** for LLMs and agents. An LLM can call `ocrner ner "..." --json`, parse the JSON response, and reason over the structured entities - no custom code needed. Pipe into `jq`, feed to an agent framework, or read from any language:
 
 ```bash
 # Pipe to jq for quick filtering
@@ -872,7 +872,7 @@ ocrner ocr invoice.png --json | jq '.results[0].entities[] | select(.type == "PE
 echo "John Smith at Microsoft" | ocrner ner --json
 ```
 
-To save to a file instead, use `-o` with a `.json` extension — same structured data, written to disk:
+To save to a file instead, use `-o` with a `.json` extension - same structured data, written to disk:
 
 ```bash
 ocrner ocr "scans/*.png" -o results.json

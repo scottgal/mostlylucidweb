@@ -37,7 +37,7 @@ Upload documents. Ask questions. Get answers with citations and a knowledge grap
 - Rebuildable vector state from source documents
 - LLMs used *only* for answer synthesis over retrieved evidence
 
-> At no point are LLMs used for chunking, embedding, entity extraction, or storage — only for synthesizing answers over retrieved, citation-backed evidence.
+> At no point are LLMs used for chunking, embedding, entity extraction, or storage - only for synthesizing answers over retrieved, citation-backed evidence.
 
 ## Why Combine Vector Search + Knowledge Graphs?
 

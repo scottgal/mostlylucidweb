@@ -264,9 +264,9 @@ This is the same pattern as:
 **Key architectural benefit: Evolvability.**
 Because you store deterministic signals alongside embeddings (not instead of them), each part of the system can change independently. Swap embedding models? Re-embed without touching signals. Add a new signal? Compute it from stored text without re-embedding. Tune ranking? Adjust signal weights and scoring logic without reindexing.
 
-With multi-vector stores (like Qdrant), you can even add **multiple embeddings per document**. Want to try a new embedding model? Add it alongside the existing one and gradually transition. Test both in production, compare quality, then deprecate the old one — all without reindexing or disrupting service.
+With multi-vector stores (like Qdrant), you can even add **multiple embeddings per document**. Want to try a new embedding model? Add it alongside the existing one and gradually transition. Test both in production, compare quality, then deprecate the old one - all without reindexing or disrupting service.
 
-Each component can evolve without forcing a full pipeline rebuild — and without degrading the others.
+Each component can evolve without forcing a full pipeline rebuild - and without degrading the others.
 
 ### What signals should you store?
 
@@ -606,7 +606,7 @@ If you're ready to build this:
 4. **Build incrementally:** Don't refactor everything at once
 
 **Reference implementations:**
-- [DoomSummarizer: Deep Research](/blog/doomsummarizer-deep-research) - Reduced RAG in practice: 6-signal RRF fusion, entity profiles, semantic graph discovery, and parallel long-form synthesis — all from a single binary
+- [DoomSummarizer: Deep Research](/blog/doomsummarizer-deep-research) - Reduced RAG in practice: 6-signal RRF fusion, entity profiles, semantic graph discovery, and parallel long-form synthesis - all from a single binary
 - [Building a Document Summarizer with RAG](/blog/building-a-document-summarizer-with-rag) - Practical implementation walkthrough
 - [DocSummarizer RAG Pipeline](/blog/docsummarizer-rag-pipeline) - Complete ingestion pipeline
 - [AudioSummarizer](/blog/audiosummarizer-forensic-audio-characterization) - Audio forensic characterization with speaker diarization
@@ -615,4 +615,3 @@ If you're ready to build this:
 - [Constrained Fuzziness](/blog/constrained-fuzziness-pattern) - The underlying pattern
 
 The infrastructure is already there. You just have to stop treating the context window like a database.
-

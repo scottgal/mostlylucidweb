@@ -15,7 +15,7 @@ A standalone multi-document RAG (Retrieval-Augmented Generation) web application
 - **Conversation Memory**: Chat sessions maintain context across multiple questions
 - **Standalone Deployment**: Single executable with SQLite for portable use, or PostgreSQL for production
 
-**What the LLM does NOT do**: The LLM is never used for entity extraction, indexing, or storage — only for reasoning over retrieved, evidence-backed context. All preprocessing is deterministic and inspectable.
+**What the LLM does NOT do**: The LLM is never used for entity extraction, indexing, or storage - only for reasoning over retrieved, evidence-backed context. All preprocessing is deterministic and inspectable.
 
 ---
 
@@ -257,15 +257,15 @@ LucidRAG will connect to Ollama at `host.docker.internal:11434`.
 
 ## Design Principles
 
-1. **Deterministic preprocessing** — Chunking, embedding, and entity extraction use fixed algorithms, not LLM calls. Results are reproducible.
+1. **Deterministic preprocessing** - Chunking, embedding, and entity extraction use fixed algorithms, not LLM calls. Results are reproducible.
 
-2. **Evidence-first** — Every answer cites specific source segments. No hallucinated claims.
+2. **Evidence-first** - Every answer cites specific source segments. No hallucinated claims.
 
-3. **Inspectable pipelines** — All intermediate state (chunks, embeddings, entities, relationships) is queryable and debuggable.
+3. **Inspectable pipelines** - All intermediate state (chunks, embeddings, entities, relationships) is queryable and debuggable.
 
-4. **Local-first execution** — ONNX embeddings, DuckDB storage, optional Ollama. No mandatory cloud dependencies.
+4. **Local-first execution** - ONNX embeddings, DuckDB storage, optional Ollama. No mandatory cloud dependencies.
 
-5. **Bounded LLM usage** — The LLM synthesizes answers from retrieved context. It doesn't index, extract, or store anything.
+5. **Bounded LLM usage** - The LLM synthesizes answers from retrieved context. It doesn't index, extract, or store anything.
 
 ---
 
@@ -288,7 +288,7 @@ LucidRAG will connect to Ollama at `host.docker.internal:11434`.
 └─────────────────┴───────────────────┴───────────────────────────┘
 ```
 
-**Why DuckDB?** DuckDB is used for vector storage to keep indexing local, fast, and inspectable without introducing an external vector database dependency. It's ephemeral by design — you can always rebuild it from source documents.
+**Why DuckDB?** DuckDB is used for vector storage to keep indexing local, fast, and inspectable without introducing an external vector database dependency. It's ephemeral by design - you can always rebuild it from source documents.
 
 ### Key Components
 

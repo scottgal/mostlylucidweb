@@ -1,6 +1,6 @@
 # DocSummarizer v3.1.0 - Documentation Improvements & Template Expansion
 
-> **Turn documents or URLs into evidence-grounded summaries — for humans or AI agents — without sending anything to the cloud.**
+> **Turn documents or URLs into evidence-grounded summaries - for humans or AI agents - without sending anything to the cloud.**
 
 ## 🎉 What's New
 

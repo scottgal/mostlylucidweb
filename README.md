@@ -3,7 +3,7 @@
 [![Live Site](https://img.shields.io/badge/Live%20Site-mostlylucid.net-blue)](https://mostlylucid.net)
 [![License: Unlicense](https://img.shields.io/badge/License-Unlicense-green.svg)](https://unlicense.org/)
 
-This repository contains the source code for [mostlylucid.net](https://mostlylucid.net) — the personal site and blog of Scott Galloway, a consulting web developer and systems architect with over 30 years of experience building web applications.
+This repository contains the source code for [mostlylucid.net](https://mostlylucid.net) - the personal site and blog of Scott Galloway, a consulting web developer and systems architect with over 30 years of experience building web applications.
 
 **🌐 Visit the live site:** [mostlylucid.net](https://mostlylucid.net)
 
@@ -11,7 +11,7 @@ This repository contains the source code for [mostlylucid.net](https://mostlyluc
 
 ## CLI Tools
 
-Self-contained, portable executables — no runtime install required.
+Self-contained, portable executables - no runtime install required.
 
 ### DataSummarizer
 
@@ -46,7 +46,7 @@ datasummarizer -f /var/log/apache2/error.log --no-llm --fast
 
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/)
 
-Turn documents or URLs into evidence-grounded summaries — every claim cites its source. Runs entirely on your machine.
+Turn documents or URLs into evidence-grounded summaries - every claim cites its source. Runs entirely on your machine.
 
 ```bash
 # Fast extractive summary (no LLM, ~3s)
@@ -151,7 +151,7 @@ HTMX-enabled ASP.NET Core Tag Helpers for paging tasks.
 [![NuGet](https://img.shields.io/nuget/v/Umami.Net.svg)](https://www.nuget.org/packages/Umami.Net)
 [![NuGet](https://img.shields.io/nuget/dt/Umami.Net.svg)](https://www.nuget.org/packages/Umami.Net)
 
-A .NET client for Umami Web Analytics — privacy-focused analytics integration.
+A .NET client for Umami Web Analytics - privacy-focused analytics integration.
 
 📖 [NuGet Package](https://www.nuget.org/packages/Umami.Net)
 
@@ -246,7 +246,7 @@ Dive into some of the technical deep-dives and experiments from the blog:
 - **Open-source contributions** like NuGet packages, tag helpers, and utilities
 - **Reflections** on freelancing, remote work, and the craft of building resilient systems
 
-The site is intentionally a work in progress — things may break, evolve, or get rebuilt entirely. That's part of the ethos: showing how things are built, not just the polished result.
+The site is intentionally a work in progress - things may break, evolve, or get rebuilt entirely. That's part of the ethos: showing how things are built, not just the polished result.
 
 ### Platform Features
 
@@ -374,4 +374,4 @@ This repo is primarily Scott's personal playground, but feedback, issues, and su
 
 ## License
 
-**Unlicense** — This is free and unencumbered software released into the public domain. See [LICENSE](./LICENSE) for details.
+**Unlicense** - This is free and unencumbered software released into the public domain. See [LICENSE](./LICENSE) for details.

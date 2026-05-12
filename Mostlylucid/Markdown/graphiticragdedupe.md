@@ -8,7 +8,7 @@
 
 This document describes a subsystem from ***lucid*RAG**, a project I’m actively developing.
 
-One core requirement of ***lucid*RAG** is the ability to extract **segments of evidence** - sentences, paragraphs, headings, captions, frames, or structured blocks — and ensure those segments are **deduplicated** without destroying useful signal.
+One core requirement of ***lucid*RAG** is the ability to extract **segments of evidence** - sentences, paragraphs, headings, captions, frames, or structured blocks - and ensure those segments are **deduplicated** without destroying useful signal.
 
 ***lucid*RAG** works by analysing and extracting the *best* available evidence from documents, images, audio, and structured data. Unlike most RAG implementations, it does **not** store LLM-generated summaries as the primary artefact. In many cases, ingestion requires no LLM at all (though one can be used when escalation is justified).
 
@@ -24,7 +24,7 @@ Simple string equality is not enough. The same concept is frequently expressed u
 
 **The problem compounds at retrieval time.**
 
-When results are retrieved (via SQL, vector embeddings, BM25, or hybrids), feeding an LLM multiple segments that all express the same underlying idea produces dull, repetitive answers. Five near-identical chunks from different documents do not add clarity — they dilute it.
+When results are retrieved (via SQL, vector embeddings, BM25, or hybrids), feeding an LLM multiple segments that all express the same underlying idea produces dull, repetitive answers. Five near-identical chunks from different documents do not add clarity - they dilute it.
 
 To address this, ***lucid*RAG** treats deduplication as a **first-class compilation problem**, not a post-hoc filter.
 
@@ -81,11 +81,11 @@ These invariants are maintained by the deduplication system:
 
 This system explicitly does **not** attempt to:
 
-- **Detect factual contradiction** — Two segments saying opposite things are not deduplicated
-- **Canonicalize truth** — We don't pick a "correct" version across sources
-- **Collapse paraphrases across documents at ingestion** — Each document keeps its own segments
-- **Normalize terminology** — "ML" and "machine learning" in different docs are preserved separately
-- **Replace entity resolution** — That's GraphRAG's job, operating at a different level
+- **Detect factual contradiction** - Two segments saying opposite things are not deduplicated
+- **Canonicalize truth** - We don't pick a "correct" version across sources
+- **Collapse paraphrases across documents at ingestion** - Each document keeps its own segments
+- **Normalize terminology** - "ML" and "machine learning" in different docs are preserved separately
+- **Replace entity resolution** - That's GraphRAG's job, operating at a different level
 
 ---
 
@@ -94,11 +94,11 @@ This system explicitly does **not** attempt to:
 Deduplication is fully deterministic:
 
 - **Embeddings are immutable** once computed at extraction time
-- **Sorting is stable** — segments with equal salience maintain original order
-- **No randomness** — no sampling, no approximate ANN, no probabilistic thresholds
-- **No external state** — dedup decisions depend only on the current segment set
+- **Sorting is stable** - segments with equal salience maintain original order
+- **No randomness** - no sampling, no approximate ANN, no probabilistic thresholds
+- **No external state** - dedup decisions depend only on the current segment set
 
-**Why this matters:** Users debugging retrieval results can trust that re-running with the same inputs produces the same outputs. This aligns with ***lucid*RAG**'s broader "constrained fuzziness" philosophy — fuzzy matching with deterministic behavior.
+**Why this matters:** Users debugging retrieval results can trust that re-running with the same inputs produces the same outputs. This aligns with ***lucid*RAG**'s broader "constrained fuzziness" philosophy - fuzzy matching with deterministic behavior.
 
 ---
 
@@ -133,8 +133,8 @@ The separation is intentional:
 
 | Phase | What it captures |
 |-------|------------------|
-| **Ingestion boost** | Author emphasis — how much the document stresses a concept |
-| **Retrieval score** | Query relevance — how well content matches user intent |
+| **Ingestion boost** | Author emphasis - how much the document stresses a concept |
+| **Retrieval score** | Query relevance - how well content matches user intent |
 
 Mixing these at retrieval would entangle document intent with user intent. A concept repeated 5 times in a document is important *to that document*, but may not be relevant *to this query*. By boosting at ingestion, we preserve the author's signal without biasing query results.
 
@@ -312,7 +312,7 @@ Deduplication and GraphRAG are intentionally orthogonal:
 | **GraphRAG** | Entities & Relations | Build knowledge graph, resolve references |
 
 **Why separate:**
-- A segment mentioning "Apple" and another mentioning "the company" may dedupe as similar text but represent the same entity — that's GraphRAG's job to resolve
+- A segment mentioning "Apple" and another mentioning "the company" may dedupe as similar text but represent the same entity - that's GraphRAG's job to resolve
 - Dedup doesn't need entity awareness; it operates purely on semantic similarity
 - Entity-aware dedup could be added later as an enhancement, not a replacement
 
@@ -507,8 +507,8 @@ Our threshold of 0.90 aligns with industry best practices for semantic deduplica
 
 This deduplication strategy:
 
-- **Preserves signal** — Near-duplicates boost importance rather than being discarded
-- **Respects boundaries** — Documents maintain independent segment sets
-- **Ranks then filters** — Uses full RRF signal before cross-doc dedup
-- **Fails safely** — Prefers keeping content over aggressive removal
-- **Stays deterministic** — Same inputs always produce same outputs
+- **Preserves signal** - Near-duplicates boost importance rather than being discarded
+- **Respects boundaries** - Documents maintain independent segment sets
+- **Ranks then filters** - Uses full RRF signal before cross-doc dedup
+- **Fails safely** - Prefers keeping content over aggressive removal
+- **Stays deterministic** - Same inputs always produce same outputs

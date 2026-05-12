@@ -1,6 +1,6 @@
 # DocSummarizer
 
-> **Turn documents or URLs into evidence-grounded summaries or structured JSON — usable by humans or AI agents — without sending anything to the cloud.**
+> **Turn documents or URLs into evidence-grounded summaries or structured JSON - usable by humans or AI agents - without sending anything to the cloud.**
 
 Every claim is traceable. Every fact cites its source. Runs entirely on your machine.
 
@@ -59,7 +59,7 @@ flowchart LR
 docsummarizer -f document.md -m Bert
 ```
 
-**Bert mode** uses local ONNX embeddings only. No LLM, no network (after first model download). This is mechanical extraction — it finds and ranks the most important sentences using semantic similarity, not AI generation.
+**Bert mode** uses local ONNX embeddings only. No LLM, no network (after first model download). This is mechanical extraction - it finds and ranks the most important sentences using semantic similarity, not AI generation.
 
 ### With LLM Synthesis (~5-10 seconds)
 
@@ -112,7 +112,7 @@ docsummarizer tool -u "https://docs.example.com"
 docsummarizer tool -f spec.pdf -q "security requirements"
 ```
 
-Output includes `keyFacts` with confidence levels, `evidence` IDs, and `entities` — ready for downstream processing.
+Output includes `keyFacts` with confidence levels, `evidence` IDs, and `entities` - ready for downstream processing.
 
 ### For Developers: Batch & Integration
 
@@ -141,7 +141,7 @@ Most summarizers give you text. This gives you *evidence*.
 - Structured JSON output for agent integration, CI pipelines, or MCP servers
 - Quality metrics catch hallucinations before they escape
 
-If you need to *trust* a summary — or feed it to another system — that's the difference.
+If you need to *trust* a summary - or feed it to another system - that's the difference.
 
 ## Features
 

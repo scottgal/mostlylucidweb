@@ -14,6 +14,8 @@ If you have pricing, inventory, or proprietary content, this is about stopping l
 
 **[Read Part 1: StyloBot: Fighting Back Against Scrapers](https://www.mostlylucid.net/blog/botdetection-introduction)**
 
+**[Read Part 3: As Simple As Possible And No Simpler](https://www.mostlylucid.net/blog/botdetection-part3-as-simple-as-possible)** - Two lines of code to full production gateway.
+
 **[👉 See It Live: StyloBot.net](https://stylobot.net)** - This is the real production system running early-exit detection inline at the gateway (measured inline; latency varies by policy and enabled waves).
 
 <!--category-- ASP.NET, Bot Detection, Security, Architecture -->

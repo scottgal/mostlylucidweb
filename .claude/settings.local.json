@@ -115,7 +115,11 @@
       "Bash(\"C:\\\\Blog\\\\mostlylucidweb\\\\Mostlylucid.OcrNer.CLI\\\\bin\\\\Release\\\\net10.0\\\\ocrner.exe\" caption \"D:\\\\ocrsamples\\\\27857671-e13cf85e-6172-11e7-81dd-c2fe5d1dfd2e.jpg\" --ocr --ner --json)",
       "Bash(\"C:\\\\Blog\\\\mostlylucidweb\\\\Mostlylucid.OcrNer.CLI\\\\bin\\\\Release\\\\net10.0\\\\ocrner.exe\" ocr \"D:\\\\ocrsamples\\\\27857671-e13cf85e-6172-11e7-81dd-c2fe5d1dfd2e.jpg\" -a --json)",
       "Bash(\"C:\\\\Blog\\\\mostlylucidweb\\\\Mostlylucid.OcrNer.CLI\\\\bin\\\\Release\\\\net10.0\\\\ocrner.exe\" ocr \"D:\\\\ocrsamples\\\\Tutorial-HolePunch-01.jpg\" --json)",
-      "Bash(\"C:\\\\Blog\\\\mostlylucidweb\\\\Mostlylucid.OcrNer.CLI\\\\bin\\\\Release\\\\net10.0\\\\ocrner.exe\" caption \"D:\\\\ocrsamples\\\\Tutorial-HolePunch-01.jpg\" --ocr --json)"
+      "Bash(\"C:\\\\Blog\\\\mostlylucidweb\\\\Mostlylucid.OcrNer.CLI\\\\bin\\\\Release\\\\net10.0\\\\ocrner.exe\" caption \"D:\\\\ocrsamples\\\\Tutorial-HolePunch-01.jpg\" --ocr --json)",
+      "Bash(gh pr:*)",
+      "Skill(pr-review-toolkit:review-pr)",
+      "WebFetch(domain:umami.is)",
+      "Bash(gh issue:*)"
     ],
     "deny": [],
     "ask": []

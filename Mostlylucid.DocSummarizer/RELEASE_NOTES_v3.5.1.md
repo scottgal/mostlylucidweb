@@ -1,6 +1,6 @@
 # DocSummarizer v3.5.1 - Enhanced Embeddings, Intelligent Retrieval & Multi-Framework
 
-> **Turn documents or URLs into evidence-grounded summaries — for humans or AI agents — without sending anything to the cloud.**
+> **Turn documents or URLs into evidence-grounded summaries - for humans or AI agents - without sending anything to the cloud.**
 
 ## What's New
 

@@ -128,11 +128,11 @@ cmd.CommandText = $"""
 // Convert distance to similarity: 1.0f - distance
 ```
 
-**Using `array_cosine_similarity` will not use the index** — it won’t trigger the HNSW index. On non-trivial corpora, this turns a ~5ms indexed query into a full table scan.
+**Using `array_cosine_similarity` will not use the index** - it won’t trigger the HNSW index. On non-trivial corpora, this turns a ~5ms indexed query into a full table scan.
 
 ## Entity Extraction
 
-This is where we diverge from Microsoft's approach. Instead of the **LLM-per-chunk extraction passes** used in Microsoft's reference GraphRAG pipeline, we use **IDF-based statistical extraction**. The goal isn't perfect entities - it's *stable, corpus-relative signals* that don't require an LLM to produce. This trades some recall for determinism, auditability, and predictable cost — a deliberate choice for technical corpora:
+This is where we diverge from Microsoft's approach. Instead of the **LLM-per-chunk extraction passes** used in Microsoft's reference GraphRAG pipeline, we use **IDF-based statistical extraction**. The goal isn't perfect entities - it's *stable, corpus-relative signals* that don't require an LLM to produce. This trades some recall for determinism, auditability, and predictable cost - a deliberate choice for technical corpora:
 
 ```mermaid
 flowchart TB
@@ -512,8 +512,8 @@ For 100 blog posts (~500 chunks, ~100 documents):
 | Operation | MSFT GraphRAG | Heuristic | Hybrid | LLM |
 |-----------|---------------|-----------|--------|-----|
 | Entity extraction | 1,000 calls | 0 | 0 | 1,000 calls |
-| Document enhancement | — | — | 100 calls | — |
-| Classification | Included | ~4 batch | — | ~4 batch |
+| Document enhancement | - | - | 100 calls | - |
+| Classification | Included | ~4 batch | - | ~4 batch |
 | Community summaries | ~20 | ~20 | ~20 | ~20 |
 | **Total LLM calls** | ~1,020 | ~24 | ~120 | ~1,024 |
 | **Relationship quality** | Semantic | Co-occurrence | Semantic | Semantic |

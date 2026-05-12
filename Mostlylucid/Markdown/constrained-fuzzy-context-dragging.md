@@ -775,7 +775,7 @@ All three patterns share the same invariant: **probabilistic components propose;
 
 The [Ten Commandments of LLM Use](/blog/tencommandments) codify these rules. The [DiSE architecture](/blog/dise-architecture-overview) implements them for code evolution. [Bot Detection](/blog/botdetection-introduction) implements them for request classification. [DocSummarizer](/blog/docsummarizer-advanced-concepts) implements them for document retrieval. [ImageSummarizer](/blog/constrained-fuzzy-image-intelligence) implements them for image analysis.
 
-Different domains. Same pattern. Same rule. [DoomSummarizer](/blog/doomsummarizer-deep-research) implements context dragging for parallel long-form document generation — running summaries, negative prompts, entity continuity, and drift detection maintain coherence across concurrent LLM calls.
+Different domains. Same pattern. Same rule. [DoomSummarizer](/blog/doomsummarizer-deep-research) implements context dragging for parallel long-form document generation - running summaries, negative prompts, entity continuity, and drift detection maintain coherence across concurrent LLM calls.
 
 ---
 
