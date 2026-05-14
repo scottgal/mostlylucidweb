@@ -21,6 +21,7 @@ jobs:
           dotnet-version: |
             8.x
             9.x
+            10.x
 
       - name: Restore dependencies
         run: dotnet restore ./Umami.Net/Umami.Net.csproj
@@ -30,6 +31,9 @@ jobs:
 
       - name: Build project (net9.0)
         run: dotnet build --configuration Release ./Umami.Net/Umami.Net.csproj --framework net9.0 --no-restore
+
+      - name: Build project (net10.0)
+        run: dotnet build --configuration Release ./Umami.Net/Umami.Net.csproj --framework net10.0 --no-restore
 
       - name: Run tests
         run: dotnet test --configuration Release ./Umami.Net.Test/Umami.Net.Test.csproj
