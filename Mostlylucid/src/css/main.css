@@ -61,15 +61,6 @@ pre code, code.hljs {
     background-color: rgb(128 0 0 / var(--tw-bg-opacity));
 }
 
-.prose ul {
-    list-style-type: none; /* This hides the bullet points */
-    padding-left: 0; /* Optional: Removes the default indentation */
-}
-
-.prose ul ul {
-    padding-left: 1rem; /* Keeps indentation for nested lists if needed */
-}
-
 /* Tighten hr spacing in prose */
 .prose hr {
     margin-top: 0.5rem !important;

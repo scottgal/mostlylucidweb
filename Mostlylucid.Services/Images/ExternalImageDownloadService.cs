@@ -56,6 +56,17 @@ public partial class ExternalImageDownloadService
             return;
         }
 
+        // First, revert any previously-inlined entries that are now invalid:
+        //  - the OriginalUrl is now in the badge skip list, or
+        //  - the local file is missing, or
+        //  - the local file's bytes don't look like a real image.
+        // Reverting rewrites the post HTML back to the OriginalUrl and removes the DB row.
+        var revertedHtml = await RevertInvalidLocalImagesAsync(post, cancellationToken);
+        if (!ReferenceEquals(revertedHtml, post.HtmlContent))
+        {
+            post.HtmlContent = revertedHtml;
+        }
+
         var externalImages = ExtractExternalImages(post.HtmlContent);
         if (externalImages.Count == 0)
         {
@@ -149,11 +160,10 @@ public partial class ExternalImageDownloadService
             // Check Content-Type header first
             var contentType = response.Content.Headers.ContentType?.MediaType ?? "image/jpeg";
 
-            // Reject HTML pages immediately
+            // Reject obvious non-image content types up front
             if (contentType.Contains("text/html", StringComparison.OrdinalIgnoreCase) ||
                 contentType.Contains("text/plain", StringComparison.OrdinalIgnoreCase) ||
-                contentType.Contains("application/json", StringComparison.OrdinalIgnoreCase) ||
-                contentType.Contains("application/xml", StringComparison.OrdinalIgnoreCase))
+                contentType.Contains("application/json", StringComparison.OrdinalIgnoreCase))
             {
                 _logger.LogWarning("URL {Url} returned non-image content type: {ContentType} - likely a 404 or error page", url, contentType);
                 return null;
@@ -172,40 +182,37 @@ public partial class ExternalImageDownloadService
 
             var imageBytes = await response.Content.ReadAsByteArrayAsync(cancellationToken);
 
-            // Early validation: Check for HTML content by looking at first 512 bytes
-            if (IsHtmlContent(imageBytes))
+            // Determine actual content format. Order matters: SVG sniff first (it's XML
+            // text, would otherwise be misclassified as HTML), then HTML reject, then
+            // binary magic bytes.
+            string detectedFormat;
+            var isSvg = contentType.Contains("image/svg", StringComparison.OrdinalIgnoreCase)
+                        || IsSvgContent(imageBytes);
+
+            if (isSvg)
+            {
+                detectedFormat = "svg";
+            }
+            else if (IsHtmlContent(imageBytes))
             {
                 _logger.LogWarning("URL {Url} contains HTML content (404/error page) - skipping", url);
                 return null;
             }
-
-            // Validate image magic bytes BEFORE trying to load with ImageSharp
-            if (!HasValidImageMagicBytes(imageBytes, out var detectedFormat))
+            else if (!HasValidImageMagicBytes(imageBytes, out detectedFormat))
             {
                 _logger.LogWarning("URL {Url} does not have valid image magic bytes - likely not an image file", url);
                 return null;
             }
 
-            // Generate local filename: slug-originalname.ext
-            var originalFileName = Path.GetFileName(new Uri(url).LocalPath);
-            var extension = Path.GetExtension(originalFileName);
-            if (string.IsNullOrEmpty(extension) || extension.Length > 5)
-            {
-                // Use detected format from magic bytes
-                extension = detectedFormat switch
-                {
-                    "jpeg" or "jpg" => ".jpg",
-                    "png" => ".png",
-                    "gif" => ".gif",
-                    "webp" => ".webp",
-                    "bmp" => ".bmp",
-                    "tiff" => ".tiff",
-                    _ => ".jpg"
-                };
-            }
+            // Always derive extension from detected content, never from the URL.
+            // (A URL ending in .jpg may serve SVG/HTML/etc; trusting the URL caused
+            // files to be served with the wrong content-type and break in browsers.)
+            var extension = ExtensionForFormat(detectedFormat);
 
             // Sanitize filename
+            var originalFileName = Path.GetFileName(new Uri(url).LocalPath);
             var sanitizedName = SanitizeFileName(Path.GetFileNameWithoutExtension(originalFileName));
+            if (string.IsNullOrEmpty(sanitizedName)) sanitizedName = "image";
             var localFileName = $"{postSlug}-{sanitizedName}{extension}";
 
             // Ensure unique filename
@@ -218,44 +225,48 @@ public partial class ExternalImageDownloadService
                 counter++;
             }
 
-            // Validate image before saving - ensure ImageSharp can process it
+            // Validate image before saving. SVG can't be loaded by ImageSharp - we
+            // already validated it via IsSvgContent so accept it without dimensions.
             int? width = null;
             int? height = null;
-            try
+            if (!isSvg)
             {
-                using var memoryStream = new MemoryStream(imageBytes);
-                var format = Image.DetectFormat(memoryStream);
-                if (format == null)
+                try
                 {
-                    _logger.LogWarning("Could not detect image format for {Url} - skipping", url);
+                    using var memoryStream = new MemoryStream(imageBytes);
+                    var format = Image.DetectFormat(memoryStream);
+                    if (format == null)
+                    {
+                        _logger.LogWarning("Could not detect image format for {Url} - skipping", url);
+                        return null;
+                    }
+
+                    memoryStream.Position = 0;
+                    using var image = Image.Load(memoryStream);
+                    width = image.Width;
+                    height = image.Height;
+
+                    if (width <= 0 || height <= 0)
+                    {
+                        _logger.LogWarning("Image has invalid dimensions for {Url}: {Width}x{Height} - skipping", url, width, height);
+                        return null;
+                    }
+                }
+                catch (UnknownImageFormatException ex)
+                {
+                    _logger.LogWarning("Unknown image format for {Url}: {Message} - skipping", url, ex.Message);
                     return null;
                 }
-
-                memoryStream.Position = 0;
-                using var image = Image.Load(memoryStream);
-                width = image.Width;
-                height = image.Height;
-
-                if (width <= 0 || height <= 0)
+                catch (InvalidImageContentException ex)
                 {
-                    _logger.LogWarning("Image has invalid dimensions for {Url}: {Width}x{Height} - skipping", url, width, height);
+                    _logger.LogWarning("Invalid/corrupt image content for {Url}: {Message} - skipping", url, ex.Message);
                     return null;
                 }
-            }
-            catch (UnknownImageFormatException ex)
-            {
-                _logger.LogWarning("Unknown image format for {Url}: {Message} - skipping", url, ex.Message);
-                return null;
-            }
-            catch (InvalidImageContentException ex)
-            {
-                _logger.LogWarning("Invalid/corrupt image content for {Url}: {Message} - skipping", url, ex.Message);
-                return null;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Could not validate image for {Url} - skipping", url);
-                return null;
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Could not validate image for {Url} - skipping", url);
+                    return null;
+                }
             }
 
             // Save file (only if validation passed)
@@ -307,11 +318,10 @@ public partial class ExternalImageDownloadService
             if (Uri.TryCreate(url, UriKind.Absolute, out var uri) &&
                 (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps))
             {
-                // Skip shields.io badges - they are dynamic and should never be inlined
-                if (uri.Host.Equals("shields.io", StringComparison.OrdinalIgnoreCase) ||
-                    uri.Host.EndsWith(".shields.io", StringComparison.OrdinalIgnoreCase))
+                // Skip badge/status hosts - they are dynamic and must never be inlined
+                if (IsBadgeHost(uri))
                 {
-                    _logger.LogDebug("Skipping shields.io badge: {Url}", url);
+                    _logger.LogDebug("Skipping badge URL: {Url}", url);
                     continue;
                 }
 
@@ -341,6 +351,85 @@ public partial class ExternalImageDownloadService
 
             return fullTag;
         }, RegexOptions.IgnoreCase);
+    }
+
+    /// <summary>
+    /// Walk the DB rows for this post and revert any entry whose OriginalUrl now
+    /// matches the badge skip list or whose local file is missing/corrupt. Returns
+    /// the (possibly updated) HTML.
+    /// </summary>
+    private async Task<string> RevertInvalidLocalImagesAsync(BlogPostEntity post, CancellationToken cancellationToken)
+    {
+        var html = post.HtmlContent ?? string.Empty;
+
+        var rows = await _dbContext.DownloadedImages
+            .Where(x => x.PostSlug == post.Slug)
+            .ToListAsync(cancellationToken);
+
+        if (rows.Count == 0) return html;
+
+        foreach (var row in rows)
+        {
+            var localPath = Path.Combine(_imageStoragePath, row.LocalFileName);
+            var isBadgeUrl = Uri.TryCreate(row.OriginalUrl, UriKind.Absolute, out var uri) && IsBadgeHost(uri);
+            var isMissing = !File.Exists(localPath);
+            var isCorrupt = !isMissing && !IsLocalFileValidImage(localPath);
+
+            if (!isBadgeUrl && !isMissing && !isCorrupt) continue;
+
+            _logger.LogInformation(
+                "Reverting inlined image for post {Slug}: {Local} -> {Original} (badge={Badge}, missing={Missing}, corrupt={Corrupt})",
+                post.Slug, row.LocalFileName, row.OriginalUrl, isBadgeUrl, isMissing, isCorrupt);
+
+            // Rewrite HTML back to the original URL
+            html = ReplaceImageUrl(html, $"/externalimages/{row.LocalFileName}", row.OriginalUrl);
+
+            // Delete the local file (if it lives under our storage path) and the DB row
+            if (!isMissing)
+            {
+                try
+                {
+                    var fullStoragePath = Path.GetFullPath(_imageStoragePath);
+                    var fullLocalPath = Path.GetFullPath(localPath);
+                    if (fullLocalPath.StartsWith(fullStoragePath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        File.Delete(fullLocalPath);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to delete stale local image {Path}", localPath);
+                }
+            }
+
+            _dbContext.DownloadedImages.Remove(row);
+        }
+
+        return html;
+    }
+
+    /// <summary>
+    /// Sniff a saved local file to confirm it is actually an image (matching magic
+    /// bytes or recognisable SVG). Used to detect previously-saved corrupt files.
+    /// </summary>
+    private static bool IsLocalFileValidImage(string path)
+    {
+        try
+        {
+            using var fs = File.OpenRead(path);
+            var buffer = new byte[2048];
+            var read = fs.Read(buffer, 0, buffer.Length);
+            if (read <= 0) return false;
+            var span = buffer.AsSpan(0, read).ToArray();
+
+            if (IsSvgContent(span)) return true;
+            if (HasValidImageMagicBytes(span, out _)) return true;
+            return false;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     /// <summary>
@@ -464,24 +553,121 @@ public partial class ExternalImageDownloadService
     }
 
     /// <summary>
-    /// Check if content is HTML by looking for HTML markers in first 512 bytes
+    /// Check if content is HTML by looking for specific HTML markers in first 512 bytes.
+    /// Intentionally narrow so we don't false-positive on SVG/XML.
     /// </summary>
     private static bool IsHtmlContent(byte[] content)
     {
         if (content.Length < 10) return false;
 
-        // Check first 512 bytes for HTML markers
         var checkLength = Math.Min(512, content.Length);
         var textContent = System.Text.Encoding.UTF8.GetString(content, 0, checkLength).ToLowerInvariant();
 
-        // Look for common HTML indicators
-        return textContent.Contains("<!doctype") ||
+        return textContent.Contains("<!doctype html") ||
                textContent.Contains("<html") ||
-               textContent.Contains("<head") ||
-               textContent.Contains("<body") ||
-               textContent.Contains("<div") ||
-               textContent.Contains("<?xml") ||
-               (textContent.Contains("<") && textContent.Contains("</") && textContent.Contains(">"));
+               textContent.Contains("<head>") ||
+               textContent.Contains("<head ") ||
+               textContent.Contains("<body>") ||
+               textContent.Contains("<body ");
+    }
+
+    /// <summary>
+    /// Detect SVG content. SVG is XML text with no fixed binary signature, so we sniff
+    /// the start of the payload past any BOM, XML prolog, comments or DOCTYPE.
+    /// </summary>
+    private static bool IsSvgContent(byte[] content)
+    {
+        if (content.Length < 5) return false;
+
+        var checkLength = Math.Min(2048, content.Length);
+        var text = System.Text.Encoding.UTF8.GetString(content, 0, checkLength);
+        text = text.TrimStart('﻿', ' ', '\t', '\r', '\n');
+
+        while (text.Length > 0)
+        {
+            if (text.StartsWith("<?xml", StringComparison.OrdinalIgnoreCase))
+            {
+                var end = text.IndexOf("?>", StringComparison.Ordinal);
+                if (end < 0) return false;
+                text = text.Substring(end + 2).TrimStart();
+                continue;
+            }
+            if (text.StartsWith("<!--", StringComparison.Ordinal))
+            {
+                var end = text.IndexOf("-->", StringComparison.Ordinal);
+                if (end < 0) return false;
+                text = text.Substring(end + 3).TrimStart();
+                continue;
+            }
+            if (text.StartsWith("<!DOCTYPE", StringComparison.OrdinalIgnoreCase))
+            {
+                var end = text.IndexOf('>');
+                if (end < 0) return false;
+                text = text.Substring(end + 1).TrimStart();
+                continue;
+            }
+            break;
+        }
+
+        return text.StartsWith("<svg>", StringComparison.OrdinalIgnoreCase) ||
+               text.StartsWith("<svg ", StringComparison.OrdinalIgnoreCase) ||
+               text.Equals("<svg", StringComparison.OrdinalIgnoreCase) ||
+               text.StartsWith("<svg\t", StringComparison.OrdinalIgnoreCase) ||
+               text.StartsWith("<svg\n", StringComparison.OrdinalIgnoreCase) ||
+               text.StartsWith("<svg\r", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static string ExtensionForFormat(string format) => format switch
+    {
+        "jpeg" or "jpg" => ".jpg",
+        "png" => ".png",
+        "gif" => ".gif",
+        "webp" => ".webp",
+        "bmp" => ".bmp",
+        "tiff" => ".tiff",
+        "ico" => ".ico",
+        "svg" => ".svg",
+        _ => ".bin"
+    };
+
+    /// <summary>
+    /// Hosts/paths whose responses are dynamic (badges, status images, counters) and
+    /// should never be inlined as static files.
+    /// </summary>
+    private static bool IsBadgeHost(Uri uri)
+    {
+        var host = uri.Host;
+        var path = uri.AbsolutePath;
+
+        if (host.Equals("shields.io", StringComparison.OrdinalIgnoreCase) ||
+            host.EndsWith(".shields.io", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (host.Equals("badge.fury.io", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (host.Equals("badgen.net", StringComparison.OrdinalIgnoreCase) ||
+            host.EndsWith(".badgen.net", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        if (host.Equals("codecov.io", StringComparison.OrdinalIgnoreCase) ||
+            host.EndsWith(".codecov.io", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        // GitHub status/badge images (workflow badges, etc.)
+        if ((host.Equals("github.com", StringComparison.OrdinalIgnoreCase) ||
+             host.EndsWith(".github.com", StringComparison.OrdinalIgnoreCase)) &&
+            (path.Contains("/badge", StringComparison.OrdinalIgnoreCase) ||
+             path.EndsWith("/badge.svg", StringComparison.OrdinalIgnoreCase)))
+            return true;
+
+        // NuGet dynamic badge endpoints
+        if ((host.Equals("nuget.org", StringComparison.OrdinalIgnoreCase) ||
+             host.EndsWith(".nuget.org", StringComparison.OrdinalIgnoreCase)) &&
+            path.Contains("/badge", StringComparison.OrdinalIgnoreCase))
+            return true;
+
+        return false;
     }
 
     /// <summary>
