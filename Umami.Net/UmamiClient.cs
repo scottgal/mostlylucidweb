@@ -71,9 +71,10 @@ public class UmamiClient(
         string? url = "",
         string? title = "",
         UmamiPayload? payload = null,
-        UmamiEventData? eventData = null)
+        UmamiEventData? eventData = null,
+        string? distinctId = null)
     {
-        var response = await TrackPageView(url, title, payload, eventData);
+        var response = await TrackPageView(url, title, payload, eventData, distinctId);
         return await DecodeResponse(response);
     }
 
@@ -82,7 +83,8 @@ public class UmamiClient(
         string? url = "",
         string? title = "",
         UmamiPayload? payload = null,
-        UmamiEventData? eventData = null)
+        UmamiEventData? eventData = null,
+        string? distinctId = null)
     {
         var sendPayload = payload ?? new UmamiPayload();
         sendPayload.Data = eventData;
@@ -90,44 +92,53 @@ public class UmamiClient(
             sendPayload.Url = url;
         if (!string.IsNullOrEmpty(title))
             sendPayload.Title = title;
+        if (!string.IsNullOrEmpty(distinctId))
+            sendPayload.DistinctId = distinctId;
         return await Send(sendPayload);
     }
 
 
     public async Task<UmamiDataResponse?> TrackAndDecode(
         string eventName,
-        UmamiEventData? eventData = null)
+        UmamiEventData? eventData = null,
+        string? distinctId = null)
     {
-        var response = await Track(eventName, eventData);
+        var response = await Track(eventName, eventData, distinctId);
         return await DecodeResponse(response);
     }
 
     public async Task<UmamiDataResponse?> TrackAndDecode(
         UmamiPayload eventObj,
-        UmamiEventData? eventData = null)
+        UmamiEventData? eventData = null,
+        string? distinctId = null)
     {
-        var response = await Track(eventObj, eventData);
+        var response = await Track(eventObj, eventData, distinctId);
         return await DecodeResponse(response);
     }
 
     public async Task<HttpResponseMessage> Track(
         string eventName,
-        UmamiEventData? eventData = null)
+        UmamiEventData? eventData = null,
+        string? distinctId = null)
     {
         var thisPayload = new UmamiPayload
         {
             Name = eventName,
-            Data = eventData ?? new UmamiEventData()
+            Data = eventData ?? new UmamiEventData(),
+            DistinctId = distinctId
         };
         return await Track(thisPayload);
     }
 
     public async Task<HttpResponseMessage> Track(UmamiPayload eventObj,
-        UmamiEventData? eventData = null)
+        UmamiEventData? eventData = null,
+        string? distinctId = null)
     {
         var payload = eventObj;
         payload.Data = eventData ?? new UmamiEventData();
         payload.Website = settings.WebsiteId;
+        if (!string.IsNullOrEmpty(distinctId))
+            payload.DistinctId = distinctId;
         return await Send(payload);
     }
 
@@ -172,9 +183,11 @@ public class UmamiClient(
 
     public async Task<UmamiDataResponse?> IdentifyAndDecode(string sessionId, string? email = null,
         string? username = null,
-        string? userId = null, UmamiEventData? eventData = null)
+        string? userId = null,
+        UmamiEventData? eventData = null,
+        string? distinctId = null)
     {
-        var response = await Identify(email, username, sessionId, userId, eventData);
+        var response = await Identify(email, username, sessionId, userId, eventData, distinctId);
         return await DecodeResponse(response);
     }
 
@@ -186,21 +199,22 @@ public class UmamiClient(
     }
 
     public async Task<HttpResponseMessage> Identify(string? email = null, string? username = null,
-        string? sessionId = null, string? userId = null, UmamiEventData? eventData = null)
+        string? sessionId = null, string? userId = null, UmamiEventData? eventData = null, string? distinctId = null)
     {
         var emailData = BuildEventData(email, username, userId, eventData);
         var payload = new UmamiPayload
         {
             SessionId = sessionId,
+            DistinctId = distinctId,
             Data = emailData
         };
 
         return await Identify(payload, eventData);
     }
 
-    public async Task<HttpResponseMessage> IdentifySession(string sessionId)
+    public async Task<HttpResponseMessage> IdentifySession(string sessionId, string? distinctId = null)
     {
-        return await Identify(sessionId: sessionId);
+        return await Identify(sessionId: sessionId, distinctId: distinctId);
     }
 
     public async Task<UmamiDataResponse?> IdentifySessionAndDecode(string sessionId)

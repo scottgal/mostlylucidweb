@@ -24,4 +24,6 @@ public class Consts
     public const string UserName = "Test User";
 
     public const string SessionId = "B41A9964-FD33-4108-B6EC-9A6B68150763";
+    
+    public const string DistinctId = "B41A9964-FD33-4108-B6EC-9A6B68150764";
 }

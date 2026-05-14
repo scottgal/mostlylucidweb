@@ -401,7 +401,7 @@ public class UmamiBackgroundSender_Tests
         var cancellationToken = new CancellationToken();
         await hostedService.StartAsync(cancellationToken);
 
-        await backgroundSender.IdentifySession(sessionId, new UmamiEventData { { key, value } });
+        await backgroundSender.IdentifySession(sessionId, eventData: new UmamiEventData { { key, value } });
 
         var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(1000, cancellationToken));
         if (completedTask != tcs.Task) throw new TimeoutException("The background task did not complete in time.");

@@ -1,4 +1,6 @@
 ﻿using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Umami.Net.Models;
 using Umami.Net.Test.Extensions;
 using Umami.Net.Test.MessageHandlers;
@@ -58,6 +60,29 @@ public class UmamiClient_IdentifyTests
         Assert.Equal(Consts.Email, content.Payload.Data["email"].ToString());
         Assert.Equal(Consts.UserName, content.Payload.Data["username"].ToString());
         Assert.Equal(Consts.UserId, content.Payload.Data["userId"].ToString());
+    }
+
+    [Fact]
+    public async Task IdentifySession_WithDistinctId_FlowsToPayloadIdField()
+    {
+        var umamiClient = SetupExtensions.GetUmamiClient();
+        var response = await umamiClient.IdentifySession(Consts.SessionId, Consts.DistinctId);
+        
+        // Read response as string to validate JSON serialization
+        var responseString = await response.Content.ReadAsStringAsync();
+        using var jsonDocument = JsonDocument.Parse(responseString);
+        var idField = jsonDocument.RootElement
+            .GetProperty("payload")
+            .GetProperty("id")
+            .GetString();
+        Assert.Equal(Consts.DistinctId, idField);
+
+        var content = await response.Content.ReadFromJsonAsync<EchoedRequest>();
+        Assert.NotNull(response);
+        Assert.NotNull(content);
+        Assert.NotNull(content.Payload);
+        Assert.Equal(Consts.DistinctId, content.Payload.DistinctId);
+      
     }
 
 

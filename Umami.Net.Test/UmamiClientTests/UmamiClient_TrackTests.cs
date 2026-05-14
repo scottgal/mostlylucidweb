@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using System.Text.Json;
 using Umami.Net.Models;
 using Umami.Net.Test.Extensions;
 using Umami.Net.Test.MessageHandlers;
@@ -64,5 +65,60 @@ public class UmamiClient_TrackTests
         Assert.Equal(Consts.DefaultName, content.Payload.Name);
         Assert.NotNull(content.Payload.Data);
         Assert.Equal("value", content.Payload.Data["string"].ToString());
+    }
+
+    [Fact]
+    public async Task TrackPageView_WithDistinctId_FlowsToPayloadIdField()
+    {
+        var umamiClient = SetupExtensions.GetUmamiClient();
+
+        var response = await umamiClient.TrackPageView("https://example.com", "Example Page", distinctId: Consts.DistinctId);
+
+        // Assert - Read response as string to validate JSON serialization
+        var responseString = await response.Content.ReadAsStringAsync();
+        using var jsonDocument = JsonDocument.Parse(responseString);
+
+        var idField = jsonDocument.RootElement
+            .GetProperty("payload")
+            .GetProperty("id")
+            .GetString();
+
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(Consts.DistinctId, idField);
+        
+        
+        var content = await response.Content.ReadFromJsonAsync<EchoedRequest>();
+        Assert.NotNull(response);
+        Assert.NotNull(content);
+        Assert.NotNull(content.Payload);
+        Assert.Equal(Consts.DistinctId, content.Payload.DistinctId);
+    }
+
+    [Fact]
+    public async Task Track_WithDistinctId_FlowsToPayloadIdField()
+    {
+        var umamiClient = SetupExtensions.GetUmamiClient();
+
+        var response = await umamiClient.Track(Consts.DefaultName, distinctId: Consts.DistinctId);
+
+        var responseString = await response.Content.ReadAsStringAsync();
+        using var jsonDocument = JsonDocument.Parse(responseString);
+
+        var idField = jsonDocument.RootElement
+            .GetProperty("payload")
+            .GetProperty("id")
+            .GetString();
+
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(Consts.DistinctId, idField);
+        
+        
+        var content = await response.Content.ReadFromJsonAsync<EchoedRequest>();
+        Assert.NotNull(response);
+        Assert.NotNull(content);
+        Assert.NotNull(content.Payload);
+        Assert.Equal(Consts.DistinctId, content.Payload.DistinctId);
     }
 }
