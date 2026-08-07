@@ -30,7 +30,7 @@ public partial class MarkdownLinkRewriter
                 return match.Value;
 
             // Skip anchor links and mailto
-            if (linkUrl.StartsWith("#") || linkUrl.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase))
+            if (linkUrl.StartsWith('#') || linkUrl.StartsWith("mailto:", StringComparison.OrdinalIgnoreCase))
                 return match.Value;
 
             // Resolve relative URL

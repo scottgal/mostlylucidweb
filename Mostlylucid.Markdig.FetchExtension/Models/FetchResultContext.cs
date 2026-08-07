@@ -8,7 +8,7 @@ namespace Mostlylucid.Markdig.FetchExtension.Models;
 /// </summary>
 public class FetchResultContext
 {
-    private static readonly string ContextKey = "FetchResultContext";
+    private const string ContextKey = "FetchResultContext";
     private readonly ConcurrentDictionary<string, MarkdownFetchResult> _results = new();
 
     /// <summary>

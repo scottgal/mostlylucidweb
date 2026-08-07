@@ -113,15 +113,15 @@ More local content after the fetch.
 
         // Assert
         Assert.NotNull(html);
-        Assert.Contains("<h1", html); // Local heading
+        Assert.Equal("My Blog Post", result.Title); // Title is extracted, not part of body HTML
         Assert.Contains("<h2", html); // Remote heading
         Assert.Contains("local content", html);
         Assert.Contains("remote source", html);
         Assert.Contains("<strong>Bold remote text</strong>", html);
         Assert.Contains("Remote item 1", html);
 
-        // Verify NO database entity was created (blogPostId = 0)
-        _dbContextMock.Verify(x => x.MarkdownFetches.Add(It.IsAny<MarkdownFetchEntity>()), Times.Never);
+        // Cached with a null BlogPostId - fetches are persisted even without a blog post
+        _dbContextMock.Verify(x => x.MarkdownFetches.Add(It.Is<MarkdownFetchEntity>(e => e.BlogPostId == null)), Times.AtLeastOnce);
     }
 
     [Fact]
@@ -193,7 +193,7 @@ Some middle content.
         Assert.Contains("middle content", html);
 
         // Verify NO database entities were created (blogPostId = 0)
-        _dbContextMock.Verify(x => x.MarkdownFetches.Add(It.IsAny<MarkdownFetchEntity>()), Times.Never);
+        _dbContextMock.Verify(x => x.MarkdownFetches.Add(It.Is<MarkdownFetchEntity>(e => e.BlogPostId == null)), Times.AtLeastOnce);
     }
 
     [Fact]
@@ -243,8 +243,8 @@ Some middle content.
         // Verify HTTP call was made (no cache check with blogPostId = 0)
         _httpClientFactoryMock.Verify(x => x.CreateClient(It.IsAny<string>()), Times.AtLeastOnce);
 
-        // Verify no database entity was created (blogPostId = 0)
-        _dbContextMock.Verify(x => x.MarkdownFetches.Add(It.IsAny<MarkdownFetchEntity>()), Times.Never);
+        // Cached with a null BlogPostId - fetches are persisted even without a blog post
+        _dbContextMock.Verify(x => x.MarkdownFetches.Add(It.Is<MarkdownFetchEntity>(e => e.BlogPostId == null)), Times.AtLeastOnce);
     }
 
     [Fact]
@@ -400,8 +400,8 @@ More content.
         Assert.Contains("This is fetched content", html);
         Assert.Contains("More content", html);
 
-        // Verify NO database entity was created (blogPostId = 0)
-        _dbContextMock.Verify(x => x.MarkdownFetches.Add(It.IsAny<MarkdownFetchEntity>()), Times.Never);
+        // Cached with a null BlogPostId - fetches are persisted even without a blog post
+        _dbContextMock.Verify(x => x.MarkdownFetches.Add(It.Is<MarkdownFetchEntity>(e => e.BlogPostId == null)), Times.AtLeastOnce);
     }
 
     [Fact]
@@ -516,8 +516,8 @@ More local content after the fetch.
         Assert.Contains("local content before", html);
         Assert.Contains("local content after", html);
 
-        // Verify NO database entity was created (blogPostId = 0)
-        _dbContextMock.Verify(x => x.MarkdownFetches.Add(It.IsAny<MarkdownFetchEntity>()), Times.Never);
+        // Cached with a null BlogPostId - fetches are persisted even without a blog post
+        _dbContextMock.Verify(x => x.MarkdownFetches.Add(It.Is<MarkdownFetchEntity>(e => e.BlogPostId == null)), Times.AtLeastOnce);
     }
 
     [Fact]

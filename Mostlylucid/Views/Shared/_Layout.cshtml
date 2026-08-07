@@ -89,11 +89,8 @@
     <link rel="icon" type="image/png" href="/img/smalllogo.svg" />
 
     <script src="https://accounts.google.com/gsi/client"  data-cfasync="false" async defer></script>
-    <link
-        rel="stylesheet"
-        href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
-    />
-    <link rel="prefetch" href="/css/dist/main.css"  asp-append-version="true">
+    <!-- Boxicons are bundled into main.css and served from /fonts - no CDN dependency -->
+    <link rel="preload" href="/fonts/boxicons.woff2" as="font" type="font/woff2" crossorigin />
     <link
         href="/css/dist/main.css" asp-append-version="true"
         media="screen, print"

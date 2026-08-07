@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Mostlylucid.Helpers.Ephemeral.Atoms;
 using Xunit;
 
@@ -8,7 +9,9 @@ public class FixedWorkAtomTests
     [Fact]
     public async Task Executes_All_Items()
     {
-        var processed = new List<int>();
+        // Concurrent: the atom runs items on 2 workers, and List<T>.Add is not thread-safe -
+        // with a plain List this test dropped items and failed intermittently.
+        var processed = new ConcurrentBag<int>();
         await using var atom = new FixedWorkAtom<int>(
             async (item, ct) =>
             {

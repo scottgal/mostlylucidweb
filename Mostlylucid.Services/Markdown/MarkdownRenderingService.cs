@@ -56,6 +56,10 @@ public partial class MarkdownRenderingService : MarkdownBaseService
 
     public BlogPostDto? GetPageFromMarkdown(string markdown, DateTime publishedDate, string filePath, string? sourceUrl)
     {
+        // Leading blank lines are harmless but would otherwise make the title check below fail and
+        // silently skip the whole post, so normalise them away before anything looks at line 0.
+        markdown = markdown.TrimStart('\r', '\n', ' ', '\t');
+
         // Preprocess markdown to inject fetched content BEFORE parsing
         // This ensures everything goes through the pipeline once
         if (_serviceProvider != null)

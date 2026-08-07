@@ -32,6 +32,6 @@ public class CachedMarkdownEntry
     public bool IsStale => Age.TotalHours >= PollFrequencyHours;
     public int ContentLength => Content?.Length ?? 0;
     public string ContentPreview => Content?.Length > 200
-        ? Content.Substring(0, 200) + "..."
+        ? string.Concat(Content.AsSpan(0, 200), "...")
         : Content ?? string.Empty;
 }

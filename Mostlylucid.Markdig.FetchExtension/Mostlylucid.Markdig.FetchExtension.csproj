@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>mostlylucid.Markdig.FetchExtension</PackageId>
-        <Version>1.1.1</Version>
+        <Version>1.1.2</Version>
         <Authors>mostlylucid</Authors>
         <Company>mostlylucid</Company>
         <Product>mostlylucid.Markdig.FetchExtension</Product>

@@ -1,7 +1,7 @@
 ﻿namespace Umami.Net.UmamiData.Helpers;
 
 [AttributeUsage(AttributeTargets.Property)]
-public class QueryStringParameterAttribute(string name = "", bool isRequired = false) : Attribute
+public sealed class QueryStringParameterAttribute(string name = "", bool isRequired = false) : Attribute
 {
     public string Name { get; } = name;
 

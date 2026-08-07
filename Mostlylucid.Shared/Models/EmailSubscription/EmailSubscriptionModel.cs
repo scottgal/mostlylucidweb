@@ -26,7 +26,7 @@ public  class EmailSubscriptionModel
     
     public string?  Day { get; set; } 
     
-    public bool EmailConfirmed { get; set; } = false;
+    public bool EmailConfirmed { get; set; }
 
     public override string ToString()
     {

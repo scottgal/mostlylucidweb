@@ -20,7 +20,7 @@ public class AnnouncementDto
 
     public bool IsActive { get; set; } = true;
 
-    public int Priority { get; set; } = 0;
+    public int Priority { get; set; }
 
     public DateTimeOffset? StartDate { get; set; }
 
@@ -45,7 +45,7 @@ public class CreateAnnouncementRequest
 
     public bool IsActive { get; set; } = true;
 
-    public int Priority { get; set; } = 0;
+    public int Priority { get; set; }
 
     public DateTimeOffset? StartDate { get; set; }
 

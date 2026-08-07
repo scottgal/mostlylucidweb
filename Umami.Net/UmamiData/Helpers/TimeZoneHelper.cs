@@ -3,7 +3,7 @@ using NodaTime;
 
 namespace Umami.Net.UmamiData.Helpers;
 
-public class TimeZoneValidatorAttribute : ValidationAttribute
+public sealed class TimeZoneValidatorAttribute : ValidationAttribute
 {
     protected override ValidationResult IsValid(object? value, ValidationContext validationContext)
     {

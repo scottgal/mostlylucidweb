@@ -103,7 +103,7 @@ public partial class TocRenderer : HtmlObjectRenderer<TocBlock>
     /// <summary>
     /// Get the document from a block
     /// </summary>
-    private MarkdownDocument? GetDocument(TocBlock block)
+    private static MarkdownDocument? GetDocument(TocBlock block)
     {
         var current = block.Parent;
         while (current != null)
@@ -121,7 +121,7 @@ public partial class TocRenderer : HtmlObjectRenderer<TocBlock>
     /// <summary>
     /// Extract plain text from a heading block
     /// </summary>
-    private string ExtractHeadingText(HeadingBlock heading)
+    private static string ExtractHeadingText(HeadingBlock heading)
     {
         if (heading.Inline == null)
             return string.Empty;
@@ -141,7 +141,7 @@ public partial class TocRenderer : HtmlObjectRenderer<TocBlock>
     /// <summary>
     /// Generate a URL-safe ID from heading text
     /// </summary>
-    private string GenerateId(string text)
+    private static string GenerateId(string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return "heading";
@@ -168,7 +168,7 @@ public partial class TocRenderer : HtmlObjectRenderer<TocBlock>
     /// <summary>
     /// Ensure the heading has an ID attribute for anchor linking
     /// </summary>
-    private void EnsureHeadingHasId(HeadingBlock heading, string id)
+    private static void EnsureHeadingHasId(HeadingBlock heading, string id)
     {
         // Check if heading already has an ID
         var attributes = heading.GetAttributes();
@@ -229,7 +229,7 @@ public partial class TocRenderer : HtmlObjectRenderer<TocBlock>
     /// <summary>
     /// Find where children at the next level end
     /// </summary>
-    private int FindChildrenEnd(List<HeadingInfo> headings, int startIndex, int parentLevel)
+    private static int FindChildrenEnd(List<HeadingInfo> headings, int startIndex, int parentLevel)
     {
         for (int i = startIndex; i < headings.Count; i++)
         {

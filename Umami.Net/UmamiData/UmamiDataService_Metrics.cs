@@ -161,7 +161,7 @@ public partial class UmamiDataService
     /// <summary>
     /// Builds a helpful error message based on the HTTP status code.
     /// </summary>
-    private string BuildErrorMessage(HttpStatusCode statusCode, string? reasonPhrase, string errorContent)
+    private static string BuildErrorMessage(HttpStatusCode statusCode, string? reasonPhrase, string errorContent)
     {
         var baseMessage = reasonPhrase ?? "Request failed";
 

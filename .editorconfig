@@ -1,0 +1,10 @@
+root = true
+
+[*.cs]
+# Code-quality analyzers ship enabled by default in the .NET 10 SDK. Rules left at their
+# defaults below; anything overridden here has a reason next to it.
+
+[**/Migrations/*.cs]
+# EF Core writes these. Any hand-fix is undone the next time a migration is scaffolded,
+# so exclude them from analysis rather than fighting the generator.
+generated_code = true

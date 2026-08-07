@@ -15,6 +15,9 @@ namespace Mostlylucid.Markdig.FetchExtension.Storage;
 /// </summary>
 public class FileBasedMarkdownFetchService : IMarkdownFetchService
 {
+    // Cached: allocating JsonSerializerOptions per call defeats the serializer's internal caching.
+    private static readonly JsonSerializerOptions IndentedJson = new() { WriteIndented = true };
+
     private readonly string _cacheDirectory;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<FileBasedMarkdownFetchService> _logger;
@@ -251,10 +254,7 @@ public class FileBasedMarkdownFetchService : IMarkdownFetchService
         await _fileLock.WaitAsync();
         try
         {
-            var json = JsonSerializer.Serialize(entry, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+            var json = JsonSerializer.Serialize(entry, IndentedJson);
             await File.WriteAllTextAsync(cacheFile, json);
         }
         catch (Exception ex)
@@ -281,10 +281,8 @@ public class FileBasedMarkdownFetchService : IMarkdownFetchService
 
     private static string ComputeHash(string content)
     {
-        using var sha256 = SHA256.Create();
         var bytes = Encoding.UTF8.GetBytes(content);
-        var hash = sha256.ComputeHash(bytes);
-        return Convert.ToHexString(hash);
+        return Convert.ToHexString(SHA256.HashData(bytes));
     }
 
     private class CacheEntry

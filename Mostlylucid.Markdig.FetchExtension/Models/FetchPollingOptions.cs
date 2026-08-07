@@ -10,7 +10,7 @@ public class FetchPollingOptions
     ///     Master switch to enable/disable the background polling loop.
     ///     Defaults to false to keep this optional for hosts.
     /// </summary>
-    public bool Enabled { get; set; } = false;
+    public bool Enabled { get; set; }
 
     /// <summary>
     ///     How often the internal scheduler wakes up to check which URLs are due.

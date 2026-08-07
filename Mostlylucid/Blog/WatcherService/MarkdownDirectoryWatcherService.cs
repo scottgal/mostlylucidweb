@@ -1,7 +1,9 @@
-﻿using System.Collections.Concurrent;
+using System.Collections.Concurrent;
+using System.Threading.Channels;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.Blog.ViewServices;
+using Mostlylucid.MarkdownTranslator;
 using Mostlylucid.Middleware;
 using Mostlylucid.SemanticSearch.Models;
 using Mostlylucid.SemanticSearch.Services;
@@ -16,6 +18,14 @@ using Serilog.Events;
 
 namespace Mostlylucid.Blog.WatcherService;
 
+/// <summary>
+/// Watches the markdown directory and syncs changes into the blog.
+///
+/// Events are captured by handlers and coalesced per file, then processed after a quiet period.
+/// The previous implementation polled with FileSystemWatcher.WaitForChanged, which listens for a
+/// single event at a time - anything that happened while a file was being processed was lost, so
+/// uploading several posts at once would only import some of them.
+/// </summary>
 public class MarkdownDirectoryWatcherService(
     MarkdownConfig markdownConfig,
     IServiceScopeFactory serviceScopeFactory,
@@ -25,11 +35,22 @@ public class MarkdownDirectoryWatcherService(
     ILogger<MarkdownDirectoryWatcherService> logger)
     : IHostedService
 {
-    private Task _awaitChangeTask = Task.CompletedTask;
-    private FileSystemWatcher _fileSystemWatcher;
+    /// <summary>
+    /// How long a file must be quiet before we act on it. Editors and uploads commonly write in
+    /// several passes; without this we would import a half-written post and keep it.
+    /// </summary>
+    private static readonly TimeSpan DebounceInterval = TimeSpan.FromMilliseconds(750);
 
-    // Per-file locks to prevent race conditions when multiple events fire for the same file
-    private readonly ConcurrentDictionary<string, SemaphoreSlim> _fileLocks = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, PendingChange> _pending = new(StringComparer.OrdinalIgnoreCase);
+
+    // Capacity-1 drop-write channel used purely as a "something changed" signal.
+    private readonly Channel<byte> _signal = Channel.CreateBounded<byte>(
+        new BoundedChannelOptions(1) { FullMode = BoundedChannelFullMode.DropWrite });
+
+    private readonly CancellationTokenSource _cts = new();
+
+    private FileSystemWatcher? _fileSystemWatcher;
+    private Task _processingTask = Task.CompletedTask;
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -38,192 +59,253 @@ public class MarkdownDirectoryWatcherService(
             Path = markdownConfig.MarkdownPath,
             NotifyFilter = NotifyFilters.FileName | NotifyFilters.LastWrite | NotifyFilters.CreationTime |
                            NotifyFilters.Size,
-            Filter = "*.md", // Watch all markdown files
-            IncludeSubdirectories = true // Enable watching subdirectories
+            Filter = "*.md",
+            IncludeSubdirectories = true,
+            // Default is 8KB. Bulk uploads can overflow it, and an overflow drops events wholesale.
+            InternalBufferSize = 64 * 1024
         };
-        // Subscribe to events
+
+        _fileSystemWatcher.Created += OnFileSystemEvent;
+        _fileSystemWatcher.Changed += OnFileSystemEvent;
+        _fileSystemWatcher.Deleted += OnFileSystemEvent;
+        _fileSystemWatcher.Renamed += OnFileRenamed;
+        _fileSystemWatcher.Error += OnWatcherError;
         _fileSystemWatcher.EnableRaisingEvents = true;
 
-        _awaitChangeTask = Task.Run(() => AwaitChanges(cancellationToken), cancellationToken);
+        _processingTask = Task.Run(() => ProcessLoopAsync(_cts.Token), _cts.Token);
         logger.LogInformation("Started watching directory {Directory}", markdownConfig.MarkdownPath);
 
-        // Signal ready - watcher is set up and listening
         startupCoordinator.SignalReady(StartupServiceNames.MarkdownDirectoryWatcher);
-
         return Task.CompletedTask;
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
+    public async Task StopAsync(CancellationToken cancellationToken)
     {
-        // Stop watching
-        _fileSystemWatcher.EnableRaisingEvents = false;
-        _fileSystemWatcher.Dispose();
+        if (_fileSystemWatcher != null)
+        {
+            _fileSystemWatcher.EnableRaisingEvents = false;
+            _fileSystemWatcher.Created -= OnFileSystemEvent;
+            _fileSystemWatcher.Changed -= OnFileSystemEvent;
+            _fileSystemWatcher.Deleted -= OnFileSystemEvent;
+            _fileSystemWatcher.Renamed -= OnFileRenamed;
+            _fileSystemWatcher.Error -= OnWatcherError;
+            _fileSystemWatcher.Dispose();
+        }
+
+        await _cts.CancelAsync();
+        await Task.WhenAny(_processingTask, Task.Delay(TimeSpan.FromSeconds(5), CancellationToken.None));
 
         logger.LogInformation("Stopped watching directory: {Path}", markdownConfig.MarkdownPath);
-
-        return Task.CompletedTask;
     }
 
-    private async Task AwaitChanges(CancellationToken cancellationToken)
+    private void OnFileSystemEvent(object sender, FileSystemEventArgs e) => Queue(e.Name, e.ChangeType, null);
+
+    private void OnFileRenamed(object sender, RenamedEventArgs e) =>
+        Queue(e.Name, WatcherChangeTypes.Renamed, e.OldName);
+
+    private void OnWatcherError(object sender, ErrorEventArgs e) =>
+        // Usually an internal buffer overflow. BlogReconciliationService is the backstop that
+        // resyncs disk and database, so surface this loudly rather than failing silently.
+        logger.LogError(e.GetException(), "File watcher error - some markdown changes may have been missed");
+
+    private void Queue(string? name, WatcherChangeTypes changeType, string? oldName)
     {
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            var fileEvent = _fileSystemWatcher.WaitForChanged(WatcherChangeTypes.All);
-            if (fileEvent.ChangeType == WatcherChangeTypes.Changed ||
-                fileEvent.ChangeType == WatcherChangeTypes.Created)
-            {
-                await OnChangedAsync(fileEvent);
-            }
-            else if (fileEvent.ChangeType == WatcherChangeTypes.Deleted)
-            {
-                await OnDeletedAsync(fileEvent);
-            }
-            else if (fileEvent.ChangeType == WatcherChangeTypes.Renamed)
-            {
-                await OnRenamedAsync(fileEvent);
-            }
-        }
+        if (string.IsNullOrEmpty(name)) return;
+
+        _pending.AddOrUpdate(
+            name,
+            _ => new PendingChange(changeType, oldName),
+            // Latest event wins, but never lose the original name of a rename.
+            (_, existing) => new PendingChange(changeType, oldName ?? existing.OldName));
+
+        _signal.Writer.TryWrite(0);
     }
 
-    private async Task OnChangedAsync(WaitForChangedResult e)
+    private async Task ProcessLoopAsync(CancellationToken cancellationToken)
     {
-        if (e.Name == null) return;
-
-        // Get or create a lock for this specific file to prevent race conditions
-        var fileLock = _fileLocks.GetOrAdd(e.Name, _ => new SemaphoreSlim(1, 1));
-
-        // Try to acquire lock - if another operation is in progress for this file, skip
-        if (!await fileLock.WaitAsync(TimeSpan.Zero))
-        {
-            logger.LogDebug("Skipping duplicate file event for {Name}, already processing", e.Name);
-            return;
-        }
-
         try
         {
-            using var activity = Log.Logger.StartActivity("Markdown File Changed {Name}", e.Name);
-            var retryPolicy = Policy
-                .Handle<IOException>() // Only handle IO exceptions (like file in use)
-                .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromMilliseconds(500 * retryAttempt),
-                    (exception, timeSpan, retryCount, context) =>
-                    {
-                        activity?.Activity?.SetTag("Retry Attempt", retryCount);
-                        // Log the retry attempt
-                        logger.LogWarning("File is in use, retrying attempt {RetryCount} after {TimeSpan}", retryCount,
-                            timeSpan);
-                    });
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                await _signal.Reader.ReadAsync(cancellationToken);
+
+                // Wait for the directory to go quiet, so a burst of writes is handled once.
+                while (true)
+                {
+                    await Task.Delay(DebounceInterval, cancellationToken);
+                    if (!_signal.Reader.TryRead(out _)) break;
+                }
+
+                await ProcessBatchAsync(cancellationToken);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Shutting down.
+        }
+        catch (Exception e)
+        {
+            logger.LogError(e, "Markdown watcher processing loop stopped unexpectedly");
+        }
+    }
+
+    private async Task ProcessBatchAsync(CancellationToken cancellationToken)
+    {
+        var batch = new List<KeyValuePair<string, PendingChange>>();
+        foreach (var key in _pending.Keys.ToArray())
+            if (_pending.TryRemove(key, out var change))
+                batch.Add(new KeyValuePair<string, PendingChange>(key, change));
+
+        if (batch.Count == 0) return;
+
+        logger.LogDebug("Processing {Count} coalesced markdown change(s)", batch.Count);
+
+        var touched = false;
+        foreach (var (name, change) in batch)
+        {
+            if (cancellationToken.IsCancellationRequested) break;
 
             try
             {
-            var fileName = e.Name;
-            var isTranslated = Path.GetFileNameWithoutExtension(e.Name).Contains(".");
-            var language = MarkdownBaseService.EnglishLanguage;
-            var directory = markdownConfig.MarkdownPath;
-
-            if (isTranslated)
-            {
-                language = Path.GetFileNameWithoutExtension(e.Name).Split('.').Last();
-                fileName = Path.GetFileName(fileName);
-                directory = markdownConfig.MarkdownTranslatedPath;
+                switch (change.ChangeType)
+                {
+                    case WatcherChangeTypes.Deleted:
+                        await OnDeletedAsync(name);
+                        touched = true;
+                        break;
+                    case WatcherChangeTypes.Renamed:
+                        if (!string.IsNullOrEmpty(change.OldName)) await OnDeletedAsync(change.OldName);
+                        await OnChangedAsync(name);
+                        touched = true;
+                        break;
+                    default:
+                        touched |= await OnChangedAsync(name);
+                        break;
+                }
             }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Error processing markdown change for {Name}", name);
+            }
+        }
 
-            var filePath = Path.Combine(directory, fileName);
-            var scope = serviceScopeFactory.CreateScope();
-            var markdownBlogService = scope.ServiceProvider.GetRequiredService<IMarkdownBlogService>();
+        if (!touched) return;
 
-            // Use the Polly retry policy for executing the operation
+        // One eviction for the whole batch. Previously every translated file written for a post
+        // flushed the entire blog output cache, so a single post cost ~15 full flushes.
+        BrokenLinkArchiveMiddleware.InvalidateLinkCaches(memoryCache);
+        await outputCacheStore.EvictByTagAsync("blog", CancellationToken.None);
+        logger.LogDebug("Invalidated broken link cache and OutputCache after {Count} change(s)", batch.Count);
+    }
+
+    private async Task<bool> OnChangedAsync(string name)
+    {
+        using var activity = Log.Logger.StartActivity("Markdown File Changed {Name}", name);
+
+        var isTranslated = Path.GetFileNameWithoutExtension(name).Contains('.');
+        var language = MarkdownBaseService.EnglishLanguage;
+        var directory = markdownConfig.MarkdownPath;
+        var fileName = name;
+
+        if (isTranslated)
+        {
+            language = Path.GetFileNameWithoutExtension(name).Split('.').Last();
+            fileName = Path.GetFileName(name);
+            directory = markdownConfig.MarkdownTranslatedPath;
+        }
+
+        var filePath = Path.Combine(directory, fileName);
+        if (!File.Exists(filePath))
+        {
+            logger.LogDebug("Skipping {Name} - no longer on disk", name);
+            activity?.Complete();
+            return false;
+        }
+
+        var retryPolicy = Policy
+            .Handle<IOException>()
+            .WaitAndRetryAsync(5, retryAttempt => TimeSpan.FromMilliseconds(500 * retryAttempt),
+                (exception, timeSpan, retryCount, context) =>
+                {
+                    activity?.Activity?.SetTag("Retry Attempt", retryCount);
+                    logger.LogWarning("File is in use, retrying attempt {RetryCount} after {TimeSpan}",
+                        retryCount, timeSpan);
+                });
+
+        try
+        {
+            using var scope = serviceScopeFactory.CreateScope();
+
             await retryPolicy.ExecuteAsync(async () =>
             {
-                // Get the blog service first to potentially set processing context
                 var blogService = scope.ServiceProvider.GetRequiredService<IBlogService>();
-
-                // Get the markdown content first (before rendering)
                 var markdown = await File.ReadAllTextAsync(filePath);
 
-                // Extract slug from filename
                 var slug = Path.GetFileNameWithoutExtension(fileName);
-                if (isTranslated)
-                {
-                    slug = slug.Split('.').First();
-                }
+                if (isTranslated) slug = slug.Split('.').First();
 
-                // Use SavePost(slug, language, markdown) which handles processing context correctly
                 var savedModel = await blogService.SavePost(slug, language, markdown);
                 activity?.Activity?.SetTag("Page Processed", savedModel.Slug);
                 activity?.Activity?.SetTag("Page Saved", savedModel.Slug);
 
-                // Invalidate broken link mapping caches
-                BrokenLinkArchiveMiddleware.InvalidateLinkCaches(memoryCache);
-
-                // Evict OutputCache for all blog pages (tag-based eviction)
-                await outputCacheStore.EvictByTagAsync("blog", CancellationToken.None);
-                logger.LogDebug("Invalidated broken link cache and OutputCache for slug {Slug}", savedModel.Slug);
-
-                // Index in semantic search for English posts, or update languages array for translations
-                var isRootDirectory = !e.Name.Contains(Path.DirectorySeparatorChar) && !e.Name.Contains(Path.AltDirectorySeparatorChar);
+                var isRootDirectory = !name.Contains(Path.DirectorySeparatorChar) &&
+                                      !name.Contains(Path.AltDirectorySeparatorChar);
                 if (isRootDirectory || isTranslated)
-                {
                     await IndexPostForSemanticSearchAsync(scope, savedModel, language);
-                }
 
                 if (language == MarkdownBaseService.EnglishLanguage && !string.IsNullOrEmpty(savedModel.Markdown))
                 {
                     var translateService = scope.ServiceProvider.GetRequiredService<IBackgroundTranslateService>();
-                    await translateService.TranslateForAllLanguages(
-                        new PageTranslationModel()
-                            { OriginalFileName = filePath, OriginalMarkdown = savedModel.Markdown, Persist = true });
+                    await translateService.TranslateForAllLanguages(new PageTranslationModel
+                    {
+                        OriginalFileName = filePath,
+                        OriginalMarkdown = savedModel.Markdown,
+                        Persist = true
+                    });
                 }
-                });
+            });
 
-                activity?.Complete();
-            }
-            catch (Exception exception)
-            {
-                activity?.Complete(LogEventLevel.Error, exception);
-            }
+            activity?.Complete();
+            return true;
         }
-        finally
+        catch (Exception exception)
         {
-            fileLock.Release();
+            activity?.Complete(LogEventLevel.Error, exception);
+            logger.LogError(exception, "Error processing changed markdown file {Name}", name);
+            return false;
         }
     }
 
-    private async Task OnDeletedAsync(WaitForChangedResult e)
+    private async Task OnDeletedAsync(string name)
     {
-        if (e.Name == null) return;
-        using var activity = Log.Logger.StartActivity("Markdown File Deleting {Name}", e.Name);
+        using var activity = Log.Logger.StartActivity("Markdown File Deleting {Name}", name);
         try
         {
-            var isTranslated = Path.GetFileNameWithoutExtension(e.Name).Contains(".");
+            var isTranslated = Path.GetFileNameWithoutExtension(name).Contains('.');
             var language = MarkdownBaseService.EnglishLanguage;
-            var slug = Path.GetFileNameWithoutExtension(e.Name);
+            var slug = Path.GetFileNameWithoutExtension(name);
+
             if (isTranslated)
             {
-                var name = Path.GetFileNameWithoutExtension(e.Name).Split('.');
-                language = name.Last();
-                slug = name.First();
+                var parts = slug.Split('.');
+                language = parts.Last();
+                slug = parts.First();
             }
-            else
+            else if (Directory.Exists(markdownConfig.MarkdownTranslatedPath))
             {
-                // Delete all translated versions
-                var translatedFiles = Directory.GetFiles(markdownConfig.MarkdownTranslatedPath, $"{slug}.*.*");
-                _fileSystemWatcher.EnableRaisingEvents = false;
-                foreach (var file in translatedFiles)
-                {
+                // Removing the English source removes its translations too. The resulting delete
+                // events are handled normally - the watcher is never blinded, which previously
+                // meant unrelated edits during this window were lost.
+                foreach (var file in Directory.GetFiles(markdownConfig.MarkdownTranslatedPath, $"{slug}.*.md"))
                     File.Delete(file);
-                }
-                _fileSystemWatcher.EnableRaisingEvents = true;
             }
 
             using var scope = serviceScopeFactory.CreateScope();
             var blogService = scope.ServiceProvider.GetRequiredService<IBlogViewService>();
             await blogService.Delete(slug, language);
 
-            // Delete from semantic search ONLY if file was in main Markdown directory (not subdirectories)
-            if (!e.Name.Contains(Path.DirectorySeparatorChar) && !e.Name.Contains(Path.AltDirectorySeparatorChar))
-            {
+            if (!name.Contains(Path.DirectorySeparatorChar) && !name.Contains(Path.AltDirectorySeparatorChar))
                 await DeletePostFromSemanticSearchAsync(scope, slug, language);
-            }
 
             activity?.Activity?.SetTag("Page Deleted", slug);
             activity?.Complete();
@@ -232,69 +314,7 @@ public class MarkdownDirectoryWatcherService(
         catch (Exception exception)
         {
             activity?.Complete(LogEventLevel.Error, exception);
-            logger.LogError(exception, "Error deleting blog post {Slug}", e.Name);
-        }
-    }
-
-    private async Task OnRenamedAsync(WaitForChangedResult e)
-    {
-        if (e.Name == null || e.OldName == null) return;
-
-        using var activity = Log.Logger.StartActivity("Markdown File Renamed from {OldName} to {NewName}", e.OldName, e.Name);
-        try
-        {
-            // Extract old slug
-            var oldSlug = Path.GetFileNameWithoutExtension(e.OldName);
-            var oldIsTranslated = oldSlug.Contains(".");
-            var oldLanguage = MarkdownBaseService.EnglishLanguage;
-
-            if (oldIsTranslated)
-            {
-                var parts = oldSlug.Split('.');
-                oldSlug = parts.First();
-                oldLanguage = parts.Last();
-            }
-
-            // Delete old entry (and translated versions if it's the main file)
-            using var scope = serviceScopeFactory.CreateScope();
-            var blogService = scope.ServiceProvider.GetRequiredService<IBlogViewService>();
-
-            if (!oldIsTranslated)
-            {
-                // Delete all translated versions of the old slug
-                var translatedFiles = Directory.GetFiles(markdownConfig.MarkdownTranslatedPath, $"{oldSlug}.*.*");
-                _fileSystemWatcher.EnableRaisingEvents = false;
-                foreach (var file in translatedFiles)
-                {
-                    File.Delete(file);
-                }
-                _fileSystemWatcher.EnableRaisingEvents = true;
-            }
-
-            await blogService.Delete(oldSlug, oldLanguage);
-            logger.LogInformation("Deleted old blog post {OldSlug} in {Language}", oldSlug, oldLanguage);
-
-            // Delete from semantic search ONLY if old file was in main Markdown directory
-            if (!e.OldName.Contains(Path.DirectorySeparatorChar) && !e.OldName.Contains(Path.AltDirectorySeparatorChar))
-            {
-                await DeletePostFromSemanticSearchAsync(scope, oldSlug, oldLanguage);
-            }
-
-            // Now process the new file as if it was created
-            await OnChangedAsync(new WaitForChangedResult
-            {
-                ChangeType = WatcherChangeTypes.Created,
-                Name = e.Name
-            });
-
-            activity?.Activity?.SetTag("Old Slug", oldSlug);
-            activity?.Activity?.SetTag("New Name", e.Name);
-            activity?.Complete();
-        }
-        catch (Exception exception)
-        {
-            activity?.Complete(LogEventLevel.Error, exception);
-            logger.LogError(exception, "Error handling renamed file from {OldName} to {NewName}", e.OldName, e.Name);
+            logger.LogError(exception, "Error deleting blog post {Slug}", name);
         }
     }
 
@@ -306,11 +326,7 @@ public class MarkdownDirectoryWatcherService(
         try
         {
             var semanticSearchService = scope.ServiceProvider.GetService<ISemanticSearchService>();
-            if (semanticSearchService == null)
-            {
-                // Semantic search not configured
-                return;
-            }
+            if (semanticSearchService == null) return;
 
             // Only index English posts for semantic search
             if (language != MarkdownBaseService.EnglishLanguage)
@@ -348,14 +364,12 @@ public class MarkdownDirectoryWatcherService(
         try
         {
             var vectorStoreService = scope.ServiceProvider.GetService<IVectorStoreService>();
-            if (vectorStoreService == null)
-            {
-                return;
-            }
+            if (vectorStoreService == null) return;
 
             var languages = GetAvailableLanguages(slug);
             await vectorStoreService.UpdateLanguagesAsync(slug, languages);
-            logger.LogDebug("Updated languages for {Slug} in semantic search: {Languages}", slug, string.Join(", ", languages));
+            logger.LogDebug("Updated languages for {Slug} in semantic search: {Languages}", slug,
+                string.Join(", ", languages));
         }
         catch (Exception ex)
         {
@@ -371,10 +385,8 @@ public class MarkdownDirectoryWatcherService(
         var languages = new List<string> { "en" }; // English is always available (the source)
 
         var translatedPath = markdownConfig.MarkdownTranslatedPath;
-        if (!Directory.Exists(translatedPath))
-            return languages.ToArray();
+        if (!Directory.Exists(translatedPath)) return languages.ToArray();
 
-        // Look for files matching pattern: {slug}.{lang}.md
         var translatedFiles = Directory.GetFiles(translatedPath, $"{slug}.*.md", SearchOption.TopDirectoryOnly);
 
         foreach (var file in translatedFiles)
@@ -384,10 +396,7 @@ public class MarkdownDirectoryWatcherService(
             if (parts.Length >= 2)
             {
                 var langCode = parts[^1];
-                if (langCode.Length == 2 && langCode != "en")
-                {
-                    languages.Add(langCode);
-                }
+                if (langCode.Length == 2 && langCode != "en") languages.Add(langCode);
             }
         }
 
@@ -402,11 +411,7 @@ public class MarkdownDirectoryWatcherService(
         try
         {
             var semanticSearchService = scope.ServiceProvider.GetService<ISemanticSearchService>();
-            if (semanticSearchService == null)
-            {
-                // Semantic search not configured
-                return;
-            }
+            if (semanticSearchService == null) return;
 
             await semanticSearchService.DeletePostAsync(slug);
             logger.LogInformation("Deleted post {Slug} from semantic search index", slug);
@@ -416,4 +421,6 @@ public class MarkdownDirectoryWatcherService(
             logger.LogWarning(ex, "Failed to delete post {Slug} from semantic search", slug);
         }
     }
+
+    private readonly record struct PendingChange(WatcherChangeTypes ChangeType, string? OldName);
 }

@@ -13,5 +13,5 @@ public class MarkdownConfig : IConfigSection
     /// When true, re-processes and saves ALL markdown posts to the database on startup.
     /// Useful for testing or after schema changes. Should be false in production.
     /// </summary>
-    public bool ReAddPosts { get; set; } = false;
+    public bool ReAddPosts { get; set; }
 }

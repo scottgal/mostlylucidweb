@@ -42,7 +42,7 @@ public class AnnouncementEntity
     /// <summary>
     /// Priority for ordering (higher = more important)
     /// </summary>
-    public int Priority { get; set; } = 0;
+    public int Priority { get; set; }
 
     /// <summary>
     /// Optional start date for the announcement

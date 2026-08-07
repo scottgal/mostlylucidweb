@@ -312,3 +312,6 @@ vocab.txt
 *.db
 /Mostlylucid/wwwroot/articleimages/25000000_firefox_79E55977.png
 /.claude/
+
+# Generated from node_modules by scripts/vendor-boxicons.mjs
+Mostlylucid/src/css/boxicons.gen.css

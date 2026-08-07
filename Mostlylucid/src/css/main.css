@@ -1,5 +1,10 @@
 @import "raleway.css";
 
+/* Boxicons, vendored locally by scripts/vendor-boxicons.mjs (npm run vendor:icons).
+   Bundled here rather than loaded from a CDN - blog posts reference arbitrary bx-* icons,
+   so we ship the whole set. */
+@import "boxicons.gen.css";
+
 /*
  * Highlight.js themes - Scoped approach
  * Light theme scoped to non-dark, dark theme scoped to .dark

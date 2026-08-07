@@ -224,7 +224,7 @@ public class UmamiClient(
 
 // Helper methods to reduce redundancy and centralize logic
 
-    private UmamiEventData BuildEventData(string? email, string? username, string? userId, UmamiEventData? eventData)
+    private static UmamiEventData BuildEventData(string? email, string? username, string? userId, UmamiEventData? eventData)
     {
         eventData ??= new UmamiEventData();
 

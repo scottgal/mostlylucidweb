@@ -34,5 +34,5 @@ public class EmailSubscriptionEntity
     
     public List<CategoryEntity>? Categories { get; set; }
     
-    public bool EmailConfirmed { get; set; } = false;
+    public bool EmailConfirmed { get; set; }
 }

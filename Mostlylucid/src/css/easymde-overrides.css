@@ -63,23 +63,27 @@
     line-height: 1;
 }
 
-/* BoxIcons icon definitions for EasyMDE toolbar */
-.editor-toolbar button.bx-bold::before { content: "\eb35"; }
-.editor-toolbar button.bx-italic::before { content: "\ec91"; }
-.editor-toolbar button.bx-heading::before { content: "\ec48"; }
-.editor-toolbar button.bx-quote-left::before { content: "\ed78"; }
-.editor-toolbar button.bx-list-ul::before { content: "\ecf1"; }
-.editor-toolbar button.bx-list-ol::before { content: "\ecef"; }
-.editor-toolbar button.bx-link::before { content: "\ecdd"; }
-.editor-toolbar button.bx-image::before { content: "\ec6f"; }
-.editor-toolbar button.bx-code-block::before { content: "\ebe4"; }
-.editor-toolbar button.bx-show::before { content: "\ede9"; }
-.editor-toolbar button.bx-columns::before { content: "\ebea"; }
-.editor-toolbar button.bx-fullscreen::before { content: "\ec1a"; }
-.editor-toolbar button.bx-save::before { content: "\edb9"; }
-.editor-toolbar button.bx-purchase-tag::before { content: "\ed6f"; }
-.editor-toolbar button.bx-refresh::before { content: "\ed84"; }
-.editor-toolbar button.bx-calendar::before { content: "\eb50"; }
+/* BoxIcons icon definitions for EasyMDE toolbar.
+   Codepoints must match the boxicons version in package.json - they drifted at some point and
+   every button rendered an unrelated glyph (bold showed an arrow, italic a magnifier).
+   Verify with: npm run check:icons */
+.editor-toolbar button.bx-bold::before { content: "\e9dc"; }
+.editor-toolbar button.bx-italic::before { content: "\eb24"; }
+.editor-toolbar button.bx-heading::before { content: "\eb07"; }
+/* No regular-weight quote-left in boxicons; the solid variant is the only one. */
+.editor-toolbar button.bx-quote-left::before { content: "\ee83"; }
+.editor-toolbar button.bx-list-ul::before { content: "\eb44"; }
+.editor-toolbar button.bx-list-ol::before { content: "\eb42"; }
+.editor-toolbar button.bx-link::before { content: "\eb3c"; }
+.editor-toolbar button.bx-image::before { content: "\eb1b"; }
+.editor-toolbar button.bx-code-block::before { content: "\ea6a"; }
+.editor-toolbar button.bx-show::before { content: "\ec0c"; }
+.editor-toolbar button.bx-columns::before { content: "\ea74"; }
+.editor-toolbar button.bx-fullscreen::before { content: "\eaeb"; }
+.editor-toolbar button.bx-save::before { content: "\ebf4"; }
+.editor-toolbar button.bx-purchase-tag::before { content: "\ebcb"; }
+.editor-toolbar button.bx-refresh::before { content: "\ebd9"; }
+.editor-toolbar button.bx-calendar::before { content: "\ea15"; }
 
 /* Separator styling - hide the pipe character */
 .editor-toolbar i.separator {

@@ -135,7 +135,7 @@ public partial class MarkdownFetchPreprocessor
                 replacement = "<!-- Markdown fetch service not configured -->";
 
             // Replace the fetch tag with the fetched content
-            result = result.Substring(0, match.Index) + replacement + result.Substring(match.Index + match.Length);
+            result = string.Concat(result.AsSpan(0, match.Index), replacement, result.AsSpan(match.Index + match.Length));
         }
 
         // Now process fetch-summary tags
@@ -177,8 +177,8 @@ public partial class MarkdownFetchPreprocessor
             }
 
             // Replace the fetch-summary tag with the formatted summary
-            result = result.Substring(0, match.Index) + summaryReplacement +
-                     result.Substring(match.Index + match.Length);
+            result = string.Concat(result.AsSpan(0, match.Index), summaryReplacement,
+                     result.AsSpan(match.Index + match.Length));
         }
 
         return result;

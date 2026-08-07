@@ -5,7 +5,7 @@ namespace Mostlylucid.Shared.Models;
 public class BasePagingModel<T> : Interfaces.IPagingModel<T> where T : class
 {
     public int Page { get; set; }
-    public int TotalItems { get; set; } = 0;
+    public int TotalItems { get; set; }
     public int PageSize { get; set; }
     public ViewType ViewType { get; set; } = ViewType.TailwindAndDaisy;
     public string LinkUrl { get; set; }
@@ -14,5 +14,5 @@ public class BasePagingModel<T> : Interfaces.IPagingModel<T> where T : class
     /// <summary>
     /// Indicates that no search match was found and these are suggested recent posts instead
     /// </summary>
-    public bool NoMatchFound { get; set; } = false;
+    public bool NoMatchFound { get; set; }
 }

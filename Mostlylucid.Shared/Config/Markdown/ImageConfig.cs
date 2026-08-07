@@ -21,7 +21,7 @@ public class ImageConfig : IConfigSection
     /// When false (default), images are served as-is unless they have processing params.
     /// When true, all images get format/quality params added automatically.
     /// </summary>
-    public bool AutoProcess { get; set; } = false;
+    public bool AutoProcess { get; set; }
 
     /// <summary>
     /// Primary folder for images (relative to wwwroot)

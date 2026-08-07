@@ -308,7 +308,7 @@ public class FilterBarTests : E2ETestBase
 
     #region HTMX Filter Bar Behavior Tests
 
-    [Fact]
+    [Fact(Skip = "Local E2E test - requires site to be running on localhost:8080")]
     public async Task FilterBar_Homepage_TargetsRootUrl()
     {
         // Arrange - Navigate to homepage
@@ -326,7 +326,7 @@ public class FilterBarTests : E2ETestBase
         Output.WriteLine("✅ Filter bar on homepage correctly targets /");
     }
 
-    [Fact]
+    [Fact(Skip = "Local E2E test - requires site to be running on localhost:8080")]
     public async Task FilterBar_BlogPage_TargetsBlogUrl()
     {
         // Arrange - Navigate to blog page
@@ -362,7 +362,7 @@ public class FilterBarTests : E2ETestBase
         Output.WriteLine("✅ Filter bar on search page correctly targets /search");
     }
 
-    [Fact]
+    [Fact(Skip = "Local E2E test - requires site to be running on localhost:8080")]
     public async Task FilterBar_Homepage_SortChangeMaintainsSelection()
     {
         // Arrange - Navigate to homepage
@@ -386,7 +386,7 @@ public class FilterBarTests : E2ETestBase
         Output.WriteLine("✅ Sort selection maintained on homepage after HTMX swap");
     }
 
-    [Fact]
+    [Fact(Skip = "Local E2E test - requires site to be running on localhost:8080")]
     public async Task FilterBar_BlogPage_SortChangeMaintainsSelection()
     {
         // Arrange - Navigate to blog page
@@ -409,7 +409,7 @@ public class FilterBarTests : E2ETestBase
         Output.WriteLine("✅ Sort selection maintained on blog page after HTMX swap");
     }
 
-    [Fact]
+    [Fact(Skip = "Local E2E test - requires site to be running on localhost:8080")]
     public async Task FilterBar_Homepage_NoFullPageReload()
     {
         // Arrange - Navigate to homepage and set a marker
@@ -561,7 +561,7 @@ public class FilterBarTests : E2ETestBase
         }
     }
 
-    [Fact]
+    [Fact(Skip = "Local E2E test - requires site to be running on localhost:8080")]
     public async Task FilterBar_AllPages_HxTargetIsContent()
     {
         // Test that all filter selects have hx-target="#content"

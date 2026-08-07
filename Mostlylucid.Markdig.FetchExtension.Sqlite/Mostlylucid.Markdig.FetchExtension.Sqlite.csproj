@@ -10,12 +10,12 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>mostlylucid.Markdig.FetchExtension.Sqlite</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <Authors>mostlylucid</Authors>
     <Company>mostlylucid</Company>
     <Product>mostlylucid.Markdig.FetchExtension.Sqlite</Product>

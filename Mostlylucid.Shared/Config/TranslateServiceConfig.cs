@@ -14,7 +14,7 @@ public class TranslateServiceConfig :IConfigSection
         set
         {
             if(string.IsNullOrEmpty(value)) return;
-            if(value.Contains(";"))
+            if(value.Contains(';'))
             {
                 IPs = value.Split(";");
             }
@@ -43,7 +43,7 @@ public class TranslateServiceConfig :IConfigSection
     /// Force retranslation of all files, ignoring hash-based change detection (default: false)
     /// Useful for development to retranslate everything regardless of whether files have changed
     /// </summary>
-    public bool ForceRetranslation { get; set; } = false;
+    public bool ForceRetranslation { get; set; }
 }
 
 public enum AutoTranslateMode

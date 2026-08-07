@@ -114,7 +114,7 @@ public class MarkdownFetchEventPublisher : IMarkdownFetchEventPublisher
     public FetchStatistics GetStatistics()
     {
         var durations = _fetchDurations.Values.ToList();
-        var avgDuration = durations.Any()
+        var avgDuration = durations.Count > 0
             ? TimeSpan.FromMilliseconds(durations.Average(d => d.TotalMilliseconds))
             : TimeSpan.Zero;
 

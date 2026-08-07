@@ -48,9 +48,9 @@ public static class VersionAwareQueryStringHelper
             var parameterName = string.IsNullOrEmpty(attribute.Name) ? property.Name : attribute.Name;
 
             // Apply version-specific parameter name mapping
-            if (apiVersion == UmamiApiVersion.V1 && V2ToV1ParameterMap.ContainsKey(parameterName))
+            if (apiVersion == UmamiApiVersion.V1 && V2ToV1ParameterMap.TryGetValue(parameterName, out var mapped))
             {
-                parameterName = V2ToV1ParameterMap[parameterName];
+                parameterName = mapped;
             }
 
             // Validate required parameters
