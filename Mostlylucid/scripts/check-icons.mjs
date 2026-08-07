@@ -7,10 +7,9 @@
 //
 // Exits non-zero on any mismatch so a bad upgrade fails the build rather than shipping.
 
-import { readFileSync, existsSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
+import { dirname, resolve, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import { globSync } from "node:fs";
 
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const boxiconsCss = resolve(projectRoot, "node_modules/boxicons/css/boxicons.min.css");
@@ -56,21 +55,43 @@ for (const m of override.matchAll(/\.(bx-[a-z0-9-]+)::before\s*\{\s*content:\s*"
 }
 
 // --- 2. classes referenced across the site ----------------------------------------
+// Hand-rolled walk rather than fs.globSync: the Docker image runs Node 20, which does not
+// have it, so using it here broke the image build while passing locally.
+function collect(dir, extension, recurse, found = []) {
+    let entries;
+    try {
+        entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+        return found; // directory absent in this build context
+    }
+
+    for (const entry of entries) {
+        const full = resolve(dir, entry.name);
+        if (entry.isDirectory()) {
+            if (recurse && entry.name !== "node_modules") collect(full, extension, recurse, found);
+        } else if (entry.name.endsWith(extension)) {
+            found.push(full);
+        }
+    }
+    return found;
+}
+
 const sources = [
-    "Views/**/*.cshtml",
-    "EmailSubscription/**/*.cshtml",
-    "src/js/**/*.js",
-    "src/css/**/*.css",
-    "Markdown/*.md"
+    ["Views", ".cshtml", true],
+    ["EmailSubscription", ".cshtml", true],
+    ["src/js", ".js", true],
+    ["src/css", ".css", true],
+    ["Markdown", ".md", false]
 ];
 
 const used = new Map(); // class -> first file that referenced it
-for (const pattern of sources) {
-    for (const file of globSync(pattern, { cwd: projectRoot })) {
+for (const [dir, extension, recurse] of sources) {
+    for (const full of collect(resolve(projectRoot, dir), extension, recurse)) {
         // Skip the file we generate from the package itself.
-        if (file.endsWith("boxicons.gen.css")) continue;
+        if (full.endsWith("boxicons.gen.css")) continue;
 
-        const text = readFileSync(resolve(projectRoot, file), "utf8");
+        const file = relative(projectRoot, full).split(sep).join("/");
+        const text = readFileSync(full, "utf8");
         for (const m of text.matchAll(/\bbxs?-[a-z0-9-]+/g)) {
             if (!used.has(m[0])) used.set(m[0], file);
         }
