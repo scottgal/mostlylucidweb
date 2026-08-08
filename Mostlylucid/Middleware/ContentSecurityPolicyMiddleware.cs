@@ -36,14 +36,14 @@ public class ContentSecurityPolicyMiddleware
             // 'unsafe-eval' needed for some Alpine.js features
             $"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://accounts.google.com {(string.IsNullOrEmpty(umamiHost) ? "" : $"https://{umamiHost}")}".Trim(),
 
-            // Styles - self, unpkg (boxicons), Google, unsafe-inline for Tailwind
-            "style-src 'self' 'unsafe-inline' https://unpkg.com https://accounts.google.com",
+            // Styles - self, Google, unsafe-inline for Tailwind
+            "style-src 'self' 'unsafe-inline' https://accounts.google.com",
 
             // Images - self, data URIs, HTTPS images
             "img-src 'self' data: https: blob:",
 
-            // Fonts - self, unpkg (boxicons fonts)
-            "font-src 'self' https://unpkg.com data:",
+            // Fonts - self only; boxicons is served from /fonts
+            "font-src 'self' data:",
 
             // Connect (fetch/XHR) - self, Google, Umami, Hugging Face (for model downloads)
             $"connect-src 'self' https://accounts.google.com https://huggingface.co {(string.IsNullOrEmpty(umamiHost) ? "" : $"https://{umamiHost}")}".Trim(),

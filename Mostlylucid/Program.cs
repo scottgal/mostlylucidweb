@@ -212,6 +212,8 @@ try
 
     app.UseResponseCompression();
     app.UseContentSecurityPolicy();
+    // Must run before OutputCache so the Vary header is stored with the cached response.
+    app.UseHtmxVary();
     app.UseSerilogRequestLogging();
     app.UseHealthChecks("/healthz");
     app.MapPrometheusScrapingEndpoint();
@@ -298,27 +300,23 @@ try
     // Initialize semantic search (if enabled and Qdrant is available)
     try
     {
-        Console.WriteLine("[SEMANTIC] Starting semantic search initialization...");
         using var scope = app.Services.CreateScope();
         var semanticConfig = scope.ServiceProvider.GetRequiredService<SemanticSearchConfig>();
-        Console.WriteLine($"[SEMANTIC] Config loaded - Enabled: {semanticConfig.Enabled}, Qdrant URL: {semanticConfig.QdrantUrl}");
+        Log.Information("Semantic search config loaded - Enabled: {Enabled}, Qdrant URL: {QdrantUrl}",
+            semanticConfig.Enabled, semanticConfig.QdrantUrl);
         if (semanticConfig.Enabled)
         {
-            Console.WriteLine("[SEMANTIC] Resolving ISemanticSearchService...");
             var semanticSearch = scope.ServiceProvider.GetRequiredService<ISemanticSearchService>();
-            Console.WriteLine("[SEMANTIC] Service resolved, calling InitializeAsync...");
             await semanticSearch.InitializeAsync();
-            Console.WriteLine("[SEMANTIC] Initialization complete!");
+            Log.Information("Semantic search initialized");
         }
         else
         {
-            Console.WriteLine("[SEMANTIC] Semantic search is disabled");
+            Log.Information("Semantic search is disabled");
         }
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"[SEMANTIC] ERROR: {ex.GetType().Name}: {ex.Message}");
-        Console.WriteLine($"[SEMANTIC] Stack: {ex.StackTrace}");
         Log.Warning(ex, "Failed to initialize semantic search - continuing without it");
     }
 
