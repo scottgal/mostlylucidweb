@@ -197,7 +197,12 @@ try
     {
         RegisterServiceWorker = true,
         RegisterWebmanifest = false, // (Manually register in Layout file)
-        Strategy = ServiceWorkerStrategy.NetworkFirst,
+        // Our own copy of NetworkFirst that ignores cross-origin requests. The stock strategy
+        // intercepted them too, which broke every external image on the site (shields.io
+        // badges, avatars). CustomStrategy is required for the file to be picked up at all -
+        // any other Strategy value silently serves the embedded worker instead.
+        Strategy = ServiceWorkerStrategy.CustomStrategy,
+        CustomServiceWorkerStrategyFileName = "serviceworker-networkfirst-sameorigin.js",
         OfflineRoute = "Offline.html"
     });
     var app = builder.Build();
