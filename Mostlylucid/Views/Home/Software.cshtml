@@ -4,6 +4,70 @@
     ViewBag.Description = "CLI tools, NuGet packages, and open source projects for document summarization, data profiling, RAG pipelines, analytics, and more.";
 }
 
+<!-- StyloBot: flagship project -->
+<section class="mb-10 rounded-lg border border-slate-200 dark:border-slate-700 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 px-6 py-8 sm:px-10 sm:py-10">
+    <div class="flex flex-col items-center gap-8 md:flex-row md:items-center md:gap-12">
+
+        @* The mark is white line-art over a transparent ground, so it needs a dark disc behind it
+           to stay legible in light mode. *@
+        <a href="https://stylo.bot" target="_blank" rel="noopener noreferrer"
+           class="shrink-0 rounded-full bg-blue-dark p-4 shadow-md transition-transform duration-300 hover:scale-105 motion-reduce:transition-none motion-reduce:hover:scale-100"
+           data-umami-event="StyloBot Logo Click">
+            <img src="~/img/stylowall.svg" asp-append-version="true"
+                 width="240" height="241" alt="StyloBot"
+                 class="h-36 w-36 sm:h-44 sm:w-44 md:h-52 md:w-52" />
+        </a>
+
+        <div class="min-w-0 text-center md:text-left">
+            <p class="font-body text-xs font-semibold uppercase tracking-[0.2em] text-green dark:text-secondary mb-2">
+                Flagship project
+            </p>
+            <h2 class="font-body text-4xl sm:text-5xl font-semibold text-blue-dark dark:text-white mb-3">
+                StyloBot
+            </h2>
+            <p class="font-body text-lg sm:text-xl font-light text-green dark:text-secondary mb-4">
+                Bot detection that knows your site.
+            </p>
+            <p class="font-body text-base text-black dark:text-gray-200 mb-5 max-w-2xl">
+                Cloud scoring services judge your traffic against baselines trained on other people's users.
+                StyloBot learns what normal looks like on <em>your</em> application &mdash; the request sequence,
+                the timing distribution, the shape of a real session &mdash; and runs entirely in your own
+                infrastructure as ASP.NET Core middleware, a YARP gateway, or a sidecar API.
+            </p>
+
+            <!-- Figures are from the StyloBot README - keep them in step with it. -->
+            <dl class="mb-6 flex flex-wrap justify-center gap-x-6 gap-y-2 md:justify-start">
+                <div class="flex items-baseline gap-1.5">
+                    <dt class="font-body text-xl font-semibold text-blue-dark dark:text-white">67</dt>
+                    <dd class="font-body text-sm text-gray-600 dark:text-gray-400">detectors</dd>
+                </div>
+                <div class="flex items-baseline gap-1.5">
+                    <dt class="font-body text-xl font-semibold text-blue-dark dark:text-white">&lt;150&micro;s</dt>
+                    <dd class="font-body text-sm text-gray-600 dark:text-gray-400">per request</dd>
+                </div>
+                <div class="flex items-baseline gap-1.5">
+                    <dt class="font-body text-xl font-semibold text-blue-dark dark:text-white">0</dt>
+                    <dd class="font-body text-sm text-gray-600 dark:text-gray-400">PII leaving your server</dd>
+                </div>
+            </dl>
+
+            <div class="flex flex-wrap justify-center gap-3 md:justify-start">
+                <a href="https://stylo.bot" target="_blank" rel="noopener noreferrer"
+                   class="btn btn-primary" data-umami-event="StyloBot Site Click">
+                    Visit stylo.bot
+                </a>
+                @* Explicit colours rather than btn-outline, which renders near-invisible on this
+                   section's light background. *@
+                <a href="https://github.com/scottgal/stylobot" target="_blank" rel="noopener noreferrer"
+                   class="btn border-blue-dark bg-transparent text-blue-dark hover:bg-blue-dark hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-blue-dark"
+                   data-umami-event="StyloBot GitHub Click">
+                    View on GitHub
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
 <div class="pb-4">
     <h1 class="font-body text-3xl font-semibold text-blue-dark dark:text-white mb-2">Software</h1>
     <p class="font-body text-base text-black dark:text-white mb-6">
