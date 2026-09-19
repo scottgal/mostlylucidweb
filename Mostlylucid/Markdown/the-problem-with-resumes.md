@@ -469,6 +469,8 @@ has three views of the same revision:
 - **Write:** the authoritative Markdown source;
 - **Markdown preview:** a fast structural preview while typing.
 
+![The live ATS Classic Word projection beside its evidence links and JobML](/articleimages/lucidresume/jobml-live-word-document-and-evidence.png?width=1200&format=webp&quality=80)
+
 The JobML and evidence cards remain beside all three. Changing a template changes
 layout, typography and pagination. It does not run extraction again, alter the
 ledger or rewrite the prose.
