@@ -13,7 +13,11 @@ résumé, CV, professional profile, or whatever we're calling the bloody thing t
 week. I have 35 years of professional experience and more than 50 gigs across
 full-time and contract work. Some lasted years. Some lasted weeks and involved
 fascinating technology. One was three months of distributed computing for an
-intelligence service.
+intelligence service. Another was a steganographic messaging system I built in
+my spare time for a domestic violence charity. Others were mostly firing and
+hiring developers. It is all potentially relevant, but *how do I choose*? Why
+would I leave out one role and include another?
+
 
 Compressing all of that into one document which is useful to both people and
 machines is a task I cannot successfully complete. I know there is supposedly a
@@ -293,12 +297,14 @@ The scientific publishing model gives the résumé three distinct layers:
 |---|---|---|
 | Human prose | Human-written Markdown | Communicate clearly to a person. |
 | Indexing metadata | JobML entities, concepts and dates | Make the document explicit and discoverable to machines. |
-| Citations and references | JobML evidence links | Connect each important claim to its justification. |
+| Citations and references | Inline cJobML numbers and a References section | Connect each important claim to its justification. |
 
-These layers live in one portable artefact, but they are not copies of one
-another. The prose can remain concise, selective and recognisably human. The
-machine layer can repeat skill names, use stable identifiers and preserve details
-which would make the prose tedious.
+These layers can travel together, but they are not copies of one another. The
+prose can remain concise, selective and recognisably human. The machine layer can
+repeat skill names, use stable identifiers and preserve details which would make
+the prose tedious. A published résumé only needs the compact citations. The full
+editing record can live at a linked JobML endpoint, much as a paper can point to
+supplementary data.
 
 The citation is what keeps the two honest:
 
@@ -326,9 +332,13 @@ This also exposes drift. If an edited paragraph no longer supports a claim, the
 citation becomes stale. A skill cannot quietly survive in a detached keyword
 list after its only supporting passage has disappeared.
 
-## JobML Is the Citation Layer
+## JobML Is the Full Citation Ledger
 
-[JobML 0.1](https://github.com/scottgal/lucidRESUME/blob/main/docs/jobml-0.1.md) is the small format I built around that idea. An ordinary Markdown résumé is followed by a fenced YAML block. The Markdown is the authored document. The YAML records claims and points each one back to evidence in the prose or to an external source.
+[JobML 0.1](https://github.com/scottgal/lucidRESUME/blob/main/docs/jobml-0.1.md)
+is the small format I built around that idea. The editable source contains
+ordinary Markdown and a fenced YAML block. The Markdown is the authored document.
+The YAML records claims and points each one back to evidence in the prose or to
+an external source.
 
 The rule at the centre of it is:
 
@@ -363,6 +373,7 @@ jobml:
 document:
   id: jane-smith-resume
   language: en-GB
+  complete_ledger: https://example.com/jane-smith.jobml
 
 entities:
   - id: example-corp
@@ -386,6 +397,12 @@ claims:
           exact: Led the modernisation of a high-volume ASP.NET Core platform.
       - type: repository
         uri: https://github.com/example/platform
+      - type: article
+        title: Operating ASP.NET Core at Scale
+        authors: [Jane Smith]
+        publisher: Jane's Engineering Notes
+        published: 2026-04-12
+        uri: https://example.com/aspnet-at-scale
 
 concepts:
   - id: aspnet-core
@@ -398,6 +415,53 @@ concepts:
 Read cold, its intent should be obvious. JobML is schema-checkable YAML, but the explanation travels inside the file. The `purpose` and `semantics` tell an unfamiliar LLM what the document means and what it must not infer.
 
 A formal [JSON Schema](https://github.com/scottgal/lucidRESUME/blob/main/docs/jobml-0.1.schema.json) supports deterministic tools. There is also a *cold-parser test*: give the document to a general model with no JobML prompt and ask it to identify the claims, evidence and unsupported assertions. If it cannot work that out from the file, the format has failed.
+
+The full representation is useful while writing because it contains the original
+passage, stable selector, fingerprint, review state and provenance. It is much too
+large to append to every résumé. Scientific papers already have a better answer:
+put small numbered links in the prose, a compact reference list at the end, and a
+link to the complete record when somebody needs the detail.
+
+## cJobML Is the Published Reference List
+
+[cJobML 0.1](https://github.com/scottgal/lucidRESUME/blob/main/docs/cjobml-0.1-specification.md)
+is the deliberately lossy publication projection of JobML. It is not
+another source format and it is not another ledger to keep in sync. lucidRESUME
+produces it deterministically from accepted links in full JobML:
+
+```markdown
+Led the modernisation of a high-volume ASP.NET Core platform. [[1]](#ref-1)
+
+## References
+
+cJobML 0.1: xref [n] in prose resolves to ref [n]. Full JobML: <https://example.com/jane-smith.jobml>.
+
+<a id="ref-1"></a>[1] Jane Smith. “Operating ASP.NET Core at Scale.” Jane's Engineering Notes, 12 Apr 2026. [Article] <https://example.com/aspnet-at-scale>.
+```
+
+That is close to the convention a scientific reader already understands. cJobML
+borrows the useful concepts from JATS rather than its XML syntax: an inline
+[`xref`](https://jats.nlm.nih.gov/archiving/tag-library/1.2d2/attribute/ref-type.html)
+points into a reference list, each numbered item is a `ref`, and the complete
+ledger link plays the role of a
+[`self-uri`](https://jats.nlm.nih.gov/publishing/tag-library/1.4/element/self-uri.html)
+or supplementary record.
+
+The compact form leaves out the quoted passage, selector, checksum, drift state,
+concept graph and review history. Those are editing machinery and remain in full
+JobML. The résumé keeps only what publication needs: a number beside the claim, a
+recognisable source at the end, and a route to the complete ledger.
+
+Reference numbers identify evidence sources, not claims. If three claims cite the
+same article or repository, they reuse the same number. Rendering does no NER,
+semantic search or LLM inference. It only numbers external evidence which is
+already attached to an accepted claim.
+
+That also makes linked posts useful without pretending they prove too much. An
+article can demonstrate knowledge, authorship and the reasoning available at its
+publication date. It does not automatically prove that its author used the
+technology in production or held a particular responsibility. Full JobML records
+the exact relationship. cJobML publishes the citation.
 
 ## The Citation Must Survive Editing
 
@@ -542,6 +606,34 @@ There are two ways this can go wrong:
 Layout detection, deterministic parsing and a local model can improve the first. The second is a review decision. [LLamaSharp](https://github.com/SciSharp/LLamaSharp) and the local [grug-9b GGUF model](https://huggingface.co/ProCreations/grug-9b-gguf) assist extraction. Imported prose and explicit human acceptance are authoritative.
 
 The Avalonia UI tests exercise import → merge → draft → reconcile → publish against multiple real DOCX variants. That matters more than a parser demo: dangerous failures occur between stages, when uncertain extraction quietly becomes accepted fact.
+
+## Checking the Published Document With OpenResume
+
+Producing valid PDF text is not the same as surviving a résumé parser, so I also
+fed the generated PDF through the open-source
+[OpenResume parser](https://github.com/xitanggg/open-resume) using its real browser
+interface. The test recovered the candidate's name, email, GitHub link, summary,
+skills, experience achievement, its `[1]` marker, the compact reference, both
+URLs and the complete-ledger link.
+
+It also found a useful compatibility problem. OpenResume has a fixed model for
+profile, education, work, projects and skills, but no References section. It
+preserved the reference text, then classified that unfamiliar section as project
+content. Nothing important vanished, but its category was wrong.
+
+That result is evidence, not a victory banner. It shows that the generated text,
+links and citation relationship survive one real, freely inspectable ATS-style
+parser. It does not prove compatibility with proprietary ATS products. It also
+suggests the right fallback: keep the reference list plain and compact, and let a
+JobML-aware parser recover its richer meaning without making an older parser fail
+the rest of the résumé.
+
+The deterministic cJobML parser separately checks that every inline number has a
+matching reference. A cold OpenAI Responses API test then gives the published
+document to a general model with no JobML-specific prompt. Across repeated runs it
+recovered the cited claim, reference number, evidence URL and full-ledger URL.
+Those tests cover different failures: syntax, conventional résumé extraction and
+semantic comprehension.
 
 ### Extraction Produces Candidates, Not Facts
 
@@ -689,3 +781,5 @@ a route back to the reviewed evidence behind every important machine claim.
 * Piopiunik, M., Schwerdt, G., Simon, L. and Woessmann, L. (2020). ["Skills, signals, and employability: An experimental investigation."](https://doi.org/10.1016/j.euroecorev.2020.103374) *European Economic Review*, 123.
 * Törngren, S. O., Schütze, C., Van Belle, E. and Nyström, M. (2024). ["We choose this CV because we choose diversity: What do eye movements say about the choices recruiters make?"](https://doi.org/10.3389/fsoc.2024.1222850) *Frontiers in Sociology*, 9.
 * Wingate, T. G., Robie, C., Powell, D. M. and Bourdage, J. S. (2025). ["The Signals That Matter: Resumes, Cover Letters, and Success on the Job Search."](https://doi.org/10.1111/ijsa.70022) *International Journal of Selection and Assessment*, 33(3).
+* National Library of Medicine. [Journal Article Tag Suite (JATS).](https://jats.nlm.nih.gov/)
+* Wang, X. [OpenResume: Open-source résumé builder and parser.](https://github.com/xitanggg/open-resume)
