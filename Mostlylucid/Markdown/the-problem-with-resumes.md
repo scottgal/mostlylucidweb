@@ -434,7 +434,7 @@ Nothing is silently repaired. A unique move or edit can be offered for acceptanc
 
 You can reopen the file after editing and see exactly what JobML believed, why it believed it and what changed underneath it.
 
-![The editor marking changed and missing evidence after the supporting prose is edited](/articleimages/lucidresume/03-jobml-drift-detected.png?width=1200&format=webp&quality=80)
+![The editor marking changed and missing evidence after the supporting prose is edited](lucidresume/03-jobml-drift-detected.png?width=1200&format=webp&quality=80)
 
 The important part of that screenshot is not the red state by itself. The prose,
 claim, reference and diagnostic remain visible together. Drift is something the
@@ -455,7 +455,7 @@ partly as a live citation manager. It shows three things together:
 
 Selecting an evidence card jumps to its source span. Editing that span updates its state. Claims extracted during ingestion begin as `origin: derived` and `review: required`, and count for nothing until accepted. Publishing commits the Markdown, reviewed JobML and document fingerprint as one snapshot.
 
-![A selected evidence card links the human prose on the left to its JobML reference on the right](/articleimages/lucidresume/02-jobml-link-selected.png?width=1200&format=webp&quality=80)
+![A selected evidence card links the human prose on the left to its JobML reference on the right](lucidresume/02-jobml-link-selected.png?width=1200&format=webp&quality=80)
 
 It works like following a citation in a paper. The prose stays readable and the justification is one click away.
 
@@ -469,7 +469,7 @@ has three views of the same revision:
 - **Write:** the authoritative Markdown source;
 - **Markdown preview:** a fast structural preview while typing.
 
-![The live ATS Classic Word projection beside its evidence links and JobML](/articleimages/lucidresume/jobml-live-word-document-and-evidence.png?width=1200&format=webp&quality=80)
+![The live ATS Classic Word projection beside its evidence links and JobML](lucidresume/jobml-live-word-document-and-evidence.png?width=1200&format=webp&quality=80)
 
 The JobML and evidence cards remain beside all three. Changing a template changes
 layout, typography and pagination. It does not run extraction again, alter the
@@ -530,7 +530,7 @@ That distinction matters. The output pipeline is not a final prompt which asks a
 
 Most people begin with `resume-final.docx`, `resume-final-2.pdf`, an old LinkedIn export and three role-specific variants which disagree about dates and wording.
 
-![An imported Word résumé rendered as pages beside the extracted structure and quality report](/articleimages/lucidresume/01-first-docx-with-experience.png?width=1200&format=webp&quality=80)
+![An imported Word résumé rendered as pages beside the extracted structure and quality report](lucidresume/01-first-docx-with-experience.png?width=1200&format=webp&quality=80)
 
 lucidRESUME imports multiple documents, parses experience, education, projects and skills, then presents merge candidates. Finding "Kubernetes" in two files gives us something to review. It does not establish a fact.
 
