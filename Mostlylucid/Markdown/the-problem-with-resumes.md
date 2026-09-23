@@ -8,7 +8,7 @@ A résumé should work like a scientific paper: human-written prose for
 communication, machine-readable structure for discovery, and references that
 connect claims to evidence.
 
-As I once more hunt for my next paying gig, I again face my nemesis: updating my
+As I once more hunt for my next paying gig ([LinkedIn](https://www.linkedin.com/in/scott-galloway-91608691/)), I again face my nemesis: updating my
 résumé, CV, professional profile, or whatever we're calling the bloody thing this
 week. I have 35 years of professional experience and more than 50 gigs across
 full-time and contract work. Some lasted years. Some lasted weeks and involved
@@ -36,10 +36,18 @@ a research project based around an evidence ledger for professional experience.
 Having to look for a job again gave me a reason to return to the underlying
 problem. This article is the result so far.
 
+> **NOTE:** lucidRESUME is a research project, not a finished end-user product.
+> It is deliberately complex and changes as I test new ideas. Feel free to have
+> a play, but I am not accepting feature requests or pull requests at present.
+
 [![lucidRESUME release](https://img.shields.io/github/v/release/scottgal/lucidRESUME?filter=v*&label=lucidRESUME&logo=github)](https://github.com/scottgal/lucidRESUME/releases)
 [![Mostlylucid.Avalonia.UITesting on NuGet](https://img.shields.io/nuget/v/Mostlylucid.Avalonia.UITesting.svg?logo=nuget&label=Avalonia%20UI%20Testing)](https://www.nuget.org/packages/Mostlylucid.Avalonia.UITesting)
 
-
+This is part one: source documents become a reviewed evidence ledger, then that
+ledger produces résumés without being re-inferred at render time. In
+[part two, the job form becomes another projection](/blog/lucidresume-evidence-filler):
+Chrome's on-device model maps unfamiliar form questions back to this same
+evidence without inventing answers.
 
 [TOC]
 
@@ -607,41 +615,12 @@ Layout detection, deterministic parsing and a local model can improve the first.
 
 The Avalonia UI tests exercise import → merge → draft → reconcile → publish against multiple real DOCX variants. That matters more than a parser demo: dangerous failures occur between stages, when uncertain extraction quietly becomes accepted fact.
 
-## Checking the Published Document With OpenResume
-
-Producing valid PDF text is not the same as surviving a résumé parser, so I also
-fed the generated PDF through the open-source
-[OpenResume parser](https://github.com/xitanggg/open-resume) using its real browser
-interface. The test recovered the candidate's name, email, GitHub link, summary,
-skills, experience achievement, its `[1]` marker, the compact reference, both
-URLs and the complete-ledger link.
-
-It also found a useful compatibility problem. OpenResume has a fixed model for
-profile, education, work, projects and skills, but no References section. It
-preserved the reference text, then classified that unfamiliar section as project
-content. Nothing important vanished, but its category was wrong.
-
-That result is evidence, not a victory banner. It shows that the generated text,
-links and citation relationship survive one real, freely inspectable ATS-style
-parser. It does not prove compatibility with proprietary ATS products. It also
-suggests the right fallback: keep the reference list plain and compact, and let a
-JobML-aware parser recover its richer meaning without making an older parser fail
-the rest of the résumé.
-
-The deterministic cJobML parser separately checks that every inline number has a
-matching reference. A cold OpenAI Responses API test then gives the published
-document to a general model with no JobML-specific prompt. Across repeated runs it
-recovered the cited claim, reference number, evidence URL and full-ledger URL.
-Those tests cover different failures: syntax, conventional résumé extraction and
-semantic comprehension.
-
 ### Extraction Produces Candidates, Not Facts
 
 The ingestion pipeline deliberately combines several narrow signals. Structural
-parsing finds sections and dates. NER identifies organisations, job titles and
-skills. A taxonomy catches exact known terms. An optional LLM can propose missing
-fields. Agreement raises confidence, but every result still carries its source
-and review state.
+parsing finds sections and dates. Local NER identifies organisations, job titles
+and skills. A taxonomy catches exact known terms. Agreement raises confidence,
+but every result still carries its source and review state.
 
 This is the useful bit of the extraction pipeline, shortened slightly for the
 article:
@@ -673,6 +652,60 @@ That code does not write résumé prose. It creates reviewable observations for 
 ledger. A model can help recognise that `K8s` and `Kubernetes` are related, but it
 cannot promote the relationship into accepted experience.
 
+### Jev Resolves Bounded Import Ambiguity
+
+NER is good at finding spans. It can tell us that `Example Corp`, `London` and
+`Platform Group` look like named entities. It is less good at answering a
+document-specific question such as "which of these organisations is the employer
+for this experience block?"
+
+That is the narrow experiment I am running with
+[Jev](https://vercel.com/ai-gateway/models/jev). Jev accepts shared state and
+typed questions, then returns a choice and a probability distribution. It does
+not get an empty text box in which to write a more convenient answer.
+
+```text
+document layout and text
+    -> deterministic parser and local NER
+    -> closed candidate set
+    -> Jev chooses a candidate or abstains
+    -> probability and winner-margin policy
+    -> human review
+    -> accepted ledger record
+```
+
+The first experiment handles three ambiguities:
+
+- classify a top-level section when heading rules abstain;
+- select the résumé owner's name from positional and NER candidates;
+- select an employer from organisation spans when an experience entry has no
+  deterministic company value.
+
+Suppose an imported block contains these candidates:
+
+```json
+{
+  "question": "Which candidate is the employer for this experience entry?",
+  "choices": ["Example Corp", "London", "Platform Group", "none"]
+}
+```
+
+Jev may select `Example Corp` or `none`. It cannot return `Google`, because
+`Google` was never observed. lucidRESUME accepts the decision only when the
+selected probability is at least `0.80` and the winner beats the runner-up by at
+least `0.20`. Otherwise it becomes a review item.
+
+Every decision records the source hash, candidate-set hash, probability
+distribution, model version and acceptance result. If the source changes, the
+old decision is stale. Jev is a hosted service and is disabled by default;
+enabling it sends bounded, contact-redacted passages to that provider. The local
+NER and deterministic paths continue to work without it.
+
+This is where Jev belongs. It helps turn messy source documents into typed
+review candidates. It is not called while exporting a résumé, and it does not
+sit inside the browser form filler. By the time either projection runs, the
+ambiguity should already have been resolved into accepted ledger data.
+
 The drift check is intentionally much less glamorous:
 
 ```csharp
@@ -696,6 +729,34 @@ FNV-1a is fast enough to run continuously while somebody types. It is not there
 to prove authorship or resist an attacker. It answers one precise question: is
 this still the normalised passage which a person reviewed when accepting the
 claim? The stable reference and quote selector handle location and recovery.
+
+## Checking the Published Document With OpenResume
+
+Producing valid PDF text is not the same as surviving a résumé parser, so I also
+fed the generated PDF through the open-source
+[OpenResume parser](https://github.com/xitanggg/open-resume) using its real browser
+interface. The test recovered the candidate's name, email, GitHub link, summary,
+skills, experience achievement, its `[1]` marker, the compact reference, both
+URLs and the complete-ledger link.
+
+It also found a useful compatibility problem. OpenResume has a fixed model for
+profile, education, work, projects and skills, but no References section. It
+preserved the reference text, then classified that unfamiliar section as project
+content. Nothing important vanished, but its category was wrong.
+
+That result is evidence, not a victory banner. It shows that the generated text,
+links and citation relationship survive one real, freely inspectable ATS-style
+parser. It does not prove compatibility with proprietary ATS products. It also
+suggests the right fallback: keep the reference list plain and compact, and let a
+JobML-aware parser recover its richer meaning without making an older parser fail
+the rest of the résumé.
+
+The deterministic cJobML parser separately checks that every inline number has a
+matching reference. A cold OpenAI Responses API test then gives the published
+document to a general model with no JobML-specific prompt. Across repeated runs it
+recovered the cited claim, reference number, evidence URL and full-ledger URL.
+Those tests cover different failures: syntax, conventional résumé extraction and
+semantic comprehension.
 
 ## Why Not Extend an Existing Résumé Format?
 
@@ -773,6 +834,13 @@ The prose communicates. JobML makes the document explicit and discoverable.
 Citations let a reader inspect why each claim exists. Together they allow one
 document to carry as much or as little detail as a role needs, while preserving
 a route back to the reviewed evidence behind every important machine claim.
+
+That completes the first half of the pipeline: imperfect source documents have
+become a reviewed ledger, and every published résumé is a projection of it. In
+[part two](/blog/lucidresume-evidence-filler), I use Chrome's local Gemini Nano
+model to map unfamiliar job-form questions onto that ledger. It is a useful
+demonstration of the boundary: the model may find evidence, but it still cannot
+author a new professional fact.
 
 ## References
 
