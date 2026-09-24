@@ -1,28 +1,30 @@
 # StyloBot Release Series: The Sidecar Architecture
 
-*StyloBot's detection engine is ASP.NET Core. This post explains how that engine connects to Go gateways, Node.js applications, and any other stack - through a gRPC sidecar, a typed Go SDK, and a Caddy plugin - without any of those consumers needing to know anything about the .NET internals.*
+*StyloBot's detection engine is ASP.NET Core. This post explains how that engine connects to Go gateways, Node.js applications, and any other stack via a gRPC sidecar, a typed Go SDK, and a Caddy plugin, without any of those consumers needing to know anything about the .NET internals.*
 
-> ## DRAFT
-> This is a working draft in the StyloBot Release Series. APIs, ports, and Caddyfile syntax may still change before final release.
->
-> **The `github.com/scottgal/stylobot-go` SDK, the `github.com/scottgal/caddy-stylobot` plugin, and the `Mostlylucid.BotDetection.Sidecar` container will be published shortly** - everything below describes the surface they will expose.
+[<img src="/articleimages/stylobot-logo.svg" alt="StyloBot" width="120" />](https://www.stylobot.net)
+
+> **The `github.com/scottgal/stylobot-go` SDK, the `github.com/scottgal/caddy-stylobot` plugin, and the `Mostlylucid.BotDetection.Sidecar` container will be published shortly.** Everything below describes the surface they will expose.
 
 > **StyloBot Release Series**
 >
-> 1. [**Behaviour, Not Identity**](/blog/stylobot-fingerprint) - why StyloBot models clients behaviourally
-> 2. [**Behaviour-Aware ASP.NET UI**](/blog/behaviour-aware-ux) - the server-rendered surface for .NET applications
-> 3. [**Finding and Fixing Unbounded Growth in Long-Running .NET Services**](/blog/stylobot-release-reliability) - the reliability discipline that keeps the engine boring in production
-> 4. [**Behaviour-Aware TypeScript UI**](/blog/typescript-sdk) - Express, Fastify, and browser components
-> 5. **The Sidecar Architecture** - this article
+> 1. [**Behaviour, Not Identity**](/blog/stylobot-fingerprint): why StyloBot models clients behaviourally
+> 2. [**Behaviour-Aware ASP.NET UI**](/blog/behaviour-aware-ux): the server-rendered surface for .NET applications
+> 3. [**Finding and Fixing Unbounded Growth in Long-Running .NET Services**](/blog/stylobot-release-reliability): the reliability discipline that keeps the engine boring in production
+> 4. [**Behaviour-Aware TypeScript UI**](/blog/typescript-sdk): Express, Fastify, and browser components
+> 5. **The Sidecar Architecture**: this article
+> 6. [**Learning to Get Faster**](/blog/stylobot-release-learning): the adaptive learning system, four-tier memory, and the verdict cache
+> 7. [**Testing the Thing That Won't Sit Still**](/blog/stylobot-release-nondeterministic-testing): the verification discipline: one BDF file drives regression, load, and calibration
+> 8. [**StyloExtract - a local learning HTML to Markdown converter**](/blog/stylobot-release-styloextract): the HTML→Markdown layer that pairs with the detector, the walker bug lucidVIEW caught, and the dogfood loop that made it honest
 
 <!--category-- Architecture, Go, ASP.NET Core, StyloBot, gRPC -->
-<datetime class="hidden">2026-05-13T10:30</datetime>
+<datetime class="hidden">2026-06-01T10:30</datetime>
 
 # Why a sidecar
 
-A reverse proxy is the obvious place to run bot detection: it sits in front of everything, sees every request, and can block before any application code runs. That logic holds right up until you ask what your application should *do differently* based on who is making the request. A gateway that blocks outright is a gate; what most applications actually need is a verdict they can act on in multiple ways at once - throttle the API, personalise the UI, exclude traffic from analytics, add a friction step at checkout. A gate cannot do any of that. A verdict pipeline can.
+A reverse proxy is the obvious place to run bot detection: it sits in front of everything, sees every request, and can block before any application code runs. That logic holds right up until you ask what your application should *do differently* based on who is making the request. A gateway that blocks outright is a gate; what most applications actually need is a verdict they can act on in multiple ways at once: throttle the API, personalise the UI, exclude traffic from analytics, add a friction step at checkout. A gate cannot do any of that. A verdict pipeline can.
 
-The sidecar pattern separates the two concerns. The gateway stays fast and stateless. The sidecar maintains the session state, reputation scores, and behavioural models that make detection accurate. The two communicate over the local network - same host or same Pod - so the round-trip is microseconds to single-digit milliseconds, not the 50-200ms of a remote API call. That latency budget is what makes per-request detection practical at all.
+The sidecar pattern separates the two concerns. The gateway stays fast and stateless. The sidecar maintains the session state, archetype anchors, drift state, and verdict cache that make detection accurate (the archetype-anchor model, the per-fingerprint verdict cache, and the four-tier learning system are covered in [Learning to Get Faster](/blog/stylobot-release-learning)). The two communicate over the local network (same host or same Pod) so the round-trip is microseconds to single-digit milliseconds, not the 50-200ms of a remote API call. That latency budget is what makes per-request detection practical at all.
 
 This is not a novel pattern. [Envoy Proxy](https://www.envoyproxy.io/) does exactly this for service-mesh concerns (mTLS, retries, circuit breaking); [Dapr](https://dapr.io/) does it for state and pub/sub; the [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) does it for telemetry. Linkerd, Consul Connect, and AWS App Mesh all follow the same model. The pattern keeps appearing because it solves a real problem: you want complex stateful behaviour that crosses language boundaries without reimplementing it in every language.
 
@@ -32,7 +34,7 @@ This is not a novel pattern. [Envoy Proxy](https://www.envoyproxy.io/) does exac
 
 The alternative is compiling detection directly into the gateway. For Go that means a pure-Go reimplementation or a CGo binding to a C library. For Node it means running detection in-process alongside the application.
 
-Neither is realistic for an engine of this complexity. StyloBot has 46 detectors organised across four execution **waves** (later waves fire only when earlier signals warrant it - a credential-stuffing attempt triggers different detectors than a Googlebot crawl). It maintains per-session **Markov chain vectors** in a 129-dimensional space - a Markov chain is just a probability model over "given the last thing this session did, what comes next?", and 129 dimensions captures enough page-transition shape to tell humans and bots apart. It runs **Leiden community detection** over those vectors - a graph-clustering algorithm that groups sessions behaving alike, which is how StyloBot spots a bot network even when individual sessions look fine. And it persists all of this to SQLite between requests. That state needs an independent lifecycle - it cannot restart with the Node process or get torn down when the gateway reloads its config.
+Neither is realistic for an engine of this complexity. StyloBot has 49 detectors organised across four execution **waves** (later waves fire only when earlier signals warrant it; a credential-stuffing attempt triggers different detectors than a Googlebot crawl). It maintains per-session **Markov chain vectors** in a 129-dimensional space. A Markov chain is just a probability model over "given the last thing this session did, what comes next?", and 129 dimensions captures enough page-transition shape to tell humans and bots apart. It runs **Leiden community detection** over those vectors: a graph-clustering algorithm that groups sessions behaving alike, which is how StyloBot spots a bot network even when individual sessions look fine. And it persists all of this to SQLite between requests. That state needs an independent lifecycle. It cannot restart with the Node process or get torn down when the gateway reloads its config.
 
 A sidecar lets each component do what it is good at:
 
@@ -59,14 +61,14 @@ The gateway calls the sidecar, injects the result as HTTP headers, and optionall
 
 `Mostlylucid.BotDetection.Sidecar` is a minimal ASP.NET Core process. It has no UI, no static file serving, and no routing beyond the gRPC and REST endpoints. It starts the full detection engine and exposes two ports:
 
-- **:5090** - HTTP/2 for gRPC clients (gateways, Go proxies, the Node gRPC client)
-- **:5091** - HTTP/1.1 for REST clients, re-exporting `/api/v1/*` endpoints
+- **:5090**: HTTP/2 for gRPC clients (gateways, Go proxies, the Node gRPC client)
+- **:5091**: HTTP/1.1 for REST clients, re-exporting `/api/v1/*` endpoints
 
 ## gRPC
 
-[gRPC](https://grpc.io/) is a high-performance remote procedure call framework developed at Google. It uses [Protocol Buffers](https://protobuf.dev/) (protobuf) as its wire format - a compact binary encoding that is faster to serialise and smaller on the wire than JSON. gRPC runs over HTTP/2, which means it gets multiplexing (multiple requests over one TCP connection) for free.
+[gRPC](https://grpc.io/) is a high-performance remote procedure call framework developed at Google. It uses [Protocol Buffers](https://protobuf.dev/) (protobuf) as its wire format: a compact binary encoding that is faster to serialise and smaller on the wire than JSON. gRPC runs over HTTP/2, which means it gets multiplexing (multiple requests over one TCP connection) for free.
 
-The interface is defined in a `.proto` file. From that file, code generators produce typed client and server stubs in any supported language. StyloBot publishes `.proto` files so any language with a gRPC implementation can call the sidecar - Go, Node, Python, Rust, Java, and many others.
+The interface is defined in a `.proto` file. From that file, code generators produce typed client and server stubs in any supported language. StyloBot publishes `.proto` files so any language with a gRPC implementation can call the sidecar: Go, Node, Python, Rust, Java, and many others.
 
 ## The gRPC interface
 
@@ -80,11 +82,11 @@ service DetectionService {
 }
 ```
 
-**`Detect`** is the per-request hot path. Pass it method, path, headers, remote IP, and optional TLS fingerprint data. It runs the wave pipeline - only the detectors that the request's signals warrant - updates the session vector, scores against the reputation store, and returns a verdict.
+**`Detect`** is the per-request hot path. Pass it method, path, headers, remote IP, and optional TLS fingerprint data. It runs the wave pipeline (only the detectors that the request's signals warrant), updates the session vector, scores against the reputation store, and returns a verdict.
 
 **`DetectBatch`** runs multiple requests sequentially. Used for log replay and offline analysis, not per-request gateway use.
 
-**`RenderWidget`** accepts a Liquid template string, an optional verdict, and a key-value map of additional variables, then renders the template server-side and returns HTML. This is how non-.NET callers produce bot-aware HTML without standing up a separate render process; details in the [RenderWidget section below](#renderwidget-liquid-templates-over-grpc).
+**`RenderWidget`** accepts a Liquid template string, an optional verdict, and a key-value map of additional variables, then renders the template server-side and returns HTML. This is how non-.NET callers produce bot-aware HTML without standing up a separate render process; details in the RenderWidget section below.
 
 ## What happens inside a Detect call
 
@@ -99,7 +101,7 @@ sequenceDiagram
     participant GW as Gateway (Caddy)
     participant SD as gRPC Service
     participant ORC as BlackboardOrchestrator
-    participant DET as Detectors (up to 46, 4 waves)
+    participant DET as Detectors (up to 49, 4 waves)
     participant DB as SQLite
 
     GW->>SD: Detect RPC { method, path, headers, remoteIp }
@@ -115,7 +117,7 @@ sequenceDiagram
     SD-->>GW: DetectResponse { isBot, riskBand, recommendedAction, ... }
 ```
 
-The entire pipeline runs inside the single gRPC call - there is no async work after the response returns.
+The entire pipeline runs inside the single gRPC call. There is no async work after the response returns.
 
 # The Go SDK
 
@@ -125,10 +127,10 @@ Gateway code in Go cannot import the ASP.NET sidecar. What it can do is call it 
 
 Protobuf-generated code is verbose and has an unusual API. Enums are represented as integers. Strings come as raw proto enum names (`RISK_BAND_HIGH`, not `"High"`). Field names are camelCase in some generators and snake_case in others. Exposing proto types in your public API means your callers have to understand all of this.
 
-The SDK translates once at the boundary - proto enums to canonical strings, proto structs to plain Go structs - and callers never see it.
+The SDK translates once at the boundary (proto enums to canonical strings, proto structs to plain Go structs) and callers never see it.
 
 ```go
-// the only interface you depend on - no proto imports required
+// the only interface you depend on: no proto imports required
 type Client interface {
     Detect(ctx context.Context, req DetectRequest) (*Verdict, error)
     DetectBatch(ctx context.Context, reqs []DetectRequest) ([]*Verdict, error)
@@ -192,7 +194,7 @@ verdict, err := client.Detect(ctx, stylobot.DetectRequest{
     Protocol: "https",
 })
 if err != nil {
-    // fail open - log and continue
+    // fail open: log and continue
     log.Printf("stylobot detect failed: %v", err)
     return next(w, r)
 }
@@ -248,7 +250,7 @@ The plugin injects nine verdict headers onto every forwarded request:
 | `X-StyloBot-ThreatScore` | numeric |
 | `X-StyloBot-ThreatBand` | `None` ... `Critical` |
 
-Requests where `isBot=true` and `Action=Block` are stopped at the gateway with a 403 and never reach the upstream. Everything else - including bots with a `Throttle` or `Challenge` recommendation - is forwarded with all nine headers intact. That is the intended split: the gateway handles hard blocks; the upstream handles nuance.
+Requests where `isBot=true` and `Action=Block` are stopped at the gateway with a 403 and never reach the upstream. Everything else (including bots with a `Throttle` or `Challenge` recommendation) is forwarded with all nine headers intact. That is the intended split: the gateway handles hard blocks; the upstream handles nuance.
 
 `on_block` changes the status code used when the gateway blocks (default: 403). Set `on_block 503` to suppress retry logic in scrapers that treat 403 as retryable.
 
@@ -273,11 +275,11 @@ flowchart TD
     D -->|no| F --> I
 ```
 
-**Step 1 - strip inbound headers.** A client that knows the `X-StyloBot-*` header names could self-inject a favourable verdict and have it survive the fail-open path. Stripping them first means the verdict the upstream sees always came from the sidecar.
+**Step 1, strip inbound headers.** A client that knows the `X-StyloBot-*` header names could self-inject a favourable verdict and have it survive the fail-open path. Stripping them first means the verdict the upstream sees always came from the sidecar.
 
-**Step 2 - context deadline.** The timeout is derived from `r.Context()` using `context.WithTimeout` (which takes a relative duration; `context.WithDeadline` takes an absolute time - they are equivalent). Deriving from `r.Context()` rather than `context.Background()` is the key point: if the client disconnects before the gRPC call completes, the cancellation propagates through and the sidecar stops processing early.
+**Step 2, context deadline.** The timeout is derived from `r.Context()` using `context.WithTimeout` (which takes a relative duration; `context.WithDeadline` takes an absolute time; they are equivalent). Deriving from `r.Context()` rather than `context.Background()` is the key point: if the client disconnects before the gRPC call completes, the cancellation propagates through and the sidecar stops processing early.
 
-**Steps 3–4** - detect and inject. The nine verdict fields become nine `X-StyloBot-*` headers. Headers are set before the block check, so the upstream reads them via `styloBotMiddleware({ mode: 'headers' })` for all non-blocked requests. Requests where `isBot=true` and `recommendedAction=Block` are returned as 403 at the gateway; everything else forwards with the full verdict headers attached.
+**Steps 3 and 4, detect and inject.** The nine verdict fields become nine `X-StyloBot-*` headers. Headers are set before the block check, so the upstream reads them via `styloBotMiddleware({ mode: 'headers' })` for all non-blocked requests. Requests where `isBot=true` and `recommendedAction=Block` are returned as 403 at the gateway; everything else forwards with the full verdict headers attached.
 
 The implementation:
 
@@ -352,17 +354,17 @@ The `--with module=path` argument is xcaddy's native equivalent of a `replace` d
 
 # RenderWidget: Liquid templates over gRPC
 
-`RenderWidget` is a gRPC RPC on the sidecar that accepts a Liquid template string, renders it with the detection context, and returns HTML. This lets any caller - Go proxy, Node SSR layer, batch pipeline - produce bot-aware HTML without running a separate render process.
+`RenderWidget` is a gRPC RPC on the sidecar that accepts a Liquid template string, renders it with the detection context, and returns HTML. This lets any caller (Go proxy, Node SSR layer, batch pipeline) produce bot-aware HTML without running a separate render process.
 
 ### Liquid templates
 
-[Liquid](https://shopify.github.io/liquid/) is a templating language created by Shopify, used by Shopify themes, Jekyll, GitHub Pages, and many other systems. Its key properties: safe to run with user-supplied templates (no arbitrary code execution), simple enough for non-developers to write, and widely understood. StyloBot uses [Fluid.Core](https://github.com/sebastienros/fluid) - a high-performance .NET implementation of Liquid - to render templates server-side.
+[Liquid](https://shopify.github.io/liquid/) is a templating language created by Shopify, used by Shopify themes, Jekyll, GitHub Pages, and many other systems. Its key properties: safe to run with user-supplied templates (no arbitrary code execution), simple enough for non-developers to write, and widely understood. StyloBot uses [Fluid.Core](https://github.com/sebastienros/fluid), a high-performance .NET implementation of Liquid, to render templates server-side.
 
 The sidecar implementation:
 
 ```csharp
 // from src/Mostlylucid.BotDetection.Sidecar/Services/DetectionGrpcService.cs
-private static readonly FluidParser Parser = new();  // static - shared, compiled templates cached
+private static readonly FluidParser Parser = new();  // static, shared, compiled templates cached
 
 public override async Task<Proto.RenderWidgetResponse> RenderWidget(
     Proto.RenderWidgetRequest request, ServerCallContext context)
@@ -390,7 +392,7 @@ public override async Task<Proto.RenderWidgetResponse> RenderWidget(
 }
 ```
 
-Fluid.Core maintains an internal compiled template cache - repeated renders of the same template string skip re-parsing. The `FluidParser` is static and shared across all gRPC calls.
+Fluid.Core maintains an internal compiled template cache. Repeated renders of the same template string skip re-parsing. The `FluidParser` is static and shared across all gRPC calls.
 
 The Node `StyloBotGrpcClient.renderWidget()` example and the full template variable reference are in the [TypeScript SDK article](/blog/typescript-sdk).
 
@@ -407,7 +409,7 @@ if err == nil && rendered.Success {
 }
 ```
 
-The template syntax is identical whether you call `RenderWidget` from Go, Node, or use `<sb-widget>` in the browser - the same Liquid engine, the same variable names, the same rendering path.
+The template syntax is identical whether you call `RenderWidget` from Go, Node, or use `<sb-widget>` in the browser: the same Liquid engine, the same variable names, the same rendering path.
 
 # Production layout
 
@@ -442,12 +444,12 @@ The trade-off this encodes: blocking legitimate traffic because detection is una
 
 ---
 
-The release series continues over the next few weeks - more posts on detection internals, deployment patterns, observability, and the commercial topology are still to come. The arc so far:
+The release series continues. More posts on detection internals, deployment patterns, observability, and the commercial topology are still to come. The arc so far:
 
-- [Behaviour, Not Identity](/blog/stylobot-fingerprint) - why detection has to be behavioural, not identity-based
-- [Behaviour-Aware ASP.NET UI](/blog/behaviour-aware-ux) - turning the verdict into Razor / controller policy
-- [Finding and Fixing Unbounded Growth in Long-Running .NET Services](/blog/stylobot-release-reliability) - the reliability discipline that keeps the engine boring under sustained traffic
-- [Behaviour-Aware TypeScript UI](/blog/typescript-sdk) - the same verdict surfaced in Express, Fastify, and the browser
-- **The Sidecar Architecture** - this article: how the engine plugs into any stack via gRPC, the Go SDK, and the Caddy plugin
+- [Behaviour, Not Identity](/blog/stylobot-fingerprint): why detection has to be behavioural, not identity-based
+- [Behaviour-Aware ASP.NET UI](/blog/behaviour-aware-ux): turning the verdict into Razor / controller policy
+- [Finding and Fixing Unbounded Growth in Long-Running .NET Services](/blog/stylobot-release-reliability): the reliability discipline that keeps the engine boring under sustained traffic
+- [Behaviour-Aware TypeScript UI](/blog/typescript-sdk): the same verdict surfaced in Express, Fastify, and the browser
+- **The Sidecar Architecture** (this article): how the engine plugs into any stack via gRPC, the Go SDK, and the Caddy plugin
 
-Source for the implementation: [github.com/scottgal/stylobot](https://github.com/scottgal/stylobot).
+Source for the implementation: [github.com/scottgal/stylobot](https://github.com/scottgal/stylobot). Live engine, dashboard, and commercial controls at [stylobot.net](https://www.stylobot.net).

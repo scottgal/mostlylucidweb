@@ -13,6 +13,8 @@
 > 4. [**Behaviour-Aware TypeScript UI**](/blog/typescript-sdk) - Express, Fastify, and browser components
 > 5. [**The Sidecar Architecture**](/blog/sidecar-architecture) - how the detection engine connects to non-.NET stacks
 > 6. **Learning to Get Faster** - the adaptive learning system, four-tier memory, and the verdict cache
+> 7. [**Testing the Thing That Won't Sit Still**](/blog/stylobot-release-nondeterministic-testing) - the verification discipline: one BDF file drives regression, load, and calibration
+> 8. [**StyloExtract - a local learning HTML to Markdown converter**](/blog/stylobot-release-styloextract) - the HTML→Markdown layer that pairs with the detector, the walker bug lucidVIEW caught, and the dogfood loop that made it honest
 
 <!--category-- ASP.NET, StyloBot, Bot Detection, Performance, Machine Learning -->
 <datetime class="hidden">2026-05-13T11:00</datetime>

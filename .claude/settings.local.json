@@ -119,7 +119,8 @@
       "Bash(gh pr:*)",
       "Skill(pr-review-toolkit:review-pr)",
       "WebFetch(domain:umami.is)",
-      "Bash(gh issue:*)"
+      "Bash(gh issue:*)",
+      "Bash(tee /private/tmp/claude-501/-Users-scottgalloway-RiderProjects-mostlylucidweb/831d1ee8-4032-46b1-8997-929820afcbc5/scratchpad/bxicons.txt)"
     ],
     "deny": [],
     "ask": []

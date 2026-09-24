@@ -1,22 +1,24 @@
 # StyloBot Release Series: Behaviour-Aware ASP.NET UI
 
-*Bot detection should not stop at allow/block. This post shows how StyloBot's classification result becomes application logic in ASP.NET - tag helpers in Razor, action filters and policies in controllers, signal-level gating - so your UI can shape the experience instead of bolting friction on after the fact.*
+*Bot detection should not stop at allow/block. This post shows how StyloBot's classification result becomes application logic in ASP.NET: tag helpers in Razor, action filters and policies in controllers, signal-level gating, so your UI can shape the experience instead of bolting friction on after the fact.*
 
-> ## DRAFT
-> This is a working draft in the StyloBot Release Series. Structure, examples, and API details may still change before final release.
+[<img src="/articleimages/stylobot-logo.svg" alt="StyloBot" width="120" />](https://www.stylobot.net)
 
 > **StyloBot Release Series**
 >
-> 1. [**Behaviour, Not Identity**](/blog/stylobot-fingerprint) - why StyloBot models clients behaviourally
-> 2. **Behaviour-Aware ASP.NET UI** - the server-rendered surface over that detection result
-> 3. [**Finding and Fixing Unbounded Growth in Long-Running .NET Services**](/blog/stylobot-release-reliability) - the reliability discipline that keeps the engine boring in production
-> 4. [**Behaviour-Aware TypeScript UI**](/blog/typescript-sdk) - Express, Fastify, and browser components
-> 5. [**The Sidecar Architecture**](/blog/sidecar-architecture) - how the detection engine connects to non-.NET stacks
+> 1. [**Behaviour, Not Identity**](/blog/stylobot-fingerprint): why StyloBot models clients behaviourally
+> 2. **Behaviour-Aware ASP.NET UI**: the server-rendered surface over that detection result
+> 3. [**Finding and Fixing Unbounded Growth in Long-Running .NET Services**](/blog/stylobot-release-reliability): the reliability discipline that keeps the engine boring in production
+> 4. [**Behaviour-Aware TypeScript UI**](/blog/typescript-sdk): Express, Fastify, and browser components
+> 5. [**The Sidecar Architecture**](/blog/sidecar-architecture): how the detection engine connects to non-.NET stacks
+> 6. [**Learning to Get Faster**](/blog/stylobot-release-learning): the adaptive learning system, four-tier memory, and the verdict cache
+> 7. [**Testing the Thing That Won't Sit Still**](/blog/stylobot-release-nondeterministic-testing): the verification discipline: one BDF file drives regression, load, and calibration
+> 8. [**StyloExtract - a local learning HTML to Markdown converter**](/blog/stylobot-release-styloextract): the HTML→Markdown layer that pairs with the detector, the walker bug lucidVIEW caught, and the dogfood loop that made it honest
 
 StyloBot UI is the ASP.NET surface over StyloBot's detection result. Its job is simple: make bot and risk classification available where web applications actually need it, in Razor views, forms, controllers, and page flows.
 
 <!--category-- ASP.NET, StyloBot, Bot Detection, Security, Architecture -->
-<datetime class="hidden">2026-05-02T10:30</datetime>
+<datetime class="hidden">2026-06-01T10:30</datetime>
 
 # Introduction
 
@@ -40,6 +42,12 @@ This article is specifically about that ASP.NET surface: tag helpers, page-level
 [TOC]
 
 # The ASP.NET Surface
+
+This is what behaviour-aware UI looks like in the wild. Top right of the stylobot.net dashboard renders the visitor's own classification inline, the same way any Razor view can:
+
+![Dashboard top bar on stylobot.net: aggregate counts on the left, and on the right "YOU: Human 0.0% Unknown view →" composed from sb-badge, sb-confidence, and sb-risk-pill tag helpers](stylobot-inline-badges.png?width=1100&format=webp&quality=70)
+
+That right-hand cluster is three tag helpers (`<sb-badge>`, `<sb-confidence>`, `<sb-risk-pill>`) reading from the same per-request detection result the controller would. Same data, expressed at render time.
 
 The core idea is simple: detection should not stop at "allow" or "block." In a web app, it should be available to the UI itself.
 
@@ -83,7 +91,7 @@ Sometimes the right answer is a block. Often it is something subtler:
 - silently discard newsletter signups from automation
 - add friction to suspicious logins without punishing normal users
 
-This is the differentiator in StyloBot UI. The detection engine gives you the verdict; the ASP.NET surface lets you do something useful with it at the page and flow level.
+This is the differentiator in StyloBot UI. The detection engine gives you the verdict; the ASP.NET surface lets you do something useful with it at the page and flow level. (Where that verdict comes from, how it's cached, and why a sustained run of requests from the same client costs microseconds rather than milliseconds, is covered in [Learning to Get Faster](/blog/stylobot-release-learning).)
 
 ## The storefront example
 
@@ -240,7 +248,7 @@ The product detail page is where commercial intent becomes explicit. It is also 
 <sb-gate min-risk="Medium">
     <div class="alert alert-warning">
         We noticed some unusual activity from your network.
-        You can still purchase - you may be asked to verify at checkout.
+        You can still purchase. You may be asked to verify at checkout.
     </div>
 </sb-gate>
 
@@ -427,7 +435,7 @@ AI crawlers are not trying to buy products or brute-force accounts. They are try
 <sb-human>
     <p class="muted">
         Get exclusive deals and discount codes delivered to your inbox.
-        Subscribe below - unsubscribe any time.
+        Subscribe below. Unsubscribe any time.
     </p>
 </sb-human>
 
@@ -501,6 +509,10 @@ The `/Me` page is the developer-facing utility page. It answers the practical in
 <sb-risk-pill></sb-risk-pill>
 <sb-summary variant="card"></sb-summary>
 ```
+
+That `<bot-detection-details>` panel is what stylobot.net renders on its own home page. Same component, same Razor tag, real recorded traffic:
+
+![bot-detection-details panel rendered on stylobot.net: Live · Your Detection with radar, 4% bot probability, VeryLow risk, Allow policy, three contributing detectors; Top Bots panel below listing real recorded bots](stylobot-live-detection.png?width=1100&format=webp&quality=70)
 
 And via the `HttpContext` extension API:
 
@@ -693,6 +705,8 @@ The dashboard at `/_stylobot` is the live operational view:
 - **Split bar**: human/bot ratio per endpoint
 - **Your Detection panel**: how the current session was classified, including reasons and contributing detectors
 
+![/_stylobot dashboard on a live install: aggregate counts in the header, traffic over time, Live Activity by signature (humans and bots, ranked by hit count), and the Endpoints table with per-route bot pressure, threat, latency, and split bars](stylobot-dashboard-landing.png?width=1100&format=webp&quality=70)
+
 The split bars are especially useful in practice. A product page that trends heavily bot-dominant is probably being scraped. A login or checkout endpoint going red is often being tested by automation long before users complain.
 
 If you want the lower-level model behind those fingerprints and behaviour vectors, that is covered in the first post in this release series: [Behaviour, Not Identity](/blog/stylobot-fingerprint).
@@ -707,4 +721,4 @@ A switch turns uncertainty into pain: false positives lose customers and false n
 
 That is what StyloBot UI is for. Detection becomes available early in the request, then your application decides what that should mean for the page, the flow, and the outcome.
 
-Next in the release series: [**Finding and Fixing Unbounded Growth in Long-Running .NET Services**](/blog/stylobot-release-reliability) - the reliability rework that turned StyloBot's vector similarity layer from a 13 GB LOH timebomb into something you can leave running on a Pi indefinitely. After that: **Behaviour-Aware JavaScript UI**, which takes the same detection result into the browser for client-side adaptation.
+Next in the release series: [**Finding and Fixing Unbounded Growth in Long-Running .NET Services**](/blog/stylobot-release-reliability), the reliability rework that turned StyloBot's vector similarity layer from a 13 GB LOH timebomb into something you can leave running on a Pi indefinitely. After that, [**Behaviour-Aware TypeScript UI**](/blog/typescript-sdk) takes the same detection result into Express, Fastify, and the browser for client-side adaptation.

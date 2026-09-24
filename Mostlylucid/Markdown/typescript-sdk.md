@@ -1,24 +1,26 @@
 # StyloBot Release Series: Behaviour-Aware TypeScript UI
 
-*Bot detection should not stop at allow/block. This post shows how StyloBot's classification result becomes application logic in TypeScript - server middleware for Express and Fastify, template helpers for Handlebars, Nunjucks, and EJS, and browser web components - so your UI can shape the experience instead of bolting friction on after the fact.*
+*Bot detection should not stop at allow/block. This post shows how StyloBot's classification result becomes application logic in TypeScript: server middleware for Express and Fastify, template helpers for Handlebars, Nunjucks, and EJS, and browser web components, so your UI can shape the experience instead of bolting friction on after the fact.*
 
-> ## DRAFT
-> This is a working draft in the StyloBot Release Series. APIs, package names, and code samples may still change before final release.
->
-> **The `@stylobot/core` and `@stylobot/node` npm packages will be published shortly** - the snippets below describe the surface they will expose.
+[<img src="/articleimages/stylobot-logo.svg" alt="StyloBot" width="120" />](https://www.stylobot.net)
+
+> **The `@stylobot/core` and `@stylobot/node` npm packages will be published shortly.** The snippets below describe the surface they will expose.
 
 > **StyloBot Release Series**
 >
-> 1. [**Behaviour, Not Identity**](/blog/stylobot-fingerprint) - why StyloBot models clients behaviourally
-> 2. [**Behaviour-Aware ASP.NET UI**](/blog/behaviour-aware-ux) - the server-rendered surface for .NET applications
-> 3. [**Finding and Fixing Unbounded Growth in Long-Running .NET Services**](/blog/stylobot-release-reliability) - the reliability discipline that keeps the engine boring in production
-> 4. **Behaviour-Aware TypeScript UI** - this article
-> 5. **The Sidecar Architecture** - how the detection engine connects to non-.NET stacks
+> 1. [**Behaviour, Not Identity**](/blog/stylobot-fingerprint): why StyloBot models clients behaviourally
+> 2. [**Behaviour-Aware ASP.NET UI**](/blog/behaviour-aware-ux): the server-rendered surface for .NET applications
+> 3. [**Finding and Fixing Unbounded Growth in Long-Running .NET Services**](/blog/stylobot-release-reliability): the reliability discipline that keeps the engine boring in production
+> 4. **Behaviour-Aware TypeScript UI**: this article
+> 5. [**The Sidecar Architecture**](/blog/sidecar-architecture): how the detection engine connects to non-.NET stacks
+> 6. [**Learning to Get Faster**](/blog/stylobot-release-learning): the adaptive learning system, four-tier memory, and the verdict cache
+> 7. [**Testing the Thing That Won't Sit Still**](/blog/stylobot-release-nondeterministic-testing): the verification discipline: one BDF file drives regression, load, and calibration
+> 8. [**StyloExtract - a local learning HTML to Markdown converter**](/blog/stylobot-release-styloextract): the HTML→Markdown layer that pairs with the detector, the walker bug lucidVIEW caught, and the dogfood loop that made it honest
 
-StyloBot's detection engine is written in ASP.NET Core - a high-performance framework with excellent async primitives, sub-millisecond hot-path latency, and twenty years of production pedigree behind it. The TypeScript SDK is the surface that brings the engine's output into Node.js applications and browsers without requiring either to know anything about what happened underneath.
+StyloBot's detection engine is written in ASP.NET Core: a high-performance framework with excellent async primitives, sub-millisecond hot-path latency, and twenty years of production pedigree behind it. The TypeScript SDK is the surface that brings the engine's output into Node.js applications and browsers without requiring either to know anything about what happened underneath. (The hot-path latency comes from the adaptive learning system covered in [Learning to Get Faster](/blog/stylobot-release-learning): once a fingerprint has been seen with enough confidence, the verdict cache skips the full detector pipeline and answers in microseconds.)
 
 <!--category-- TypeScript, Node.js, StyloBot, Bot Detection, Security -->
-<datetime class="hidden">2026-05-12T10:30</datetime>
+<datetime class="hidden">2026-06-01T10:30</datetime>
 
 # Introduction
 
@@ -26,7 +28,7 @@ Most bot detection available in the TypeScript ecosystem gives you one of two th
 
 Neither is useful at the application layer.
 
-[botd](https://github.com/fingerprintjs/BotD) runs in the browser and has no view of request headers, TLS fingerprints, session behaviour, or IP reputation. A headless Chromium and a Googlebot look identical to it. Pure UA matching packages (`is-bot`, `isbot`) catch only what opts in to being caught. Network-layer products (Cloudflare Bot Management, DataDome) block at the edge but cannot personalise at the application layer - you learn a request was blocked, never that a request that reached your app had a 0.87 bot probability and a Medium risk band, so your checkout page could have shown a friction step and your analytics could have excluded it, all without an error code.
+[botd](https://github.com/fingerprintjs/BotD) runs in the browser and has no view of request headers, TLS fingerprints, session behaviour, or IP reputation. A headless Chromium and a Googlebot look identical to it. Pure UA matching packages (`is-bot`, `isbot`) catch only what opts in to being caught. Network-layer products (Cloudflare Bot Management, DataDome) block at the edge but cannot personalise at the application layer. You learn a request was blocked, never that a request that reached your app had a 0.87 bot probability and a Medium risk band, so your checkout page could have shown a friction step and your analytics could have excluded it, all without an error code.
 
 What StyloBot gives your TypeScript application is a verdict: a typed result with a continuous bot probability score, a classification (`AiBot`, `Scraper`, `GoodBot`, `MaliciousBot`, ...), a risk band, a recommended action, and a threat score. What you do with that verdict is up to you.
 
@@ -95,11 +97,11 @@ graph LR
     end
 ```
 
-**`headers` mode** - detection ran upstream at the gateway; the middleware reads injected headers with no network call. This is the production pattern when a Caddy or YARP gateway sits in front.
+**`headers` mode**: detection ran upstream at the gateway; the middleware reads injected headers with no network call. This is the production pattern when a Caddy or YARP gateway sits in front.
 
-**`grpc` mode** - the middleware calls the sidecar directly over HTTP/2. Lowest latency, no JSON overhead, requires `@grpc/grpc-js`. The gRPC interface and sidecar deployment details are in the [Sidecar Architecture article](/blog/sidecar-architecture).
+**`grpc` mode**: the middleware calls the sidecar directly over HTTP/2. Lowest latency, no JSON overhead, requires `@grpc/grpc-js`. The gRPC interface and sidecar deployment details are in the [Sidecar Architecture article](/blog/sidecar-architecture).
 
-**`api` mode** - calls `POST /api/v1/detect` over HTTP/1.1. Also returns `reasons` (per-detector contributions) and `signals` (the full blackboard state) that the other modes omit.
+**`api` mode**: calls `POST /api/v1/detect` over HTTP/1.1. Also returns `reasons` (per-detector contributions) and `signals` (the full blackboard state) that the other modes omit.
 
 The middleware always fails open. If the sidecar is unreachable or times out, `req.stylobot` is set to a permissive empty verdict and the request continues.
 
@@ -139,7 +141,7 @@ declare module 'fastify' {
 
 # The storefront
 
-The same sample storefront from the [ASP.NET article](/blog/behaviour-aware-ux) - product page, checkout, login, newsletter - but in TypeScript. The detection result is the same; what changes is how the surface exposes it.
+The same sample storefront from the [ASP.NET article](/blog/behaviour-aware-ux), product page, checkout, login, newsletter, but in TypeScript. The detection result is the same; what changes is how the surface exposes it.
 
 ## Page 1: The product page
 
@@ -197,7 +199,7 @@ The template (Handlebars):
 {{/if}}
 ```
 
-Three patterns in use here. Crawler differentiation: `SearchEngine` and `VerifiedBot` get structured metadata without commercial signals, which is what they actually need. Discount targeting: a loyalty code shown only to low-risk traffic is less likely to end up on a voucher forum. Progressive friction: `Challenge` is a warning, not a block - suspicious sessions can still buy.
+Three patterns in use here. Crawler differentiation: `SearchEngine` and `VerifiedBot` get structured metadata without commercial signals, which is what they actually need. Discount targeting: a loyalty code shown only to low-risk traffic is less likely to end up on a voucher forum. Progressive friction: `Challenge` is a warning, not a block. Suspicious sessions can still buy.
 
 ## Page 2: Checkout
 
@@ -415,7 +417,7 @@ app.use(sbVerdictInjector({ mode: 'sidecar', endpoint: 'http://localhost:5091' }
 
 ## Handlebars
 
-Define `RISK_ORDER` once at module scope - the Nunjucks and EJS helpers below use the same map:
+Define `RISK_ORDER` once at module scope (the Nunjucks and EJS helpers below use the same map):
 
 ```ts
 import type { Verdict, RiskBand } from '@stylobot/core';
@@ -466,7 +468,7 @@ In templates:
 {{/sbGate}}
 
 {{#sbBotType sbVerdict "AiBot"}}
-  <div class="alert alert-info">AI crawler detected - data licensing info above.</div>
+  <div class="alert alert-info">AI crawler detected. Data licensing info above.</div>
 {{/sbBotType}}
 
 {{#sbMinRisk sbVerdict "High"}}
@@ -540,7 +542,7 @@ app.use((req, res, next) => {
 <% } %>
 
 <% if (sbBotIs('AiBot')) { %>
-  <div class="alert alert-info">AI crawler - data licensing enquiries via /contact.</div>
+  <div class="alert alert-info">AI crawler. Data licensing enquiries via /contact.</div>
 <% } %>
 ```
 
@@ -597,7 +599,7 @@ Then load the elements bundle:
 
 ## `<sb-widget>`: server-rendered Liquid fragments
 
-`<sb-gate>` hides content client-side. If you need a bot to receive different markup - not hidden markup - you need the fragment to be rendered on the server with the detection context available to the template.
+`<sb-gate>` hides content client-side. If you need a bot to receive different markup, not hidden markup, you need the fragment to be rendered on the server with the detection context available to the template.
 
 `<sb-widget>` reads a Liquid template from an inline `<template>` element, batches all widget requests on the page into a single round-trip, and replaces itself with the returned HTML:
 
@@ -654,6 +656,6 @@ sequenceDiagram
 | `<sb-widget>` | Browser | Fetch server-rendered Liquid fragment, batched per tick |
 | `StyloBotGrpcClient` | Node / Bun / Deno | Direct gRPC client for non-middleware use |
 
-Next in the release series: [**The Sidecar Architecture**](/blog/sidecar-architecture) - how the detection engine connects to non-.NET stacks, the Go SDK, the Caddy plugin, and the gRPC interface that ties it together.
+Next in the release series: [**The Sidecar Architecture**](/blog/sidecar-architecture), how the detection engine connects to non-.NET stacks, the Go SDK, the Caddy plugin, and the gRPC interface that ties it together.
 
-If you arrived here from the .NET side, [Behaviour-Aware ASP.NET UI](/blog/behaviour-aware-ux) covers the same storefront patterns with tag helpers and action filters; the reliability rework that keeps the engine memory-stable under sustained traffic is in [Finding and Fixing Unbounded Growth in Long-Running .NET Services](/blog/stylobot-release-reliability).
+If you arrived here from the .NET side, [Behaviour-Aware ASP.NET UI](/blog/behaviour-aware-ux) covers the same storefront patterns with tag helpers and action filters; the reliability rework that keeps the engine memory-stable under sustained traffic is in [Finding and Fixing Unbounded Growth in Long-Running .NET Services](/blog/stylobot-release-reliability). Live engine, dashboard, and commercial controls at [stylobot.net](https://www.stylobot.net).

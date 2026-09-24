@@ -1,30 +1,47 @@
 # StyloBot Release Series: Behaviour, Not Identity
 
-*Identity-based bot detection (IPs, user-agents, headers) collapses the moment automation starts rotating identities. StyloBot models clients as behavioural shapes in a 130+ dimensional vector space - here's why that's the right level of abstraction for level-4 and level-5 bots, and how the engine actually works.*
+*Identity-based bot detection (IPs, user-agents, headers) collapses the moment automation starts rotating identities. StyloBot models clients as behavioural shapes in a 130+ dimensional vector space. Here's why that's the right level of abstraction for level-4 and level-5 bots, and how the engine actually works.*
 
-> ## DRAFT
-> This is a working draft in the StyloBot Release Series. Structure, examples, and naming may still change before final release.
+[<img src="/articleimages/stylobot-logo.svg" alt="StyloBot" width="120" />](https://www.stylobot.net)
 
 > **StyloBot Release Series**
 >
-> 1. **Behaviour, Not Identity** - why StyloBot models clients behaviourally
-> 2. [**Behaviour-Aware ASP.NET UI**](/blog/behaviour-aware-ux) - the server-rendered surface over that detection result
-> 3. [**Finding and Fixing Unbounded Growth in Long-Running .NET Services**](/blog/stylobot-release-reliability) - the reliability discipline that keeps the engine boring in production
-> 4. [**Behaviour-Aware TypeScript UI**](/blog/typescript-sdk) - Express, Fastify, and browser components
-> 5. [**The Sidecar Architecture**](/blog/sidecar-architecture) - how the detection engine connects to non-.NET stacks
+> 1. **Behaviour, Not Identity**: why StyloBot models clients behaviourally
+> 2. [**Behaviour-Aware ASP.NET UI**](/blog/behaviour-aware-ux): the server-rendered surface over that detection result
+> 3. [**Finding and Fixing Unbounded Growth in Long-Running .NET Services**](/blog/stylobot-release-reliability): the reliability discipline that keeps the engine boring in production
+> 4. [**Behaviour-Aware TypeScript UI**](/blog/typescript-sdk): Express, Fastify, and browser components
+> 5. [**The Sidecar Architecture**](/blog/sidecar-architecture): how the detection engine connects to non-.NET stacks
+> 6. [**Learning to Get Faster**](/blog/stylobot-release-learning): the adaptive learning system, four-tier memory, and the verdict cache
+> 7. [**Testing the Thing That Won't Sit Still**](/blog/stylobot-release-nondeterministic-testing): the verification discipline: one BDF file drives regression, load, and calibration
+> 8. [**StyloExtract - a local learning HTML to Markdown converter**](/blog/stylobot-release-styloextract): the HTML→Markdown layer that pairs with the detector, the walker bug lucidVIEW caught, and the dogfood loop that made it honest
 
 
 # Introduction
+
+> *"Oh what a tangled web we weave, when first we practice to deceive."*
+>
+> Walter Scott
+
+StyloBot detects the maintenance cost of deception.
+
+Innocent traffic doesn't have to invent stories, lay trails, or produce exculpatory evidence. The structure that grows AROUND a deception is what you can detect; not the deception itself. That is the heart of forensics, including behavioural forensics like StyloBot.
+
+Years ago I worked in forensic psychology, classifying behavioural patterns to identify underlying dementia pathologies: specific memory loss patterns, characteristic comorbidities, the compensations people unconsciously build around the gap. Classification let you tailor a care plan to what was actually happening, not to the cover story. StyloBot applies the same technique to a new foe: AI-driven automation stealing your data, distorting your pricing, exhausting your inventory.
+
 Most bot systems are still built around identity claims: IP reputation, user-agent strings, header correctness, maybe a fingerprint if you are lucky.
 
 That works right up until the bots get good.
 
-The moment automation starts rotating identities, mimicking browsers, spreading across residential IPs, and adapting in-session, "who does this request claim to be?" stops being the right question. The more useful question is: "what does this client behave like over time?"
+The moment automation starts rotating identities, mimicking browsers, spreading across residential IPs, and adapting in-session, "who does this request claim to be?" stops being the right question. The more useful question is: "what does this client behave like over time, across dozens of tells, compared to clients we already know?"
 
-That is the idea behind StyloBot. It models requests, sessions, and repeat clients as behavioural shapes rather than static identities. This post is the first entry in the release series and explains that model: why it exists, why it matters, and why behaviour is a better foundation than identity when the bots get smart.
+That is the idea behind StyloBot. It models requests, sessions, and repeat clients as behavioural shapes rather than static identities. It looks ACROSS sessions at dozens of behavioural tells and works out what type of client could plausibly produce that behaviour. Not dumb UA / IP blocking. This post is the first entry in the release series and explains that model: why it exists, why it matters, and why behaviour is a better foundation than identity when the bots get smart.
 
-<!--category-- ASP.NET, Bot Detection, Security, Architecture -->
-<datetime class="hidden">2026-05-01T10:30</datetime>
+This isn't theoretical. The engine is running on this page right now. Your radar is on the left; the Top Bots panel is the shapes already recorded against stylobot.net:
+
+![Live detection on this page (Human, 4% bot probability, Allow) next to the Top Bots panel listing MJ12bot, SERankingBacklinksBot, Aranet-SearchBot, bingbot and others with their bot %, confidence, threat, and recent hit count](stylobot-live-detection.png?width=1100&format=webp&quality=70)
+
+<!--category-- Caddy, TypeScript, ASP.NET, Bot Detection, Security, Architecture -->
+<datetime class="hidden">2026-06-01T10:30</datetime>
 
 # Quick Start
 StyloBot is ENTIRELY FREE TO RUN. In future I'll sell realtime management and reporting (to try and you know...eat) but the engine in the exe IS StyloBot. Commercial just adds distributed topology, *realtime* config (no reload), and more DB options.
@@ -76,8 +93,7 @@ app.MapControllers();
 
 Dashboard at `/_stylobot`. Detection at `~150µs` per request from first request.
 
-<!-- IMAGE PLACEHOLDER: StyloBot dashboard landing screenshot. Source: screenshot of /_stylobot on a live install (the one with the live request feed + verdict colours). -->
-![StyloBot dashboard overview](img-placeholder-dashboard.png?width=900&format=webp&quality=40)
+![StyloBot dashboard landing on a live install: traffic over time, live activity by signature, and the per-visitor verdict for the human looking at the page](stylobot-dashboard-landing.png?width=1100&format=webp&quality=70)
 
 ---
 
@@ -309,7 +325,7 @@ The market leaders share one of two shapes; either they rely on simple static ru
 
 StyloBot aims for the distribution model of Fail2Ban (run an exe, point at upstream) with the power of the enterprise stacks. It downloads lists of user agents, CVEs, exploits, and other indicators of compromise to enrich detection; but those are one factor in a decision, never the verdict on their own.
 
-Under the hood StyloBot runs ~50 'contributors'; small focused bits of code that look like this:
+Under the hood StyloBot runs ~49 'contributors'; small focused bits of code that look like this:
 
 ```csharp 
 using Microsoft.AspNetCore.Http;
@@ -424,16 +440,16 @@ Using my [mostlylucid.ephemeral framework](https://github.com/scottgal/mostlyluc
 
 > Aside: Ephemeral also gives StyloBot LFU / sliding-window processing; it drops human requests while retaining a window so that if a *future* request crosses a bot threshold we can look back and reprocess the older ones for clues. That mechanism deserves its own post; for now just know it's why retention costs nothing in the steady state.
 
-## The 50 detectors aren't 50 decisions
-StyloBot has 50 detectors. It rarely runs more than 5-7 per request. They aren't 50 independent verdicts; they're 50 ways of observing the same underlying behaviour, each contributing evidence toward a single behavioural model.
+## The 49 detectors aren't 49 decisions
+StyloBot has 49 detectors. It rarely runs more than 5-7 per request. They aren't 49 independent verdicts; they're 49 ways of observing the same underlying behaviour, each contributing evidence toward a single behavioural model.
 
-The 50 is the CAPABILITY; it only uses what it needs.
+The 49 is the CAPABILITY; it only uses what it needs.
 
 **Fast path (the common case).** 5-7 SUPER fast (sub-millisecond) initial detectors and fingerprinters. From that fingerprint it can decide what sort of thing you are AND what your next requests are likely to be (content->resource pathing). Then it predicts the next request, compares against what actually arrives, and escalates only if the shape diverges. ~150µs end to end. This is what the vast majority of human traffic ever sees.
 
 **Slow path (the interesting case).** Crucially, **the slow path runs OUT of the request pipeline**. Your user's response goes out on the fast-path verdict; the slow path is enrichment for what happens next, not latency on this request.
 
-It triggers when the fast path is *ambiguous* (signals contradict each other, the shape doesn't match anything we've seen, confidence sits in the dead zone) or when the request looks novel (new attack pattern, fresh CVE probe, an LLM-driven scraper trying something we haven't fingerprinted yet). When it does, StyloBot opens the throttle. ALL 50 detectors run. The Intelligence stage consults an LLM that takes the full signal bundle and contributes another dimension of resolution; pattern-matching against threat intel, reasoning about request intent, spotting things the heuristics aren't shaped for yet.
+It triggers when the fast path is *ambiguous* (signals contradict each other, the shape doesn't match anything we've seen, confidence sits in the dead zone) or when the request looks novel (new attack pattern, fresh CVE probe, an LLM-driven scraper trying something we haven't fingerprinted yet). When it does, StyloBot opens the throttle. ALL 49 detectors run. The Intelligence stage consults an LLM that takes the full signal bundle and contributes another dimension of resolution; pattern-matching against threat intel, reasoning about request intent, spotting things the heuristics aren't shaped for yet.
 
 You get two escalation options:
 
@@ -442,7 +458,7 @@ You get two escalation options:
 
 Either way, the request that triggered the escalation already responded. There is no scenario where the slow path adds milliseconds to a user's page load.
 
-That's the deal: pay microseconds when you can, pay milliseconds when you must, never pay both, and never pay them on the user's clock. The slow path is rare by design (typically <1% of traffic) but it's where StyloBot earns its keep against the level-5 adaptive bots from earlier; the ones that *will* slip past any fixed pipeline. Every slow-path verdict feeds back as new fast-path signal, so next time the cheap detectors catch what the expensive ones discovered.
+That's the deal: pay microseconds when you can, pay milliseconds when you must, never pay both, and never pay them on the user's clock. The slow path is rare by design (typically <1% of traffic) but it's where StyloBot earns its keep against the level-5 adaptive bots from earlier; the ones that *will* slip past any fixed pipeline. Every slow-path verdict feeds back as new fast-path signal, so next time the cheap detectors catch what the expensive ones discovered. The full mechanics of that feedback loop (drift-tuned pattern reputation against the archetype anchors, the per-fingerprint verdict cache, the Skip/Bias/Miss/Watchdog gate that decides whether the pipeline runs at all) are covered in [Learning to Get Faster](/blog/stylobot-release-learning).
 
 The full set of layers (you only see all of them on a slow-path request that genuinely needs every angle):
 
@@ -463,38 +479,46 @@ The full set of layers (you only see all of them on a slow-path request that gen
 ![Fast path vs slow path (slow path is off the request thread)](img-placeholder-fast-slow-path.png?width=900&format=webp&quality=40)
 
 # What if client behaviour was a vector?
-With 50 detectors and hundreds of signals we have a LOT of metadata about each client. None of it on its own is a verdict; together it's a *position* in a 130+ dimensional space.
+With 49 detectors and hundreds of signals we have a LOT of metadata about each client. None of it on its own is a verdict; together it's a *position* in a 130+ dimensional space.
 
-This is a *projection* ([Wikipedia](https://en.wikipedia.org/wiki/Projection_(linear_algebra))) of that underlying vector space, built from the contributors above. A 'low resolution' image of the fingerprint.
+What the dashboard shows is a *projection* ([Wikipedia](https://en.wikipedia.org/wiki/Projection_(linear_algebra))) of that underlying vector space, collapsed onto seven axes: Network, Locale, Headers, Tool, Transport, Session, Quality. A "low resolution" image of the fingerprint that humans can actually read.
 
-<!-- IMAGE PLACEHOLDER: 2D projection of the high-dimensional behavioural vectors, humans clustered tight in green, bots scattered in distinct shapes/colours. Source: SCREENSHOT from /_stylobot dashboard if it has a UMAP/t-SNE view; if not, generate one server-side from real session data and snapshot it. AI-generated as a last resort with prompt "scientific scatter plot, 2D projection, dense human cluster centre, sparse bot clusters around edges, dark theme". -->
-![Behavioural vector projection](img-placeholder-vector-projection.png?width=900&format=webp&quality=40)
+![Human signature on stylobot.net: 0% bot probability, 100% confidence, green radar with broad Headers and Tool arms, fingerprint integrity blank, headless indicator clean](stylobot-human-signature.png?width=1100&format=webp&quality=70)
 
 ## Bots are shapes
 Your bots aren't just a bunch of numbers. They're SHAPES. These shapes are DIFFERENT to human ones.
 
 Humans are noisy but *consistent in structure*. Bots are consistent but *wrong in structure*.
 
-That's the whole trick. Once you can see the shape, the per-detector confidence scores stop mattering individually; what matters is whether the projection looks like a human or like something pretending to be one.
+Here's the same projection for a declared bot recorded against this site:
 
-Combine that with tracking across ALL sessions (the system collects ZERO PII). A single session might look totally human (it might even *be* a recording of one). HOWEVER...sensitivity across TIME (looking for automated cadences, even human fingerprints which get USED as bots later) is where the shape really gives them away.
+![MJ12bot signature on stylobot.net: 100% bot probability, 50% confidence, GoodBot policy rate-limit-search, red radar shape, risk profile VeryHigh](stylobot-bot-signature.png?width=1100&format=webp&quality=70)
+
+Two clients, same seven axes, two different shapes. Verdict colour shifts from green to red. Risk profile shifts from Unknown to VeryHigh. The fingerprint fields underneath (TLS, HTTP protocol, headless indicator) populate with non-clean values. The verdict isn't a single signal flipping. It's the whole shape.
+
+That's the trick. Once you can see the shape, the per-detector confidence scores stop mattering individually; what matters is whether the projection looks like a human or like something pretending to be one. The maintenance cost of deception lives in the structure.
+
+Combine that with tracking across ALL sessions (the system collects ZERO PII). A single session might look totally human (it might even *be* a recording of one). HOWEVER... sensitivity across TIME, looking for automated cadences, even human fingerprints which get USED as bots later, is where the shape really gives them away.
 
 ## Bots cluster (Leiden over the vectors)
 Once everything is a shape, bots stop hiding from each other. They cluster.
 
 StyloBot runs [Leiden community detection](https://en.wikipedia.org/wiki/Leiden_algorithm) over the live vector space. This trick is borrowed wholesale from my GraphRAG work; if you've read [GraphRAG: Why Vector Search Breaks Down at the Corpus Level](/blog/graphrag-knowledge-graphs-for-rag) and [GraphRAG Part 2: Minimum Viable GraphRAG](/blog/graphrag-minimum-viable-implementation) you've already seen this exact pattern. There it builds *communities of meaning* over document chunks so a query can pull a whole connected idea instead of disconnected snippets. Here it does the structurally identical job over *behavioural* vectors; communities of clients that move alike. Same algorithm, same insight, different domain. A bot family is just a community in the graph; a GraphRAG topic is the same shape over text.
 
+Two concerns worth heading off if you've done graph clustering before. **Doesn't Leiden slow down as |V| and |E| grow?** Yes, which is why the input is not "every request ever seen." It's the bounded hot signature cache (capped by `SignatureCacheSize`, default 10k, 1k on the `LowMemory` preset) plus a compacted centroid layer for the long tail. |V| is config-bounded; |E| is HNSW-bounded by `M` neighbours per node. The bounding discipline that makes that work is covered in [Finding and Fixing Unbounded Growth in Long-Running .NET Services](/blog/stylobot-release-reliability). **Doesn't cosine collapse at 130 dimensions?** It does in the naive form. StyloBot sidesteps it two ways. HNSW similarity is approximate by design (tuned via `M` and `ef_construct`), and the engine works in terms of *drift from a learned archetype anchor* rather than all-pairs distance in the raw space, so the question is always "how far has this client moved from its prior?" instead of "where is this in 130d?" The radar projection (seven axes) is for humans; the engine never clusters on the radar.
+
 Bots that share an origin (same toolkit, same operator, same scraping campaign) land in the same neighbourhood even when they've rotated IPs, headers, fingerprints and timing. They didn't co-ordinate to look the same; they look the same because they ARE the same, structurally.
 
 That gives StyloBot two superpowers for free:
 
-* **A new request gets the verdict of its cluster.** First-ever-seen bot from a known operator? Already inside a hostile community on arrival. No warm-up, no learning period.
+* **A new request gets the verdict of its cluster.** First-ever-seen bot from a known operator? Already inside a hostile community on arrival. No warm-up, no learning period. (This is the entity-family fallback in the verdict cache; see [Learning to Get Faster](/blog/stylobot-release-learning) for how a rotated fingerprint inherits its family's verdict.)
 * **Novel attacks make their own cluster.** When something genuinely new shows up it doesn't fit anywhere; that *itself* is the signal. The slow path runs, the LLM stage labels it, and from then on the whole cluster is recognised on the fast path.
 
 This is also where similarity search (HNSW over the same vectors) earns its keep; "show me the 20 closest things to this request right now" is a constant-time question, not a scan over history.
 
-<!-- IMAGE PLACEHOLDER: Leiden communities over the behavioural vector graph; nodes coloured by community, with one tight human community and several smaller bot communities at the edges. Source: SCREENSHOT from /_stylobot dashboard if it has a cluster view (it should); otherwise render from a Gephi/networkx export of a real run. AI-generated as a last resort with prompt "force-directed graph, multiple coloured communities, one large central community, several small peripheral ones, dark scientific style". -->
-![Leiden communities over behavioural vectors](img-placeholder-leiden-clusters.png?width=900&format=webp&quality=40)
+(Future UI idea shown, not currently implemented)
+
+![Leiden communities over behavioural vectors](leiden_communities.png?width=900&format=webp&quality=40)
 
 ## Odd Implications
 Note what I DIDN'T say. I didn't say 'once set up' or 'when properly configured' because that's StyloBot's secret; it has a good default set but *it learns*.
@@ -504,9 +528,9 @@ As it runs it profiles *your traffic* and understands *your users*. Not creepily
 You can THEN decide, or let the system take care of it (set a bot threshold of say 0.8 for most and 0.6 for secure endpoints). The defaults that ship are good; the defaults that emerge after a few hours on your traffic are better.
 
 # Conclusion
-StyloBot is NOW live. The detection engine, the dashboard, the NuGet packages, the gateway exe; all of it is shipping right now and FREE to run on your own infra. Grab the source at [github.com/scottgal/stylobot](https://github.com/scottgal/stylobot) or `brew install scottgal/stylobot/stylobot` and point it at your upstream.
+StyloBot is NOW live. Self-hosted bot detection. Open source. 49 detectors. Full decision trace. Privacy-aware. AI without LLMs in the hot path. The detection engine, the dashboard, the NuGet packages, the gateway exe; all of it is shipping right now and FREE to run on your own infra. Grab the source at [github.com/scottgal/stylobot](https://github.com/scottgal/stylobot) or `brew install scottgal/stylobot/stylobot` and point it at your upstream.
 
-I'll add commercial features shortly (managed dashboards, hosted reputation, multi-site reporting; the things that need a server somewhere I have to keep paying for) but the core engine stays free.
+Commercial controls sit on top: live config without reload, central fleet dashboard, persistence, commercial LLM providers. $100/mo per domain, 30-day trial, no credit card. Open-source and charity projects get a complimentary license; [contact us](https://www.stylobot.net/contact). The core engine stays free, on your infra, forever.
 
 Next in the release series: [Behaviour-Aware ASP.NET UI](/blog/behaviour-aware-ux), which takes the behavioural classification described here and exposes it to Razor, forms, and controller policy. After that, [Finding and Fixing Unbounded Growth in Long-Running .NET Services](/blog/stylobot-release-reliability) covers the reliability rework that lets the engine sit on a Pi forever without operator intervention, with the StyloBot vector layer as the worked example.
 

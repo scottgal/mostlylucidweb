@@ -2,21 +2,23 @@
 
 *Long-running services tend to slowly drift toward unbounded memory. Here's how I find that drift, how I think about fixing it without papering over it, and a worked example from StyloBot's vector similarity layer that took it from 13 GB on the Large Object Heap to under 6 MB.*
 
-> ## DRAFT
-> This is a working draft in the StyloBot Release Series. Numbers, knobs, and naming may still change before final release.
+[<img src="/articleimages/stylobot-logo.svg" alt="StyloBot" width="120" />](https://www.stylobot.net)
 
 > **StyloBot Release Series**
 >
-> 1. [**Behaviour, Not Identity**](/blog/stylobot-fingerprint) - why StyloBot models clients behaviourally
-> 2. [**Behaviour-Aware ASP.NET UI**](/blog/behaviour-aware-ux) - the server-rendered surface over that detection result
-> 3. **Finding and Fixing Unbounded Growth in Long-Running .NET Services** - the reliability discipline (worked example: StyloBot)
-> 4. [**Behaviour-Aware TypeScript UI**](/blog/typescript-sdk) - Express, Fastify, and browser components
-> 5. [**The Sidecar Architecture**](/blog/sidecar-architecture) - how the detection engine connects to non-.NET stacks
+> 1. [**Behaviour, Not Identity**](/blog/stylobot-fingerprint): why StyloBot models clients behaviourally
+> 2. [**Behaviour-Aware ASP.NET UI**](/blog/behaviour-aware-ux): the server-rendered surface over that detection result
+> 3. **Finding and Fixing Unbounded Growth in Long-Running .NET Services**: the reliability discipline (worked example: StyloBot)
+> 4. [**Behaviour-Aware TypeScript UI**](/blog/typescript-sdk): Express, Fastify, and browser components
+> 5. [**The Sidecar Architecture**](/blog/sidecar-architecture): how the detection engine connects to non-.NET stacks
+> 6. [**Learning to Get Faster**](/blog/stylobot-release-learning): the adaptive learning system, four-tier memory, and the verdict cache
+> 7. [**Testing the Thing That Won't Sit Still**](/blog/stylobot-release-nondeterministic-testing): the verification discipline: one BDF file drives regression, load, and calibration
+> 8. [**StyloExtract - a local learning HTML to Markdown converter**](/blog/stylobot-release-styloextract): the HTML→Markdown layer that pairs with the detector, the walker bug lucidVIEW caught, and the dogfood loop that made it honest
 
 <!--category-- ASP.NET, StyloBot, Bot Detection, Performance, Architecture -->
-<datetime class="hidden">2026-05-09T10:30</datetime>
+<datetime class="hidden">2026-06-01T10:30</datetime>
 
-The worked example is the StyloBot vector layer, but the discipline isn't StyloBot-specific. Any long-running .NET service that accumulates state from traffic eventually grows a class of bug you can't catch in tests or short load runs - it only shows up after days of real traffic. This post is the playbook I use for finding it.
+The worked example is the StyloBot vector layer, but the discipline isn't StyloBot-specific. Any long-running .NET service that accumulates state from traffic eventually grows a class of bug you can't catch in tests or short load runs. It only shows up after days of real traffic. This post is the playbook I use for finding it.
 
 The behavioural model is in [Behaviour, Not Identity](/blog/stylobot-fingerprint); the ASP.NET surface in [Behaviour-Aware ASP.NET UI](/blog/behaviour-aware-ux); source at [github.com/scottgal/stylobot](https://github.com/scottgal/stylobot).
 
@@ -37,7 +39,7 @@ You catch this by *deliberately looking for it*, on a process that's been runnin
 
 The first piece of the discipline isn't technical. It's the calendar entry.
 
-Every few releases, I stop adding features and just look at the running system under realistic traffic, asking *does any of this look wrong?* No specific bug, no goal - just looking. Running systems lie quietly; they don't fail loudly until they fail catastrophically. If you only look when something breaks, you've already lost.
+Every few releases, I stop adding features and just look at the running system under realistic traffic, asking *does any of this look wrong?* No specific bug, no goal. Just looking. Running systems lie quietly; they don't fail loudly until they fail catastrophically. If you only look when something breaks, you've already lost.
 
 The most recent review caught the bug this post is about: the `Mostlylucid.BotDetection.Demo` process sitting at a 20 GB resident set under synthetic test traffic. That's the kind of number that should not survive thirty seconds of attention.
 
@@ -64,7 +66,7 @@ The Large Object Heap is one of the most common surprises the first time you pro
 - The GC has three generations (Gen0, Gen1, Gen2) for normal short-lived objects. Most allocations live and die in Gen0, which is cheap to collect.
 - **Anything larger than 85 KB doesn't go in those generations.** It goes straight onto the **Large Object Heap**.
 - The LOH is only collected during a **Gen2 GC**, which is the most expensive collection .NET does. Gen2 happens infrequently, and the runtime tries hard to avoid it.
-- Worse, by default the LOH is **not compacted** when it is collected - it just frees the slots. So even after a Gen2, the LOH gets fragmented: you have free space, but it's in the wrong-sized holes for the next allocation. New large objects extend the heap rather than reuse it.
+- Worse, by default the LOH is **not compacted** when it is collected; it just frees the slots. So even after a Gen2, the LOH gets fragmented: you have free space, but it's in the wrong-sized holes for the next allocation. New large objects extend the heap rather than reuse it.
 - Net effect: keep allocating large objects at a steady rate, and your process's memory footprint marches upward whether or not the objects are still referenced. It looks like a leak even when it isn't one.
 
 The biggest sources of accidental LOH growth in real .NET services, in my experience:
@@ -101,9 +103,9 @@ Tools that help diagnose it:
 - [`dotnet-counters`](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters) for live numbers (the LOH gauge above).
 - [`dotnet-gcdump`](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-gcdump) and [`dotnet-dump`](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-dump) for snapshots you can open in Visual Studio or PerfView.
 - [PerfView](https://github.com/microsoft/perfview) itself for tracing allocations down to a stack.
-- **JetBrains CLI profilers** - what I actually used for this rework. Now packaged as proper .NET global tools, so headless / remote / CI runtime profiling needs no Rider GUI:
-  - [`JetBrains.dotMemory.GlobalTools`](https://www.jetbrains.com/help/dotmemory/Command-Line_Profiler.html) - attach, take a memory snapshot, open the `.dmw` workspace later to see which retained roots are holding the LOH allocations.
-  - [`JetBrains.dotTrace.GlobalTools`](https://www.jetbrains.com/help/profiler/Performance_Profiling__Profiling_Using_the_Command_Line.html) - same shape for sampling / tracing / timeline data. Use this when you need a stack rather than a counter (e.g. "what is that timer actually doing?").
+- **JetBrains CLI profilers** (what I actually used for this rework). Now packaged as proper .NET global tools, so headless / remote / CI runtime profiling needs no Rider GUI:
+  - [`JetBrains.dotMemory.GlobalTools`](https://www.jetbrains.com/help/dotmemory/Command-Line_Profiler.html): attach, take a memory snapshot, open the `.dmw` workspace later to see which retained roots are holding the LOH allocations.
+  - [`JetBrains.dotTrace.GlobalTools`](https://www.jetbrains.com/help/profiler/Performance_Profiling__Profiling_Using_the_Command_Line.html): same shape for sampling / tracing / timeline data. Use this when you need a stack rather than a counter (e.g. "what is that timer actually doing?").
 
   ```bash
   dotnet tool install -g JetBrains.dotMemory.GlobalTools
@@ -115,7 +117,7 @@ Tools that help diagnose it:
 
   Division of labour for this rework: `dotnet-counters` told me the LOH was the problem; the dotMemory snapshot told me the autosave timer was the cause.
 
-There are escape hatches if you genuinely need them - `GCSettings.LargeObjectHeapCompactionMode = CompactOnce` forces a one-off LOH compaction, and [`RecyclableMemoryStream`](https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream) from Microsoft pools buffers to avoid the allocation in the first place - but they're plasters. The real fix is almost always to stop producing the giant object in the first place.
+There are escape hatches if you genuinely need them. `GCSettings.LargeObjectHeapCompactionMode = CompactOnce` forces a one-off LOH compaction. [`RecyclableMemoryStream`](https://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream) from Microsoft pools buffers to avoid the allocation in the first place. Both are plasters. The real fix is almost always to stop producing the giant object in the first place.
 
 ### Back to the diagnosis
 
@@ -127,7 +129,7 @@ The exceptions counter mattered too. `4/sec` of `SqliteException` is low enough 
 
 ## Step 3: The wrong-abstraction smell (worked example: HNSW for caching)
 
-This is where the discipline gets interesting, because the temptation - always - is to *patch* the symptom rather than question the abstraction.
+This is where the discipline gets interesting, because the temptation, always, is to *patch* the symptom rather than question the abstraction.
 
 > ### Quick vocab (for the next few sections)
 >
@@ -167,9 +169,9 @@ flowchart LR
     LOH -.fragmentation.-> RSS["Process RSS climbs"]:::problem
 ```
 
-Now: the easy fix is to add a cap. `MaxVectors = 10_000`, LRU eviction, ship it. It would have worked - numbers would come down, dashboard would look fine. It would also have been wrong.
+Now: the easy fix is to add a cap. `MaxVectors = 10_000`, LRU eviction, ship it. It would have worked. Numbers would come down, dashboard would look fine. It would also have been wrong.
 
-HNSW is excellent technology and I use it deliberately elsewhere ([Self-Hosted Vector Databases with Qdrant](/blog/self-hosted-vector-databases-qdrant), [RAG Hybrid Search and Indexing](/blog/rag-hybrid-search-and-indexing), [Minimum Viable GraphRAG](/blog/graphrag-minimum-viable-implementation)). [Pinecone](https://www.pinecone.io/learn/series/faiss/hnsw/), [Weaviate](https://weaviate.io/developers/weaviate/concepts/vector-index#hnsw-index), [pgvector](https://github.com/pgvector/pgvector#hnsw), and [Qdrant](https://qdrant.tech/documentation/concepts/indexing/#vector-index) all use it internally. But it's an index of a corpus, not a cache - and what StyloBot actually needed was a cache: *"for each active fingerprint, keep a small window of recent behavioural vectors so detection can compare the current request against past behaviour from similar ones."* Bot fingerprints repeat (stay hot); human fingerprints don't (evict). The earlier [As Simple As Possible](/blog/botdetection-part3-as-simple-as-possible) post listed the in-process HNSW index as a feature - this post is the follow-up admitting where that was the wrong fit.
+HNSW is excellent technology and I use it deliberately elsewhere ([Self-Hosted Vector Databases with Qdrant](/blog/self-hosted-vector-databases-qdrant), [RAG Hybrid Search and Indexing](/blog/rag-hybrid-search-and-indexing), [Minimum Viable GraphRAG](/blog/graphrag-minimum-viable-implementation)). [Pinecone](https://www.pinecone.io/learn/series/faiss/hnsw/), [Weaviate](https://weaviate.io/developers/weaviate/concepts/vector-index#hnsw-index), [pgvector](https://github.com/pgvector/pgvector#hnsw), and [Qdrant](https://qdrant.tech/documentation/concepts/indexing/#vector-index) all use it internally. But it's an index of a corpus, not a cache, and what StyloBot actually needed was a cache: *"for each active fingerprint, keep a small window of recent behavioural vectors so detection can compare the current request against past behaviour from similar ones."* Bot fingerprints repeat (stay hot); human fingerprints don't (evict). The earlier [As Simple As Possible](/blog/botdetection-part3-as-simple-as-possible) post listed the in-process HNSW index as a feature; this post is the follow-up admitting where that was the wrong fit.
 
 There's a quick test for the smell: if you imagine slapping a hard cap on the structure, is the result still semantically the thing you wanted? A capped HNSW with constant churn isn't an index, it's a bad cache wearing an index's clothes.
 
@@ -179,7 +181,7 @@ There's a quick test for the smell: if you imagine slapping a hard cap on the st
 
 Once you've named the wrong abstraction, the replacement usually writes itself. For StyloBot it was two layers:
 
-**Hot layer:** a bounded `BoundedVectorCache<TEntry>` - a thin wrapper around [`ConcurrentDictionary`](https://learn.microsoft.com/en-us/dotnet/api/system.collections.concurrent.concurrentdictionary-2) with access-frequency priority eviction. The retention scorer gives bot-classified entries a 2x survival weight, so the cache self-organises around the traffic pattern:
+**Hot layer:** a bounded `BoundedVectorCache<TEntry>`, a thin wrapper around [`ConcurrentDictionary`](https://learn.microsoft.com/en-us/dotnet/api/system.collections.concurrent.concurrentdictionary-2) with access-frequency priority eviction. The retention scorer gives bot-classified entries a 2x survival weight, so the cache self-organises around the traffic pattern:
 
 ```csharp
 retentionScorer: (_, entry) => entry.WasBot ? 2.0 : 1.0
@@ -203,7 +205,7 @@ A note on **L1/L2 compaction**, since "compaction" is doing real work in this se
 - **L1**: take all the raw vectors written today, group the ones that are very similar, and replace each group with one centroid (the average). Cheap; happens often; modest size reduction (e.g. ~10x).
 - **L2**: take L1 centroids that are themselves similar across days/weeks and merge them again. Aggressive; happens less often; large size reduction (another ~10x). What survives L2 is the long-term shape of the traffic, not the transient noise.
 
-This is the same pattern LSM-tree storage engines (RocksDB, LevelDB, Cassandra) use for SSTables - level 0 holds recent fine-grained data; lower levels hold compacted, summarised data. Borrowing it works because the access pattern is the same: most reads hit recent data; a small fraction of reads need the long tail; nothing benefits from keeping every raw row forever.
+This is the same pattern LSM-tree storage engines (RocksDB, LevelDB, Cassandra) use for SSTables: level 0 holds recent fine-grained data; lower levels hold compacted, summarised data. Borrowing it works because the access pattern is the same: most reads hit recent data; a small fraction of reads need the long tail; nothing benefits from keeping every raw row forever.
 
 ```mermaid
 flowchart LR
@@ -223,7 +225,7 @@ flowchart LR
     DB --> NC
 ```
 
-The general shape - **bounded hot cache for the steady state + compact persistent store for history + a periodic compactor between them** - shows up over and over in long-running learning systems. It's worth keeping in your toolkit. When somebody reaches for HNSW or pgvector for a workload that's actually a cache, this is the cheaper, simpler thing they should have reached for instead.
+The general shape (**bounded hot cache for the steady state + compact persistent store for history + a periodic compactor between them**) shows up over and over in long-running learning systems. It's worth keeping in your toolkit. When somebody reaches for HNSW or pgvector for a workload that's actually a cache, this is the cheaper, simpler thing they should have reached for instead.
 
 **Rule:** prefer the simplest data structure that fits the *runtime pattern*, not the one that fits the dataset's size on paper.
 
@@ -242,7 +244,7 @@ A miss means *no similarity signal this request*. The other detectors still run.
 
 This is where most caching goes wrong: people build a cache, make the fallback synchronous "for correctness", and the miss path becomes a 50ms p99 spike. The cache was meant to make things faster; instead it made the worst case worse.
 
-**Rule:** if you can't tolerate a miss, you don't have a cache - you have a fancy queue.
+**Rule:** if you can't tolerate a miss, you don't have a cache. You have a fancy queue.
 
 ## Step 6: Audit *every* accumulator, not just the loud one
 
@@ -252,12 +254,12 @@ The audit is mechanical. For each long-lived dictionary, list, or set: *what bou
 
 For StyloBot, most accumulators were already well-bounded:
 
-- `EphemeralPatternReputationCache`: hard cap at 10,000 entries with background decay and LRU eviction
+- `EphemeralPatternReputationCache`: hard cap at 10,000 entries with background decay and LRU eviction (the decay mechanics, the `Neutral` → `Suspect` → `ConfirmedBad` state machine, and the asymmetric hysteresis live in [Learning to Get Faster](/blog/stylobot-release-learning))
 - `BehavioralPatternAnalyzer`: IMemoryCache with per-identity limits (50 paths, 100 timings, 15-min TTL)
 - `DriftDetectionHandler`: 10,000 patterns × 50 samples, TTL-pruned
 - `SessionEscalationService`: 35-minute TTL with timer-driven eviction
 
-One needed attention beyond the HNSW classes: `MarkovTracker._cohortBaselines`. The [Markov chain](https://en.wikipedia.org/wiki/Markov_chain) tracker maintains per-cohort baseline transition matrices (separate from per-signature chains, which already had LRU eviction at `MaxTrackedSignatures`). The cohort baselines - one per traffic cohort like "datacenter-new" or "residential-returning" - had no eviction at all. The fix: evict the coldest cohorts (fewest total transitions) when the dictionary exceeds `SelfMaintenanceOptions.MarkovCohortSize`.
+One needed attention beyond the HNSW classes: `MarkovTracker._cohortBaselines`. The [Markov chain](https://en.wikipedia.org/wiki/Markov_chain) tracker maintains per-cohort baseline transition matrices (separate from per-signature chains, which already had LRU eviction at `MaxTrackedSignatures`). The cohort baselines (one per traffic cohort like "datacenter-new" or "residential-returning") had no eviction at all. The fix: evict the coldest cohorts (fewest total transitions) when the dictionary exceeds `SelfMaintenanceOptions.MarkovCohortSize`.
 
 **Rule:** every singleton collection answers three questions or it's a bug: what bounds it, what evicts it, what's its worst-case shape.
 
@@ -319,19 +321,19 @@ For StyloBot specifically (FOSS build, LowMemory preset):
 
 The detection model is unchanged. What changed is *where similarity evidence lives* and *when it's allowed to affect the fast path*. Centroids survive restarts in SQLite (FOSS) or Postgres+pgvector (paid); nightly compaction still produces L1/L2; none of it requires unbounded memory.
 
-On a Pi4 with the LowMemory preset, the FOSS build sits under 500 MB RSS after warmup, indefinitely. Paid Postgres-backed deployments inherit the same hot-cache discipline - the persistent layer just scales horizontally instead of living next to the process. Either way: predictable steady-state envelope, reached after warmup, regardless of uptime or traffic.
+On a Pi4 with the LowMemory preset, the FOSS build sits under 500 MB RSS after warmup, indefinitely. Paid Postgres-backed deployments inherit the same hot-cache discipline; the persistent layer just scales horizontally instead of living next to the process. Either way: predictable steady-state envelope, reached after warmup, regardless of uptime or traffic.
 
 ## The general lesson
 
-Adding a cap bounds memory without changing the architecture. The wrong abstraction stays wrong; the symptom just gets quieter. The next person to touch the system inherits a structure that almost works - which is worse than one that obviously doesn't.
+Adding a cap bounds memory without changing the architecture. The wrong abstraction stays wrong; the symptom just gets quieter. The next person to touch the system inherits a structure that almost works, which is worse than one that obviously doesn't.
 
 The pattern that recurs in long-running learning systems:
 
-- **Cap the hot path** - bounded, in-memory, designed to tolerate misses, eviction policy aligned with the workload
-- **Compress the history** - compact binary persistent store, periodically compacted, accessed off the request thread
-- **Audit everything else** - every accumulator answers what bounds it, what evicts it, what's the worst case
-- **Centralise the knobs** - one config block, not fifteen `const`s
-- **Schedule the looking** - the bug only exists in the running system
+- **Cap the hot path**: bounded, in-memory, designed to tolerate misses, eviction policy aligned with the workload
+- **Compress the history**: compact binary persistent store, periodically compacted, accessed off the request thread
+- **Audit everything else**: every accumulator answers what bounds it, what evicts it, what's the worst case
+- **Centralise the knobs**: one config block, not fifteen `const`s
+- **Schedule the looking**: the bug only exists in the running system
 
 Fix the shape, not the symptom.
 
@@ -341,29 +343,30 @@ Fix the shape, not the symptom.
 
 **StyloBot release series**
 
-- [Behaviour, Not Identity](/blog/stylobot-fingerprint) - the behavioural model and Leiden clustering this layer is the memory for
-- [Behaviour-Aware ASP.NET UI](/blog/behaviour-aware-ux) - the surface that consumes detection verdicts in Razor
-- [Bot Detection Part 2: Signature Pipeline and StyloBot Architecture](/blog/botdetection-part2-signature-pipeline-and-stylobot-architecture) - the original detection-engine architecture post
-- [Bot Detection Part 3: As Simple As Possible](/blog/botdetection-part3-as-simple-as-possible) - the two-line drop-in (where the in-process HNSW index was first introduced)
+- [Behaviour, Not Identity](/blog/stylobot-fingerprint): the behavioural model and Leiden clustering this layer is the memory for
+- [Behaviour-Aware ASP.NET UI](/blog/behaviour-aware-ux): the surface that consumes detection verdicts in Razor
+- [Learning to Get Faster](/blog/stylobot-release-learning): the four-tier learning system and verdict cache that this memory discipline keeps bounded
+- [Bot Detection Part 2: Signature Pipeline and StyloBot Architecture](/blog/botdetection-part2-signature-pipeline-and-stylobot-architecture): the original detection-engine architecture post
+- [Bot Detection Part 3: As Simple As Possible](/blog/botdetection-part3-as-simple-as-possible): the two-line drop-in (where the in-process HNSW index was first introduced)
 
 **HNSW and vector search in this blog**
 
-- [Self-Hosted Vector Databases with Qdrant](/blog/self-hosted-vector-databases-qdrant) - HNSW deep dive: graph layers, `M`, `ef_construct`, tuning
-- [RAG Hybrid Search and Indexing](/blog/rag-hybrid-search-and-indexing) - HNSW as the dense half of a hybrid retrieval pipeline
-- [Minimum Viable GraphRAG](/blog/graphrag-minimum-viable-implementation) - DuckDB VSS HNSW gotcha (`array_cosine_distance` vs `array_cosine_similarity`)
-- [Semantic Search with ONNX and Qdrant](/blog/semantic-search-with-onnx-and-qdrant) - HNSW configuration via the Qdrant .NET client
-- [GraphRAG: Why Vector Search Breaks Down at the Corpus Level](/blog/graphrag-knowledge-graphs-for-rag) - why pure ANN isn't enough at scale
+- [Self-Hosted Vector Databases with Qdrant](/blog/self-hosted-vector-databases-qdrant): HNSW deep dive: graph layers, `M`, `ef_construct`, tuning
+- [RAG Hybrid Search and Indexing](/blog/rag-hybrid-search-and-indexing): HNSW as the dense half of a hybrid retrieval pipeline
+- [Minimum Viable GraphRAG](/blog/graphrag-minimum-viable-implementation): DuckDB VSS HNSW gotcha (`array_cosine_distance` vs `array_cosine_similarity`)
+- [Semantic Search with ONNX and Qdrant](/blog/semantic-search-with-onnx-and-qdrant): HNSW configuration via the Qdrant .NET client
+- [GraphRAG: Why Vector Search Breaks Down at the Corpus Level](/blog/graphrag-knowledge-graphs-for-rag): why pure ANN isn't enough at scale
 
 **External references**
 
 - [HNSW (Wikipedia)](https://en.wikipedia.org/wiki/Hierarchical_navigable_small_world_graphs)
-- [Malkov & Yashunin, *Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs*](https://arxiv.org/abs/1603.09320) - the original 2016 paper
+- [Malkov & Yashunin, *Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs*](https://arxiv.org/abs/1603.09320): the original 2016 paper
 - [Pinecone: Faiss / HNSW explainer](https://www.pinecone.io/learn/series/faiss/hnsw/)
 - [Qdrant indexing concepts](https://qdrant.tech/documentation/concepts/indexing/#vector-index)
 - [.NET Large Object Heap docs](https://learn.microsoft.com/en-us/dotnet/standard/garbage-collection/large-object-heap)
-- [`dotnet-counters` reference](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters) - the tool that surfaced the LOH in the first place
-- [JetBrains dotMemory command-line profiler](https://www.jetbrains.com/help/dotmemory/Command-Line_Profiler.html) - the CLI / global-tool memory profiler used for this rework
-- [JetBrains dotTrace command-line profiler](https://www.jetbrains.com/help/profiler/Performance_Profiling__Profiling_Using_the_Command_Line.html) - same shape for performance / timeline profiling
-- [sqlite-vss](https://github.com/asg017/sqlite-vss) - SQLite + Faiss, if and when the persistent layer outgrows brute force
+- [`dotnet-counters` reference](https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters): the tool that surfaced the LOH in the first place
+- [JetBrains dotMemory command-line profiler](https://www.jetbrains.com/help/dotmemory/Command-Line_Profiler.html): the CLI / global-tool memory profiler used for this rework
+- [JetBrains dotTrace command-line profiler](https://www.jetbrains.com/help/profiler/Performance_Profiling__Profiling_Using_the_Command_Line.html): same shape for performance / timeline profiling
+- [sqlite-vss](https://github.com/asg017/sqlite-vss): SQLite + Faiss, if and when the persistent layer outgrows brute force
 
-Source for the implementation: [github.com/scottgal/stylobot](https://github.com/scottgal/stylobot).
+Source for the implementation: [github.com/scottgal/stylobot](https://github.com/scottgal/stylobot). Live engine, dashboard, and commercial controls at [stylobot.net](https://www.stylobot.net).
