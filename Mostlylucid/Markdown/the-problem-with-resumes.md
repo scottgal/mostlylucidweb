@@ -123,9 +123,9 @@ flowchart LR
     D --> A[Supporting artefact]
     A --> V[External verification where available]
 
-    classDef claim fill:transparent,stroke:#89b4fa,stroke-width:2px
-    classDef context fill:transparent,stroke:#f9e2af,stroke-width:2px
-    classDef evidence fill:transparent,stroke:#a6e3a1,stroke-width:2px
+    classDef claim fill:none,stroke:#89b4fa,stroke-width:2px
+    classDef context fill:none,stroke:#f9e2af,stroke-width:2px
+    classDef evidence fill:none,stroke:#a6e3a1,stroke-width:2px
     class C claim
     class R,D context
     class A,V evidence
@@ -239,10 +239,10 @@ flowchart TB
     ML --> C
     C -. must resolve to .-> E
 
-    classDef source fill:transparent,stroke:#a6e3a1,stroke-width:2px
-    classDef human fill:transparent,stroke:#89b4fa,stroke-width:2px
-    classDef machine fill:transparent,stroke:#cba6f7,stroke-width:2px
-    classDef constraint fill:transparent,stroke:#f9e2af,stroke-width:2px
+    classDef source fill:none,stroke:#a6e3a1,stroke-width:2px
+    classDef human fill:none,stroke:#89b4fa,stroke-width:2px
+    classDef machine fill:none,stroke:#cba6f7,stroke-width:2px
+    classDef constraint fill:none,stroke:#f9e2af,stroke-width:2px
     class E source
     class H,HL human
     class M,ML machine
@@ -297,15 +297,35 @@ There is little strong independent evidence that:
 
 ATS products are proprietary, varied and continually changing. The safest advice remains painfully generic: use predictable headings, preserve the reading order and make the evidence easy to recover. That is not optimisation. It is damage limitation.
 
-## Three Layers, One Artefact
+## One Ledger, Three Publication Resolutions
 
-The scientific publishing model gives the résumé three distinct layers:
+The scientific publishing model gives the published résumé three distinct
+layers, but the implementation needs one more thing behind them: a canonical
+career ledger.
 
 | Scientific paper | Evidence-aware résumé | Purpose |
 |---|---|---|
 | Human prose | Human-written Markdown | Communicate clearly to a person. |
 | Indexing metadata | JobML entities, concepts and dates | Make the document explicit and discoverable to machines. |
 | Citations and references | Inline cJobML numbers and a References section | Connect each important claim to its justification. |
+
+The ledger is the application's complete working record. It can retain imported
+files, rejected extraction candidates, merge decisions, private observations,
+the evidence and skill ledgers, article summaries, repository descriptions,
+embeddings and role centroids. It is deliberately richer than anything I would
+publish.
+
+JobML is now the portable envelope around that record, not another name for the
+record itself. A `career_record` JobML document is the complete interchange
+projection. A `resume` JobML document is a selected role-specific projection.
+cJobML is the compact citation projection attached to the résumé a person sends.
+
+```text
+canonical career ledger
+    ├── JobML career_record     complete portable projection
+    ├── JobML resume            role-specific machine projection
+    └── cJobML                  compact published citations
+```
 
 These layers can travel together, but they are not copies of one another. The
 prose can remain concise, selective and recognisably human. The machine layer can
@@ -340,13 +360,13 @@ This also exposes drift. If an edited paragraph no longer supports a claim, the
 citation becomes stale. A skill cannot quietly survive in a detached keyword
 list after its only supporting passage has disappeared.
 
-## JobML Is the Full Citation Ledger
+## JobML Is the Portable Citation Record
 
 [JobML 0.1](https://github.com/scottgal/lucidRESUME/blob/main/docs/jobml-0.1.md)
-is the small format I built around that idea. The editable source contains
-ordinary Markdown and a fenced YAML block. The Markdown is the authored document.
-The YAML records claims and points each one back to evidence in the prose or to
-an external source.
+is the small interchange format I built around that idea. The editable source
+contains ordinary Markdown and a fenced YAML block. The Markdown is the authored
+document. The YAML records claims and points each one back to evidence in the
+prose or to an external source.
 
 The rule at the centre of it is:
 
@@ -368,6 +388,7 @@ Led the modernisation of a high-volume ASP.NET Core platform.
 ```jobml
 jobml:
   version: "0.1"
+  profile: career_record
   purpose: >
     Machine-readable representation of claims made by this resume. Claims are
     supported by human-readable prose or external evidence. Absence of a claim
@@ -379,9 +400,8 @@ jobml:
     - Treat JobML as a higher-resolution description, not as replacement prose.
 
 document:
-  id: jane-smith-resume
+  id: jane-smith-career-record
   language: en-GB
-  complete_ledger: https://example.com/jane-smith.jobml
 
 entities:
   - id: example-corp
@@ -417,18 +437,41 @@ concepts:
     type: skill
     name: ASP.NET Core
     aliases: [ASP.NET, .NET web development]
+  - id: engineering-leadership
+    type: capability
+    name: Engineering Leadership
+
+semantic_spaces:
+  - id: article-demo-v1
+    model: example/article-demo-v1
+    dimensions: 4
+    normalization: l2
+
+role_centroids:
+  - id: head-of-engineering
+    name: Head of Engineering
+    space: article-demo-v1
+    derived_from: [engineering-leadership]
+    vector: [0.12, -0.34, 0.56, 0.75]
 ```
 ````
 
 Read cold, its intent should be obvious. JobML is schema-checkable YAML, but the explanation travels inside the file. The `purpose` and `semantics` tell an unfamiliar LLM what the document means and what it must not infer.
 
+The real exporter uses the local `all-MiniLM-L6-v2` ONNX model and writes its
+384-dimensional space descriptor, concept vectors and shipped role centroids
+into `career_record`. Those values help another processor reproduce semantic
+selection. They are explicitly derived artefacts: a nearby vector can rank a
+claim, but it cannot make the claim true or become evidence for it.
+
 A formal [JSON Schema](https://github.com/scottgal/lucidRESUME/blob/main/docs/jobml-0.1.schema.json) supports deterministic tools. There is also a *cold-parser test*: give the document to a general model with no JobML prompt and ask it to identify the claims, evidence and unsupported assertions. If it cannot work that out from the file, the format has failed.
 
-The full representation is useful while writing because it contains the original
+The `career_record` representation is useful while writing and between tools
+because it contains the original
 passage, stable selector, fingerprint, review state and provenance. It is much too
 large to append to every résumé. Scientific papers already have a better answer:
 put small numbered links in the prose, a compact reference list at the end, and a
-link to the complete record when somebody needs the detail.
+link to the full JobML record when somebody needs the detail.
 
 ## cJobML Is the Published Reference List
 
@@ -450,15 +493,15 @@ cJobML 0.1: xref [n] in prose resolves to ref [n]. Full JobML: <https://example.
 That is close to the convention a scientific reader already understands. cJobML
 borrows the useful concepts from JATS rather than its XML syntax: an inline
 [`xref`](https://jats.nlm.nih.gov/archiving/tag-library/1.2d2/attribute/ref-type.html)
-points into a reference list, each numbered item is a `ref`, and the complete
-ledger link plays the role of a
+points into a reference list, each numbered item is a `ref`, and the full-JobML
+link plays the role of a
 [`self-uri`](https://jats.nlm.nih.gov/publishing/tag-library/1.4/element/self-uri.html)
 or supplementary record.
 
 The compact form leaves out the quoted passage, selector, checksum, drift state,
 concept graph and review history. Those are editing machinery and remain in full
 JobML. The résumé keeps only what publication needs: a number beside the claim, a
-recognisable source at the end, and a route to the complete ledger.
+recognisable source at the end, and a route to the full JobML career record.
 
 Reference numbers identify evidence sources, not claims. If three claims cite the
 same article or repository, they reuse the same number. Rendering does no NER,
@@ -577,9 +620,9 @@ flowchart TB
     LR --> C
     MR --> C
 
-    classDef source fill:transparent,stroke:#a6e3a1,stroke-width:2px
-    classDef human fill:transparent,stroke:#89b4fa,stroke-width:2px
-    classDef machine fill:transparent,stroke:#cba6f7,stroke-width:2px
+    classDef source fill:none,stroke:#a6e3a1,stroke-width:2px
+    classDef human fill:none,stroke:#89b4fa,stroke-width:2px
+    classDef machine fill:none,stroke:#cba6f7,stroke-width:2px
     class E,C source
     class ER,LR human
     class MR machine
@@ -598,6 +641,57 @@ to make generated text pass as human text.
 
 That distinction matters. The output pipeline is not a final prompt which asks a model to rediscover the candidate from source documents. Extraction happens once at ingestion, using deterministic parsing, NER, and optionally an LLM. Each result keeps its source, method, confidence, review state, and evidence fingerprint. The ledger is then kept current as sources change. Markdown, JobML, Word, and PDF are projections of a particular ledger revision. They are not new interpretations of it.
 
+## From a Complete Career to an Appropriate Résumé
+
+The useful product surface is much smaller than the machinery underneath it:
+
+> Paste the job. Get the right version of you.
+
+The hard work happens earlier. Old résumés, a LinkedIn export, repositories,
+projects and linked articles become one reviewed career ledger and a deliberately
+long human career transcript. JobML `career_record` is the portable expression
+of that work.
+
+A job description is then a query, not a writing prompt. It changes which parts
+of the record are selected, their order and the resolution at which they are
+presented. It does not get permission to modify the candidate.
+
+```mermaid
+flowchart LR
+    L[Canonical career ledger] --> C[JobML career_record]
+    J[Job description] --> Q[Requirement query]
+    C --> S[Evidence selection]
+    Q --> S
+    S --> H[Role-specific human résumé]
+    S --> M[JobML resume]
+    M --> R[cJobML references]
+    H --> O[Word or PDF]
+    R --> O
+
+    classDef source fill:none,stroke:#a6e3a1,stroke-width:2px
+    classDef process fill:none,stroke:#89b4fa,stroke-width:2px
+    classDef output fill:none,stroke:#cba6f7,stroke-width:2px
+    class L,C,J source
+    class Q,S process
+    class H,M,R,O output
+```
+
+Semantic concepts and role centroids help retrieve the relevant evidence for a
+Lead Developer, Head of Engineering, CTO or VP Engineering role. Their influence
+ends at ranking. They remain derived indexes, much like the search index around
+a scientific archive; they are not citations and they cannot establish a fact.
+
+The human résumé starts from human prose in the complete transcript. Usually it
+is selected and compressed. It may be tightened with assistance, but the result
+remains an editorial draft until the person accepts it. The accompanying JobML
+`resume` preserves the selected claim identities, cJobML adds the compact
+references, and `document.full_jobml` provides the route back to the published
+career record.
+
+This is a compiler in the useful sense. The same reviewed source can produce
+different documents without becoming different people. The résumé changes with
+the question. The evidence does not.
+
 ## Importing Several Imperfect Résumés
 
 Most people begin with `resume-final.docx`, `resume-final-2.pdf`, an old LinkedIn export and three role-specific variants which disagree about dates and wording.
@@ -613,7 +707,10 @@ There are two ways this can go wrong:
 
 Layout detection, deterministic parsing and a local model can improve the first. The second is a review decision. [LLamaSharp](https://github.com/SciSharp/LLamaSharp) and the local [grug-9b GGUF model](https://huggingface.co/ProCreations/grug-9b-gguf) assist extraction. Imported prose and explicit human acceptance are authoritative.
 
-The Avalonia UI tests exercise import → merge → draft → reconcile → publish against multiple real DOCX variants. That matters more than a parser demo: dangerous failures occur between stages, when uncertain extraction quietly becomes accepted fact.
+The important boundary sits between extraction and acceptance. A parser may
+identify a plausible employer, date or skill, but uncertainty must not quietly
+become professional fact as the document moves through merge, drafting and
+publication.
 
 ### Extraction Produces Candidates, Not Facts
 
@@ -735,14 +832,14 @@ claim? The stable reference and quote selector handle location and recovery.
 Producing valid PDF text is not the same as surviving a résumé parser, so I also
 fed the generated PDF through the open-source
 [OpenResume parser](https://github.com/xitanggg/open-resume) using its real browser
-interface. The test recovered the candidate's name, email, GitHub link, summary,
+interface. It recovered the candidate's name, email, GitHub link, summary,
 skills, experience achievement, its `[1]` marker, the compact reference, both
-URLs and the complete-ledger link.
+URLs and the full-JobML link.
 
-It also found a useful compatibility problem. OpenResume has a fixed model for
-profile, education, work, projects and skills, but no References section. It
-preserved the reference text, then classified that unfamiliar section as project
-content. Nothing important vanished, but its category was wrong.
+OpenResume has a fixed model for profile, education, work, projects and skills,
+but no References section. It preserved the reference text as project content.
+That is a useful limitation to understand: an older parser can retain unfamiliar
+material without understanding its category.
 
 That result is evidence, not a victory banner. It shows that the generated text,
 links and citation relationship survive one real, freely inspectable ATS-style
@@ -751,12 +848,11 @@ suggests the right fallback: keep the reference list plain and compact, and let 
 JobML-aware parser recover its richer meaning without making an older parser fail
 the rest of the résumé.
 
-The deterministic cJobML parser separately checks that every inline number has a
-matching reference. A cold OpenAI Responses API test then gives the published
-document to a general model with no JobML-specific prompt. Across repeated runs it
-recovered the cited claim, reference number, evidence URL and full-ledger URL.
-Those tests cover different failures: syntax, conventional résumé extraction and
-semantic comprehension.
+The same document is also legible at two other levels. A deterministic cJobML
+parser can pair every inline number with its reference, while a general language
+model with no JobML-specific prompt can recover the cited claim, evidence URL
+and full-JobML URL. That is the progressive-enhancement goal: ordinary readers,
+existing résumé parsers and JobML-aware tools can each take what they understand.
 
 ## Why Not Extend an Existing Résumé Format?
 
@@ -790,10 +886,10 @@ flowchart LR
     C --> R[Valid citation]
     R --> E[Human prose or external evidence]
 
-    classDef requirement fill:transparent,stroke:#f38ba8,stroke-width:2px
-    classDef machine fill:transparent,stroke:#cba6f7,stroke-width:2px
-    classDef claim fill:transparent,stroke:#89b4fa,stroke-width:2px
-    classDef evidence fill:transparent,stroke:#a6e3a1,stroke-width:2px
+    classDef requirement fill:none,stroke:#f38ba8,stroke-width:2px
+    classDef machine fill:none,stroke:#cba6f7,stroke-width:2px
+    classDef claim fill:none,stroke:#89b4fa,stroke-width:2px
+    classDef evidence fill:none,stroke:#a6e3a1,stroke-width:2px
     class J requirement
     class S machine
     class C claim
@@ -838,9 +934,9 @@ a route back to the reviewed evidence behind every important machine claim.
 That completes the first half of the pipeline: imperfect source documents have
 become a reviewed ledger, and every published résumé is a projection of it. In
 [part two](/blog/lucidresume-evidence-filler), I use Chrome's local Gemini Nano
-model to map unfamiliar job-form questions onto that ledger. It is a useful
-demonstration of the boundary: the model may find evidence, but it still cannot
-author a new professional fact.
+model to map unfamiliar job-form questions onto the published JobML career
+record. It is a useful demonstration of the boundary: the model may find
+evidence, but it still cannot author a new professional fact.
 
 ## References
 
