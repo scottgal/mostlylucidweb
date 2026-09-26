@@ -48,6 +48,9 @@ ledger produces résumés without being re-inferred at render time. In
 [part two, the job form becomes another projection](/blog/lucidresume-evidence-filler):
 Chrome's on-device model maps unfamiliar form questions back to this same
 evidence without inventing answers.
+[Part three compiles a real role-specific résumé from my complete career
+record](/blog/lucidresume-web-compiler), with cJobML references linking its
+compressed statements back to the fuller transcript and public artefacts.
 
 [TOC]
 
@@ -356,13 +359,25 @@ complete career record. The JobML layer can be richer, link to external sources
 and support shorter role-specific documents. It must not overwrite the author's
 words or turn an inference into fact.
 
+The ledger also needs an identity for the work which is separate from the name
+on an invoice. My Seamcor work continued through Rooikat Investment when the
+contracting entity changed for legal reasons. It remained the same product,
+team and delivery responsibility. Treating the two company names as two jobs
+would shorten the apparent tenure, duplicate the product and make the history
+less accurate. The reviewed record therefore keeps both legal entities and
+their source dates, but publishes one continuous product engagement.
+
+That is the résumé equivalent of resolving two citations which describe the
+same study. We retain what each source actually says, record the reviewed
+relationship between them, and avoid counting the same underlying work twice.
+
 This also exposes drift. If an edited paragraph no longer supports a claim, the
 citation becomes stale. A skill cannot quietly survive in a detached keyword
 list after its only supporting passage has disappeared.
 
 ## JobML Is the Portable Citation Record
 
-[JobML 0.1](https://github.com/scottgal/lucidRESUME/blob/main/docs/jobml-0.1.md)
+[JobML 0.1](https://github.com/scottgal/lucidRESUME/blob/main/docs/jobml-0.1-specification.md)
 is the small interchange format I built around that idea. The editable source
 contains ordinary Markdown and a fenced YAML block. The Markdown is the authored
 document. The YAML records claims and points each one back to evidence in the
@@ -681,6 +696,12 @@ Lead Developer, Head of Engineering, CTO or VP Engineering role. Their influence
 ends at ranking. They remain derived indexes, much like the search index around
 a scientific archive; they are not citations and they cannot establish a fact.
 
+Their score is evidence coverage, not a hiring verdict. A record can contain
+language which is semantically close to almost every paragraph in a vacancy and
+still miss a hard requirement such as a qualification, a particular scale of
+leadership or direct experience training foundation models. Calling that number
+"fit" would turn a retrieval measurement into an unsupported career claim.
+
 The human résumé starts from human prose in the complete transcript. Usually it
 is selected and compressed. It may be tightened with assistance, but the result
 remains an editorial draft until the person accepts it. The accompanying JobML
@@ -699,6 +720,28 @@ Most people begin with `resume-final.docx`, `resume-final-2.pdf`, an old LinkedI
 ![An imported Word résumé rendered as pages beside the extracted structure and quality report](lucidresume/01-first-docx-with-experience.png?width=1200&format=webp&quality=80)
 
 lucidRESUME imports multiple documents, parses experience, education, projects and skills, then presents merge candidates. Finding "Kubernetes" in two files gives us something to review. It does not establish a fact.
+
+The real record produced a more interesting merge than a spelling variation.
+LinkedIn listed Seamcor and Rooikat as overlapping positions. A contract named
+Rooikat as the client but explicitly described the work as development,
+deployment and management of the Seamcor application and architecture. I could
+then confirm that the work began in December 2022 and continued to May 2024 on
+the same product. The accepted record became:
+
+```text
+Head of Software / Contract Head of Development
+Seamcor Ltd / Rooikat Investment Ltd
+December 2022 to May 2024
+
+One product and team; contracting entity changed for legal reasons.
+Recruited eight engineers and led a mixed-seniority team of more than ten.
+```
+
+No parser could responsibly infer all of that from one document. Equally, a
+model should not smooth the overlap into a plausible story and forget where it
+came from. The ledger retains the source observations, the explicit continuity
+decision and the reviewed dates. Every later résumé receives the same chronology
+without reinterpreting the imports.
 
 There are two ways this can go wrong:
 

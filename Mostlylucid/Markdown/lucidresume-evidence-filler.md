@@ -42,6 +42,9 @@ deterministic parsing, NER, optional bounded model decisions and human review.
 It then exports that private working ledger as a portable JobML
 `career_record`. This part begins at the published export, not inside the source
 ledger.
+[Part three uses my own career record as the worked example for the web
+compiler](/blog/lucidresume-web-compiler): paste a job description, select
+reviewed evidence, and export a short résumé with cJobML references.
 
 > **NOTE:** lucidRESUME is a research project, not an application automation
 > product. This extension is a prototype and never submits a form.
@@ -351,6 +354,18 @@ No published evidence explicitly establishes sponsorship requirements.
 The same rule applies to salary, consent, demographic declarations and current
 availability. These are decisions or facts which need direct support from the
 person. A plausible inference is still an unsupported answer.
+
+"Current employer" is less dull than it first appears. My canonical record has
+Mostlylucid as my company, client engagements beneath it and one continuous
+product engagement whose contracting entity changed from Seamcor to Rooikat for
+legal reasons. Sorting organisations by their latest date would not answer the
+form's question. Depending on what the site means, the honest answer might be
+Mostlylucid, a current client, self-employed, or nothing at all.
+
+The published record can expose an explicit, person-reviewed answer for that
+purpose. Until it does, the extension leaves the field blank. Gemini is not
+allowed to convert chronology or a legal entity name into an employment
+relationship.
 
 The full decision table for the fixture looks like this:
 
