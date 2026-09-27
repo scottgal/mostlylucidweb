@@ -271,6 +271,8 @@ public class QdrantVectorStoreService : IVectorStoreService
                     }
                 },
                 limit: 1,
+                // Scroll omits vectors unless asked for them, and without one there is nothing to compare
+                vectorsSelector: new WithVectorsSelector { Enable = true },
                 cancellationToken: cancellationToken
             );
 
@@ -281,24 +283,23 @@ public class QdrantVectorStoreService : IVectorStoreService
                 return new List<SearchResult>();
             }
 
-            // Check if the point has valid vector data
-            if (point.Vectors?.Vector == null)
+            // GetDenseVector reads the current Dense field and falls back to the deprecated Data
+            // field, so this works whichever one the server populates
+            var vector = point.Vectors?.Vector?.GetDenseVector()?.Data.ToArray();
+            if (vector == null || vector.Length == 0)
             {
                 _logger.LogWarning("Post {Slug} found in vector store but has no vector data", slug);
                 return new List<SearchResult>();
             }
 
             // Use the document's vector to find similar posts
-            // Note: .Data is obsolete but still works - the vector is accessed directly
-#pragma warning disable CS0612 // Type or member is obsolete
             var searchResults = await _client.SearchAsync(
                 collectionName: _config.CollectionName,
-                vector: point.Vectors.Vector.Data.ToArray(),
+                vector: vector,
                 limit: (ulong)(limit + 1), // +1 because the first result will be the post itself
                 scoreThreshold: _config.MinimumSimilarityScore,
                 cancellationToken: cancellationToken
             );
-#pragma warning restore CS0612 // Type or member is obsolete
 
             // Filter out the original post and return top N similar posts
             return searchResults

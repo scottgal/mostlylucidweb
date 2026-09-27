@@ -145,6 +145,7 @@ try
     // Announcement service
     builder.Configure<AnnouncementConfig>();
     services.AddScoped<IAnnouncementService, AnnouncementService>();
+    services.AddSingleton<ISiteContentService, SiteContentService>();
 
     services.AddImageSharp().Configure<PhysicalFileSystemCacheOptions>(options => options.CacheFolder = "cache");
     services.SetupEmail(config);

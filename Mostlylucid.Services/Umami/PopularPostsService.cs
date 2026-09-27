@@ -4,6 +4,7 @@ using Mostlylucid.Services.Blog;
 using Mostlylucid.Shared.Models;
 using Umami.Net.UmamiData;
 using Umami.Net.UmamiData.Models.RequestObjects;
+using Umami.Net.UmamiData.Models.ResponseObjects;
 
 namespace Mostlylucid.Services.Umami;
 
@@ -89,27 +90,7 @@ public class PopularPostsService(
             }
 
             // Aggregate all language variants of the same post
-            var aggregatedPosts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var post in blogPosts)
-            {
-                if (!post.x.StartsWith("/blog/", StringComparison.OrdinalIgnoreCase))
-                    continue;
-
-                var slug = post.x.Substring(6).Trim('/');
-
-                // Remove language extension if present (e.g., "slug.fr" -> "slug")
-                var baseSlug = slug.Contains('.') ? slug.Substring(0, slug.LastIndexOf('.')) : slug;
-
-                if (aggregatedPosts.ContainsKey(baseSlug))
-                {
-                    aggregatedPosts[baseSlug] += post.y;
-                }
-                else
-                {
-                    aggregatedPosts[baseSlug] = post.y;
-                }
-            }
+            var aggregatedPosts = AggregateBySlug(blogPosts);
 
             // Find the most popular post
             var mostPopular = aggregatedPosts.OrderByDescending(kvp => kvp.Value).FirstOrDefault();
@@ -150,6 +131,63 @@ public class PopularPostsService(
         {
             _semaphore.Release();
         }
+    }
+
+    private static Dictionary<string, int> AggregateBySlug(IEnumerable<MetricsResponseModels> blogPaths)
+    {
+        var aggregated = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        foreach (var path in blogPaths)
+        {
+            var slug = GetPostSlug(path.x);
+            if (slug == null) continue;
+            aggregated[slug] = aggregated.GetValueOrDefault(slug) + path.y;
+        }
+
+        return aggregated;
+    }
+
+    // Blog routes that live under /blog/ but are not posts
+    private static readonly HashSet<string> NonPostSegments = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "category", "categories", "calendar-days", "date-range", "drafts", "language"
+    };
+
+    /// <summary>
+    /// Maps a tracked path to the post it belongs to, so every language of a post counts once:
+    /// /blog/{slug}, /blog/{language}/{slug}, /blog/language/{slug}/{language} and the older
+    /// /blog/{slug}.{language}. Returns null for paths that are not a post.
+    /// </summary>
+    public static string? GetPostSlug(string path)
+    {
+        if (string.IsNullOrEmpty(path)) return null;
+
+        var end = path.IndexOfAny(['?', '#']);
+        if (end >= 0) path = path[..end];
+
+        var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+        if (segments.Length < 2 || !segments[0].Equals("blog", StringComparison.OrdinalIgnoreCase)) return null;
+
+        string slug;
+        switch (segments.Length)
+        {
+            case 2 when !NonPostSegments.Contains(segments[1]):
+                slug = segments[1];
+                break;
+            case 3 when segments[1].Length == 2:
+                slug = segments[2];
+                break;
+            case 4 when segments[1].Equals("language", StringComparison.OrdinalIgnoreCase):
+                slug = segments[2];
+                break;
+            default:
+                return null;
+        }
+
+        // Older translated URLs carried the language as an extension (e.g. "slug.fr")
+        var dot = slug.LastIndexOf('.');
+        if (dot > 0) slug = slug[..dot];
+
+        return slug;
     }
 
     public async Task<PopularPost?> GetCachedPopularPost()
@@ -203,18 +241,7 @@ public class PopularPostsService(
             }
 
             // Aggregate all language variants of the same post
-            var aggregatedPosts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (var post in blogPosts)
-            {
-                var slug = post.x.Substring(6).Trim('/');
-                var baseSlug = slug.Contains('.') ? slug.Substring(0, slug.LastIndexOf('.')) : slug;
-
-                if (aggregatedPosts.ContainsKey(baseSlug))
-                    aggregatedPosts[baseSlug] += post.y;
-                else
-                    aggregatedPosts[baseSlug] = post.y;
-            }
+            var aggregatedPosts = AggregateBySlug(blogPosts);
 
             // Get top posts
             var topSlugs = aggregatedPosts

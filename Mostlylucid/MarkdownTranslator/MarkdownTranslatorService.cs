@@ -98,12 +98,17 @@ public class MarkdownTranslatorService(
     {
         var workingIPs = new List<string>();
 
+        // Always probe every configured IP, not just the ones that answered last time. This runs
+        // on a timer, and probing only the survivors meant one failed ping removed an IP for good -
+        // once the list was empty translation stayed dead until the app was restarted.
+        var configuredIPs = translateServiceConfig.IPs;
+
         try
         {
-            logger.LogWarning("Checking service status for {IPs}", string.Join(", ", IPs));
-            foreach (var ip in IPs)
+            logger.LogDebug("Checking service status for {IPs}", string.Join(", ", configuredIPs));
+            foreach (var ip in configuredIPs)
             {
-                logger.LogInformation("Checking service status at {IP}", ip);
+                logger.LogDebug("Checking service status at {IP}", ip);
                 try
                 {
                     var response = await client.GetAsync($"{ip}/model_name", cancellationToken);
@@ -139,18 +144,18 @@ public class MarkdownTranslatorService(
     {
         return await _resiliencePipeline.ExecuteAsync(async ct =>
         {
-            if (!IPs.Any())
+            // Snapshot: the health check can swap the list out between reads
+            var ips = IPs;
+            if (ips.Length == 0)
             {
                 logger.LogError("No IPs available for translation");
                 throw new Exception("No IPs available for translation");
             }
 
-            var ip = IPs[currentIPIndex];
+            var index = (int)((uint)Interlocked.Increment(ref currentIPIndex) % (uint)ips.Length);
+            var ip = ips[index];
 
             logger.LogInformation("Sending request to {IP}", ip);
-
-            // Update the index for the next request
-            currentIPIndex = (currentIPIndex + 1) % IPs.Length;
             var postObject = new PostRecord(targetLang, elements);
 
             var response = await client.PostAsJsonAsync($"{ip}/translate", postObject, ct);

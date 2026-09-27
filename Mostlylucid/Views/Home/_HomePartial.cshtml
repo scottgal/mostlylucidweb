@@ -1,9 +1,22 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model Mostlylucid.Models.IndexPageViewModel
+@inject Mostlylucid.Blog.ISiteContentService SiteContentService
+@{
+    // Edit Markdown/site/home-intro.md to change this; the text below is the fallback if it is missing
+    var intro = SiteContentService.Get(Mostlylucid.Blog.SiteContentService.HomeIntro);
+}
 <title > @ViewBag.Title</title>
 <div class=" pb-4">
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
         <img src="/img/author.png?format=webp&quality=15" asp-append-version="true" width="64px" height="64px" class="h-16 w-16 mask mask-circle flex-shrink-0" alt="author"/>
+        @if (intro != null)
+        {
+            <div class="font-body text-base text-blue-dark dark:text-white flex-1 [&_p]:mb-2 [&_p:last-child]:mb-0 [&_a]:text-blue-dark dark:[&_a]:text-blue [&_a:hover]:underline">
+                @Html.Raw(intro.Html)
+            </div>
+        }
+        else
+        {
         <p class="font-body text-base text-blue-dark dark:text-white flex-1">
             <span class="font-semibold text-xl">Hi, I'm Scott Galloway</span> —
             I'm a consulting web / internet /  systems / full-cycle, full-stack developer (it's complicated 🤓) specializing in bringing 'AI' to the masses,  .NET Core, full-stack development, cloud, and search technologies. Former Microsoft ASP.NET Program Manager with 30+ years building web applications for Fortune 500 companies and startups.
@@ -12,6 +25,7 @@
             Code on <a href="https://github.com/scottgal/mostlylucidweb" class="text-blue-dark dark:text-blue hover:underline">GitHub</a> |
             Feedback on <a href="https://hachyderm.io/@("@")scottgal@("@")hachyderm.io" class="text-blue-dark dark:text-blue hover:underline">Mastodon</a>
         </p>
+        }
     </div>
 </div>
 

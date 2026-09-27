@@ -1,0 +1,1 @@
+**I'm currently looking for my next role** (contract, full-time or consultancy). See what I'm building in the [lucidRESUME series](/blog/the-problem-with-resumes) ([all JobML posts](/blog/category/JobML)) or [get in touch](mailto:scott.galloway+ml@gmail.com).

@@ -62,7 +62,10 @@ public partial class UmamiDataService
     /// </code>
     /// </para>
     /// </remarks>
-    public async Task<UmamiResult<MetricsResponseModels[]>> GetMetrics(MetricsRequest metricsRequest)
+    public Task<UmamiResult<MetricsResponseModels[]>> GetMetrics(MetricsRequest metricsRequest) =>
+        GetMetrics(metricsRequest, isRetry: false);
+
+    private async Task<UmamiResult<MetricsResponseModels[]>> GetMetrics(MetricsRequest metricsRequest, bool isRetry)
     {
         if (metricsRequest == null)
         {
@@ -116,12 +119,14 @@ public partial class UmamiDataService
                     content ?? Array.Empty<MetricsResponseModels>());
             }
 
-            // Handle unauthorized - retry once after re-authentication
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            // Handle unauthorized - retry once after re-authentication. Only once: Umami also answers
+            // 401 when the user cannot view the website, and the token still verifies in that case,
+            // so an unbounded retry never ends.
+            if (response.StatusCode == HttpStatusCode.Unauthorized && !isRetry)
             {
                 logger.LogWarning("Received 401 Unauthorized, attempting to re-authenticate");
-                await authService.Login();
-                return await GetMetrics(metricsRequest);
+                await authService.Login(skipVerify: true);
+                return await GetMetrics(metricsRequest, isRetry: true);
             }
 
             // Log detailed error information

@@ -12,15 +12,18 @@ public class AnnouncementController : Controller
 {
     private const string DismissedCookiePrefix = "announcement_dismissed_";
     private readonly IAnnouncementService _announcementService;
+    private readonly ISiteContentService _siteContentService;
     private readonly UmamiBackgroundSender _umamiBackgroundSender;
     private readonly ILogger<AnnouncementController> _logger;
 
     public AnnouncementController(
         IAnnouncementService announcementService,
+        ISiteContentService siteContentService,
         UmamiBackgroundSender umamiBackgroundSender,
         ILogger<AnnouncementController> logger)
     {
         _announcementService = announcementService;
+        _siteContentService = siteContentService;
         _umamiBackgroundSender = umamiBackgroundSender;
         _logger = logger;
     }
@@ -33,13 +36,15 @@ public class AnnouncementController : Controller
     {
         var announcement = await _announcementService.GetActiveAnnouncementAsync(language, cancellationToken);
 
-        if (announcement == null)
+        // A database announcement wins; otherwise fall back to Markdown/site/announcement.md
+        var dto = announcement != null ? MapToDto(announcement) : GetSiteAnnouncement(language);
+        if (dto == null)
         {
             return Content(string.Empty);
         }
 
         // Check if user has dismissed this announcement
-        var cookieName = DismissedCookiePrefix + announcement.Key;
+        var cookieName = DismissedCookiePrefix + dto.Key;
         if (Request.Cookies.ContainsKey(cookieName))
         {
             return Content(string.Empty);
@@ -48,11 +53,10 @@ public class AnnouncementController : Controller
         // Track announcement view
         await _umamiBackgroundSender.Track("announcement_view", new UmamiEventData
         {
-            { "key", announcement.Key },
-            { "language", announcement.Language }
+            { "key", dto.Key },
+            { "language", dto.Language }
         });
 
-        var dto = MapToDto(announcement);
         return PartialView("_Announcement", dto);
     }
 
@@ -86,6 +90,21 @@ public class AnnouncementController : Controller
         });
 
         return Ok();
+    }
+
+    private AnnouncementDto? GetSiteAnnouncement(string language)
+    {
+        var content = _siteContentService.Get(SiteContentService.Announcement);
+        if (content == null) return null;
+
+        return new AnnouncementDto
+        {
+            // Keyed on the content hash so editing the file re-shows it to people who dismissed it
+            Key = $"site-{content.Hash}",
+            HtmlContent = content.Html,
+            Language = language,
+            IsActive = true
+        };
     }
 
     private static AnnouncementDto MapToDto(AnnouncementEntity entity)

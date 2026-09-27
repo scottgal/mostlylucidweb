@@ -161,9 +161,18 @@ public class MarkdownDirectoryWatcherService(
         logger.LogDebug("Processing {Count} coalesced markdown change(s)", batch.Count);
 
         var touched = false;
+        var siteContentTouched = false;
         foreach (var (name, change) in batch)
         {
             if (cancellationToken.IsCancellationRequested) break;
+
+            // Site fragments (home intro, announcement) are not posts - SiteContentService reads
+            // them on demand, so all that is needed here is to drop the cached pages that show them.
+            if (SiteContentService.IsSiteContentPath(name))
+            {
+                siteContentTouched = true;
+                continue;
+            }
 
             try
             {
@@ -187,6 +196,12 @@ public class MarkdownDirectoryWatcherService(
             {
                 logger.LogError(e, "Error processing markdown change for {Name}", name);
             }
+        }
+
+        if (siteContentTouched)
+        {
+            await outputCacheStore.EvictByTagAsync(SiteContentService.OutputCacheTag, CancellationToken.None);
+            logger.LogInformation("Site content changed; evicted cached pages that show it");
         }
 
         if (!touched) return;

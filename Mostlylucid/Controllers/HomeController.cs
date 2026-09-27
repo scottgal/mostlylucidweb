@@ -15,7 +15,8 @@ public class HomeController(BaseControllerService baseControllerService, ILogger
     : BaseController(baseControllerService, logger)
 {
     [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request", "pagerequest", "homerequest", "Cookie" },
-        VaryByQueryKeys = new[] { "page", "pageSize", "startDate", "endDate", "language", "orderBy", "orderDir", "order", "category" })]
+        VaryByQueryKeys = new[] { "page", "pageSize", "startDate", "endDate", "language", "orderBy", "orderDir", "order", "category" },
+        Tags = new[] { SiteContentService.OutputCacheTag })]
     [HttpGet]
     public async Task<IActionResult> Index(int page = 1, int pageSize = 10, DateTime? startDate = null, DateTime? endDate = null,
         string language = MarkdownBaseService.EnglishLanguage, string orderBy = "date", string orderDir = "desc",
