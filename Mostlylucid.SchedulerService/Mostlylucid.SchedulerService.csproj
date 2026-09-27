@@ -36,7 +36,7 @@
       <PackageReference Include="SerilogTracing" Version="2.4.0" />
       <PackageReference Include="SerilogTracing.Expressions" Version="2.4.0" />
       <PackageReference Include="SerilogTracing.Instrumentation.AspNetCore" Version="2.4.0" />
-      <PackageReference Include="Scalar.AspNetCore" Version="1.2.60" />
+      <PackageReference Include="Scalar.AspNetCore" Version="2.17.10" />
     </ItemGroup>
 
     <ItemGroup>

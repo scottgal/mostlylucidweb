@@ -11,7 +11,7 @@ public static class MockDbSetExtensions
     public static Mock<DbSet<T>> CreateDbSetMock<T>(this IEnumerable<T> sourceList) where T : class
     {
         // Use the MockQueryable.Moq extension method to create the mock
-        return sourceList.AsQueryable().BuildMockDbSet();
+        return sourceList.ToList().BuildMockDbSet();
     }
 
     // SetupDbSet remains the same, just uses the updated CreateDbSetMock

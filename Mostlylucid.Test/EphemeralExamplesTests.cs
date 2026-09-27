@@ -11,6 +11,17 @@ namespace Mostlylucid.Test;
 /// </summary>
 public class EphemeralExamplesTests
 {
+    /// <summary>
+    /// Polls until the condition holds or the timeout passes. A fixed sleep before asserting on
+    /// background work fails when the machine is busy (e.g. the full suite in a Docker build).
+    /// </summary>
+    private static async Task WaitUntilAsync(Func<bool> condition, int timeoutMs = 5000)
+    {
+        var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
+        while (!condition() && DateTime.UtcNow < deadline)
+            await Task.Delay(20);
+    }
+
     #region SignalingHttpClient Tests
 
     [Fact]
@@ -150,7 +161,7 @@ public class EphemeralExamplesTests
         handler.OnSignal(signal);
 
         // Wait for async processing
-        await Task.Delay(200);
+        await WaitUntilAsync(() => telemetry.GetEvents().Any(e => e.Name == "EphemeralSignal"));
 
         // Assert
         var events = telemetry.GetEvents();
@@ -171,7 +182,12 @@ public class EphemeralExamplesTests
         handler.OnSignal(new SignalEvent("success", 3, null, DateTimeOffset.UtcNow));
 
         // Wait for async processing
-        await Task.Delay(300);
+        await WaitUntilAsync(() =>
+        {
+            var seen = telemetry.GetEvents();
+            return seen.Any(e => e.Type == TelemetryEventType.Exception) &&
+                   seen.Any(e => e.Type == TelemetryEventType.Metric);
+        });
 
         // Assert
         var events = telemetry.GetEvents();
@@ -225,7 +241,7 @@ public class EphemeralExamplesTests
         }
 
         // Wait for processing
-        await Task.Delay(500);
+        await WaitUntilAsync(() => processor.ProcessedCount == 10);
 
         // Assert
         Assert.Equal(10, processed.Count);

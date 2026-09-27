@@ -32,8 +32,14 @@ module.exports = (env, argv) => {
                                 ['@babel/preset-env', {
                                     targets: '> 0.25%, not dead',
                                     modules: false, // ✅ for tree shaking
-                                    useBuiltIns: 'usage',
-                                    corejs: 3,
+                                }],
+                            ],
+                            // Babel 8 moved polyfill injection out of preset-env; this is the
+                            // equivalent of the old useBuiltIns: 'usage', corejs: 3
+                            plugins: [
+                                ['polyfill-corejs3', {
+                                    method: 'usage-global',
+                                    version: require('core-js/package.json').version,
                                 }],
                             ],
                         },

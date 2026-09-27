@@ -48,7 +48,7 @@
     <!-- Package dependencies -->
     <ItemGroup>
         <!-- MinVer -->
-        <PackageReference Include="MinVer" Version="6.0.0">
+        <PackageReference Include="MinVer" Version="8.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -69,7 +69,7 @@
         <!-- ML/Embeddings -->
         <!-- Cross-platform ONNX runtime - CPU only, works on all platforms -->
         <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.30.0" />
-        <PackageReference Include="Markdig" Version="0.44.0" />
+        <PackageReference Include="Markdig" Version="1.4.0" />
         
         <!-- Document Processing -->
         <PackageReference Include="PdfPig" Version="0.1.16" />

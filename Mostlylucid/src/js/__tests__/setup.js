@@ -40,7 +40,13 @@ const localStorageProxy = new Proxy(localStorageBase, {
   }
 });
 
-global.localStorage = localStorageProxy;
+// happy-dom 20 exposes localStorage as a getter-only property, so it has to be redefined
+// rather than assigned
+Object.defineProperty(globalThis, 'localStorage', {
+  configurable: true,
+  writable: true,
+  value: localStorageProxy,
+});
 
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
