@@ -54,38 +54,38 @@
         </PackageReference>
         
         <!-- Core dependencies - .NET 10 -->
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.1" />
-        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.1" />
-        <PackageReference Include="Polly.Core" Version="8.6.5" />
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
+        <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.12" />
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.12" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.12" />
+        <PackageReference Include="Polly.Core" Version="8.8.0" />
         
         <!-- OpenTelemetry for observability -->
-        <PackageReference Include="OpenTelemetry.Api" Version="1.12.0" />
-        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.1" />
+        <PackageReference Include="OpenTelemetry.Api" Version="1.19.1" />
+        <PackageReference Include="System.Diagnostics.DiagnosticSource" Version="10.0.12" />
         
         <!-- ML/Embeddings -->
         <!-- Cross-platform ONNX runtime - CPU only, works on all platforms -->
-        <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.23.0" />
+        <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.30.0" />
         <PackageReference Include="Markdig" Version="0.44.0" />
         
         <!-- Document Processing -->
-        <PackageReference Include="PdfPig" Version="0.1.13" />
-        <PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
-        <PackageReference Include="AngleSharp" Version="1.4.0" />
+        <PackageReference Include="PdfPig" Version="0.1.16" />
+        <PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
+        <PackageReference Include="AngleSharp" Version="1.8.2" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
         
         <!-- Web Fetching (for URL processing with JS-rendered pages) -->
-        <PackageReference Include="Microsoft.Playwright" Version="1.57.0" />
+        <PackageReference Include="Microsoft.Playwright" Version="1.63.0" />
         
         <!-- Vector Storage (optional backends) -->
-        <PackageReference Include="Qdrant.Client" Version="1.16.1" />
-        <PackageReference Include="DuckDB.NET.Data.Full" Version="1.4.3" />
+        <PackageReference Include="Qdrant.Client" Version="1.19.0" />
+        <PackageReference Include="DuckDB.NET.Data.Full" Version="1.5.5" />
         
         <!-- Utilities -->
-        <PackageReference Include="System.IO.Hashing" Version="10.0.1" />
+        <PackageReference Include="System.IO.Hashing" Version="10.0.12" />
         <PackageReference Include="dotnet-stop-words" Version="1.1.0" />
         
         <!-- Override vulnerable transitive dependency from Qdrant.Client -->
