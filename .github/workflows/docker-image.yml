@@ -5,6 +5,8 @@ on:
     tags:
       - 'release-*'
       - 'local-*'
+  # Manual runs build from the selected branch and publish :latest, like a release-* tag
+  workflow_dispatch:
 
 jobs:
   build-and-push:
