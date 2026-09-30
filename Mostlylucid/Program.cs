@@ -16,6 +16,7 @@ using Mostlylucid.SemanticSearch.Extensions;
 using Mostlylucid.SemanticSearch.Services;
 using Mostlylucid.Services.BrokenLinks;
 using Mostlylucid.Services.Announcement;
+using Mostlylucid.Resume;
 
 try
 {  Log.Logger = new LoggerConfiguration()
@@ -33,6 +34,7 @@ try
         config.AddUserSecrets<Program>();
     }
     config.AddEnvironmentVariables();
+    var fileBlogMode = string.Equals(config["Blog:Mode"], "File", StringComparison.OrdinalIgnoreCase);
 
     builder.Host.UseSerilog((context, configuration) =>
     {
@@ -132,15 +134,18 @@ try
 
     // External image download service
     services.AddScoped<ExternalImageDownloadService>();
-    services.AddHostedService<ImageDownloadBackgroundService>();
+    if (!fileBlogMode) services.AddHostedService<ImageDownloadBackgroundService>();
 
     // Popular posts polling service
-    services.AddHostedService<PopularPostsPollingService>();
+    if (!fileBlogMode) services.AddHostedService<PopularPostsPollingService>();
 
     // Broken link detection and archive.org replacement service
     services.AddHttpClient("BrokenLinkChecker");
-    services.AddScoped<IBrokenLinkService, BrokenLinkService>();
-    services.AddHostedService<BrokenLinkCheckerBackgroundService>();
+    if (!fileBlogMode)
+    {
+        services.AddScoped<IBrokenLinkService, BrokenLinkService>();
+        services.AddHostedService<BrokenLinkCheckerBackgroundService>();
+    }
 
     // Announcement service
     builder.Configure<AnnouncementConfig>();
@@ -153,6 +158,7 @@ try
     services.SetupBlog(config, builder.Environment);
     services.SetupUmamiClient(config);
     services.AddSemanticSearch(config);
+    services.AddLucidResumeProxy(config);
     builder.Services.AddResponseCompression(options =>
     {
         options.EnableForHttps = true;
@@ -218,8 +224,10 @@ try
     app.UseSerilogRequestLogging();
     app.UseHealthChecks("/healthz");
     app.MapPrometheusScrapingEndpoint();
-    using (var scope = app.Services.CreateScope())
+    // File-backed local development has no database registration to migrate.
+    if (app.Services.GetRequiredService<Mostlylucid.Blog.BlogConfig>().Mode == Mostlylucid.Blog.BlogMode.Database)
     {
+        using var scope = app.Services.CreateScope();
         var blogContext = scope.ServiceProvider.GetRequiredService<IMostlylucidDBContext>();
         await blogContext.Database.MigrateAsync();
     }
@@ -288,7 +296,7 @@ try
     // Broken link archive middleware - AFTER OutputCache so processed pages get cached
     // On cache miss: BrokenLink processes response, then OutputCache caches the processed result
     // On cache hit: OutputCache serves already-processed content directly (BrokenLink doesn't run)
-    app.UseBrokenLinkArchive();
+    if (!fileBlogMode) app.UseBrokenLinkArchive();
 
     if (app.Environment.IsDevelopment())
     {
@@ -333,6 +341,8 @@ try
         policyBuilder.Cache();
     });
 
+
+    app.MapLucidResumeProxy();
 
     app.MapControllerRoute(
         "sitemap",

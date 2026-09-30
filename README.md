@@ -9,6 +9,28 @@ This repository contains the source code for [mostlylucid.net](https://mostlyluc
 
 ---
 
+## lucidRESUME gateway
+
+The site maps `/resume` to a separately running lucidRESUME compiler through a
+same-origin gateway. Readers can open a published résumé, its JobML and complete
+source transcript, ordered source chunks, and Markdown, Word, or PDF downloads.
+POST requests require the configured writer email; an explicit loopback-only
+setting permits local development without site login. The gateway forwards only
+the compiler's antiforgery cookie.
+
+Set `LucidResumeProxy__UpstreamUri` to the compiler root, for example
+`http://127.0.0.1:5098/`, and `LucidResumeProxy__WriterEmail` for the public site.
+Set the compiler's `LucidResumeCompiler__PublicBaseUri` to the site's `/resume`
+URL so document citations lead back to this gateway. Keep the compiler's
+publication storage persistent so existing verification links remain valid.
+
+For local setup, run `scripts/run-local-resume-integration.sh` from the adjacent
+lucidRESUME checkout. That script enables file-backed blog mode and local
+analytics placeholders. The [compiler guide](https://github.com/scottgal/lucidRESUME/blob/main/docs/jobml-web-compiler.md)
+documents the Ollama model and the complete route list.
+
+---
+
 ## CLI Tools
 
 Self-contained, portable executables - no runtime install required.
