@@ -62,7 +62,19 @@ public class PayloadService(
         if (payload.DistinctId != null)
             newPayload.DistinctId = payload.DistinctId;
 
-        newPayload.UserAgent = payload.UserAgent ?? DefaultUserAgent;
+        newPayload.UserAgent = payload.UserAgent ?? newPayload.UserAgent ?? DefaultUserAgent;
+        newPayload.Tag = payload.Tag;
+        newPayload.Timestamp = payload.Timestamp;
+        newPayload.Browser = payload.Browser;
+        newPayload.Os = payload.Os;
+        newPayload.Device = payload.Device;
+        newPayload.Lcp = payload.Lcp;
+        newPayload.Inp = payload.Inp;
+        newPayload.Cls = payload.Cls;
+        newPayload.Fcp = payload.Fcp;
+        newPayload.Ttfb = payload.Ttfb;
+        newPayload.CacheToken = payload.CacheToken;
+        newPayload.IpAddress = payload.IpAddress ?? newPayload.IpAddress;
 
         if (payload.UseDefaultUserAgent)
         {
@@ -92,7 +104,7 @@ public class PayloadService(
         {
             Website = settings.WebsiteId,
             Data = data,
-            Url = url ?? httpContext?.Request?.Path.Value,
+            Url = url ?? (request == null ? null : request.PathBase + request.Path + request.QueryString),
             IpAddress = httpContext?.Connection?.RemoteIpAddress?.ToString(),
             UserAgent = request?.Headers["User-Agent"].FirstOrDefault(),
             Referrer = request?.Headers["Referer"].FirstOrDefault(),

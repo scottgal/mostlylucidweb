@@ -12,7 +12,7 @@ public static class RetryPolicyExtension
         var delay = Backoff.DecorrelatedJitterBackoffV2(TimeSpan.FromSeconds(1), 3);
         return HttpPolicyExtensions
             .HandleTransientHttpError()
-            .OrResult(msg => msg.StatusCode == HttpStatusCode.ServiceUnavailable)
-            .WaitAndRetryAsync(delay);
+            .OrResult(msg => msg.StatusCode == HttpStatusCode.TooManyRequests)
+            .WaitAndRetryAsync(delay, (outcome, _) => outcome.Result?.Dispose());
     }
 }

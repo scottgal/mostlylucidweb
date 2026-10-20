@@ -17,15 +17,6 @@ public partial class UmamiDataService(
 
     public async Task<UmamiResult<ActiveUsersResponse>> GetActiveUsers()
     {
-        if (await authService.Login() == false)
-            return new UmamiResult<ActiveUsersResponse>(HttpStatusCode.Unauthorized, "Failed to login", null);
-        /*GET /api/websites/:websiteId/active*/
-        var metrics = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/active");
-        if (!metrics.IsSuccessStatusCode)
-            return new UmamiResult<ActiveUsersResponse>(metrics.StatusCode,
-                metrics.ReasonPhrase ?? "Failed to get active users", null);
-        var content = await metrics.Content.ReadFromJsonAsync<ActiveUsersResponse>();
-        return new UmamiResult<ActiveUsersResponse>(metrics.StatusCode, metrics.ReasonPhrase ?? "Success",
-            content ?? null);
+        return await RequestAsync<ActiveUsersResponse>(HttpMethod.Get, WebsitePath("active"));
     }
 }

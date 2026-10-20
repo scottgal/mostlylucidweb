@@ -22,37 +22,32 @@ public class UmamiClient(
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
 
-    public async Task<HttpResponseMessage> Send(
-        UmamiPayload? payload = null,
-        UmamiEventData? eventData = null,
-        string type = "event")
+    public Task<HttpResponseMessage> Send(UmamiPayload? payload = null, UmamiEventData? eventData = null, string type = "event") =>
+        SendAsync(payload, eventData, type);
+
+    public async Task<HttpResponseMessage> SendAsync(UmamiPayload? payload = null, UmamiEventData? eventData = null,
+        string type = "event", CancellationToken cancellationToken = default)
     {
-        if (type != "event" && type != "identify")
-            throw new ArgumentException("Type must be either 'event' or 'identify'");
+        if (type != "event" && type != "identify" && type != "performance")
+            throw new ArgumentException("Type must be 'event', 'identify' or 'performance'");
         payload ??= new UmamiPayload();
-        if (!payload.PayloadPopulated)
-            payload = payloadService.PopulateFromPayload(payload, eventData);
+        payload = payloadService.PopulateFromPayload(payload, eventData);
 
         var jsonPayload = new { type, payload };
-        var request = new HttpRequestMessage(HttpMethod.Post, "api/send");
+        using var request = new HttpRequestMessage(HttpMethod.Post, "api/send");
         request.Headers.Remove("User-Agent");
         request.Headers.TryAddWithoutValidation("User-Agent", payload.UserAgent);
+        if (!string.IsNullOrWhiteSpace(payload.CacheToken))
+            request.Headers.TryAddWithoutValidation("x-umami-cache", payload.CacheToken);
         request.Content = JsonContent.Create(jsonPayload, options: Options);
-        var response = await client.SendAsync(request);
+        var response = await client.SendAsync(request, cancellationToken);
 
 
         if (!response.IsSuccessStatusCode)
         {
-            var content = await response.Content.ReadAsStringAsync();
-            logger.LogError("Failed to send data to Umami: {StatusCode}, {ReasonPhrase} , {Content}",
-                response.StatusCode, response.ReasonPhrase, content);
+            logger.LogWarning("Failed to send data to Umami: {StatusCode}", response.StatusCode);
         }
-        else if (logger.IsEnabled(LogLevel.Information))
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            logger.LogInformation("Successfully sent data to Umami: {StatusCode}, {ReasonPhrase}, {Content}",
-                response.StatusCode, response.ReasonPhrase, content);
-        }
+        else logger.LogDebug("Successfully sent data to Umami: {StatusCode}", response.StatusCode);
 
         return response;
     }
@@ -63,7 +58,7 @@ public class UmamiClient(
         UmamiEventData? eventData = null,
         string type = "event")
     {
-        var response = await Send(payload, eventData, type);
+        using var response = await Send(payload, eventData, type);
         return await DecodeResponse(response);
     }
 
@@ -74,7 +69,7 @@ public class UmamiClient(
         UmamiEventData? eventData = null,
         string? distinctId = null)
     {
-        var response = await TrackPageView(url, title, payload, eventData, distinctId);
+        using var response = await TrackPageView(url, title, payload, eventData, distinctId);
         return await DecodeResponse(response);
     }
 
@@ -87,7 +82,7 @@ public class UmamiClient(
         string? distinctId = null)
     {
         var sendPayload = payload ?? new UmamiPayload();
-        sendPayload.Data = eventData;
+        sendPayload.Data = eventData ?? sendPayload.Data;
         if (!string.IsNullOrEmpty(url))
             sendPayload.Url = url;
         if (!string.IsNullOrEmpty(title))
@@ -103,7 +98,7 @@ public class UmamiClient(
         UmamiEventData? eventData = null,
         string? distinctId = null)
     {
-        var response = await Track(eventName, eventData, distinctId);
+        using var response = await Track(eventName, eventData, distinctId);
         return await DecodeResponse(response);
     }
 
@@ -112,7 +107,7 @@ public class UmamiClient(
         UmamiEventData? eventData = null,
         string? distinctId = null)
     {
-        var response = await Track(eventObj, eventData, distinctId);
+        using var response = await Track(eventObj, eventData, distinctId);
         return await DecodeResponse(response);
     }
 
@@ -135,7 +130,7 @@ public class UmamiClient(
         string? distinctId = null)
     {
         var payload = eventObj;
-        payload.Data = eventData ?? new UmamiEventData();
+        payload.Data = eventData ?? payload.Data ?? new UmamiEventData();
         payload.Website = settings.WebsiteId;
         if (!string.IsNullOrEmpty(distinctId))
             payload.DistinctId = distinctId;
@@ -146,26 +141,44 @@ public class UmamiClient(
     {
         var responseString = await responseMessage.Content.ReadAsStringAsync();
 
-        switch (responseMessage.IsSuccessStatusCode)
+        if (!responseMessage.IsSuccessStatusCode) return new(UmamiDataResponse.ResponseStatus.Failed);
+        if (responseString.TrimStart().StartsWith('{'))
         {
-            case false:
-                return new UmamiDataResponse(UmamiDataResponse.ResponseStatus.Failed);
-            case true when responseString.Contains("beep") && responseString.Contains("boop"):
-                logger.LogWarning("Bot detected data not stored in Umami");
-                return new UmamiDataResponse(UmamiDataResponse.ResponseStatus.BotDetected);
-
-            case true:
-                var decoded = await jwtDecoder.DecodeResponse(responseString);
-                if (decoded == null)
+            try
+            {
+                using var document = JsonDocument.Parse(responseString);
+                var root = document.RootElement;
+                if (root.TryGetProperty("beep", out var beep) && beep.GetString() == "boop")
+                    return new(UmamiDataResponse.ResponseStatus.BotDetected);
+                if (!root.TryGetProperty("sessionId", out var session) || !Guid.TryParse(session.GetString(), out var sessionId)
+                    || !root.TryGetProperty("visitId", out var visit) || !Guid.TryParse(visit.GetString(), out var visitId))
+                    return new(UmamiDataResponse.ResponseStatus.Failed);
+                return new(UmamiDataResponse.ResponseStatus.Success)
                 {
-                    logger.LogError("Failed to decode response from Umami");
-                    return null;
-                }
-
-                var payload = UmamiDataResponse.Decode(decoded);
-
-                return payload;
+                    Id = sessionId, SessionId = sessionId, VisitId = visitId,
+                    Cache = root.TryGetProperty("cache", out var cache) ? cache.GetString() : null
+                };
+            }
+            catch (Exception exception) when (exception is JsonException or InvalidOperationException)
+            { return new(UmamiDataResponse.ResponseStatus.Failed); }
         }
+        // Legacy Umami servers returned a bare JWT; it is decoded only as analytics metadata.
+        var decoded = await jwtDecoder.DecodeResponse(responseString);
+        try { return decoded == null ? null : UmamiDataResponse.Decode(decoded); }
+        catch (FormatException) { return new(UmamiDataResponse.ResponseStatus.Failed); }
+    }
+
+    public Task<HttpResponseMessage> TrackPerformanceAsync(UmamiPayload payload)
+    {
+        ArgumentNullException.ThrowIfNull(payload);
+        foreach (var (value, maximum, name) in new[]
+        {
+            (payload.Lcp, 60000d, "lcp"), (payload.Inp, 60000d, "inp"), (payload.Cls, 100d, "cls"),
+            (payload.Fcp, 60000d, "fcp"), (payload.Ttfb, 60000d, "ttfb")
+        })
+            if (value is { } number && (!double.IsFinite(number) || number < 0 || number > maximum))
+                throw new ArgumentOutOfRangeException(name);
+        return Send(payload, type: "performance");
     }
 
 
@@ -177,7 +190,7 @@ public class UmamiClient(
 
     public async Task<UmamiDataResponse?> IdentifyAndDecode(UmamiPayload payload, UmamiEventData? eventData = null)
     {
-        var response = await Identify(payload, eventData);
+        using var response = await Identify(payload, eventData);
         return await DecodeResponse(response);
     }
 
@@ -187,13 +200,13 @@ public class UmamiClient(
         UmamiEventData? eventData = null,
         string? distinctId = null)
     {
-        var response = await Identify(email, username, sessionId, userId, eventData, distinctId);
+        using var response = await Identify(email, username, sessionId, userId, eventData, distinctId);
         return await DecodeResponse(response);
     }
 
     public async Task<HttpResponseMessage> Identify(UmamiPayload payload, UmamiEventData? eventData = null)
     {
-        eventData ??= new UmamiEventData();
+        eventData ??= payload.Data ?? new UmamiEventData();
         var sendPayload = payloadService.PopulateFromPayload(payload, eventData);
         return await Send(sendPayload, eventData, "identify");
     }

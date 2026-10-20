@@ -1,12 +1,15 @@
+using System.Text.Json.Serialization;
+
 ﻿namespace Umami.Net.UmamiData.Models.ResponseObjects;
 
+[JsonConverter(typeof(StatsResponseConverter))]
 public class StatsResponseModels
 {
-    public Pageviews pageviews { get; set; }
-    public Visitors visitors { get; set; }
-    public Visits visits { get; set; }
-    public Bounces bounces { get; set; }
-    public Totaltime totaltime { get; set; }
+    public Pageviews pageviews { get; set; } = new();
+    public Visitors visitors { get; set; } = new();
+    public Visits visits { get; set; } = new();
+    public Bounces bounces { get; set; } = new();
+    public Totaltime totaltime { get; set; } = new();
 
 
     public class Pageviews

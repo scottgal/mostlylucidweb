@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using Microsoft.AspNetCore.WebUtilities;
 using Umami.Net.UmamiData.Models;
@@ -78,6 +79,8 @@ public static class VersionAwareQueryStringHelper
             if (propertyValue != null)
             {
                 var stringValue = ConvertPropertyValue(propertyValue);
+                if (apiVersion == UmamiApiVersion.V3 && parameterName == "type" && stringValue == "url")
+                    stringValue = "path";
                 if (!string.IsNullOrEmpty(stringValue))
                 {
                     queryParams.Add(parameterName, stringValue);
@@ -97,10 +100,11 @@ public static class VersionAwareQueryStringHelper
         {
             null => string.Empty,
             bool b => b.ToString().ToLowerInvariant(),
-            Enum e => e.ToString().ToLowerInvariant(),
+            Enum e => e.ToString(),
             DateTime dt => throw new InvalidOperationException(
                 $"DateTime value {dt:O} cannot be converted directly. " +
                 "Suggestion: Use a calculated property that converts DateTime to Unix milliseconds (see BaseRequest.StartAt/EndAt)."),
+            IFormattable number => number.ToString(null, CultureInfo.InvariantCulture),
             _ => value.ToString() ?? string.Empty
         };
     }

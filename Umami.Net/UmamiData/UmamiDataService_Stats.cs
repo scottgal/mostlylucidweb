@@ -22,29 +22,7 @@ public partial class UmamiDataService
 
     public async Task<UmamiResult<StatsResponseModels>> GetStats(StatsRequest statsRequest)
     {
-        if (await authService.Login() == false)
-            return new UmamiResult<StatsResponseModels>(HttpStatusCode.Unauthorized, "Failed to login", null);
-
-        var queryString = statsRequest.ToQueryString();
-
-        // Make the HTTP request
-        var response = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/stats{queryString}");
-
-        if (response.IsSuccessStatusCode)
-        {
-            var content = await response.Content.ReadFromJsonAsync<StatsResponseModels>();
-            return new UmamiResult<StatsResponseModels>(response.StatusCode, response.ReasonPhrase ?? "Success",
-                content ?? new StatsResponseModels());
-        }
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            await authService.Login();
-            return await GetStats(statsRequest);
-        }
-
-        logger.LogError("Failed to get stats");
-        return new UmamiResult<StatsResponseModels>(response.StatusCode, response.ReasonPhrase ?? "Failed to get stats",
-            null);
+        ArgumentNullException.ThrowIfNull(statsRequest);
+        return await RequestAsync<StatsResponseModels>(HttpMethod.Get, WebsitePath("stats") + Query(statsRequest));
     }
 }

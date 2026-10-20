@@ -189,11 +189,11 @@ public class PayloadService_Tests
         // Act
         var result = service.PopulateFromPayload(payload, null);
 
-        // Assert - DefaultUserAgent is used since payload.UserAgent is null
+        // Preserve the inbound agent before applying the explicit override.
         Assert.NotNull(result.Data);
         Assert.Contains("OriginalUserAgent", result.Data.Keys);
         Assert.Equal(PayloadService.DefaultUserAgent, result.UserAgent);
-        Assert.Equal(PayloadService.DefaultUserAgent, result.Data["OriginalUserAgent"]);
+        Assert.Equal("Mozilla/5.0 Test", result.Data["OriginalUserAgent"]);
     }
 
     /// <summary>

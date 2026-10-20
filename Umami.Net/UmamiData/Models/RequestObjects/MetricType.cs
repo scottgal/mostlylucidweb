@@ -64,5 +64,11 @@ public enum MetricType
     channel,
 
     /// <summary>Full domain names</summary>
-    domain
+    domain,
+    distinctId,
+    utmSource,
+    utmMedium,
+    utmCampaign,
+    utmContent,
+    utmTerm
 }

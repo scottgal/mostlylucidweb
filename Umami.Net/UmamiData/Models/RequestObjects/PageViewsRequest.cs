@@ -8,6 +8,8 @@ namespace Umami.Net.UmamiData.Models.RequestObjects;
 /// </summary>
 public class PageViewsRequest : BaseRequest
 {
+    [QueryStringParameter("language")] public string? Language { get; set; }
+
     /// <summary>
     /// Required: Time unit for grouping data.
     /// </summary>

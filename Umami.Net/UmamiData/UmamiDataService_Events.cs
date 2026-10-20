@@ -20,44 +20,8 @@ public partial class UmamiDataService
     /// <returns>Array of event data points with timestamps and counts</returns>
     public async Task<UmamiResult<EventsSeriesResponseModel[]>> GetEventsSeries(EventsSeriesRequest request)
     {
-        try
-        {
-            if (await authService.Login() == false)
-                return new UmamiResult<EventsSeriesResponseModel[]>(HttpStatusCode.Unauthorized, "Failed to login", null);
-
-            var queryString = request.ToQueryString();
-            var response = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/events/series{queryString}");
-
-            if (response.IsSuccessStatusCode)
-            {
-                logger.LogInformation("Successfully got events series");
-                var content = await response.Content.ReadFromJsonAsync<EventsSeriesResponseModel[]>();
-                return new UmamiResult<EventsSeriesResponseModel[]>(
-                    response.StatusCode,
-                    response.ReasonPhrase ?? "Success",
-                    content ?? Array.Empty<EventsSeriesResponseModel>());
-            }
-
-            if (response.StatusCode == HttpStatusCode.Unauthorized)
-            {
-                await authService.Login();
-                return await GetEventsSeries(request);
-            }
-
-            logger.LogError("Failed to get events series");
-            return new UmamiResult<EventsSeriesResponseModel[]>(
-                response.StatusCode,
-                response.ReasonPhrase ?? "Failed to get events series",
-                null);
-        }
-        catch (Exception e)
-        {
-            logger.LogError(e, "Failed to get events series");
-            return new UmamiResult<EventsSeriesResponseModel[]>(
-                HttpStatusCode.InternalServerError,
-                "Failed to get events series",
-                null);
-        }
+        ArgumentNullException.ThrowIfNull(request);
+        return await RequestAsync<EventsSeriesResponseModel[]>(HttpMethod.Get, WebsitePath("events/series") + Query(request));
     }
 
     /// <summary>
@@ -81,7 +45,7 @@ public partial class UmamiDataService
             StartAtDate = startDate,
             EndAtDate = endDate,
             Unit = unit,
-            Timezone = timezone,
+            Timezone = timezone ?? "UTC",
             EventName = eventName
         };
 

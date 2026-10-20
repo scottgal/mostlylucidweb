@@ -19,6 +19,8 @@ public class UmamiDataResponse
     public ResponseStatus Status { get; set; }
 
     public Guid Id { get; set; }
+    public Guid SessionId { get; set; }
+    public string? Cache { get; set; }
     public Guid WebsiteId { get; set; }
     public string? Hostname { get; set; }
     public string? Browser { get; set; }

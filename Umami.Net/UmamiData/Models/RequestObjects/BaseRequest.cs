@@ -11,6 +11,16 @@ namespace Umami.Net.UmamiData.Models.RequestObjects;
 /// </remarks>
 public class BaseRequest
 {
+    [QueryStringParameter("distinctId")] public string? DistinctId { get; set; }
+    [QueryStringParameter("utmSource")] public string? UtmSource { get; set; }
+    [QueryStringParameter("utmMedium")] public string? UtmMedium { get; set; }
+    [QueryStringParameter("utmCampaign")] public string? UtmCampaign { get; set; }
+    [QueryStringParameter("utmContent")] public string? UtmContent { get; set; }
+    [QueryStringParameter("utmTerm")] public string? UtmTerm { get; set; }
+    [QueryStringParameter("eventType")] public int? EventType { get; set; }
+    [QueryStringParameter("excludeBounce")] public string? ExcludeBounce { get; set; }
+    [QueryStringParameter("match")] public string? Match { get; set; }
+
     private DateTime _startAtDate;
     private DateTime _endAtDate;
 
@@ -84,6 +94,10 @@ public class BaseRequest
     /// </exception>
     public virtual void Validate()
     {
+        if (Match is not (null or "all" or "any")) throw new ArgumentException("Match must be all or any", nameof(Match));
+        if (EventType is <= 0) throw new ArgumentOutOfRangeException(nameof(EventType));
+        System.ComponentModel.DataAnnotations.Validator.ValidateObject(this,
+            new System.ComponentModel.DataAnnotations.ValidationContext(this), validateAllProperties: true);
         if (StartAtDate == default)
         {
             throw new InvalidOperationException(

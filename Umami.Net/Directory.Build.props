@@ -1,7 +1,6 @@
 <Project>
     <PropertyGroup>
         <!-- Properties that apply to all projects in the solution root -->
-        <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <LangVersion>Latest</LangVersion>
 

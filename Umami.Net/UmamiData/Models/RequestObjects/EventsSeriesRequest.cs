@@ -8,6 +8,9 @@ namespace Umami.Net.UmamiData.Models.RequestObjects;
 /// </summary>
 public class EventsSeriesRequest : BaseRequest
 {
+    [QueryStringParameter("limit")] public int? Limit { get; set; }
+    [QueryStringParameter("language")] public string? Language { get; set; }
+
     /// <summary>
     /// Required: Time unit for data bucketing (minute, hour, day, month, year)
     /// </summary>
@@ -19,7 +22,7 @@ public class EventsSeriesRequest : BaseRequest
     /// </summary>
     [QueryStringParameter("timezone")]
     [TimeZoneValidator]
-    public string? Timezone { get; set; }
+    public string? Timezone { get; set; } = "UTC";
 
     /// <summary>
     /// Optional: Event name to filter by (for filtering specific events)

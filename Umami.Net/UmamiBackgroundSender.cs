@@ -11,7 +11,7 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, ILogger<Um
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    private readonly Channel<SendBackgroundPayload> _channel = Channel.CreateUnbounded<SendBackgroundPayload>();
+    private readonly Channel<SendBackgroundPayload> _channel = Channel.CreateBounded<SendBackgroundPayload>(new BoundedChannelOptions(1024) { FullMode = BoundedChannelFullMode.Wait, SingleReader = true });
 
     private Task _sendTask = Task.CompletedTask;
 
@@ -26,27 +26,24 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, ILogger<Um
     {
         logger.LogInformation("UmamiBackgroundSender is stopping.");
 
-        // Signal cancellation and complete the channel
-        await _cancellationTokenSource.CancelAsync();
-        _channel.Writer.Complete();
-        try
+        _channel.Writer.TryComplete();
+        try { await _sendTask.WaitAsync(cancellationToken); }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            // Wait for the background task to complete processing any remaining items
-            await Task.WhenAny(_sendTask, Task.Delay(Timeout.Infinite, cancellationToken));
-        }
-        catch (OperationCanceledException)
-        {
-            logger.LogWarning("StopAsync operation was canceled.");
+            await _cancellationTokenSource.CancelAsync();
+            logger.LogWarning("Umami background delivery did not drain before the shutdown deadline");
         }
     }
+
 
     public async Task TrackPageView(string url, string title, UmamiPayload? payload = null,
         UmamiEventData? eventData = null, bool useDefaultUserAgent = false)
     {
         await using var scope = scopeFactory.CreateAsyncScope();
         var payloadService = scope.ServiceProvider.GetRequiredService<PayloadService>();
+        payload ??= new UmamiPayload();
+        payload.UseDefaultUserAgent |= useDefaultUserAgent;
         var sendPayload = payloadService.PopulateFromPayload(payload, eventData);
-        sendPayload.UseDefaultUserAgent = useDefaultUserAgent;
         sendPayload.Url = url;
         sendPayload.Title = title;
         await _channel.Writer.WriteAsync(new SendBackgroundPayload("event", sendPayload));
@@ -111,8 +108,9 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, ILogger<Um
     {
         await using var scope = scopeFactory.CreateAsyncScope();
         var payloadService = scope.ServiceProvider.GetRequiredService<PayloadService>();
+        payload ??= new UmamiPayload();
+        payload.UseDefaultUserAgent |= useDefaultUserAgent;
         var sendPayload = payloadService.PopulateFromPayload(payload, eventData);
-        sendPayload.UseDefaultUserAgent = useDefaultUserAgent;
         await _channel.Writer.WriteAsync(new SendBackgroundPayload(eventType, sendPayload));
         logger.LogInformation("Umami background event sent");
     }
@@ -122,16 +120,17 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, ILogger<Um
     {
         logger.LogInformation("Umami background delivery started");
 
-        while (await _channel.Reader.WaitToReadAsync(token))
+        while (await WaitForWorkAsync(token))
         while (_channel.Reader.TryRead(out var payload))
             try
             {
                 using var scope = scopeFactory.CreateScope();
                 var client = scope.ServiceProvider.GetRequiredService<UmamiClient>();
                 // Send the event via the client
-                await client.Send(payload.Payload, type: payload.EventType);
+                using var response = await client.SendAsync(payload.Payload, type: payload.EventType, cancellationToken: token);
 
-                logger.LogInformation("Umami background event sent: {EventType}", payload.EventType);
+                if (response.IsSuccessStatusCode) logger.LogDebug("Umami background event delivered: {EventType}", payload.EventType);
+                else logger.LogWarning("Umami background delivery failed: {StatusCode}", response.StatusCode);
             }
             catch (OperationCanceledException)
             {
@@ -142,6 +141,12 @@ public class UmamiBackgroundSender(IServiceScopeFactory scopeFactory, ILogger<Um
             {
                 logger.LogError(ex, "Error sending Umami background event.");
             }
+    }
+
+    private async Task<bool> WaitForWorkAsync(CancellationToken token)
+    {
+        try { return await _channel.Reader.WaitToReadAsync(token); }
+        catch (OperationCanceledException) when (token.IsCancellationRequested) { return false; }
     }
 
     private record SendBackgroundPayload(string EventType, UmamiPayload Payload);

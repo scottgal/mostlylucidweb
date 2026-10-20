@@ -5,5 +5,6 @@ public enum Unit
     year,
     month,
     hour,
-    day
+    day,
+    minute
 }

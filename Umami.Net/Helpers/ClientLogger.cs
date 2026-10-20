@@ -18,7 +18,7 @@ public class HttpLogger : IHttpClientLogger
             "Sending '{Method}' to '{Host}{Path}'",
             request.Method,
             request.RequestUri?.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped),
-            request.RequestUri!.PathAndQuery);
+            request.RequestUri!.AbsolutePath);
         return null;
     }
 
@@ -43,7 +43,7 @@ public class HttpLogger : IHttpClientLogger
             exception,
             "Request towards '{Host}{Path}' failed after {ElapsedMilliseconds}ms",
             request.RequestUri?.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped),
-            request.RequestUri!.PathAndQuery,
+            request.RequestUri!.AbsolutePath,
             elapsed.TotalMilliseconds.ToString("F1"));
     }
 }

@@ -1,3 +1,8 @@
+1.1.0 (candidate)
+Reviewed against Umami 3.4.0. Adds current JSON tracking response decoding, explicit per-visitor cache tokens, Web Vitals/performance collection, tagging and historical timestamps, API-key/Cloud authentication, modern analytics queries and annotation CRUD.
+Fixes bounded reauthentication, POST token verification, response disposal, event-data/identity preservation, visitor user-agent/IP/query capture, v3 metrics mapping and camelCase UTM filters. Preserves the legacy public entry points and normalizes old/new stats responses.
+Bounds the background queue, drains on shutdown, adds cancellation and avoids automatic retries of non-idempotent tracking/resource writes. Removes registration-wide logging overrides and token/body logging. API version selection is explicit rather than claimed automatic detection.
+
 ﻿0.2.0
 Adds new Identify endpoints. 
 These can be used on user signin to identify the user.

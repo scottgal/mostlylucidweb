@@ -29,6 +29,8 @@ namespace Umami.Net.UmamiData.Models.RequestObjects;
 /// </remarks>
 public class MetricsRequest : BaseRequest
 {
+    [QueryStringParameter("search")] public string? Search { get; set; }
+
     private int? _limit = 500;
 
     /// <summary>
@@ -176,7 +178,7 @@ public class MetricsRequest : BaseRequest
 
     /// <summary>
     /// Gets or sets an event name filter for custom tracked events.
-    /// Required when Type is <see cref="MetricType.@event"/>.
+    /// Optional filter when listing event names.
     /// </summary>
     /// <example>
     /// "button-click" or "form-submit" or "video-play"
@@ -257,12 +259,7 @@ public class MetricsRequest : BaseRequest
     {
         base.Validate();
 
-        if (Type == MetricType.@event && string.IsNullOrWhiteSpace(Event))
-        {
-            throw new InvalidOperationException(
-                "Event name is required when Type is MetricType.@event. " +
-                "Suggestion: Set the Event property to your custom event name " +
-                "(e.g., \"button-click\" or \"search\").");
-        }
+        if (!Enum.IsDefined(Type)) throw new ArgumentException("Unknown metric type", nameof(Type));
+        if (Offset < 0) throw new ArgumentOutOfRangeException(nameof(Offset));
     }
 }

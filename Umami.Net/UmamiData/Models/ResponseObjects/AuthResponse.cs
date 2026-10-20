@@ -2,7 +2,8 @@
 
 public class AuthResponse
 {
-    public string Token { get; set; }
+    public string? Token { get; set; }
+    public bool RequiresTwoFactor { get; set; }
     public UserResponse User { get; set; }
 }
 

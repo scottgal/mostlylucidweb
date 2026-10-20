@@ -16,6 +16,18 @@ public class UmamiPayload
     public string? Title { get; set; }
     public string? Url { get; set; }
     public string? Name { get; set; }
+    public string? Tag { get; set; }
+    /// <summary>Unix timestamp in seconds (analytics queries use milliseconds).</summary>
+    public long? Timestamp { get; set; }
+    public string? Browser { get; set; }
+    public string? Os { get; set; }
+    public string? Device { get; set; }
+    public double? Lcp { get; set; }
+    public double? Inp { get; set; }
+    public double? Cls { get; set; }
+    public double? Fcp { get; set; }
+    public double? Ttfb { get; set; }
+    [JsonIgnore] public string? CacheToken { get; set; }
 
     public string? SessionId { get; set; }
     

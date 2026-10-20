@@ -29,7 +29,7 @@ public class JwtDecoder(ILogger<JwtDecoder> logger)
         }
         catch (Exception e)
         {
-            logger.LogError(e, "Failed to decode JWT for {Token}", token);
+            logger.LogWarning("Failed to decode legacy Umami tracking response");
             return null;
         }
     }

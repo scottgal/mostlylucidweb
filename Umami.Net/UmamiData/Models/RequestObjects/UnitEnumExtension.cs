@@ -10,6 +10,7 @@ public static class UnitEnumExtension
             Unit.month => "month",
             Unit.hour => "hour",
             Unit.day => "day",
+            Unit.minute => "minute",
             _ => throw new ArgumentOutOfRangeException(nameof(unit), unit, null)
         };
     }

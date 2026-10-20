@@ -30,31 +30,7 @@ public partial class UmamiDataService
 
     public async Task<UmamiResult<PageViewsResponseModel>> GetPageViews(PageViewsRequest pageViewsRequest)
     {
-        if (await authService.Login() == false)
-            return new UmamiResult<PageViewsResponseModel>(HttpStatusCode.Unauthorized, "Failed to login", null);
-
-        var queryString = pageViewsRequest.ToQueryString();
-
-
-        // Make the HTTP request
-        var response = await authService.HttpClient.GetAsync($"/api/websites/{WebsiteId}/pageviews{queryString}");
-
-        if (response.IsSuccessStatusCode)
-        {
-            logger.LogInformation("Successfully got page views");
-            var content = await response.Content.ReadFromJsonAsync<PageViewsResponseModel>();
-            return new UmamiResult<PageViewsResponseModel>(response.StatusCode, response.ReasonPhrase ?? "Success",
-                content ?? new PageViewsResponseModel());
-        }
-
-        if (response.StatusCode == HttpStatusCode.Unauthorized)
-        {
-            await authService.Login();
-            return await GetPageViews(pageViewsRequest);
-        }
-
-        logger.LogError("Failed to get page views");
-        return new UmamiResult<PageViewsResponseModel>(response.StatusCode,
-            response.ReasonPhrase ?? "Failed to get page views", null);
+        ArgumentNullException.ThrowIfNull(pageViewsRequest);
+        return await RequestAsync<PageViewsResponseModel>(HttpMethod.Get, WebsitePath("pageviews") + Query(pageViewsRequest));
     }
 }

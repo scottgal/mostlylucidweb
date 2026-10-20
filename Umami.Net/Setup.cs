@@ -12,7 +12,7 @@ public static class Setup
     {
         if (string.IsNullOrEmpty(settings.UmamiPath))
             throw new ArgumentNullException(settings.UmamiPath, "UmamiUrl is required");
-        if (!Uri.TryCreate(settings.UmamiPath, UriKind.Absolute, out _))
+        if (!Uri.TryCreate(settings.UmamiPath, UriKind.Absolute, out var uri) || uri.Scheme is not ("http" or "https"))
             throw new FormatException("UmamiUrl must be a valid Uri");
         if (string.IsNullOrEmpty(settings.WebsiteId))
             throw new ArgumentNullException(settings.WebsiteId, "WebsiteId is required");
@@ -30,9 +30,8 @@ public static class Setup
         var httpClientBuilder = services.AddHttpClient<UmamiClient>((serviceProvider, client) =>
             {
                 var settings = serviceProvider.GetRequiredService<UmamiClientSettings>();
-                client.BaseAddress = new Uri(settings.UmamiPath);
-            }).SetHandlerLifetime(TimeSpan.FromMinutes(5)) //Set lifetime to five minutes
-            .AddPolicyHandler(RetryPolicyExtension.GetRetryPolicy());
+                client.BaseAddress = new Uri(settings.UmamiPath.TrimEnd('/') + "/");
+            }).SetHandlerLifetime(TimeSpan.FromMinutes(5)); // Tracking writes are not idempotent; do not retry automatically.
 
         if (isDevelopment)
         {
@@ -40,12 +39,7 @@ public static class Setup
             httpClientBuilder.AddLogger<HttpLogger>();
         }
 
-        services.AddLogging(options =>
-        {
-            options.AddConsole();
-            options.SetMinimumLevel(LogLevel.Debug);
-        });
-
+        services.AddLogging();
 
         services.AddHttpContextAccessor();
         services.AddScoped<PayloadService>();

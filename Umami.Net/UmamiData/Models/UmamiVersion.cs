@@ -6,7 +6,7 @@ namespace Umami.Net.UmamiData.Models;
 public enum UmamiApiVersion
 {
     /// <summary>
-    /// API version not yet detected. Will auto-detect on first request.
+    /// Unspecified legacy version information; the data client uses its configured ApiVersion.
     /// </summary>
     Unknown = 0,
 

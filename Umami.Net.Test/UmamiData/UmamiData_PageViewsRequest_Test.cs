@@ -26,7 +26,8 @@ public class UmamiData_PageViewsRequest_Test : UmamiDataBase
         var fakeUmamiDataLogger = (FakeLogger<UmamiDataService>)umamiDataLogger;
         var umamiDataCollector = fakeUmamiDataLogger.Collector;
         var umamiDataLogs = umamiDataCollector.GetSnapshot();
-        Assert.Contains("Successfully got page views", umamiDataLogs.Select(x => x.Message));
+        Assert.Equal(System.Net.HttpStatusCode.OK, result.Status);
+        Assert.NotNull(result.Data);
 
         Assert.NotNull(result);
     }

@@ -13,6 +13,9 @@ namespace Umami.Net.UmamiData.Models.RequestObjects;
 /// </remarks>
 public class StatsRequest : BaseRequest
 {
+    [QueryStringParameter("compare")] public string? Compare { get; set; }
+    [QueryStringParameter("language")] public string? Language { get; set; }
+    [QueryStringParameter("event")] public string? Event { get; set; }
     /// <summary>
     /// Path filter (not "url"). Must use "path" as per Umami API specification.
     /// </summary>
