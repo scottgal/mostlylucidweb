@@ -291,7 +291,7 @@ try
         {
             ctx.Context.Response.Headers.Append("Cache-Control",
                 ctx.Context.Request.Path.StartsWithSegments("/resumes")
-                    ? "public, max-age=0, must-revalidate"
+                    ? "no-cache"
                     : $"public, max-age={cacheMaxAgeOneWeek}");
             var fileExt = Path.GetExtension(ctx.File.Name);
             if (fileExt.Equals(".pdf", StringComparison.OrdinalIgnoreCase))

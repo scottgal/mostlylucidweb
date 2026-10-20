@@ -50,7 +50,15 @@ jobs:
       - name: Verify the packaged website and bundled resume compiler
         run: |
           trap 'docker logs mostlylucid-release-check; docker rm -f mostlylucid-release-check' EXIT
+          mkdir -p "$RUNNER_TEMP/mostlylucid-release-tls"
+          openssl req -x509 -newkey rsa:2048 -nodes -days 1 -subj /CN=localhost \
+            -keyout "$RUNNER_TEMP/mostlylucid-release-tls/key.pem" -out "$RUNNER_TEMP/mostlylucid-release-tls/cert.pem"
+          openssl pkcs12 -export -passout pass:release-check \
+            -inkey "$RUNNER_TEMP/mostlylucid-release-tls/key.pem" -in "$RUNNER_TEMP/mostlylucid-release-tls/cert.pem" \
+            -out "$RUNNER_TEMP/mostlylucid-release-tls/mostlylucid.pfx"
           docker run -d --name mostlylucid-release-check \
+            -v "$RUNNER_TEMP/mostlylucid-release-tls/mostlylucid.pfx:/app/mostlylucid.pfx:ro" \
+            -e CertPassword=release-check \
             --entrypoint sh \
             -e Blog__Mode=File \
             -e Markdown__MarkdownPath=/app/site-content \
@@ -63,6 +71,7 @@ jobs:
             -e Analytics__Password=release-check \
             ${{ env.TAGS }} -c 'mkdir -p /app/site-content/translated; exec dotnet /app/Mostlylucid.dll'
           docker exec mostlylucid-release-check dotnet /app/resume-compiler/LucidResumeHost.dll --probe http://127.0.0.1:8080
+          docker exec mostlylucid-release-check dotnet /app/resume-compiler/LucidResumeHost.dll --probe https://localhost:7240
 
       - name: Push the Docker image to Docker Hub
         run: |

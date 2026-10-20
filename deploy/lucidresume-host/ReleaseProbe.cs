@@ -53,9 +53,18 @@ internal static class ReleaseProbe
         }
     }
 
-    private static HttpClient CreateClient(Uri site) =>
-        new(new HttpClientHandler { CookieContainer = new CookieContainer() })
-        { BaseAddress = site, Timeout = TimeSpan.FromSeconds(30) };
+    private static HttpClient CreateClient(Uri site)
+    {
+        var handler = new HttpClientHandler { CookieContainer = new CookieContainer() };
+        // The release gate generates a short-lived self-signed certificate for loopback only.
+        if (site.IsLoopback) handler.ServerCertificateCustomValidationCallback = (_, _, _, _) => true;
+        return new(handler)
+        {
+            BaseAddress = site, Timeout = TimeSpan.FromSeconds(30),
+            DefaultRequestVersion = site.Scheme == "https" ? HttpVersion.Version20 : HttpVersion.Version11,
+            DefaultVersionPolicy = site.Scheme == "https" ? HttpVersionPolicy.RequestVersionExact : HttpVersionPolicy.RequestVersionOrLower
+        };
+    }
 
     private static async Task CompileAsync(HttpClient client)
     {
