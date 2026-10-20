@@ -3,11 +3,11 @@ name: Build, test and publish Umami.NET
 on:
   push:
     branches: [main]
-    paths: ['Umami.Net/**', 'Umami.Net.Test/**', '.github/workflows/main.yml']
+    paths: ['Umami.Net/**', 'Umami.Net.Test/**', '.github/workflows/main.yml', 'scripts/test-umami-integration.sh']
     tags:
       - 'umamiv*.*.*'  # Triggers on tags like umamiv1.0.0, umamiv2.1.3, etc.
   pull_request:
-    paths: ['Umami.Net/**', 'Umami.Net.Test/**', '.github/workflows/main.yml']
+    paths: ['Umami.Net/**', 'Umami.Net.Test/**', '.github/workflows/main.yml', 'scripts/test-umami-integration.sh']
   workflow_dispatch:
 
 jobs:
@@ -44,28 +44,15 @@ jobs:
         run: dotnet test --configuration Release ./Umami.Net.Test/Umami.Net.Test.csproj
 
       - name: Verify against disposable Umami 3.4.0 and PostgreSQL
-        run: |
-          trap 'docker logs umami-sdk-server; docker rm -f umami-sdk-server umami-sdk-db; docker network rm umami-sdk-test' EXIT
-          docker network create umami-sdk-test
-          docker run -d --name umami-sdk-db --network umami-sdk-test \
-            -e POSTGRES_USER=umami -e POSTGRES_PASSWORD=local-umami-only -e POSTGRES_DB=umami postgres:16-alpine
-          for attempt in $(seq 1 30); do
-            if docker exec umami-sdk-db pg_isready -U umami -d umami; then break; fi
-            sleep 2
-          done
-          docker run -d --name umami-sdk-server --network umami-sdk-test -p 127.0.0.1:18086:3000 \
-            -e DATABASE_URL=postgresql://umami:local-umami-only@umami-sdk-db:5432/umami \
-            -e APP_SECRET=local-integration-secret-umami-review-only \
-            ghcr.io/umami-software/umami:3.4.0
-          ready=false
-          for attempt in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:18086/ >/dev/null; then ready=true; break; fi
-            sleep 2
-          done
-          if [ "$ready" != true ]; then exit 1; fi
-          UMAMI_TEST_URL=http://127.0.0.1:18086/ dotnet test --configuration Release \
-            ./Umami.Net.Test/Umami.Net.Test.csproj --framework net10.0 --no-restore \
-            --filter FullyQualifiedName~Umami34IntegrationTests
+        run: scripts/test-umami-integration.sh --configuration Release --no-restore
+
+      - name: Upload integration test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: umami-integration-results
+          path: Umami.Net.Test/TestResults/integration/*.trx
+          if-no-files-found: ignore
 
       - name: Pack project
         run: dotnet pack --configuration Release ./Umami.Net/Umami.Net.csproj --no-build --output ./nupkg

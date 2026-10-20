@@ -250,6 +250,7 @@ a password fallback. Logs omit auth/cache tokens, payloads and query strings.
 
 ```sh
 dotnet test Umami.Net.Test/Umami.Net.Test.csproj
+scripts/test-umami-integration.sh # Spins up disposable Umami 3.4.0 + PostgreSQL; 51 real cases per target
 dotnet build Umami.Net/Umami.Net.csproj -c Release
 dotnet pack Umami.Net/Umami.Net.csproj -c Release --no-build -o /tmp/umami-pack
 ```

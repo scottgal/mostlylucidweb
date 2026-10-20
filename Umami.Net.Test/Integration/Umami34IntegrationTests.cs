@@ -1,96 +1,156 @@
 using System.Net;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging.Abstractions;
-using Umami.Net;
-using Umami.Net.Config;
-using Umami.Net.Helpers;
-using Umami.Net.Models;
 using Umami.Net.UmamiData;
+using Umami.Net.UmamiData.Models;
 using Umami.Net.UmamiData.Models.RequestObjects;
-using Umami.Net.UmamiData.Models.ResponseObjects;
-
 
 namespace Umami.Net.Test.Integration;
 
-public sealed class DisposableUmamiFactAttribute : FactAttribute
-{
-    public DisposableUmamiFactAttribute()
-    {
-        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("UMAMI_TEST_URL")))
-            Skip = "Opt in with UMAMI_TEST_URL=http://127.0.0.1:18086/ and the disposable Umami 3.4.0 test stack.";
-    }
-}
-
-public class Umami34IntegrationTests
+[Collection("Disposable Umami")]
+public partial class Umami34IntegrationTests(UmamiServerFixture server)
 {
     [DisposableUmamiFact]
-    public async Task CurrentClientWorksWithRealUmami34AndPostgres()
+    public async Task StatsAndTimeSeriesReportPersistedEventsAndVisitors()
     {
-        var endpoint = new Uri(Environment.GetEnvironmentVariable("UMAMI_TEST_URL")!);
-        if (!endpoint.IsLoopback || endpoint.Scheme != "http" || endpoint.Port != 18086)
-            throw new InvalidOperationException("This destructive integration check is restricted to the disposable local Umami server on port 18086.");
-        using var setup = new HttpClient { BaseAddress = endpoint };
-        using var login = await setup.PostAsJsonAsync("api/auth/login", new { username = "admin", password = "umami" });
-        login.EnsureSuccessStatusCode();
-        using var authenticated = JsonDocument.Parse(await login.Content.ReadAsStringAsync());
-        setup.DefaultRequestHeaders.Authorization = new("Bearer", authenticated.RootElement.GetProperty("token").GetString());
-        using var created = await setup.PostAsJsonAsync("api/websites", new { name = "Disposable .NET integration", domain = "integration.test" });
-        created.EnsureSuccessStatusCode();
-        using var website = JsonDocument.Parse(await created.Content.ReadAsStringAsync());
-        var websiteId = website.RootElement.GetProperty("id").GetString()!;
-        var settings = new UmamiDataSettings { WebsiteId = websiteId, UmamiPath = endpoint.ToString(), Username = "admin", Password = "umami" };
-        using var collectionHttp = new HttpClient { BaseAddress = endpoint };
-        using var dataHttp = new HttpClient { BaseAddress = endpoint };
-        var client = new UmamiClient(collectionHttp, new PayloadService(new HttpContextAccessor(), settings, NullLogger<PayloadService>.Instance),
-            new JwtDecoder(NullLogger<JwtDecoder>.Instance), NullLogger<UmamiClient>.Instance, settings);
-        var data = new UmamiDataService(settings, new AuthService(dataHttp, settings, NullLogger<AuthService>.Instance), NullLogger<UmamiDataService>.Instance);
-        const string agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
-        var payload = new UmamiPayload { Url = "/landing?utm_source=contract", Hostname = "integration.test", UserAgent = agent, IpAddress = "203.0.113.10", DistinctId = "integration-customer", Tag = "integration" };
-        var tracked = await client.TrackPageViewAndDecode(payload: payload);
-        if (tracked?.Status != UmamiDataResponse.ResponseStatus.Success || tracked.SessionId == Guid.Empty || string.IsNullOrEmpty(tracked.Cache)) throw new Exception("Tracking JSON contract failed");
-        using var performance = await client.TrackPerformanceAsync(new UmamiPayload { Url = "/landing", Hostname = "integration.test", UserAgent = agent, IpAddress = payload.IpAddress,
-            DistinctId = payload.DistinctId, CacheToken = tracked.Cache, Lcp = 1200, Inp = 80, Cls = 0.05, Fcp = 750, Ttfb = 150 });
-        performance.EnsureSuccessStatusCode();
-        using var namedEvent = await client.Track(new UmamiPayload { Name = "integration-purchase", Url = "/landing",
-            Hostname = "integration.test", UserAgent = agent, IpAddress = payload.IpAddress,
-            DistinctId = payload.DistinctId, Data = new() { ["amount"] = 15 } });
-        namedEvent.EnsureSuccessStatusCode();
-        var start = DateTime.UtcNow.AddDays(-1); var end = DateTime.UtcNow.AddDays(1);
-        var stats = await data.GetStats(start, end);
-        if (stats.Status != HttpStatusCode.OK || stats.Data!.pageviews.value < 1) throw new Exception("Stats normalization failed: " + stats.Message);
-        var active = await data.GetActiveUsers();
-        if (active.Data?.ActiveUsers < 1 || active.Status != HttpStatusCode.OK) throw new Exception("Active visitors failed");
-        var metrics = await data.GetMetrics(new() { StartAtDate = start, EndAtDate = end, Type = MetricType.url });
-        if (metrics.Status != HttpStatusCode.OK || metrics.Data!.Length == 0) throw new Exception("V3 metrics mapping failed");
-        var expanded = await data.GetExpandedMetrics(new() { StartAtDate = start, EndAtDate = end, Type = MetricType.path });
-        if (expanded.Status != HttpStatusCode.OK || expanded.Data!.Length == 0) throw new Exception("Expanded metrics failed");
-        var series = await data.GetEventsSeries(start, end, Unit.minute, "UTC");
-        if (series.Status != HttpStatusCode.OK || !series.Data!.Any(item => item.x == "integration-purchase")) throw new Exception("Minute event series failed");
-        var pageviews = await data.GetPageViews(new() { StartAtDate = start, EndAtDate = end, Unit = Unit.minute, Timezone = "UTC" });
-        if (pageviews.Status != HttpStatusCode.OK || pageviews.Data!.pageviews.Length == 0) throw new Exception("Minute pageviews failed");
-        var annotations = await data.CreateAnnotationAsync(new AnnotationInput(DateTimeOffset.UtcNow, "Integration deployment", false));
-        if (annotations.Status != HttpStatusCode.OK || string.IsNullOrEmpty(annotations.Data?.Id)) throw new Exception("Annotation create failed");
-        var annotationId = annotations.Data!.Id;
-        var list = await data.GetAnnotationsAsync();
-        if (!list.Data!.Data.Any(note => note.Id == annotationId)) throw new Exception("Annotation list failed");
-        var updated = await data.UpdateAnnotationAsync(annotationId, new AnnotationInput(DateTimeOffset.UtcNow, "Updated integration", true));
-        if (updated.Data?.Note != "Updated integration") throw new Exception("Annotation update failed");
-        if (!(await data.DeleteAnnotationAsync(annotationId)).Data) throw new Exception("Annotation delete failed");
-        foreach (var type in new[] { AnalyticsEndpoint.PerformanceStats, AnalyticsEndpoint.PerformanceChart, AnalyticsEndpoint.PerformanceMetrics, AnalyticsEndpoint.UtmMetrics, AnalyticsEndpoint.Sessions })
+        await using var site = await server.CreateSiteAsync(seed: true);
+        foreach (var stats in new[] { await site.Data.GetStats(site.Start, site.End), await site.Data.GetStats(site.Range()) })
         {
-            var result = await data.GetAnalyticsAsync(type, new AnalyticsRequest { StartAtDate = start, EndAtDate = end, Unit = Unit.day, Timezone = "UTC", Metric = "lcp", Type = type == AnalyticsEndpoint.UtmMetrics ? "utm_source" : "path" });
-            if (result.Status != HttpStatusCode.OK) throw new Exception(type + ": " + result.Status + " " + result.Message);
+            Assert.Equal(HttpStatusCode.OK, stats.Status);
+            Assert.Equal(3, stats.Data!.pageviews.value);
+            Assert.Equal(2, stats.Data.visitors.value);
         }
-        using var keyCreated = await setup.PostAsJsonAsync("api/me/api-keys", new { name = "Disposable SDK key" });
-        keyCreated.EnsureSuccessStatusCode();
-        using var keyJson = JsonDocument.Parse(await keyCreated.Content.ReadAsStringAsync());
-        settings.ApiKey = keyJson.RootElement.GetProperty("key").GetString();
-        using var keyHttp = new HttpClient { BaseAddress = endpoint };
-        var keyData = new UmamiDataService(settings, new AuthService(keyHttp, settings, NullLogger<AuthService>.Instance), NullLogger<UmamiDataService>.Instance);
-        if ((await keyData.GetStats(start, end)).Status != HttpStatusCode.OK) throw new Exception("Real API key auth failed");
-        Console.WriteLine("PASS: real Umami 3.4.0 tracking JSON/cache, Web Vitals, stats, active visitors, metrics mapping, annotation CRUD, performance datasets, UTM, sessions and API-key authentication.");
+        var pageviews = await site.Data.GetPageViews(site.Start, site.End);
+        Assert.Equal(HttpStatusCode.OK, pageviews.Status);
+        Assert.Equal(3, pageviews.Data!.pageviews.Sum(point => point.y));
+        var minuteViews = await site.Data.GetPageViews(new() { StartAtDate = site.Start, EndAtDate = site.End, Unit = Unit.minute, Timezone = "UTC" });
+        Assert.Equal(3, minuteViews.Data!.pageviews.Sum(point => point.y));
+        var events = await site.Data.GetEventsSeries(site.Start, site.End, Unit.minute);
+        Assert.Equal(HttpStatusCode.OK, events.Status);
+        Assert.Equal(1, events.Data!.Single(point => point.x == "purchase").y);
+        var eventRequest = await site.Data.GetEventsSeries(new() { StartAtDate = site.Start, EndAtDate = site.End, EventName = "purchase" });
+        Assert.Equal(1, eventRequest.Data!.Sum(point => point.y));
+        var active = await site.Data.GetActiveUsers();
+        Assert.Equal(HttpStatusCode.OK, active.Status);
+        Assert.Equal(2, active.Data!.ActiveUsers);
+    }
+
+    [DisposableUmamiFact]
+    public async Task MetricsFiltersPaginationAndExpandedRowsMatchStoredValues()
+    {
+        await using var site = await server.CreateSiteAsync(seed: true);
+        MetricsRequest Request() => new() { StartAtDate = site.Start, EndAtDate = site.End, Type = MetricType.url, Limit = 1 };
+        var request = Request();
+        var first = await site.Data.GetMetrics(request);
+        Assert.Equal(HttpStatusCode.OK, first.Status);
+        Assert.Single(first.Data!);
+        request.Offset = 1;
+        var second = await site.Data.GetMetrics(request);
+        Assert.Single(second.Data!);
+        Assert.NotEqual(first.Data![0].x, second.Data![0].x);
+        request = Request(); request.Limit = 10; request.Path = "/checkout";
+        var filtered = await site.Data.GetMetrics(request);
+        Assert.Equal("/checkout", Assert.Single(filtered.Data!).x);
+        Assert.Equal(1, filtered.Data![0].y);
+        request.Path = null; request.DistinctId = "visitor-b";
+        Assert.Equal("/other", Assert.Single((await site.Data.GetMetrics(request)).Data!).x);
+        request.DistinctId = null; request.UtmSource = "contract";
+        Assert.Equal("/landing", Assert.Single((await site.Data.GetMetrics(request)).Data!).x);
+        request.UtmSource = null; request.Search = "checkout";
+        Assert.Equal("/checkout", Assert.Single((await site.Data.GetMetrics(request)).Data!).x);
+        request.Search = null; request.Type = MetricType.@event;
+        Assert.Equal("purchase", Assert.Single((await site.Data.GetMetrics(request)).Data!).x);
+        request.Type = MetricType.path;
+        var expanded = await site.Data.GetExpandedMetrics(request);
+        Assert.Equal(HttpStatusCode.OK, expanded.Status);
+        Assert.Contains(expanded.Data!, row => row.name == "/landing" && row.pageviews == 1);
+    }
+
+    [DisposableUmamiFact]
+    public async Task EmptyAndOutsideDateRangesReturnEmptyDatasets()
+    {
+        await using var site = await server.CreateSiteAsync(seed: true);
+        var empty = await site.Data.GetStats(new() { StartAtDate = site.Start.AddDays(-10), EndAtDate = site.Start.AddDays(-9) });
+        Assert.Equal(HttpStatusCode.OK, empty.Status);
+        Assert.Equal(0, empty.Data!.pageviews.value);
+        var metrics = await site.Data.GetMetrics(new() { StartAtDate = site.Start, EndAtDate = site.End, Type = MetricType.path, Path = "/does-not-exist" });
+        Assert.Equal(HttpStatusCode.OK, metrics.Status);
+        Assert.Empty(metrics.Data!);
+    }
+
+    [DisposableUmamiTheory]
+    [InlineData(AnalyticsEndpoint.Attribution, "attribution")]
+    [InlineData(AnalyticsEndpoint.Breakdown, "breakdown")]
+    [InlineData(AnalyticsEndpoint.FunnelStats, "funnels/stats")]
+    [InlineData(AnalyticsEndpoint.GoalStats, "goals/stats")]
+    [InlineData(AnalyticsEndpoint.Heatmaps, "heatmaps")]
+    [InlineData(AnalyticsEndpoint.Journeys, "journeys")]
+    [InlineData(AnalyticsEndpoint.Retention, "retention")]
+    [InlineData(AnalyticsEndpoint.PerformanceStats, "performance/stats")]
+    [InlineData(AnalyticsEndpoint.PerformanceChart, "performance/chart")]
+    [InlineData(AnalyticsEndpoint.PerformanceMetrics, "performance/metrics")]
+    [InlineData(AnalyticsEndpoint.UtmMetrics, "utm/metrics")]
+    [InlineData(AnalyticsEndpoint.RevenueStats, "revenue/stats")]
+    [InlineData(AnalyticsEndpoint.RevenueChart, "revenue/chart")]
+    [InlineData(AnalyticsEndpoint.RevenueMetrics, "revenue/metrics")]
+    [InlineData(AnalyticsEndpoint.Sessions, "sessions")]
+    [InlineData(AnalyticsEndpoint.Events, "events")]
+    public async Task EveryAnalyticsEndpointExecutesAgainstRealServer(AnalyticsEndpoint endpoint, string route)
+    {
+        await using var site = await server.CreateSiteAsync(seed: true);
+        var request = site.Analytics();
+        request.Type = "path"; request.Currency = "GBP"; request.Metric = "lcp";
+        request.Model = "last-click"; request.Step = "purchase";
+        request.Fields = "[\"path\",\"country\"]";
+        request.Window = 60;
+        request.Steps = "[{\"type\":\"path\",\"value\":\"/landing\"},{\"type\":\"path\",\"value\":\"/checkout\"}]";
+        request.Value = "/checkout"; request.UrlPath = "/checkout"; request.Mode = "click";
+        if (endpoint == AnalyticsEndpoint.Attribution) request.Type = "event";
+        if (endpoint == AnalyticsEndpoint.Journeys) request.Steps = "3";
+        if (endpoint == AnalyticsEndpoint.UtmMetrics) request.Type = "utm_source";
+        if (endpoint == AnalyticsEndpoint.RevenueMetrics) request.Type = "country";
+        var result = await site.Data.GetAnalyticsAsync(endpoint, request);
+        Assert.True(result.Status == HttpStatusCode.OK, $"{endpoint}: {result.Status} ({result.Message})");
+        Assert.Contains(result.Data.ValueKind, new[] { JsonValueKind.Array, JsonValueKind.Object });
+        var sent = Assert.Single(site.DataRequests, item => item.Path.StartsWith("/api/websites/"));
+        Assert.Equal(HttpMethod.Get, sent.Method);
+        Assert.Equal($"/api/websites/{site.WebsiteId}/{route}", sent.Path);
+        if (endpoint == AnalyticsEndpoint.RevenueStats)
+        {
+            Assert.Equal(19.95, double.Parse(result.Data.GetProperty("sum").ToString(), System.Globalization.CultureInfo.InvariantCulture), 2);
+            Assert.Equal(1, result.Data.GetProperty("count").GetInt32());
+        }
+        if (endpoint == AnalyticsEndpoint.PerformanceStats)
+        {
+            Assert.Equal(1200, result.Data.GetProperty("lcp").GetProperty("p75").GetDouble());
+            Assert.Equal(0.05, result.Data.GetProperty("cls").GetProperty("p75").GetDouble(), 3);
+            Assert.Equal(1, result.Data.GetProperty("count").GetInt32());
+        }
+        if (endpoint == AnalyticsEndpoint.Sessions) Assert.Equal(2, result.Data.GetProperty("count").GetInt32());
+        if (endpoint == AnalyticsEndpoint.UtmMetrics)
+            Assert.Contains(result.Data.EnumerateArray(), item => item.GetProperty("utm").GetString() == "contract" && item.GetProperty("views").GetInt32() == 1);
+    }
+
+    private sealed class SessionPage
+    {
+        public SessionRow[] Data { get; set; } = [];
+        public int Count { get; set; }
+    }
+    private sealed class SessionRow
+    {
+        public string Id { get; set; } = "";
+        public string? DistinctId { get; set; }
+    }
+
+    [DisposableUmamiFact]
+    public async Task CallerTypedAnalyticsAndGenericSessionDetailDeserializeCorrectly()
+    {
+        await using var site = await server.CreateSiteAsync(seed: true);
+        var sessions = await site.Data.GetAnalyticsAsync<SessionPage>(AnalyticsEndpoint.Sessions, site.Analytics());
+        Assert.Equal(HttpStatusCode.OK, sessions.Status);
+        Assert.Equal(2, sessions.Data!.Count);
+        var visitor = Assert.Single(sessions.Data.Data, row => row.Id == site.VisitorSessionId);
+        var detail = await site.Data.SendWebsiteRequestAsync<JsonElement>(HttpMethod.Get, "sessions/" + visitor.Id, site.DateQuery());
+        Assert.Equal(HttpStatusCode.OK, detail.Status);
+        Assert.Equal(visitor.Id, detail.Data.GetProperty("id").GetString());
     }
 }

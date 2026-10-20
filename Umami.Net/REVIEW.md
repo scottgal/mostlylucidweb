@@ -88,3 +88,18 @@ release is separate from this SDK update.
 - [Authentication](https://docs.umami.is/docs/api/authentication)
 - [Cloud API key and endpoint](https://docs.umami.is/docs/cloud/api-key)
 - [Annotation routes](https://github.com/umami-software/umami/tree/v3.4.0/src/app/api/websites/%5BwebsiteId%5D/annotations)
+
+## Expanded integration suite
+
+The original single smoke scenario is replaced with 51 independent integration
+cases. All 51 passed locally for net8.0, net9.0 and net10.0 (153 integration
+passes), using the real pinned Umami 3.4.0 image and PostgreSQL 16. No SDK source
+fix was needed to make the expanded cases pass. The suite verifies stored values,
+all analytics endpoint routes, authentication failures, resource lifecycles,
+collection/identity overloads, background delivery and real transport errors.
+
+`./scripts/test-umami-integration.sh` now manages disposable startup/readiness,
+test execution, failure diagnostics, TRX reports and cleanup. CI uses this same
+runner against all three native runtimes before packing or publishing.
+See the [coverage and usage guide](../Umami.Net.Test/Integration/README.md) for the
+case matrix, isolation guarantees and explicit limits.
