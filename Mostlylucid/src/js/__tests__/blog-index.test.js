@@ -1,112 +1,72 @@
-﻿import { describe, it, expect, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+import { syncFilters, prepareFilterRequest } from '../blog-index';
 
-// Suppress console output (module under test logs extensively)
-vi.spyOn(console, 'log').mockImplementation(() => {});
-vi.spyOn(console, 'warn').mockImplementation(() => {});
-vi.spyOn(console, 'error').mockImplementation(() => {});
-
-// The test verifies that language changes refresh calendar highlights
-// and that HTMX swaps cause the date selection to be adjusted to the last post
-// when posts fall outside the currently selected flatpickr range.
-
-describe('blog-index integration (flatpickr + language + htmx)', () => {
-  it('refreshes highlights on language change and adjusts selection when posts are outside range', async () => {
-    // Prepare DOM
+beforeEach(() => {
+    window.history.replaceState({}, '', '/');
     document.body.innerHTML = `
-      <div id="content">
-        <input id="dateRange" type="text" />
-        <select id="languageSelect">
-          <option value="en">English</option>
-          <option value="es">Spanish</option>
-        </select>
-        <select id="orderSelect"><option value="date_desc">Newest</option></select>
-        <button id="clearDateFilter"></button>
-        <div class="post" data-published-date="2025-12-05"></div>
-      </div>
-    `;I update
+        <form data-blog-filters>
+            <select name="category"><option value="">All topics</option><option value="C#">C#</option></select>
+            <select name="language"><option value="">All languages</option><option value="en">English</option><option value="es">Spanish</option></select>
+            <input type="date" name="startDate"><input type="date" name="endDate">
+            <select name="order"><option value="relevance">Best match</option><option value="date_desc">Newest first</option><option value="title_asc">Title A–Z</option></select>
+            <input name="pageSize" value="10"><input name="query" data-filter-query>
+        </form>
+        <p id="filterSummary"></p>`;
+});
 
-    // Spies for flatpickr instance methods
-    const setDateSpy = vi.fn((dates) => {
-      // Update selectedDates when setDate is called
-      if (Array.isArray(dates)) {
-        currentFp.selectedDates = dates.map(d => (typeof d === 'string' ? new Date(d + 'T00:00:00') : d));
-      }
-    });
-    const redrawSpy = vi.fn();
-    const destroySpy = vi.fn();
+const control = name => document.querySelector(`[name="${name}"]`);
 
-    // Keep reference to current flatpickr instance
-    let currentFp = null;
-
-    // Mock global flatpickr before importing the module
-    global.flatpickr = (input, opts) => {
-      // Create a fake instance and attach to input as the real code expects
-      const fp = {
-        currentYear: 2025,
-        currentMonth: 10, // November (0-based +1 => 11)
-        selectedDates: [new Date('2025-11-01'), new Date('2025-11-30')],
-        redraw: redrawSpy,
-        setDate: setDateSpy,
-        destroy: destroySpy,
-      };
-
-      // If there is a defaultDate in opts, mimic applying it
-      if (opts && opts.defaultDate) {
-        fp.selectedDates = opts.defaultDate.map(d => (typeof d === 'string' ? new Date(d + 'T00:00:00') : d));
-      }
-
-      currentFp = fp;
-      input._flatpickr = fp;
-      return fp;
-    };
-
-    // Mock fetch to return a predictable set of highlight dates
-    global.fetch = vi.fn((url) => {
-      if (typeof url === 'string' && url.includes('/blog/calendar-days')) {
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ dates: ['2025-11-15', '2025-12-05'] })
-        });
-      }
-      return Promise.resolve({ ok: false });
+describe('article filter state', () => {
+    it('restores all filters from a shared URL and preserves the selected sort', () => {
+        window.history.replaceState({}, '', '/?category=C%23&language=es&order=title_asc&startDate=2026-01-01&endDate=2026-10-19&pageSize=20');
+        syncFilters();
+        expect(control('category').value).toBe('C#');
+        expect(control('language').value).toBe('es');
+        expect(control('order').value).toBe('title_asc');
+        expect(control('startDate').value).toBe('2026-01-01');
+        expect(control('endDate').min).toBe('2026-01-01');
+        expect(control('startDate').max).toBe('2026-10-19');
+        expect(control('pageSize').value).toBe('20');
+        expect(document.querySelector('#filterSummary').textContent).toContain('Title A–Z');
     });
 
-    // Stub htmx to prevent actual Ajax calls
-    global.htmx = { ajax: vi.fn() };
+    it('resets controls and date constraints after reset or history restoration', () => {
+        window.history.replaceState({}, '', '/?language=es&category=C%23&startDate=2026-01-01');
+        syncFilters();
+        window.history.replaceState({}, '', '/');
+        syncFilters();
+        expect(control('language').value).toBe('en');
+        expect(control('category').value).toBe('');
+        expect(control('startDate').value).toBe('');
+        expect(control('endDate').min).toBe('');
+        expect(control('order').value).toBe('date_desc');
+    });
 
-    // Import the module (it executes and attaches window.blogIndexInit)
-    await import('../blog-index.js');
+    it('defaults search to newest first and all languages and retains the search query', () => {
+        window.history.replaceState({}, '', '/search?query=dotnet');
+        syncFilters();
+        expect(control('order').value).toBe('date_desc');
+        expect(control('language').value).toBe('');
+        expect(control('query').value).toBe('dotnet');
+    });
 
-    // Initialize the blog index on the content root
-    const root = document.querySelector('#content');
-    expect(typeof window.blogIndexInit).toBe('function');
-    window.blogIndexInit(root);
+    it('reads legacy sort URLs', () => {
+        window.history.replaceState({}, '', '/?orderBy=title&orderDir=asc');
+        syncFilters();
+        expect(control('order').value).toBe('title_asc');
+    });
 
-    // Simulate language change to 'es'
-    const langSelect = document.querySelector('#languageSelect');
-    langSelect.value = 'es';
-    langSelect.dispatchEvent(new Event('change'));
+    it('keeps the visible search query and every active filter in a request', () => {
+        document.body.insertAdjacentHTML('beforeend', '<input id="searchQuery" value="updated search">');
+        const parameters = { query: 'old search', category: 'C#', language: 'es', order: 'title_asc', startDate: '2026-01-01', endDate: '', page: '1' };
+        prepareFilterRequest({ detail: { elt: control('order'), parameters } });
+        expect(parameters).toEqual({ query: 'updated search', category: 'C#', language: 'es', order: 'title_asc', startDate: '2026-01-01', page: '1' });
+    });
 
-    // Wait for async language handler to fetch and redraw
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    // Expect fetch called with language param and flatpickr redraw to be invoked
-    const calledWithLang = global.fetch.mock.calls.some(call => call[0] && call[0].includes('language=es'));
-    expect(calledWithLang).toBe(true);
-    expect(redrawSpy).toHaveBeenCalled();
-
-    // Test that the module properly exports the init function and can handle re-initialization
-    const contentEl = document.querySelector('#content');
-    expect(contentEl.__blogIndexInitialized).toBe(true);
-    expect(typeof contentEl.__ensureSelectionCoversPosts).toBe('function');
-
-    // Test that flatpickr instance exists and has the expected structure
-    const input = document.querySelector('#dateRange');
-    expect(input._flatpickr).toBeTruthy();
-    expect(Array.isArray(input._flatpickr.selectedDates)).toBe(true);
-
-    // The actual HTMX afterSettle and ensureSelectionCoversPosts behavior
-    // is tested in integration/e2e tests rather than unit tests due to
-    // complex timing and DOM manipulation requirements
-  });
+    it('does not alter unrelated HTMX requests', () => {
+        const elt = document.createElement('button');
+        const parameters = { startDate: '', query: 'untouched' };
+        prepareFilterRequest({ detail: { elt, parameters } });
+        expect(parameters).toEqual({ startDate: '', query: 'untouched' });
+    });
 });

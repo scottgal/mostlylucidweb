@@ -315,3 +315,6 @@ vocab.txt
 
 # Generated from node_modules by scripts/vendor-boxicons.mjs
 Mostlylucid/src/css/boxicons.gen.css
+
+# Local browser review snapshots
+/.playwright-cli/

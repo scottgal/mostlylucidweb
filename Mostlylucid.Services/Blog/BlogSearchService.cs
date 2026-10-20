@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Mostlylucid.DbContext.EntityFramework;
 using Mostlylucid.SemanticSearch.Services;
 using Mostlylucid.Shared.Entities;
+using Mostlylucid.Shared.Helpers;
 using Mostlylucid.Shared.Mapper;
 using Mostlylucid.Shared.Models;
 using Serilog;
@@ -15,7 +16,7 @@ public class BlogSearchService(
     ISemanticSearchService semanticSearchService,
     IMemoryCache memoryCache,
     SearchRanker? searchRanker = null,
-    SearchQueryParser? queryParser = null)
+    SearchQueryParser? queryParser = null) : IBlogSearchService
 {
     private readonly SearchRanker _ranker = searchRanker ?? new SearchRanker();
     private readonly SearchQueryParser _queryParser = queryParser ?? new SearchQueryParser();
@@ -75,14 +76,18 @@ public class BlogSearchService(
             if (_cachedCategories != null && DateTime.UtcNow < _categoryCacheExpiry)
                 return _cachedCategories.Take(limit).ToList();
 
+            var now = DateTimeOffset.UtcNow;
             _cachedCategories = await context.Categories
                 .AsNoTracking()
-                .Select(c => new CategoryWithCount(
+                .Select(c => new
+                {
                     c.Name,
-                    c.BlogPosts.Count(p => !p.IsHidden && p.LanguageEntity.Name == "en")
-                ))
+                    PostCount = c.BlogPosts.Count(p => !p.IsHidden && p.LanguageEntity.Name == "en"
+                        && (p.ScheduledPublishDate == null || p.ScheduledPublishDate <= now))
+                })
                 .Where(c => c.PostCount > 0)
                 .OrderByDescending(c => c.PostCount)
+                .Select(c => new CategoryWithCount(c.Name, c.PostCount))
                 .ToListAsync();
 
             _categoryCacheExpiry = DateTime.UtcNow.Add(CategoryCacheDuration);
@@ -338,7 +343,7 @@ public class BlogSearchService(
         activity.AddProperty("Order", order);
 
         var targetLanguage = string.IsNullOrEmpty(language) ? "en" : language;
-        var noMatchFound = false;
+        var parsed = _queryParser.Parse(query);
 
         // Try semantic search first (with fallback to PostgreSQL on any failure)
         try
@@ -349,21 +354,11 @@ public class BlogSearchService(
             {
                 // Get full blog posts for the semantic results
                 var slugs = semanticResults.Select(r => r.Slug).ToList();
-                var now = DateTimeOffset.UtcNow;
-
-                var postsQuery = context.BlogPosts
+                var postsQuery = ApplyMetadataFilters(context.BlogPosts
                     .Include(x => x.Categories)
+                    .Include(x => x.LanguageEntity)
                     .AsNoTracking()
-                    .Where(x => slugs.Contains(x.Slug)
-                                && !x.IsHidden
-                                && (x.ScheduledPublishDate == null || x.ScheduledPublishDate <= now)
-                                && x.LanguageEntity.Name == targetLanguage);
-
-                // Apply date filters
-                if (startDate.HasValue)
-                    postsQuery = postsQuery.Where(x => x.PublishedDate >= startDate.Value);
-                if (endDate.HasValue)
-                    postsQuery = postsQuery.Where(x => x.PublishedDate <= endDate.Value);
+                    .Where(x => slugs.Contains(x.Slug)), targetLanguage, startDate, endDate, parsed);
 
                 var posts = await postsQuery.ToListAsync();
 
@@ -483,7 +478,7 @@ public class BlogSearchService(
             // If no results found, mark it so we can return recent posts as suggestions
             if (pgResults.TotalItems == 0)
             {
-                noMatchFound = true;
+                Log.Logger.Information("No matches for {Query}; suggesting recent articles", query);
             }
             else
             {
@@ -493,16 +488,12 @@ public class BlogSearchService(
         catch (Exception ex)
         {
             Log.Logger.Error(ex, "PostgreSQL full-text search failed for query '{Query}'", query);
-            noMatchFound = true;
+
         }
 
-        // No match found - return empty result (UI will show "No results found")
-        if (noMatchFound)
-        {
-            Log.Logger.Information("No search results for '{Query}'", query);
-        }
-
-        return new BasePagingModel<BlogPostDto>();
+        // Recommendations are explicitly marked and always ordered newest first.
+        return await GetRecentPostsAsSuggestions(targetLanguage, startDate, endDate, page, pageSize,
+            parsed);
     }
 
     /// <summary>
@@ -556,24 +547,11 @@ public class BlogSearchService(
         DateTime? endDate,
         string order)
     {
-        var now = DateTimeOffset.UtcNow;
-        var baseQuery = context.BlogPosts
+        var parsed = _queryParser.Parse(query);
+        var baseQuery = ApplyMetadataFilters(context.BlogPosts
             .Include(x => x.Categories)
             .Include(x => x.LanguageEntity)
-            .AsNoTracking()
-            .Where(x =>
-                !x.IsHidden
-                && (x.ScheduledPublishDate == null || x.ScheduledPublishDate <= now)
-                && x.LanguageEntity.Name == language);
-
-        // Apply date filters
-        if (startDate.HasValue)
-            baseQuery = baseQuery.Where(x => x.PublishedDate >= startDate.Value);
-        if (endDate.HasValue)
-            baseQuery = baseQuery.Where(x => x.PublishedDate <= endDate.Value);
-
-        // Parse the query for special operators
-        var parsed = _queryParser.Parse(query);
+            .AsNoTracking(), language, startDate, endDate, parsed);
 
         // Build the search query based on parsed components
         IQueryable<BlogPostEntity> searchQuery = baseQuery;
@@ -581,11 +559,12 @@ public class BlogSearchService(
         // Handle phrases (exact substring matching) - batched into single query
         if (parsed.Phrases.Count > 0)
         {
+            var phrasePatterns = parsed.Phrases.Select(phrase => $"%{phrase}%").ToArray();
             searchQuery = searchQuery.Where(x =>
-                parsed.Phrases.All(phrase =>
-                    EF.Functions.ILike(x.Title, $"%{phrase}%")
-                    || EF.Functions.ILike(x.PlainTextContent, $"%{phrase}%")
-                    || x.Categories.Any(c => EF.Functions.ILike(c.Name, $"%{phrase}%"))));
+                phrasePatterns.All(pattern =>
+                    EF.Functions.ILike(x.Title, pattern)
+                    || EF.Functions.ILike(x.PlainTextContent, pattern)
+                    || x.Categories.Any(c => EF.Functions.ILike(c.Name, pattern))));
         }
 
         // Build tsquery for include terms and wildcards
@@ -634,31 +613,12 @@ public class BlogSearchService(
         // Handle excluded terms (must NOT contain these) - batched into single query
         if (parsed.ExcludeTerms.Count > 0)
         {
+            var excludedPatterns = parsed.ExcludeTerms.Select(term => $"%{term}%").ToArray();
             searchQuery = searchQuery.Where(x =>
-                !parsed.ExcludeTerms.Any(excludeTerm =>
-                    EF.Functions.ILike(x.Title, $"%{excludeTerm}%")
-                    || EF.Functions.ILike(x.PlainTextContent, $"%{excludeTerm}%")
-                    || x.Categories.Any(c => EF.Functions.ILike(c.Name, $"%{excludeTerm}%"))));
-        }
-
-        // Handle category filters (category:ASP.NET)
-        if (parsed.Categories.Count > 0)
-        {
-            searchQuery = searchQuery.Where(x =>
-                x.Categories.Any(c =>
-                    parsed.Categories.Any(category =>
-                        EF.Functions.ILike(c.Name, $"%{category}%"))));
-        }
-
-        // Handle date range filters (after:2025-01-01, before:2025-12-31)
-        if (parsed.AfterDate.HasValue)
-        {
-            searchQuery = searchQuery.Where(x => x.PublishedDate >= parsed.AfterDate.Value);
-        }
-
-        if (parsed.BeforeDate.HasValue)
-        {
-            searchQuery = searchQuery.Where(x => x.PublishedDate <= parsed.BeforeDate.Value);
+                !excludedPatterns.Any(pattern =>
+                    EF.Functions.ILike(x.Title, pattern)
+                    || EF.Functions.ILike(x.PlainTextContent, pattern)
+                    || x.Categories.Any(c => EF.Functions.ILike(c.Name, pattern))));
         }
 
         // Apply ordering - relevance uses ts_rank_cd (cover density), others use column values
@@ -704,23 +664,13 @@ public class BlogSearchService(
         DateTime? startDate,
         DateTime? endDate,
         int page,
-        int pageSize)
+        int pageSize,
+        SearchQueryParser.ParsedQuery parsed)
     {
-        var now = DateTimeOffset.UtcNow;
-        var query = context.BlogPosts
+        var query = ApplyMetadataFilters(context.BlogPosts
             .Include(x => x.Categories)
             .Include(x => x.LanguageEntity)
-            .AsNoTracking()
-            .Where(x =>
-                !x.IsHidden
-                && (x.ScheduledPublishDate == null || x.ScheduledPublishDate <= now)
-                && x.LanguageEntity.Name == language);
-
-        // Apply date filters
-        if (startDate.HasValue)
-            query = query.Where(x => x.PublishedDate >= startDate.Value);
-        if (endDate.HasValue)
-            query = query.Where(x => x.PublishedDate <= endDate.Value);
+            .AsNoTracking(), language, startDate, endDate, parsed);
 
         var totalPosts = await query.CountAsync();
         var results = await query
@@ -737,6 +687,31 @@ public class BlogSearchService(
             PageSize = pageSize,
             NoMatchFound = true
         };
+    }
+
+    private static IQueryable<BlogPostEntity> ApplyMetadataFilters(IQueryable<BlogPostEntity> query,
+        string language, DateTime? startDate, DateTime? endDate, SearchQueryParser.ParsedQuery parsed)
+    {
+        var now = DateTimeOffset.UtcNow;
+        query = query.Where(post => !post.IsHidden
+            && (post.ScheduledPublishDate == null || post.ScheduledPublishDate <= now)
+            && post.LanguageEntity.Name == language);
+        // Both UI dates and query operators constrain every candidate source, including suggestions.
+        if (DateFilterHelper.InclusiveStart(startDate) is { } inclusiveStart)
+            query = query.Where(post => post.PublishedDate >= inclusiveStart);
+        if (DateFilterHelper.InclusiveStart(parsed.AfterDate) is { } afterInclusive)
+            query = query.Where(post => post.PublishedDate >= afterInclusive);
+        if (DateFilterHelper.ExclusiveEnd(endDate) is { } exclusiveEnd)
+            query = query.Where(post => post.PublishedDate < exclusiveEnd);
+        if (DateFilterHelper.ExclusiveEnd(parsed.BeforeDate) is { } beforeExclusive)
+            query = query.Where(post => post.PublishedDate < beforeExclusive);
+        if (parsed.Categories.Count > 0)
+        {
+            var categoryPatterns = parsed.Categories.Select(term => $"%{term}%").ToArray();
+            query = query.Where(post => post.Categories.Any(category => categoryPatterns.Any(pattern =>
+                EF.Functions.ILike(category.Name, pattern))));
+        }
+        return query;
     }
 
     /// <summary>

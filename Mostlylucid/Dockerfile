@@ -4,6 +4,14 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 7240
 
+# Build the pinned web compiler into the same deployable image; no companion service is required.
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS resume-build
+WORKDIR /src
+ADD --checksum=sha256:d074c71cd01c566db5aa8e7d1dd8ed2033a8e860e071834282fbce8caa4c70e9 https://codeload.github.com/scottgal/lucidRESUME/tar.gz/a35b32c2249a7bebf6e80f7e0b997e5b1e5e438a /src/lucidresume-source.tar.gz
+RUN mkdir lucidresume && tar -xzf lucidresume-source.tar.gz -C lucidresume --strip-components=1 && rm lucidresume-source.tar.gz
+COPY deploy/lucidresume-host/ /src/host/
+RUN dotnet publish /src/host/LucidResumeHost.csproj -c Release -o /out /p:UseAppHost=false
+
 # Build image with SDK for building the application
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -82,6 +90,7 @@ WORKDIR /app
 
 # Copy the published application from the build stage
 COPY --from=publish /app/publish .
+COPY --from=resume-build /out /app/resume-compiler
 
 
 # Start the application

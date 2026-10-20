@@ -14,6 +14,8 @@ const CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
  * @returns {Promise<Object>} Dictionary of originalUrl -> archiveUrl
  */
 async function fetchLinkMappings() {
+    // The archive mapping service is available only in database-backed mode.
+    if (document.body.dataset.blogMode === 'File') return {};
     const now = Date.now();
 
     // Return cached data if still fresh

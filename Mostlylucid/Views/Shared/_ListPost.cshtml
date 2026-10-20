@@ -1,9 +1,9 @@
-﻿@using Mostlylucid.Helpers
+@using Mostlylucid.Helpers
 @model Mostlylucid.Models.Blog.PostListModel
 
-<div class="border-b border-grey-lighter pb-4 mb-4" data-published-date="@Model.PublishedDate.ToString("yyyy-MM-dd")">
+<article class="post-card" data-published-date="@Model.PublishedDate.ToString("yyyy-MM-dd")">
 
-    <div class="flex items-start justify-between gap-3 mb-2">
+    <div class="post-title-row flex items-start justify-between gap-3">
         @if (BlogUrlHelper.IsEnglish(Model.Language))
         {
             <a href="@Url.Action("Show", "Blog", new { slug = Model.Slug })"
@@ -25,20 +25,19 @@
             </div>
         }
     </div>
-    <div class="flex flex-wrap gap-1.5 py-2 print:!hidden">
-        @foreach (var category in Model.Categories)
-        {
-            <partial name="_Category" model="category"/>
-        }
+    @if (!string.IsNullOrWhiteSpace(Model.Summary))
+    {
+        <p class="post-lede" data-post-lede>@Model.Summary</p>
+    }
+    <div class="post-meta">
+        <time datetime="@Model.PublishedDate.ToString("yyyy-MM-dd")">@Model.PublishedDate.ToString("dd MMM yyyy")</time>
+        <span aria-hidden="true">·</span>
+        <span>@Model.ReadingTime</span>
+        <div class="post-topics print:!hidden">
+            @foreach (var category in Model.Categories)
+            {
+                <partial name="_Category" model="category"/>
+            }
+        </div>
     </div>
-    <div class="block font-body text-black dark:text-white">@Model.Summary</div>
-    <div class="flex items-center pt-4">
-        <p class="pr-2 font-body font-light text-primary light:text-black dark:text-white">
-            @Model.PublishedDate.ToString("f")
-        </p>
-        <span class="font-body text-grey dark:text-white">//</span>
-        <p class="pl-2 font-body font-light text-primary light:text-black dark:text-white">
-            @Model.ReadingTime
-        </p>
-    </div>
-</div>
+</article>

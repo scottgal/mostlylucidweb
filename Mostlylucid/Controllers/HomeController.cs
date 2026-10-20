@@ -14,7 +14,7 @@ namespace Mostlylucid.Controllers;
 public class HomeController(BaseControllerService baseControllerService, ILogger<HomeController> logger)
     : BaseController(baseControllerService, logger)
 {
-    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request", "pagerequest", "homerequest", "Cookie" },
+    [OutputCache(Duration = 3600, VaryByHeaderNames = new[] { "hx-request", "hx-target", "pagerequest", "homerequest", "Cookie" },
         VaryByQueryKeys = new[] { "page", "pageSize", "startDate", "endDate", "language", "orderBy", "orderDir", "order", "category" },
         Tags = new[] { SiteContentService.OutputCacheTag })]
     [HttpGet]
@@ -84,5 +84,13 @@ public class HomeController(BaseControllerService baseControllerService, ILogger
             return PartialView("Software");
         }
         return View();
+    }
+
+    [HttpGet("resumes")]
+    public async Task<IActionResult> Resumes()
+    {
+        var model = await PopulateBaseModel(new BaseViewModel());
+        if (Request.IsHtmx()) return PartialView("Resumes", model);
+        return View(model);
     }
 }

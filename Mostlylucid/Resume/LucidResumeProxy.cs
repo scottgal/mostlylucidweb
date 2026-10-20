@@ -1,5 +1,7 @@
 using System.Net;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace Mostlylucid.Resume;
 
@@ -15,7 +17,17 @@ public static class LucidResumeProxy
 
     public static IServiceCollection AddLucidResumeProxy(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<LucidResumeProxyOptions>(configuration.GetSection("LucidResumeProxy"));
+        services.AddOptions<LucidResumeProxyOptions>().Bind(configuration.GetSection("LucidResumeProxy"))
+            .PostConfigure(options =>
+            {
+                options.AdminUserGoogleId = configuration["Auth:AdminUserGoogleId"];
+                if (string.IsNullOrWhiteSpace(options.UpstreamUri) && File.Exists(EmbeddedResumeCompiler.ExecutablePath))
+                {
+                    options.UpstreamUri = EmbeddedResumeCompiler.UpstreamUri;
+                    options.UseEmbeddedCompiler = true;
+                }
+            });
+        services.AddHostedService<EmbeddedResumeCompiler>();
         services.AddHttpClient(ClientName, client => client.Timeout = TimeSpan.FromMinutes(15))
             .ConfigurePrimaryHttpMessageHandler(() =>
             new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false });
@@ -24,18 +36,28 @@ public static class LucidResumeProxy
 
     public static IEndpointRouteBuilder MapLucidResumeProxy(this IEndpointRouteBuilder endpoints)
     {
-        endpoints.MapMethods("/resume", ["GET", "HEAD", "POST"], ForwardAsync);
-        endpoints.MapMethods("/resume/{**path}", ["GET", "HEAD", "POST"], ForwardAsync);
+        endpoints.MapMethods("/resume", ["GET", "HEAD", "POST"], ForwardAsync).CacheOutput(policy => policy.NoCache());
+        endpoints.MapMethods("/resume/{**path}", ["GET", "HEAD", "POST"], ForwardAsync).CacheOutput(policy => policy.NoCache());
         return endpoints;
     }
 
     private static async Task ForwardAsync(HttpContext context, IHttpClientFactory clients,
         Microsoft.Extensions.Options.IOptions<LucidResumeProxyOptions> configured)
     {
+        // API responses must retain their status/body instead of re-executing the MVC error page.
+        if (context.Features.Get<IStatusCodePagesFeature>() is { } statusPages)
+            statusPages.Enabled = false;
+        context.Response.Headers.CacheControl = "no-store";
         var options = configured.Value;
         if (!Uri.TryCreate(options.UpstreamUri, UriKind.Absolute, out var upstream) ||
             upstream.Scheme is not ("http" or "https") || upstream.AbsolutePath != "/")
         {
+            if (HttpMethods.IsGet(context.Request.Method) &&
+                context.Request.Path.Value?.TrimEnd('/') == "/resume")
+            {
+                context.Response.Redirect("/resumes");
+                return;
+            }
             context.Response.StatusCode = StatusCodes.Status503ServiceUnavailable;
             await context.Response.WriteAsync("Résumé compiler is not configured.");
             return;
@@ -47,10 +69,15 @@ public static class LucidResumeProxy
         var loopbackWriter = options.AllowLoopbackWriter && upstream.IsLoopback && loopbackHost &&
                                      context.Connection.RemoteIpAddress is { } remote &&
                                      IPAddress.IsLoopback(remote);
-        if (HttpMethods.IsPost(context.Request.Method) && !loopbackWriter &&
-            (string.IsNullOrWhiteSpace(options.WriterEmail) ||
-             !string.Equals(context.User.FindFirstValue(ClaimTypes.Email), options.WriterEmail,
-                 StringComparison.OrdinalIgnoreCase)))
+        // Visitors may compile from the published record; publishing/changing that record is writer-only.
+        var isCompilation = context.Request.Path.Value?.TrimEnd('/') == "/resume/api/compile";
+        var writer = context.User.Identity?.IsAuthenticated == true &&
+            (!string.IsNullOrWhiteSpace(options.WriterEmail)
+                ? string.Equals(context.User.FindFirstValue(ClaimTypes.Email), options.WriterEmail, StringComparison.OrdinalIgnoreCase)
+                : !string.IsNullOrWhiteSpace(options.AdminUserGoogleId) &&
+                  (context.User.FindFirstValue("sub") ?? context.User.FindFirstValue(ClaimTypes.NameIdentifier)) == options.AdminUserGoogleId);
+        if (HttpMethods.IsPost(context.Request.Method) && !isCompilation && !loopbackWriter &&
+            !writer)
         {
             context.Response.StatusCode = context.User.Identity?.IsAuthenticated == true
                 ? StatusCodes.Status403Forbidden : StatusCodes.Status401Unauthorized;
@@ -83,6 +110,7 @@ public static class LucidResumeProxy
             foreach (var header in upstreamResponse.Content.Headers)
                 if (!HopByHopHeaders.Contains(header.Key))
                     context.Response.Headers[header.Key] = header.Value.ToArray();
+            context.Response.Headers.CacheControl = "no-store";
             if (!HttpMethods.IsHead(context.Request.Method))
                 await upstreamResponse.Content.CopyToAsync(context.Response.Body, context.RequestAborted);
         }
@@ -102,4 +130,7 @@ public sealed class LucidResumeProxyOptions
     public string? UpstreamUri { get; set; }
     public string? WriterEmail { get; set; }
     public bool AllowLoopbackWriter { get; set; }
+    public string? PublicBaseUri { get; set; }
+    internal string? AdminUserGoogleId { get; set; }
+    internal bool UseEmbeddedCompiler { get; set; }
 }

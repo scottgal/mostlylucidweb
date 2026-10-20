@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Htmx;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
@@ -17,7 +17,7 @@ namespace Mostlylucid.Controllers;
 [Route("search")]
 public class SearchController(
     BaseControllerService baseControllerService,
-    BlogSearchService searchService,
+    IBlogSearchService searchService,
     ISemanticSearchService semanticSearchService,
     SemanticSearchConfig semanticSearchConfig,
     ILogger<SearchController> logger)
@@ -25,7 +25,7 @@ public class SearchController(
 {
     [HttpGet]
     [Route("")]
-    [OutputCache(Duration = 3600, Tags = new[] { "blog" }, VaryByHeaderNames = new[] { "hx-request", "pagerequest" }, VaryByQueryKeys = new[] { "query", "page", "pageSize", "language", "category", "dateRange", "startDate", "endDate", "order" })]
+    [OutputCache(Duration = 3600, Tags = new[] { "blog" }, VaryByHeaderNames = new[] { "hx-request", "hx-target", "pagerequest" }, VaryByQueryKeys = new[] { "query", "page", "pageSize", "language", "category", "dateRange", "startDate", "endDate", "order" })]
     public async Task<IActionResult> Search(
         string? query,
         int page = 1,
@@ -35,7 +35,7 @@ public class SearchController(
         DateRangeOption dateRange = DateRangeOption.AllTime,
         DateTime? startDate = null,
         DateTime? endDate = null,
-        string order = "relevance",
+        string order = "date_desc",
         [FromHeader] bool pagerequest = false)
     {
         try
@@ -56,10 +56,11 @@ public class SearchController(
                 topCategories = new();
             }
 
-            // Append category to query if specified
+            var effectiveQuery = query;
+            // Apply the category to search without mutating the displayed query.
             if (!string.IsNullOrEmpty(category) && !string.IsNullOrEmpty(query))
             {
-                query = $"{query} category:{category}".Trim();
+                effectiveQuery = $"{query} category:\"{category.Replace("\"", "")}\"".Trim();
             }
 
             // Check if this is a filter/pagination request targeting just the content area
@@ -88,7 +89,7 @@ public class SearchController(
             }
 
             var searchResults = await searchService.HybridSearchWithPagingAsync(
-                query,
+                effectiveQuery!,
                 language,
                 calculatedStartDate,
                 calculatedEndDate,
@@ -113,7 +114,7 @@ public class SearchController(
             searchModel = await PopulateBaseModel(searchModel);
 
             // Build link URL with current filters
-            var linkUrl = Url.Action("Search", "Search", new { query, language, dateRange, startDate, endDate, order });
+            var linkUrl = Url.Action("Search", "Search", new { query, language, category, dateRange, startDate, endDate, order });
             searchModel.SearchResults.LinkUrl = linkUrl;
 
             if (isContentOnlyRequest) return PartialView("_SearchResultsPartial", searchModel.SearchResults);

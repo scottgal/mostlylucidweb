@@ -1,4 +1,4 @@
-﻿using Mostlylucid.Blog.ViewServices;
+using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Mapper;
 using Mostlylucid.Models.Blog;
 using Mostlylucid.Services.Interfaces;
@@ -97,10 +97,10 @@ public class MarkdownBlogViewService(MarkdownConfig config, ILogger<MarkdownBlog
         return await Task.FromResult(pageCache.Select(x => x.ToPostListModel()).ToList());
     }
 
-    public async Task<bool> EntryExists(string slug, string language)
+    public Task<bool> EntryExists(string slug, string language)
     {
-        var file = Path.Combine(MarkdownConfig.MarkdownTranslatedPath, $"{slug}.{language}.md");
-        return await Task.FromResult(File.Exists(file));
+        language = string.IsNullOrEmpty(language) ? Constants.EnglishLanguage : language;
+        return Task.FromResult(PageCacheHelper.GetPageCache().ContainsKey((slug, language)));
     }
 
     public async Task<bool> EntryChanged(string slug, string language, string hash)
@@ -189,10 +189,8 @@ public class MarkdownBlogViewService(MarkdownConfig config, ILogger<MarkdownBlog
         // Apply visibility filters
         postsQuery = ApplyVisibilityFilters(postsQuery);
 
-        // For page 1, prioritize pinned posts
-        var postsList = page == 1
-            ? postsQuery.OrderByDescending(x => x.IsPinned).ThenByDescending(x => x.PublishedDate).Select(x => x.ToPostListModel()).ToList()
-            : postsQuery.OrderByDescending(x => x.PublishedDate).Select(x => x.ToPostListModel()).ToList();
+        var postsList = postsQuery.OrderByDescending(x => x.PublishedDate)
+            .ThenBy(x => x.Slug).Select(x => x.ToPostListModel()).ToList();
 
         var totalItems = postsList.Count;
 
@@ -248,46 +246,14 @@ public class MarkdownBlogViewService(MarkdownConfig config, ILogger<MarkdownBlog
         if (endDate.HasValue)
             postsQuery = postsQuery.Where(p => p.PublishedDate.Date <= endDate.Value.Date);
 
-        // For page 1, prioritize pinned posts
-        var isFirstPage = page == 1;
-        if (isFirstPage)
+        // Keep one stable order across every page; pins do not override the selected sort.
+        postsQuery = (orderBy?.ToLowerInvariant(), orderDir?.ToLowerInvariant()) switch
         {
-            switch (orderBy?.ToLower())
-            {
-                case "title":
-                    postsQuery = orderDir?.ToLower() == "asc"
-                        ? postsQuery.OrderByDescending(x => x.IsPinned).ThenBy(x => x.Title)
-                        : postsQuery.OrderByDescending(x => x.IsPinned).ThenByDescending(x => x.Title);
-                    break;
-                case "date":
-                    postsQuery = orderDir?.ToLower() == "asc"
-                        ? postsQuery.OrderByDescending(x => x.IsPinned).ThenBy(x => x.PublishedDate)
-                        : postsQuery.OrderByDescending(x => x.IsPinned).ThenByDescending(x => x.PublishedDate);
-                    break;
-                default:
-                    postsQuery = postsQuery.OrderByDescending(x => x.IsPinned).ThenByDescending(x => x.PublishedDate);
-                    break;
-            }
-        }
-        else
-        {
-            switch (orderBy?.ToLower())
-            {
-                case "title":
-                    postsQuery = orderDir?.ToLower() == "asc"
-                        ? postsQuery.OrderBy(x => x.Title)
-                        : postsQuery.OrderByDescending(x => x.Title);
-                    break;
-                case "date":
-                    postsQuery = orderDir?.ToLower() == "asc"
-                        ? postsQuery.OrderBy(x => x.PublishedDate)
-                        : postsQuery.OrderByDescending(x => x.PublishedDate);
-                    break;
-                default:
-                    postsQuery = postsQuery.OrderByDescending(x => x.PublishedDate);
-                    break;
-            }
-        }
+            ("title", "asc") => postsQuery.OrderBy(x => x.Title).ThenBy(x => x.Slug),
+            ("title", _) => postsQuery.OrderByDescending(x => x.Title).ThenBy(x => x.Slug),
+            ("date", "asc") => postsQuery.OrderBy(x => x.PublishedDate).ThenBy(x => x.Slug),
+            _ => postsQuery.OrderByDescending(x => x.PublishedDate).ThenBy(x => x.Slug)
+        };
 
         var posts = postsQuery.Select(x => x.ToPostListModel()).ToList();
         model.TotalItems = posts.Count;
@@ -307,9 +273,21 @@ public class MarkdownBlogViewService(MarkdownConfig config, ILogger<MarkdownBlog
         return Task.FromResult(posts);
     }
 
-    public Task<BlogIndexResult> GetIndexDataAsync(BlogIndexRequest request)
+    public async Task<BlogIndexResult> GetIndexDataAsync(BlogIndexRequest request)
     {
-        throw new NotImplementedException("File mode does not support GetIndexDataAsync");
+        var orderParts = request.Order?.Split('_', 2);
+        var orderBy = orderParts?.Length == 2 ? orderParts[0] : request.OrderBy;
+        var orderDir = orderParts?.Length == 2 ? orderParts[1] : request.OrderDir;
+        var posts = await GetPagedPosts(1, int.MaxValue, request.Language,
+            request.StartDate, request.EndDate, orderBy, orderDir);
+        var filtered = posts.Data.Where(post => string.IsNullOrEmpty(request.Category)
+            || post.Categories.Contains(request.Category)).ToList();
+        posts.Page = Math.Max(1, request.Page);
+        posts.PageSize = Math.Clamp(request.PageSize, 1, 100);
+        posts.TotalItems = filtered.Count;
+        posts.Data = filtered.Skip((posts.Page - 1) * posts.PageSize).Take(posts.PageSize).ToList();
+        posts.AllCategories = await GetCategoriesWithCount(request.Language);
+        return new BlogIndexResult { Posts = posts };
     }
 
     public Task<List<string>> GetCalendarDaysAsync(int year, int month, string language)

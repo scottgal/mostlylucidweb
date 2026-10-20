@@ -1,0 +1,3 @@
+# Generated downloads are binary documents, including PDFs with text-based internals.
+*.pdf binary
+*.docx binary

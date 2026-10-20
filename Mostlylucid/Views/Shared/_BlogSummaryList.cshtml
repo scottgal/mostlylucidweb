@@ -1,4 +1,4 @@
-﻿@model Mostlylucid.Models.Blog.PostListViewModel
+@model Mostlylucid.Models.Blog.PostListViewModel
 <div class="pt-2" id="content" data-blog-list>
 
     <!-- Top Pagination -->
@@ -7,8 +7,9 @@
             hx-boost="true"
             class="shrink-0"
             hx-target="#content"
-            hx-push-url="false"
-            hx-swap="show:none"
+            hx-push-url="true"
+            hx-sync="#contentcontainer:replace"
+            hx-swap="outerHTML show:none"
             hx-headers='{"pagerequest": "true"}'
             model="@Model">
         </paging>
@@ -25,8 +26,9 @@
             hx-boost="true"
             class="shrink-0"
             hx-target="#content"
-            hx-push-url="false"
-            hx-swap="show:none"
+            hx-push-url="true"
+            hx-sync="#contentcontainer:replace"
+            hx-swap="outerHTML show:none"
             hx-headers='{"pagerequest": "true"}'
             model="@Model">
         </paging>

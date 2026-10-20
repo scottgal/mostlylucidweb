@@ -12,57 +12,18 @@
     ViewBag.Description = "Search through technical articles on ASP.NET Core, C#, Entity Framework, and web development. Find tutorials, guides, and solutions.";
 }
 
-<form
-    x-data="{
-        query: '@Model.Query',
-        autoSearch: true,
-        doAutoSearch() {
-            if (this.autoSearch && this.query.length > 2) {
-                const params = new URLSearchParams();
-                params.set('query', this.query);
-                const lang = document.getElementById('languageSelect')?.value;
-                const order = document.getElementById('orderSelect')?.value;
-                if (lang) params.set('language', lang);
-                if (order) params.set('order', order);
-                htmx.ajax('GET', '/search?' + params.toString(), {target: '#content', swap: 'outerHTML', select: '#content'});
-            }
-        }
-    }"
-    class="space-y-2"
-    action="@Url.Action("Search", "Search")"
-    hx-push-url="true"
-    hx-boost="true"
-    hx-target="#contentcontainer"
-    hx-swap="innerHTML show:window:top">
-
-    <!-- Main search bar -->
-    <div class="flex items-center gap-2 bg-neutral-500 bg-opacity-10 p-2 rounded-lg">
-        <button
-            type="submit"
-            x-ref="searchButton"
-            class="btn btn-outline btn-sm flex items-center gap-2 text-black dark:text-white">
-            Search
-            <i class="bx bx-search text-lg"></i>
-        </button>
-        <label class="flex items-center gap-2">
-            <input
-                type="checkbox"
-                x-model="autoSearch"
-                class="checkbox checkbox-primary checkbox-sm"
-            />
-            <span class="text-black dark:text-white text-sm">Auto</span>
-        </label>
-        <input
-            type="text"
-            placeholder="Search..."
-            name="query"
-            id="searchQuery"
-            value="@Model.Query"
-            x-model="query"
-            x-on:input.debounce.300ms="doAutoSearch"
-            x-on:keydown.enter.prevent="$refs.searchButton.click()"
-            class="input input-sm border-0 grow text-black dark:text-white bg-transparent focus:outline-none"
-        />
+<form class="search-form" action="/search" method="get"
+      hx-get="/search" hx-target="#contentcontainer" hx-swap="innerHTML show:none"
+      hx-push-url="true" hx-sync="#contentcontainer:replace"
+      hx-trigger="submit, input changed delay:500ms from:#searchQuery"
+      hx-include="#categorySelect, #languageSelect, #startDate, #endDate, #orderSelect">
+    <label for="searchQuery">Search the engineering notebook</label>
+    <div>
+        <input type="search" name="query" id="searchQuery" value="@Model.Query"
+               placeholder="Articles, tools, and ideas…" />
+        <input type="hidden" name="page" value="1" />
+        <input type="hidden" name="dateRange" value="Custom" />
+        <button type="submit" class="filter-apply">Search</button>
     </div>
 </form>
 

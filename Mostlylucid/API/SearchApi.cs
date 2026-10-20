@@ -14,7 +14,7 @@ namespace Mostlylucid.API;
 [ApiController]
 [Route("api")]
 public class SearchApi(
-    BlogSearchService searchService,
+    IBlogSearchService searchService,
     UmamiBackgroundSender umamiBackgroundSender,
     SearchService indexService,
     SemanticSearchConfig semanticSearchConfig,

@@ -81,6 +81,15 @@ try
     var translateServiceConfig = builder.Configure<TranslateServiceConfig>();
     builder.Configure<Mostlylucid.Shared.Config.Markdown.ImageConfig>();
     var services = builder.Services;
+    services.AddHttpClient("GitHubActivity", client =>
+    {
+        client.BaseAddress = new Uri("https://api.github.com/");
+        client.DefaultRequestHeaders.UserAgent.ParseAdd("mostlylucid.net/1.0");
+        client.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+        client.Timeout = TimeSpan.FromSeconds(8);
+    });
+    services.AddSingleton<GitHubActivityService>();
+    services.AddSingleton<IGoogleIdTokenValidator, GoogleIdTokenValidator>();
     services.AddOpenTelemetry()
         .WithMetrics(builder =>
         {
@@ -111,7 +120,7 @@ try
         options.AddPolicy("BlogList", builder => builder
             .Expire(TimeSpan.FromMinutes(5))
             .Tag("blog")
-            .SetVaryByQuery("page", "pageSize", "startDate", "endDate", "language", "orderBy", "orderDir")
+            .SetVaryByQuery("page", "pageSize", "startDate", "endDate", "language", "orderBy", "orderDir", "order", "category")
             .With(ctx => !ctx.HttpContext.Request.Headers.ContainsKey("HX-Request")));
 
         // Category policy
@@ -190,10 +199,11 @@ try
     services
         .AddAuthentication(options =>
         {
-            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            options.DefaultScheme = SiteAuthentication.CookieScheme;
             options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
         })
-        .AddCookie()
+        // Discard cookies issued by the former login handler, which accepted unvalidated tokens.
+        .AddCookie(SiteAuthentication.CookieScheme, options => options.Cookie.Name = SiteAuthentication.CookieName)
         .AddGoogle(options =>
         {
             options.ClientId = auth.GoogleClientId;
@@ -259,6 +269,13 @@ try
         await next();
     });
 
+    // Routing and identity must be available when endpoint cache policies are evaluated.
+    // Status re-execution must wrap routing so error pages can select their own endpoint.
+    app.UseStatusCodePagesWithReExecute("/error/{0}");
+    app.UseRouting();
+    app.UseCors("AllowMostlylucid");
+    app.UseAuthentication();
+    app.UseAuthorization();
     app.UseOutputCache();
     app.UseResponseCaching();
     app.UseImageSharp();
@@ -272,8 +289,10 @@ try
         DefaultContentType = "application/octet-stream", // Fallback for unknown types
         OnPrepareResponse = ctx =>
         {
-            ctx.Context.Response.Headers.Append(
-                "Cache-Control", $"public, max-age={cacheMaxAgeOneWeek}");
+            ctx.Context.Response.Headers.Append("Cache-Control",
+                ctx.Context.Request.Path.StartsWithSegments("/resumes")
+                    ? "public, max-age=0, must-revalidate"
+                    : $"public, max-age={cacheMaxAgeOneWeek}");
             var fileExt = Path.GetExtension(ctx.File.Name);
             if (fileExt.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
             {
@@ -285,13 +304,6 @@ try
             }
         }
     });
-
-    app.UseStatusCodePagesWithReExecute("/error/{0}");
-
-    app.UseRouting();
-    app.UseCors("AllowMostlylucid");
-    app.UseAuthentication();
-    app.UseAuthorization();
 
     // Broken link archive middleware - AFTER OutputCache so processed pages get cached
     // On cache miss: BrokenLink processes response, then OutputCache caches the processed result

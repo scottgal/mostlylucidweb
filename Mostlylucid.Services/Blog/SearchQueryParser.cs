@@ -183,11 +183,11 @@ public partial class SearchQueryParser
         var result = query;
 
         // Extract category: operators (can be multiple)
-        var categoryPattern = @"category:(\S+)";
+        var categoryPattern = @"category:(?:""([^""]+)""|(\S+))";
         var categoryMatches = Regex.Matches(result, categoryPattern, RegexOptions.IgnoreCase);
         foreach (Match match in categoryMatches)
         {
-            var category = match.Groups[1].Value;
+            var category = match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value;
             categories.Add(category);
             result = result.Replace(match.Value, ""); // Remove from query
         }

@@ -1,4 +1,4 @@
-﻿@model Mostlylucid.Models.Error.NotFoundModel
+@model Mostlylucid.Models.Error.NotFoundModel
 @using Mostlylucid.Helpers
 
 <div class="container mx-auto px-4 py-8">
@@ -16,7 +16,7 @@
     @if (Model?.SuggestionsWithScores?.Any() == true)
     {
         <div class="mt-8">
-            <h2 class="text-2xl font-semibold mb-4">Did you mean one of these?</h2>
+            <h2 class="text-2xl font-semibold mb-4">@(Model.SuggestionsWithScores.Any(suggestion => suggestion.Score > 0) ? "Did you mean one of these?" : "Latest articles")</h2>
             <div class="space-y-4">
                 @for (var i = 0; i < Model.SuggestionsWithScores.Count; i++)
                 {
@@ -82,7 +82,7 @@
     <script>
             document.addEventListener('DOMContentLoaded', function () {
                 if (!window.hasTracked) {
-                    umami.track('404', { page:'@ViewData["OriginalUrl"]'});
+                    window.umami?.track('404', { page:'@ViewData["OriginalUrl"]'});
                     window.hasTracked = true;
                 }
             });

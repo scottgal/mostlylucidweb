@@ -35,6 +35,8 @@ public class SiteContentService(
     public const string OutputCacheTag = "sitecontent";
 
     public const string HomeIntro = "home-intro";
+    public const string ResumeCallout = "resume-callout";
+    public const string CurrentProjects = "current-projects";
     public const string Announcement = "announcement";
 
     private static readonly MarkdownPipeline Pipeline = new MarkdownPipelineBuilder()
@@ -48,6 +50,8 @@ public class SiteContentService(
     public SiteContent? Get(string name)
     {
         var path = Path.Combine(markdownConfig.MarkdownPath, FolderName, $"{name}.md");
+        // Bind-mounted Markdown overrides image defaults, including an empty file to hide a section.
+        if (!File.Exists(path)) path = Path.Combine(AppContext.BaseDirectory, "site-content", $"{name}.md");
 
         try
         {
@@ -56,7 +60,7 @@ public class SiteContentService(
 
             // Keyed on the file's write time and size, so an edit is picked up on the next request
             // without anything having to invalidate this cache.
-            var cacheKey = $"sitecontent:{name}:{file.LastWriteTimeUtc.Ticks}:{file.Length}";
+            var cacheKey = $"sitecontent:{path}:{file.LastWriteTimeUtc.Ticks}:{file.Length}";
             return memoryCache.GetOrCreate(cacheKey, entry =>
             {
                 entry.SlidingExpiration = TimeSpan.FromHours(1);

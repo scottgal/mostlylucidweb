@@ -1,4 +1,4 @@
-﻿using Mostlylucid.Models.Blog;
+using Mostlylucid.Models.Blog;
 using Mostlylucid.Shared.Helpers;
 using Mostlylucid.Shared.Models;
 
@@ -11,6 +11,7 @@ public static class BlogViewMapperExtensions
         return new PostListModel
         {
             Id = dto.Id,
+            Summary = GetSummary(dto.PlainTextContent),
             Title = dto.Title,
             Categories = dto.Categories,
             Language = dto.Language,
@@ -50,6 +51,7 @@ public static class BlogViewMapperExtensions
         {
             Data = postEntity.Data?.Select(x => x.ToListModel(x.Languages)).ToList() ?? new List<PostListModel>(),
             TotalItems = postEntity.TotalItems,
+            NoMatchFound = postEntity.NoMatchFound,
             Page = postEntity.Page,
             PageSize = postEntity.PageSize
         };
@@ -58,16 +60,8 @@ public static class BlogViewMapperExtensions
 
     public static PostListModel ToListModel(this BlogPostDto postEntity, string[]? languages = null)
     {
-        var introductionText = "Introduction\n";
-        var summaryText = postEntity.PlainTextContent;
-        var wordCount = summaryText.WordCount();
-        
-        if (!string.IsNullOrEmpty(summaryText) && summaryText.StartsWith(introductionText, StringComparison.OrdinalIgnoreCase))
-        {
-            summaryText = summaryText.Substring(introductionText.Length);
-        }
-
-        summaryText = summaryText.TruncateAtWord(200) + "...";
+        var summaryText = GetSummary(postEntity.PlainTextContent);
+        var wordCount = postEntity.PlainTextContent.WordCount();
         return new PostListModel()
         {
             Categories = postEntity.Categories,
@@ -79,5 +73,13 @@ public static class BlogViewMapperExtensions
             WordCount = wordCount,
             PublishedDate = postEntity.PublishedDate
         };
+    }
+
+    private static string GetSummary(string text)
+    {
+        var summary = string.Join(" ", (text ?? "").Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+        if (summary.StartsWith("Introduction ", StringComparison.OrdinalIgnoreCase))
+            summary = summary["Introduction ".Length..];
+        return summary.Length > 260 ? summary.TruncateAtWord(260) + "…" : summary;
     }
 }

@@ -175,6 +175,8 @@
         </div>
     }
 
+    @if (Model.Comments?.PostId > 0)
+    {
     <div x-data="{ showNewElement: false }" x-init="
     document.addEventListener('htmx:afterSwap', (event) => {
         if (event.detail.target.id === 'contentformarea') {
@@ -191,7 +193,7 @@
            hx-boost="false"
            hx-controller="Comment"
            hx-action="GetCommentForm"
-           hx-route-postId="@(Int32.Parse(Model.Id))"
+           hx-route-postId="@Model.Comments.PostId"
            hx-get
            hx-push-url="false"
            hx-swap="innerHTML"
@@ -206,6 +208,7 @@
         </div>
     </div>
 
+    }
     <div id="commentlist">
         
     

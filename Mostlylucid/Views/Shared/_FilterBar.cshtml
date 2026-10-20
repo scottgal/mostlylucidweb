@@ -1,129 +1,75 @@
 @using Mostlylucid.Models.Search
+@using Mostlylucid.Shared.Helpers
+@using Mostlylucid.Services.Markdown
 @model dynamic
 @{
     var targetUrl = Context.Request.Path.Value ?? "/";
     var isSearchPage = targetUrl.StartsWith("/search", StringComparison.OrdinalIgnoreCase);
     var postList = isSearchPage ? ((SearchResultsModel)Model).SearchResults : (Mostlylucid.Models.Blog.PostListViewModel)Model;
     var allCategories = isSearchPage ? ((SearchResultsModel)Model).AllCategories : postList.AllCategories;
-    var langs = postList?.Data?.SelectMany(p => p.Languages ?? Array.Empty<string>()).Concat(new[] { "en" }).Distinct(StringComparer.OrdinalIgnoreCase).ToList() ?? new List<string> { "en" };
+    var query = Context.Request.Query;
+    var language = query["language"].FirstOrDefault() ?? (isSearchPage ? "" : "en");
+    var order = query["order"].FirstOrDefault()
+        ?? (query.ContainsKey("orderBy") ? $"{query["orderBy"]}_{query["orderDir"].FirstOrDefault() ?? "desc"}" : "date_desc");
+    var resetUrl = isSearchPage ? "/search?query=" + Uri.EscapeDataString(query["query"].ToString()) : targetUrl;
 }
-<div x-data="{ showFilters: false }" @(isSearchPage ? "data-search-page" : "")>
-    <!-- Mobile Filter Toggle (shown on mobile only) -->
-    <div class="flex lg:hidden items-center justify-center gap-2 mb-2">
-        <button type="button"
-                x-on:click="showFilters = !showFilters"
-                class="btn btn-outline btn-sm flex items-center gap-1"
-                x-bind:class="showFilters ? 'btn-active' : ''">
-            <i class="bx bx-filter text-lg"></i>
-            <span class="text-sm">Filters</span>
-            <i class="bx" x-bind:class="showFilters ? 'bx-chevron-up' : 'bx-chevron-down'"></i>
-        </button>
-        <a href="/blog" hx-boost="true" hx-target="#contentcontainer" hx-push-url="true"
-           class="btn btn-outline btn-sm text-gray-700 border-gray-300 dark:text-gray-100 dark:border-gray-600">
-            <i class='bx bx-book-reader'></i>
-        </a>
-    </div>
-
-    <!-- Filter Controls - collapsible on mobile, always visible on desktop -->
-    <div x-bind:class="showFilters ? '' : 'hidden lg:flex'"
-         class="flex-wrap gap-2 items-center justify-center lg:flex bg-base-200 lg:bg-transparent dark:bg-gray-800 lg:dark:bg-transparent p-3 lg:p-0 rounded-lg lg:rounded-none mb-3 lg:mb-0">
-                <a href="/blog" hx-boost="true" hx-target="#contentcontainer" hx-push-url="true"
-                   class="btn btn-outline btn-sm text-gray-700 border-gray-300 dark:text-gray-100 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hidden xl:inline-flex">
-                    <i class='bx bx-book-reader mr-2'></i>Blog Posts
-                </a>
-                <a href="/rss" target="_blank"
-                   class="btn btn-outline btn-sm text-gray-700 border-gray-300 dark:text-gray-100 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hidden 2xl:inline-flex">
-                    <i class="bx bx-rss mr-2"></i>RSS
-                </a>
-                <a asp-action="Edit" asp-controller="Editor"
-                   class="btn btn-outline btn-sm text-gray-700 border-gray-300 dark:text-gray-100 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all hidden 2xl:inline-flex">
-                    <i class="bx bx-edit mr-2"></i>New Post(ish)
-                </a>
-                <clear-param all="true" target="#content">Clear All</clear-param>
-
-                <!-- Date Range Filter -->
-                <div class="flex items-center gap-1">
-                    <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Date:</label>
-                    <input id="dateRange" type="text" placeholder="Date range"
-                           class="input input-bordered input-sm w-48 bg-white text-gray-800 border-gray-300 placeholder-gray-500 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 dark:placeholder-gray-400 focus:border-blue-500 dark:focus:border-blue-400 transition-colors"/>
-                </div>
-
-                <!-- Language -->
-                <div class="flex items-center gap-1">
-                    <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Lang:</label>
-                    <partial name="_LanguageDropDown" model="langs"/>
-                </div>
-
-                @if (!isSearchPage)
-                {
-                <!-- Category (blog only) -->
-                <div class="flex items-center gap-1">
-                    <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Cat:</label>
-                    <select id="categorySelect" name="category"
-                            hx-get="@targetUrl"
-                            hx-target="#content"
-                            hx-swap="outerHTML show:none"
-                            hx-trigger="change"
-                            hx-push-url="true"
-                            hx-include="#languageSelect, #orderSelect"
-                            hx-vals='{"page": "1"}'
-                            class="select select-bordered select-sm bg-white text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 transition-colors cursor-pointer">
-                        <option value="">All</option>
-                        @foreach (var cat in allCategories ?? new List<Mostlylucid.Shared.Models.CategoryWithCount>())
-                        {
-                            <option value="@cat.Name">@cat.Name (@cat.PostCount)</option>
-                        }
-                    </select>
-                </div>
-                }
-                @if (isSearchPage)
-                {
-                <!-- Category (search page - hidden on mobile) -->
-                <div class="hidden lg:flex items-center gap-1">
-                    <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Cat:</label>
-                    <select id="categorySelect" name="category"
-                            hx-get="@targetUrl"
-                            hx-target="#content"
-                            hx-swap="outerHTML show:none"
-                            hx-trigger="change"
-                            hx-push-url="true"
-                            hx-include="#languageSelect, #orderSelect, #searchQuery"
-                            hx-vals='{"page": "1"}'
-                            class="select select-bordered select-sm bg-white text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 transition-colors cursor-pointer">
-                        <option value="">All</option>
-                        @foreach (var cat in allCategories ?? new List<Mostlylucid.Shared.Models.CategoryWithCount>())
-                        {
-                            <option value="@cat.Name">@cat.Name (@cat.PostCount)</option>
-                        }
-                    </select>
-                </div>
-                }
-
-                <!-- Sort -->
-                <div class="flex items-center gap-1">
-                    <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Sort:</label>
-                    <select id="orderSelect" name="order"
-                            hx-get="@targetUrl"
-                            hx-target="#content"
-                            hx-swap="outerHTML show:none"
-                            hx-trigger="change"
-                            hx-push-url="true"
-                            hx-include="#languageSelect@(!isSearchPage ? ", #categorySelect" : ", #searchQuery")"
-                            hx-vals='{"page": "1"}'
-                            class="select select-bordered select-sm bg-white text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-100 dark:border-gray-600 transition-colors cursor-pointer">
-                        @if (isSearchPage)
-                        {
-                            <option value="relevance" selected>Best Match</option>
-                            <option value="date_desc">Newest</option>
-                        }
-                        else
-                        {
-                            <option value="date_desc" selected>Newest</option>
-                        }
-                        <option value="date_asc">Oldest</option>
-                        <option value="title_asc">A–Z</option>
-                        <option value="title_desc">Z–A</option>
-                    </select>
-                </div>
+<section class="filter-panel" aria-label="Filter articles" data-filter-panel>
+    <details open="@(targetUrl != "/")">
+        <summary><span><i class="bx bx-filter-alt" aria-hidden="true"></i> Find your next read</span><span class="filter-toggle-hint">Filters <i class="bx bx-chevron-down" aria-hidden="true"></i></span></summary>
+        <form action="@targetUrl" method="get" data-blog-filters
+              hx-get="@targetUrl" hx-target="#content" hx-swap="outerHTML show:none"
+              hx-trigger="submit, change" hx-push-url="true" hx-sync="#contentcontainer:replace">
+            <input type="hidden" name="page" value="1" />
+            <input type="hidden" name="pageSize" value="@(postList?.PageSize > 0 ? postList.PageSize : 10)" />
+            @if (isSearchPage)
+            {
+                <input type="hidden" name="query" value="@query["query"]" data-filter-query />
+                <input type="hidden" name="dateRange" value="Custom" />
+            }
+            <label for="categorySelect">Topic
+                <select id="categorySelect" name="category">
+                    <option value="">All topics</option>
+                    @foreach (var category in allCategories ?? new List<Mostlylucid.Shared.Models.CategoryWithCount>())
+                    {
+                        <option value="@category.Name" selected="@(query["category"] == category.Name)">@category.Name (@category.PostCount)</option>
+                    }
+                </select>
+            </label>
+            <label for="languageSelect">Language
+                <select id="languageSelect" name="language">
+                    @if (isSearchPage)
+                    {
+                        <option value="" selected="@(language == "")">All languages</option>
+                    }
+                    @foreach (var code in LanguageConverter.LanguageMap.Keys.OrderBy(code => code.ConvertCodeToLanguage()))
+                    {
+                        <option value="@code" selected="@(language == code)">@code.ConvertCodeToLanguage()</option>
+                    }
+                </select>
+            </label>
+            <label for="startDate">From
+                <input id="startDate" name="startDate" type="date" value="@query["startDate"]" />
+            </label>
+            <label for="endDate">Until
+                <input id="endDate" name="endDate" type="date" value="@query["endDate"]" />
+            </label>
+            <label for="orderSelect">Sort by
+                <select id="orderSelect" name="order">
+                    @if (isSearchPage)
+                    {
+                        <option value="relevance" selected="@(order == "relevance")">Best match</option>
+                    }
+                    <option value="date_desc" selected="@(order == "date_desc")">Newest first</option>
+                    <option value="date_asc" selected="@(order == "date_asc")">Oldest first</option>
+                    <option value="title_asc" selected="@(order == "title_asc")">Title A–Z</option>
+                    <option value="title_desc" selected="@(order == "title_desc")">Title Z–A</option>
+                </select>
+            </label>
+            <div class="filter-actions">
+                <button type="submit" class="filter-apply">Apply</button>
+                <a href="@resetUrl" data-filter-reset hx-get="@resetUrl" hx-target="#content" hx-swap="outerHTML show:none" hx-push-url="true" hx-sync="#contentcontainer:replace">Reset</a>
             </div>
-</div>
+        </form>
+        <p class="filter-summary" id="filterSummary" aria-live="polite"></p>
+    </details>
+</section>

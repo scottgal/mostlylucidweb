@@ -1,12 +1,13 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using Google.Apis.Auth;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using Mostlylucid.Services;
 
 namespace Mostlylucid.Controllers;
 
 [Route("/")]
-public class LoginController : Controller
+public class LoginController(IGoogleIdTokenValidator tokens, ILogger<LoginController> logger) : Controller
 {
     [Route("challenge")]
     [HttpGet]
@@ -21,7 +22,7 @@ public class LoginController : Controller
     [HttpGet]
     public async Task<IActionResult> Logout(string returnUrl = "/")
     {
-        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignOutAsync(SiteAuthentication.CookieScheme);
         return Redirect(returnUrl);
     }
 
@@ -29,14 +30,34 @@ public class LoginController : Controller
     [HttpPost]
     public async Task<IActionResult> HandleGoogleCallback([FromBody] GoogleLoginRequest request)
     {
-        var handler = new JwtSecurityTokenHandler();
-        var jsonToken = handler.ReadToken(request.IdToken) as JwtSecurityToken;
+        if (string.IsNullOrWhiteSpace(request.IdToken)) return BadRequest("A Google ID token is required.");
 
-        if (jsonToken == null) return BadRequest("Invalid token");
+        GoogleJsonWebSignature.Payload payload;
+        try
+        {
+            payload = await tokens.ValidateAsync(request.IdToken);
+        }
+        catch (InvalidJwtException)
+        {
+            return Unauthorized(new { error = "Invalid Google ID token." });
+        }
+        catch (HttpRequestException exception)
+        {
+            logger.LogWarning(exception, "Google sign-in verification is unavailable");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new { error = "Google sign-in verification is unavailable." });
+        }
 
-        var claimsIdentity = new ClaimsIdentity(
-            jsonToken.Claims,
-            GoogleDefaults.AuthenticationScheme);
+        if (string.IsNullOrWhiteSpace(payload.Subject)) return Unauthorized(new { error = "Invalid Google ID token." });
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, payload.Subject),
+            new("sub", payload.Subject)
+        };
+        if (!string.IsNullOrEmpty(payload.Name)) claims.Add(new Claim(ClaimTypes.Name, payload.Name));
+        if (!string.IsNullOrEmpty(payload.Picture)) claims.Add(new Claim("picture", payload.Picture));
+        if (payload.EmailVerified && !string.IsNullOrEmpty(payload.Email))
+            claims.Add(new Claim(ClaimTypes.Email, payload.Email));
+        var claimsIdentity = new ClaimsIdentity(claims, GoogleDefaults.AuthenticationScheme);
 
         var authProperties = new AuthenticationProperties
         {
@@ -45,7 +66,7 @@ public class LoginController : Controller
 
 
         await HttpContext.SignInAsync(
-            CookieAuthenticationDefaults.AuthenticationScheme,
+            SiteAuthentication.CookieScheme,
             new ClaimsPrincipal(claimsIdentity),
             authProperties);
 
@@ -55,5 +76,5 @@ public class LoginController : Controller
 
 public class GoogleLoginRequest
 {
-    public string IdToken { get; set; }
+    public string? IdToken { get; set; }
 }

@@ -49,7 +49,7 @@ public class BaseController(BaseControllerService baseControllerService, ILogger
 
     protected async Task<LoginData> GetUserInfo()
     {
-        var authenticateResult = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        var authenticateResult = await HttpContext.AuthenticateAsync(SiteAuthentication.CookieScheme);
         if (!authenticateResult.Succeeded)
         {
             logger.LogInformation("User is not authenticated");

@@ -1,0 +1,32 @@
+@model Mostlylucid.Models.RepositoryActivityViewModel
+@if (Model.Repositories.Count > 0)
+{
+    <ul class="repository-list" data-repository-activity>
+        @foreach (var repo in Model.Repositories)
+        {
+            <li>
+                <a class="repository-name" href="https://github.com/scottgal/@repo.Name">@repo.Name <span aria-hidden="true">↗</span></a>
+                <time datetime="@repo.PushedAt.ToString("O")" title="Last repository push">Pushed @repo.PushedAt.ToString("dd MMM yyyy")</time>
+                @if (repo.HasRelease)
+                {
+                    <a class="repository-release" href="https://github.com/scottgal/@repo.Name/releases" aria-label="@repo.Name releases">
+                        <img src="https://img.shields.io/github/v/release/scottgal/@(repo.Name)?include_prereleases&amp;label=release&amp;color=087c7a"
+                             alt="Latest @repo.Name release" loading="lazy" width="150" height="20" />
+                    </a>
+                }
+            </li>
+        }
+    </ul>
+    @if (Model.IsStale)
+    {
+        <p class="repository-note">Showing saved activity. GitHub is temporarily unavailable.</p>
+    }
+    else
+    {
+        <p class="repository-note">Public repository pushes · refreshed every 30 minutes</p>
+    }
+}
+else
+{
+    <p class="repository-note">Activity is temporarily unavailable. <a href="https://github.com/scottgal?tab=repositories&amp;sort=updated">Browse my repositories →</a></p>
+}

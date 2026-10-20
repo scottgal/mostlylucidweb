@@ -1,0 +1,10 @@
+@inject Mostlylucid.Blog.ISiteContentService SiteContentService
+@{
+    var projects = SiteContentService.Get(Mostlylucid.Blog.SiteContentService.CurrentProjects);
+}
+@if (projects != null)
+{
+    <section class="current-projects" aria-label="Current projects" data-current-projects>
+        @Html.Raw(projects.Html)
+    </section>
+}

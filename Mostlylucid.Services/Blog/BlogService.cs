@@ -5,6 +5,7 @@ using Mostlylucid.DbContext.EntityFramework;
 using Mostlylucid.Services.Markdown;
 using Mostlylucid.Shared;
 using Mostlylucid.Shared.Entities;
+using Mostlylucid.Shared.Helpers;
 using Mostlylucid.Shared.Mapper;
 using Mostlylucid.Shared.Models;
 using Serilog;
@@ -46,14 +47,14 @@ public class BlogService(
                 !string.IsNullOrWhiteSpace(x.Title) &&
                 (x.ScheduledPublishDate == null || x.ScheduledPublishDate <= now));
 
-            if (model.StartDate != null)
+            if (DateFilterHelper.InclusiveStart(model.StartDate) is { } inclusiveStart)
             {
-                postQuery = postQuery.Where(x => x.PublishedDate.DateTime >= model.StartDate);
+                postQuery = postQuery.Where(x => x.PublishedDate >= inclusiveStart);
             }
 
-            if (model.EndDate != null)
+            if (DateFilterHelper.ExclusiveEnd(model.EndDate) is { } exclusiveEnd)
             {
-                postQuery = postQuery.Where(x => x.PublishedDate.DateTime <= model.EndDate);
+                postQuery = postQuery.Where(x => x.PublishedDate < exclusiveEnd);
             }
 
             if (categories?.Any(x=>!string.IsNullOrEmpty(x))==true)
@@ -66,45 +67,15 @@ public class BlogService(
                 postQuery = postQuery.Where(x => x.LanguageEntity.Name == language);
             }
 
-            // For page 1, prioritize pinned posts
-            var isFirstPage = page == null || page.Value == 1;
-            if (isFirstPage)
+            // Sort before paging so every page follows the same order, including pinned posts.
+            postQuery = (model.orderBy?.ToLowerInvariant(), model.orderDir?.ToLowerInvariant()) switch
             {
-                switch (model.orderBy?.ToLower())
-                {
-                    case "title":
-                        postQuery = model.orderDir?.ToLower() == "asc"
-                            ? postQuery.OrderByDescending(x => x.IsPinned).ThenBy(x => x.Title)
-                            : postQuery.OrderByDescending(x => x.IsPinned).ThenByDescending(x => x.Title);
-                        break;
-                    case "date":
-                        postQuery = model.orderDir?.ToLower() == "asc"
-                            ? postQuery.OrderByDescending(x => x.IsPinned).ThenBy(x => x.PublishedDate.DateTime)
-                            : postQuery.OrderByDescending(x => x.IsPinned).ThenByDescending(x => x.PublishedDate.DateTime);
-                        break;
-                    default:
-                        postQuery = postQuery.OrderByDescending(x => x.IsPinned).ThenByDescending(x => x.PublishedDate.DateTime);
-                        break;
-                }
-            }
-            else
-            {
-                switch (model.orderBy?.ToLower())
-                {
-                    case "title":
-                        postQuery = model.orderDir?.ToLower() == "asc"
-                            ? postQuery.OrderBy(x => x.Title)
-                            : postQuery.OrderByDescending(x => x.Title);
-                        break;
-                    case "date":
-                        postQuery = model.orderDir?.ToLower() == "asc"
-                            ? postQuery.OrderBy(x => x.PublishedDate.DateTime)
-                            : postQuery.OrderByDescending(x => x.PublishedDate.DateTime);
-                        break;
-                }
-            }
+                ("title", "asc") => postQuery.OrderBy(x => x.Title).ThenBy(x => x.Id),
+                ("title", _) => postQuery.OrderByDescending(x => x.Title).ThenBy(x => x.Id),
+                ("date", "asc") => postQuery.OrderBy(x => x.PublishedDate).ThenBy(x => x.Id),
+                _ => postQuery.OrderByDescending(x => x.PublishedDate).ThenBy(x => x.Id)
+            };
 
-        
             var count =await  postQuery.CountAsync();
            
             if (page != null)

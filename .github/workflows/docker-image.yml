@@ -47,6 +47,23 @@ jobs:
           # Build the Docker image
           docker build . --file Mostlylucid/Dockerfile --tag $TAGS --tag $ADDITIONAL_TAG
 
+      - name: Verify the packaged website and bundled resume compiler
+        run: |
+          trap 'docker logs mostlylucid-release-check; docker rm -f mostlylucid-release-check' EXIT
+          docker run -d --name mostlylucid-release-check \
+            --entrypoint sh \
+            -e Blog__Mode=File \
+            -e Markdown__MarkdownPath=/app/site-content \
+            -e Markdown__MarkdownTranslatedPath=/app/site-content/translated \
+            -e SemanticSearch__Enabled=false \
+            -e Auth__GoogleClientId=release-check \
+            -e Auth__GoogleClientSecret=release-check \
+            -e Analytics__UmamiPath=http://127.0.0.1:59999 \
+            -e Analytics__Username=release-check \
+            -e Analytics__Password=release-check \
+            ${{ env.TAGS }} -c 'mkdir -p /app/site-content/translated; exec dotnet /app/Mostlylucid.dll'
+          docker exec mostlylucid-release-check dotnet /app/resume-compiler/LucidResumeHost.dll --probe http://127.0.0.1:8080
+
       - name: Push the Docker image to Docker Hub
         run: |
           docker push ${{ env.TAGS }}

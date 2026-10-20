@@ -1,4 +1,4 @@
-﻿using Mostlylucid.Blog.Markdown;
+using Mostlylucid.Blog.Markdown;
 using Mostlylucid.Blog.ViewServices;
 using Mostlylucid.Blog.WatcherService;
 using Mostlylucid.Blog.ValidationService;
@@ -42,6 +42,7 @@ public static class BlogSetup
             case BlogMode.File:
                 Log.Information("Using file based blog");
                 services.AddScoped<IBlogViewService, MarkdownBlogViewService>();
+                services.AddScoped<IBlogSearchService, MarkdownBlogSearchService>();
                 services.AddScoped<IBlogPopulator, MarkdownBlogPopulator>();
                 break;
             case BlogMode.Database:
@@ -58,6 +59,7 @@ public static class BlogSetup
                     return new SearchRanker(popularityProvider: popularityProvider);
                 });
                 services.AddScoped<BlogSearchService>();
+                services.AddScoped<IBlogSearchService>(provider => provider.GetRequiredService<BlogSearchService>());
                 services.AddScoped<CommentViewService>();
                 services.AddSingleton<BlogUpdater>();
                 services.AddScoped<IBlogService, BlogService>();

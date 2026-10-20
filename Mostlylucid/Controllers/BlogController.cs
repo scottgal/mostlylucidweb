@@ -17,10 +17,10 @@ namespace Mostlylucidblog.Controllers;
 [Route("blog")]
 public class BlogController(
     BaseControllerService baseControllerService,
-    CommentViewService commentViewService,
     MarkdownRenderingService markdownRenderingService,
     MarkdownConfig markdownConfig,
-    ILogger<BlogController> logger) : BaseController(baseControllerService, logger)
+    ILogger<BlogController> logger,
+    CommentViewService? commentViewService = null) : BaseController(baseControllerService, logger)
 {
     [ResponseCache(Duration = 300, VaryByHeader = "hx-request", VaryByQueryKeys = new[] { "page", "pageSize", nameof(startDate), nameof(endDate), nameof(language), nameof(orderBy), nameof(orderDir), "order", nameof(category) },
         Location = ResponseCacheLocation.Client)]
@@ -218,13 +218,17 @@ public class BlogController(
         // Populate comments
         var commentViewList = new CommentViewList
         {
-            PostId = int.Parse(post.Id),
+            PostId = int.TryParse(post.Id, out var postId) ? postId : 0,
             IsAdmin = userInfo.IsAdmin
         };
 
-        commentViewList.Comments = userInfo.IsAdmin
-            ? await commentViewService.GetAllComments(int.Parse(post.Id))
-            : await commentViewService.GetApprovedComments(int.Parse(post.Id));
+        // Markdown-backed posts have no database comment thread or numeric database ID.
+        if (commentViewService != null && commentViewList.PostId > 0)
+        {
+            commentViewList.Comments = userInfo.IsAdmin
+                ? await commentViewService.GetAllComments(commentViewList.PostId)
+                : await commentViewService.GetApprovedComments(commentViewList.PostId);
+        }
 
         commentViewList.Comments.ForEach(x => x.IsAdmin = userInfo.IsAdmin);
         post.Comments = commentViewList;

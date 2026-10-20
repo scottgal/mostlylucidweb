@@ -1,0 +1,19 @@
+@model Mostlylucid.Models.BaseViewModel
+@inject Mostlylucid.Blog.ISiteContentService SiteContentService
+@{
+    ViewBag.Title = "Résumés & lucidRESUME | Scott Galloway";
+    ViewBag.Description = "Download Scott Galloway's résumé and explore lucidRESUME, an evidence-backed résumé tool.";
+    var content = SiteContentService.Get("resumes");
+}
+<section class="resume-page" aria-label="Résumés and lucidRESUME" data-resumes>
+    @if (content != null)
+    {
+        @Html.Raw(content.Html)
+    }
+    else
+    {
+        <h1>Résumés & lucidRESUME</h1>
+        <p><a href="/resumes/Scott-Galloway-Complete-Resume.pdf">Download my résumé (PDF)</a> · <a href="/resumes/Scott-Galloway-Complete-Resume.docx">Download my résumé (Word)</a></p>
+        <p><a href="/resume">Open lucidRESUME →</a></p>
+    }
+</section>

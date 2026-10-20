@@ -2,7 +2,7 @@
 @{
     var url = Url.Action("Category", "Blog", new { category = Model });
 }
-<a hx-get="@url"
+<a href="@url" hx-get="@url"
    hx-push-url="true"
    hx-target="#contentcontainer"
    onclick="event.stopPropagation();"

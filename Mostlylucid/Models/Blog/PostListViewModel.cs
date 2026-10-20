@@ -1,4 +1,4 @@
-﻿using mostlylucid.pagingtaghelper.Models;
+using mostlylucid.pagingtaghelper.Models;
 using Mostlylucid.Shared.Helpers;
 
 using Mostlylucid.Shared.Models;
@@ -12,6 +12,7 @@ public class PostListViewModel : BaseViewModel, IPagingModel
     public int Page { get; set; }
 
     public int TotalItems { get; set; }
+    public bool NoMatchFound { get; set; }
 
     public int PageSize { get; set; }
 

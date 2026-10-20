@@ -1,17 +1,19 @@
 @using Mostlylucid.Services.Umami
 @using Mostlylucid.Services.Blog
 @inject Mostlylucid.Services.Umami.IPopularPostsService PopularPostsService
-@inject Mostlylucid.Services.Blog.IBlogService BlogService
+@inject Mostlylucid.Blog.ViewServices.IBlogViewService BlogViewService
+@inject Mostlylucid.Blog.BlogConfig BlogConfig
 @{
-    var popularPost = await PopularPostsService.GetCachedPopularPost();
-    Mostlylucid.Shared.Models.BlogPostDto? blogPost = null;
+    var popularPost = BlogConfig.Mode == Mostlylucid.Blog.BlogMode.Database
+        ? await PopularPostsService.GetCachedPopularPost() : null;
+    Mostlylucid.Models.Blog.BlogPostViewModel? blogPost = null;
 
     // Try to get full blog post data if available
     if (popularPost != null && !string.IsNullOrEmpty(popularPost.Url))
     {
         var slug = popularPost.Url.Replace("/blog/", "").Trim('/');
         var language = Context.Request.Cookies["SelectedLanguage"] ?? "en";
-        blogPost = await BlogService.GetPost(new Mostlylucid.Shared.Models.BlogPostQueryModel(slug, language));
+        blogPost = await BlogViewService.GetPost(slug, language);
     }
 }
 

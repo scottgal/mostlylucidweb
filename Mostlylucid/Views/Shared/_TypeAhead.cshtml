@@ -1,34 +1,23 @@
-@* Typeahead search component - article search *@
-<div x-data="typeahead()" class="relative w-full" id="searchelement" x-on:click.outside="results = []">
-    <form x-on:submit.prevent="goToSearch" class="flex items-center gap-1 w-full">
-        <label class="input input-sm bg-neutral-500 bg-opacity-10 input-bordered flex items-center gap-2 flex-1">
-            <input
-                type="text"
-                x-model="query"
-                x-on:input.debounce.200ms="search"
-                x-on:keydown.down.prevent="moveDown"
-                x-on:keydown.up.prevent="moveUp"
-                x-on:keydown.tab.prevent="completeWithHighlighted"
-                x-on:keydown.enter.prevent="completeAndSearch"
-                placeholder="Search..."
-                class="border-0 grow input-sm text-black dark:text-white bg-transparent w-full"/>
-        </label>
-        <button type="submit" class="btn btn-sm btn-primary" title="Search">
-            <i class="bx bx-search text-lg"></i>
+@* A single search surface: input and submit share one border and background. *@
+<div x-data="typeahead()" id="searchelement" x-on:click.outside="results = []" class="header-typeahead">
+    <form action="/search" method="get" role="search" x-on:submit.prevent="goToSearch" class="header-search-form">
+        <input type="search" name="query" x-model="query"
+               x-on:input.debounce.200ms="search"
+               x-on:keydown.down.prevent="moveDown" x-on:keydown.up.prevent="moveUp"
+               x-on:keydown.enter.prevent="completeAndSearch"
+               x-on:keydown.escape.prevent="results = []"
+               placeholder="Search articles…" aria-label="Search articles" autocomplete="off"
+               class="header-search-input" />
+        <button type="submit" class="header-search-submit" title="Search" aria-label="Search">
+            <i class="bx bx-search" aria-hidden="true"></i>
         </button>
     </form>
-    <!-- Dropdown showing matching articles -->
-    <ul x-show="results.length > 0"
-        id="searchresults"
-        class="absolute z-100 my-2 left-0 right-0 w-full min-w-[280px] bg-white dark:bg-custom-dark-bg border border-1 text-black dark:text-white border-neutral-600 rounded-lg shadow-lg overflow-hidden">
+    <ul x-show="results.length > 0" x-cloak id="searchresults" class="header-search-results">
         <template x-for="(article, index) in results" :key="article.slug">
-            <li x-on:click="window.location.href = '/blog/' + article.slug"
-                x-on:mouseenter="highlightedIndex = index"
-                :class="{
-                    'dark:bg-blue-dark bg-blue-light': index === highlightedIndex,
-                    'dark:hover:bg-blue-dark hover:bg-blue-light': true
-                }"
-                class="cursor-pointer text-sm p-2 m-2"><span x-text="article.title" class="block"></span></li>
+            <li>
+                <a :href="'/blog/' + article.slug" x-on:mouseenter="highlightedIndex = index"
+                   :class="{ 'is-highlighted': index === highlightedIndex }" x-text="article.title"></a>
+            </li>
         </template>
     </ul>
 </div>

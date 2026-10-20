@@ -228,7 +228,7 @@ This is a test post.";
     #region BlogService Pinned Posts Tests
 
     [Fact]
-    public async Task TestBlogService_PinnedPosts_AppearFirstOnPage1()
+    public async Task TestBlogService_PinnedPosts_DoNotOverrideNewestFirst()
     {
         // Arrange
         var blogPosts = new List<BlogPostEntity>
@@ -245,11 +245,11 @@ This is a test post.";
 
         // Assert
         Assert.Equal(3, result.TotalItems);
-        Assert.Equal("Pinned Post", result.Data.First().Title);
+        Assert.Equal(new[] { "Regular Post 2", "Pinned Post", "Regular Post 1" }, result.Data.Select(post => post.Title));
     }
 
     [Fact]
-    public async Task TestBlogService_MultiplePinnedPosts_OrderedByDateAmongThemselves()
+    public async Task TestBlogService_MultiplePinnedPosts_FollowPublicationOrder()
     {
         // Arrange
         var blogPosts = new List<BlogPostEntity>
@@ -267,10 +267,8 @@ This is a test post.";
 
         // Assert
         Assert.Equal(4, result.TotalItems);
-        // Pinned posts should appear first, ordered by date among themselves
-        Assert.Equal("Pinned Post B", result.Data[0].Title); // Newer pinned post
-        Assert.Equal("Pinned Post A", result.Data[1].Title); // Older pinned post
-        Assert.Equal("Another Regular Post", result.Data[2].Title); // Regular posts after pinned
+        Assert.Equal(new[] { "Another Regular Post", "Regular Post", "Pinned Post B", "Pinned Post A" },
+            result.Data.Select(post => post.Title));
     }
 
     #endregion
@@ -305,11 +303,28 @@ This is a test post.";
         Assert.Contains(result.Data, p => p.Title == "Visible Regular Post");
         Assert.Contains(result.Data, p => p.Title == "Past Scheduled Post");
         Assert.Contains(result.Data, p => p.Title == "Pinned Visible Post");
-        // Pinned post should be first
-        Assert.Equal("Pinned Visible Post", result.Data.First().Title);
+
     }
 
     #endregion
+
+    [Fact]
+    public async Task TestBlogService_DefaultOrderIsStableAcrossPagesDespitePins()
+    {
+        var service = SetupBlogService(new List<BlogPostEntity>
+        {
+            CreateTestPost(1, "Old pin", new DateTime(2025, 1, 1), isPinned: true),
+            CreateTestPost(2, "Newest", new DateTime(2025, 3, 1)),
+            CreateTestPost(3, "Middle", new DateTime(2025, 2, 1))
+        });
+        var titles = new List<string>();
+        for (var page = 1; page <= 3; page++)
+        {
+            var result = await service.Get(new PostListQueryModel { Language = "en", Page = page, PageSize = 1 });
+            titles.Add(Assert.Single(result.Data).Title);
+        }
+        Assert.Equal(new[] { "Newest", "Middle", "Old pin" }, titles);
+    }
 
     #region Helper Methods
 

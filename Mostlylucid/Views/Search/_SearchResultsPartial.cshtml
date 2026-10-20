@@ -1,5 +1,9 @@
-﻿@model Mostlylucid.Models.Blog.PostListViewModel
+@model Mostlylucid.Models.Blog.PostListViewModel
 <div class="pt-2" id="content" data-search-page>
+    @if (Model.NoMatchFound)
+    {
+        <p class="filter-summary" data-no-match>No matches found. Here are the latest published articles instead, newest first.</p>
+    }
     @if (Model.Data?.Any() is true)
     {
         <div class="inline-flex w-full items-center justify-center print:!hidden pb-4">
@@ -10,7 +14,9 @@
                     link-url="@Model.LinkUrl"
                     hx-boost="true"
                     hx-target="#content"
-                    hx-swap="show:none"
+                    hx-swap="outerHTML show:none"
+                    hx-push-url="true"
+                    hx-sync="#contentcontainer:replace"
                     page="@Model.Page"
                     page-size="@Model.PageSize"
                     total-items="@Model.TotalItems"

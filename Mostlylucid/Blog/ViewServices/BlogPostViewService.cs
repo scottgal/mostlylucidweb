@@ -136,20 +136,12 @@ public class BlogPostViewService(IBlogService blogPostService) : IBlogViewServic
             orderDir = parts.Length > 1 ? parts[1] : "desc";
         }
 
-        var posts = !string.IsNullOrEmpty(category)
-            ? await GetPostsByCategory(category, page, pageSize, language)
-            : await GetPagedPosts(page, pageSize, language: language, startDate: startDate, endDate: endDate, orderBy: orderBy, orderDir: orderDir);
+        var posts = await GetListPostsViewModel(new PostListQueryModel(
+            Page: page, PageSize: pageSize, Language: language,
+            Categories: string.IsNullOrEmpty(category) ? null : new[] { category },
+            StartDate: startDate, EndDate: endDate, orderBy: orderBy, orderDir: orderDir));
 
         var result = new BlogIndexResult { Posts = posts };
-
-        // Check if category filter results in exactly 1 post - caller should redirect
-        if (!string.IsNullOrEmpty(category) && posts.TotalItems == 1 && posts.Data?.Count == 1)
-        {
-            var singlePost = posts.Data[0];
-            result.ShouldRedirectToSinglePost = true;
-            result.SinglePostSlug = singlePost.Slug;
-            result.SinglePostLanguage = language;
-        }
 
         // Get all categories for the filter dropdown
         posts.AllCategories = await GetCategoriesWithCount(language);

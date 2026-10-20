@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Mostlylucid.Models.Error;
 using Mostlylucid.Services;
@@ -9,7 +9,6 @@ namespace Mostlylucid.Controllers;
 public class ErrorController(
     BaseControllerService baseControllerService,
     ILogger<ErrorController> logger,
-    IBlogService blogService,
     ISlugSuggestionService? slugSuggestionService = null) : BaseController(baseControllerService, logger)
 {
     [Route("/error/{statusCode}")]
@@ -34,6 +33,12 @@ public class ErrorController(
         switch (statusCode)
         {
             case 404:
+                // HTMX does not swap error responses. Load the normal 404 page for navigation
+                // requests so visitors can actually see and follow the suggested destinations.
+                if (HttpMethods.IsGet(Request.Method) && Request.Headers["HX-Request"] == "true" &&
+                    Request.Headers["HX-Target"] == "contentcontainer" && statusCodeReExecuteFeature != null)
+                    Response.Headers["HX-Redirect"] = statusCodeReExecuteFeature.OriginalPath +
+                        statusCodeReExecuteFeature.OriginalQueryString;
                 // Check for high-confidence auto-redirect for first-time typos
                 var autoRedirectResult = await TryAutoRedirectAsync(statusCodeReExecuteFeature, cancellationToken);
                 if (autoRedirectResult != null)
@@ -212,7 +217,7 @@ public class ErrorController(
             {
                 // It's not a numeric ID, so treat it as a potential slug
                 var normalizedSlug = archiveId.ToLowerInvariant().Replace('_', '-').Replace(' ', '-');
-                var slugExists = await blogService.EntryExists(normalizedSlug, "en");
+                var slugExists = await BlogViewService.EntryExists(normalizedSlug, "en");
 
                 if (slugExists)
                 {
@@ -337,8 +342,11 @@ public class ErrorController(
             SuggestionsWithScores = new List<Mostlylucid.Models.Error.SuggestionWithScore>()
         };
 
-        if (slugSuggestionService == null || string.IsNullOrWhiteSpace(model.OriginalPath))
+        if (string.IsNullOrWhiteSpace(model.OriginalPath)) return model;
+        if (slugSuggestionService == null)
         {
+            model.SuggestionsWithScores = Mostlylucid.Helpers.MissingPageSuggestions.Create(
+                await BlogViewService.GetAllPosts(), model.OriginalPath);
             return model;
         }
 
@@ -418,6 +426,9 @@ public class ErrorController(
             logger.LogError(ex, "Error generating slug suggestions for path: {Path}", model.OriginalPath);
         }
 
+        if (model.SuggestionsWithScores.Count == 0)
+            model.SuggestionsWithScores = Mostlylucid.Helpers.MissingPageSuggestions.Create(
+                await BlogViewService.GetAllPosts(), model.OriginalPath);
         return model;
     }
 }

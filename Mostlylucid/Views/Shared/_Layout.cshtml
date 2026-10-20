@@ -1,4 +1,5 @@
-﻿@model Mostlylucid.Models.BaseViewModel
+@model Mostlylucid.Models.BaseViewModel
+@inject Mostlylucid.Blog.BlogConfig BlogConfig
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,117 +101,76 @@
     <link rel="manifest" href="~/manifest.json" />
 </head>
 <body
+    data-blog-mode="@BlogConfig.Mode"
     x-data="globalSetup()"
     x-init="themeInit()"
     :class="isMobileMenuOpen ? 'max-h-screen overflow-hidden relative' : ''"
     class="bg-custom-light-bg dark:bg-custom-dark-bg ">
 <partial name="_Toast"  />
-<header class="sticky top-0 z-40 bg-white  dark:bg-custom-dark-bg shadow-md  container mx-auto flex flex-wrap items-center justify-between px-4 mb-3 py-1 w-full rounded border-b border-x border-l-neutral-600 border-r-neutral-600 border-b-neutral-600 print:!hidden" id="header">
+<a class="skip-link" href="#contentcontainer">Skip to content</a>
+<partial name="_ResumeCallout" />
+<header class="site-header sticky top-0 z-40 container mx-auto print:!hidden" id="header">
+    <div class="site-header-inner">
+        <a href="/" class="header-brand" aria-label="mostlylucid home"
+           hx-controller="Home" hx-action="Index" hx-get hx-target="#contentcontainer"
+           hx-swap="show:window:top" hx-push-url="true" hx-headers='{"homerequest": "true"}'>
+            <img src="/img/logo.svg" asp-append-version="true" width="176" height="30"
+                 alt="mostlylucid" class="site-logo" :class="{ 'img-filter-dark': !isDarkMode }" />
+        </a>
 
-    <ul class="flex items-center w-full print:hidden gap-1 sm:gap-2">
-        <!-- Logo + Home Icon - Always visible (last to hide) -->
-        <li>
-            <a href="/" hx-controller="Home" hx-action="Index" hx-swap="show:window:top" hx-target="#contentcontainer" hx-push-url="true" hx-get hx-headers='{"homerequest": "true"}' class="flex items-center">
-                <span class="bx bx-home-alt-2 text-xl lg:text-2xl font-semibold mr-1 sm:mr-2 transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary print:hidden"></span>
+        <div class="header-search">
+            <partial name="_TypeAhead" />
+        </div>
 
-                <div class="svg-container">
-                    <!-- Large screen logo (shown on large screens) -->
-                    <img
-                        src="/img/logo.svg"
-                        asp-append-version="true"
-                        width="180px"
-                        height="30px"
-                        alt="mostlylucid limited"
-                        class="hidden lg:block img-filter-dark"
-                        :class="{ 'img-filter-dark': !isDarkMode }"/>
-
-                    <!-- Small screen logo (shown on small/medium screens) -->
-                    <img
-                        src="/img/smalllogo.svg"
-                        asp-append-version="true"
-                        width="30px"
-                        height="20px"
-                        alt="mostlylucid limited"
-                        class="block lg:hidden"/>
-                </div>
+        <nav class="site-navigation" aria-label="Main navigation">
+            <a href="/search" class="header-control mobile-search" aria-label="Search articles" title="Search articles"><i class="bx bx-search" aria-hidden="true"></i></a>
+            <a href="/software" class="header-control" hx-boost="true" hx-target="#contentcontainer"
+               hx-swap="show:window:top" aria-label="Software" data-umami-event="Software Click" title="Software">
+                <i class="bx bx-code-block" aria-hidden="true"></i><span class="header-link-label">Software</span>
             </a>
-        </li>
+            <a asp-action="Index" asp-controller="Contact" class="header-control" hx-boost="true"
+               hx-target="#contentcontainer" hx-swap="show:window:top" aria-label="Contact"
+               data-umami-event="Contact Click" title="Contact">
+                <i class="bx bx-envelope" aria-hidden="true"></i><span class="header-link-label">Contact</span>
+            </a>
+            <a href="https://www.nuget.org/profiles/mostlylucid" class="header-control header-wide-link"
+               target="_blank" rel="noopener noreferrer" data-umami-event="NuGet Click">NuGet</a>
+        </nav>
 
-        <!-- Search Typeahead - Expands to fill available space -->
-        <li class="group relative mb-1 hidden lg:flex flex-1 mx-4 max-w-xl">
-            @await Html.PartialAsync("_TypeAhead")
-        </li>
-
-        <li class="ml-auto lg:hidden"></li>
-
-        <!-- Login/User Avatar - Hide on medium screens (lg+) -->
-        <li class="group relative mb-1 hidden lg:block">
-            <div class="flex items-center">
+        <div class="header-utilities">
+            <a href="https://github.com/scottgal/" class="header-control header-wide-link" aria-label="GitHub" title="GitHub"
+               target="_blank" rel="noopener noreferrer"><i class="bx bxl-github" aria-hidden="true"></i></a>
+            <a href="/rss" class="header-control header-rss" aria-label="RSS feed" title="RSS feed"><i class="bx bx-rss" aria-hidden="true"></i></a>
+            <div class="header-auth">
                 @if (Model?.Authenticated == true)
                 {
-                    <a data-logout-link asp-action="Logout" asp-controller="Login" class="flex items-center gap-1 hover:opacity-80 transition-opacity" title="Sign out">
+                    <a data-logout-link asp-action="Logout" asp-controller="Login" class="header-control" aria-label="Sign out" title="Sign out">
                         @if (Model.AvatarUrl != null)
                         {
-                            <img src="@Model.AvatarUrl" width="28" height="28" class="h-7 w-7 rounded-full" alt="@Model.Name"/>
+                            <img src="@Model.AvatarUrl" width="28" height="28" class="rounded-full" alt="@Model.Name" />
                         }
-                        <i class="bx bx-log-out text-lg text-primary dark:text-white"></i>
+                        else
+                        {
+                            <i class="bx bx-log-out" aria-hidden="true"></i>
+                        }
                     </a>
                 }
                 else
                 {
-                    <div class="w-[32px] h-[32px] rounded-full overflow-hidden flex items-center justify-center [&_iframe]:!rounded-full" title="Sign in with Google">
-                        <div id="google_button" class="scale-[1.3] -m-1"></div>
-                    </div>
+                    <div id="google_button" title="Sign in with Google"></div>
                 }
             </div>
-        </li>
-
-        <!-- Social Icons - Hide on medium screens (lg+) -->
-        <li class="group relative my-1 px-2 hidden lg:block border-neutral-400 dark:border-neutral-600 border rounded-lg">
-            <partial name="_Socials"/>
-        </li>
-
-        <!-- RSS - Icon only -->
-        <li class="group relative mb-1 hidden md:block">
-            <a href="/rss" target="_blank" class="flex items-center text-lg hover:text-secondary dark:hover:text-secondary transition-colors" title="RSS Feed">
-                <i class="text-xl bx bx-rss"></i>
-            </a>
-        </li>
-
-        <!-- NuGet - Icon always visible, text on lg+ -->
-        <li class="group relative mb-1">
-            <a href="https://www.nuget.org/profiles/mostlylucid" target="_blank" rel="noopener noreferrer" class="flex items-center px-1 lg:px-2 font-body text-base font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary" data-umami-event="NuGet Click">
-                <i class="bx bxl-nuget text-xl"></i>
-                <span class="ml-0.5 hidden lg:inline">NuGet</span>
-            </a>
-        </li>
-
-        <!-- Software - Icon always visible, text on lg+ -->
-        <li class="group relative mb-1">
-            <a href="/software" hx-boost="true" hx-target="#contentcontainer" hx-swap="show:window:top" class="flex items-center px-1 lg:px-2 font-body text-base font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary" data-umami-event="Software Click">
-                <i class="bx bx-code-block text-xl"></i>
-                <span class="ml-0.5 hidden lg:inline">Software</span>
-            </a>
-        </li>
-
-        <!-- Contact - Icon always visible, text on lg+ -->
-        <li class="group relative mb-1">
-            <a asp-action="Index" hx-boost="true" hx-swap="show:window:top" hx-target="#contentcontainer" asp-controller="Contact" class="flex items-center px-1 lg:px-2 font-body text-base font-medium text-primary transition-colors group-hover:text-green dark:text-white dark:group-hover:text-secondary" data-umami-event="Contact Click">
-                <i class="bx bx-mail-send text-xl"></i>
-                <span class="ml-0.5 hidden lg:inline">Contact</span>
-            </a>
-        </li>
-
-        <!-- Theme Toggle - Always visible -->
-        <li class="group relative mb-1">
-            <div class="flex items-center">
-                <i class="bx cursor-pointer text-xl lg:text-3xl text-primary dark:text-white transition-colors" x-on:click="themeSwitch()" :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'"></i>
-            </div>
-        </li>
-    </ul>
-
+            <button type="button" class="header-control theme-toggle" x-on:click="themeSwitch()"
+                    :aria-label="isDarkMode ? 'Switch to light theme' : 'Switch to dark theme'">
+                <i class="bx" :class="isDarkMode ? 'bxs-sun' : 'bxs-moon'" aria-hidden="true"></i>
+            </button>
+        </div>
+    </div>
 </header>
-<div id="announcement-container" hx-get="/announcement/banner" hx-trigger="load" hx-swap="innerHTML"></div>
+@if (BlogConfig.Mode == Mostlylucid.Blog.BlogMode.Database)
+{
+    <div id="announcement-container" hx-get="/announcement/banner" hx-trigger="load" hx-swap="innerHTML"></div>
+}
 <span class="hidden btn btn-sm btn-active btn-disabled select select-primary select-sm
         text-sm text-gray-600 text-neutral-500 border rounded flex items-center
         justify-center min-w-[80px] pr-4 pt-0 mt-0 mr-2 btn-primary btn-outline
@@ -219,9 +179,9 @@ bg-white    dark:border-gray-600 dark:bg-gray-800 bg-gray-800
         dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700
         dark:btn-accent dark:btn-outline dark:btn-disabled dark:btn-primary dark:btn-active gap-2 whitespace-nowrap cursor-pointer">
 </span>
-<div class="container mx-auto" id="contentcontainer" hx-history-elt>
+<main class="container mx-auto" id="contentcontainer" tabindex="-1" hx-history-elt>
     @RenderBody()
-</div>
+</main>
 <div class="container pb-8 mx-auto print:hidden">
     <div
         class="flex flex-col items-center justify-between  sm:flex-row sm:py-2">
