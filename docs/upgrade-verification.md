@@ -100,3 +100,27 @@ selected title, oldest-first or relevance sorting remains available.
 
 Regression checks cover older pins versus newer unpinned posts, pagination in
 both database and Markdown modes, category pagination and search filter defaults.
+
+## Published release and live verification
+
+Published website tag `release-website-refresh-2026-10-20-02`, commit `d3bd6390`.
+[Docker workflow 39427444131](https://github.com/scottgal/mostlylucidweb/actions/runs/39427444131)
+passed the build/tests and both HTTP and HTTP/2 TLS packaged-image probes before
+publishing. Watchtower replaced the live container using the existing deployment.
+
+The first release exposed a production HTTPS download error: response caching
+tried to store a `max-age=0` response and threw after the body had started. The
+error was reproduced against local Kestrel TLS. The follow-up release uses
+`Cache-Control: no-cache` for static résumé downloads, and the workflow now
+explicitly tests TLS/HTTP2 transfers. No production settings were changed.
+
+Live verification then passed home, blog, health, résumés, software, contact,
+project activity and compiler readiness. Home/blog article dates were descending.
+Complete PDF (18,077 bytes), Word (42,867 bytes) and Markdown (13,709 bytes)
+downloads matched the repository files byte for byte. A real public compilation
+succeeded through the production proxy and generated valid PDF, Word and Markdown
+downloads. This used the automatically bundled public record and no manual upload.
+The pre-existing compiler snapshot revision was retained across image replacement.
+
+The subsequent Umami.Net source update is a separate commit and CI run; it was
+not included in this website image or published to NuGet by these website tags.

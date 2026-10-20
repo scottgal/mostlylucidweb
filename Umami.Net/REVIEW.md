@@ -43,7 +43,7 @@ strongly typed wrapper for every administrative API or browser replay protocol.
 - Tests pass for **net8.0, net9.0 and net10.0**, including the real-server integration
   check (145 cases per target at the latest complete run).
 - Local net8/net9 target tests use `DOTNET_ROLL_FORWARD=Major` on the installed
-  .NET 10 runtime. CI installs all three SDK/runtime versions for native execution.
+  .NET 10 runtime. CI also passed on all three native runtimes: [run 39428399246](https://github.com/scottgal/mostlylucidweb/actions/runs/39428399246). It ran 144 unit/contract cases per target, then the real-server integration case on net10.0, and packed all three targets. NuGet publication was skipped for this main-branch run.
 - A disposable official Umami 3.4.0 container and PostgreSQL 16 were used. The test
   creates a dedicated website and API key in that disposable database. It verifies
   collection/identity/cache, Web Vitals, stats, active visitors, simple/expanded
@@ -76,9 +76,8 @@ Umami service. The in-memory delivery queue is not durable. API keys, annotation
 performance and modern analytics routes depend on the server version and access
 permissions. Cloud headers/path behavior are checked with protocol fixtures;
 no paid Cloud account was used. Legacy response shapes/mappings are covered by
-fixtures; an old Umami server was not deployed during this review. Native .NET
-8/9 execution and the packaged-image website release are reported separately
-from this SDK's local .NET 10 runtime checks.
+fixtures; an old Umami server was not deployed during this review. Native .NET 8/9 execution is verified by CI above. The packaged-image website
+release is separate from this SDK update.
 
 ## Primary sources
 
