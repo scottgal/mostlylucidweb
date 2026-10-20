@@ -1,5 +1,7 @@
 # Umami.Net
 
+**Version 1.1.0** · [Upgrade guide](https://github.com/scottgal/mostlylucidweb/blob/umamiv1.1.0/Umami.Net/MIGRATION.md) · [Release notes](https://github.com/scottgal/mostlylucidweb/blob/umamiv1.1.0/Umami.Net/RELEASE.md)
+
 A .NET 8, 9 and 10 client for [Umami Analytics](https://umami.is), reviewed against
 [Umami 3.4.0](https://github.com/umami-software/umami/releases/tag/v3.4.0).
 
@@ -10,7 +12,7 @@ credentials, and the current Umami Cloud Bearer API-key protocol.
 ## Install and register
 
 ```sh
-dotnet add package Umami.Net
+dotnet add package Umami.Net --version 1.1.0
 ```
 
 ```csharp

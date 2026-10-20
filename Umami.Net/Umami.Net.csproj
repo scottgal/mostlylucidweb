@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <LangVersion>12</LangVersion>
@@ -63,6 +63,11 @@
         <None Include=".\README.md" Pack="true" PackagePath="">
             <Link>Properties\README.md</Link>
         </None>
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="MIGRATION.md;REVIEW.md;RELEASE.md" />
+        <None Include="MIGRATION.md;REVIEW.md;RELEASE.md" Pack="true" PackagePath="docs/" />
+        <None Include="../Umami.Net.Test/Integration/README.md" Pack="true" PackagePath="docs/INTEGRATION.md" />
     </ItemGroup>
     <ItemGroup>
         <FrameworkReference Include="Microsoft.AspNetCore.App"/>

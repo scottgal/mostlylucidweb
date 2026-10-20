@@ -2,8 +2,8 @@
 
 Reviewed the collection client, payload capture, background delivery, authentication,
 analytics methods/models, query serialization, configuration, docs, tests and package
-workflow against the latest official release, **Umami 3.4.0**. This update is a 1.1.0
-candidate; it does not upgrade a deployed Umami server or publish a NuGet package.
+workflow against the latest official release, **Umami 3.4.0**. This review accompanies Umami.Net 1.1.0. The package does not upgrade a deployed
+Umami server or database. See [migration notes](MIGRATION.md) for behavior changes.
 
 ## Findings and changes
 
@@ -40,38 +40,36 @@ strongly typed wrapper for every administrative API or browser replay protocol.
 
 ## Verification
 
-- Tests pass for **net8.0, net9.0 and net10.0**, including the real-server integration
-  check (145 cases per target at the latest complete run).
-- Local net8/net9 target tests use `DOTNET_ROLL_FORWARD=Major` on the installed
-  .NET 10 runtime. CI also passed on all three native runtimes: [run 39428399246](https://github.com/scottgal/mostlylucidweb/actions/runs/39428399246). It ran 144 unit/contract cases per target, then the real-server integration case on net10.0, and packed all three targets. NuGet publication was skipped for this main-branch run.
-- A disposable official Umami 3.4.0 container and PostgreSQL 16 were used. The test
-  creates a dedicated website and API key in that disposable database. It verifies
-  collection/identity/cache, Web Vitals, stats, active visitors, simple/expanded
-  metrics, minute pageview/event series, annotation CRUD, performance datasets,
-  UTM, sessions and API-key authentication.
+- Native .NET 8, 9 and 10 passed 144 unit/contract tests and 51 real-server
+  integration cases per target: [run 39432202360](https://github.com/scottgal/mostlylucidweb/actions/runs/39432202360).
+  That main-branch run also packed all three targets; publication is gated separately
+  by a release tag. Local net8/net9 runs use `DOTNET_ROLL_FORWARD=Major` on .NET 10.
+- Disposable official Umami 3.4.0 and PostgreSQL 16 containers verify all 16
+  analytics endpoints, stored values, collection/identity/cache, Web Vitals,
+  filtering/paging, annotations, saved goals/funnels, permissions, revoked keys,
+  background delivery, cancellation and actual socket failures. Each case owns
+  an isolated website; test users, keys and the disposable database are cleaned up.
 - Contract cases cover Cloud path/auth headers, bounded 401 handling, partial 2FA,
   malformed responses, cancellation, regex and UTM serialization, scoped resource
   paths, cache isolation, performance ranges and background shutdown.
 - Release package builds with `lib/net8.0`, `lib/net9.0` and `lib/net10.0` assemblies.
-  Local candidate command: `dotnet pack -c Release -p:MinVerVersionOverride=1.1.0-preview.1`.
+  Local release verification: `dotnet pack Umami.Net/Umami.Net.csproj -c Release -p:MinVerVersionOverride=1.1.0`.
 - NuGet vulnerability audit reports no known vulnerable dependencies for this
   package against the configured public source.
 
 ## Run the disposable integration check
 
 Use an isolated Docker network with PostgreSQL 16 and
-`ghcr.io/umami-software/umami:3.4.0`. The publication workflow contains the complete
-startup and cleanup commands. Wait for PostgreSQL readiness before starting Umami.
+`ghcr.io/umami-software/umami:3.4.0`. The publication workflow uses `scripts/test-umami-integration.sh` for startup,
+readiness and cleanup. Wait for PostgreSQL readiness before starting Umami.
 The check uses the stock disposable admin credentials and creates test resources;
 **never point it at production**. Its URL guard accepts only loopback HTTP on 18086.
 
 ```sh
-UMAMI_TEST_URL=http://127.0.0.1:18086/ \
-  dotnet test Umami.Net.Test/Umami.Net.Test.csproj --framework net10.0 \
-  --filter FullyQualifiedName~Umami34IntegrationTests
+scripts/test-umami-integration.sh --configuration Release
 ```
 
-Without `UMAMI_TEST_URL`, the integration case is skipped. Other tests need no
+Without `UMAMI_TEST_URL`, integration cases are skipped. Other tests need no
 Umami service. The in-memory delivery queue is not durable. API keys, annotations,
 performance and modern analytics routes depend on the server version and access
 permissions. Cloud headers/path behavior are checked with protocol fixtures;
@@ -101,5 +99,5 @@ collection/identity overloads, background delivery and real transport errors.
 `./scripts/test-umami-integration.sh` now manages disposable startup/readiness,
 test execution, failure diagnostics, TRX reports and cleanup. CI uses this same
 runner against all three native runtimes before packing or publishing.
-See the [coverage and usage guide](../Umami.Net.Test/Integration/README.md) for the
+See the [coverage and usage guide](https://github.com/scottgal/mostlylucidweb/blob/umamiv1.1.0/Umami.Net.Test/Integration/README.md) for the
 case matrix, isolation guarantees and explicit limits.

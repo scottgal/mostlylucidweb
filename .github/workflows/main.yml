@@ -10,6 +10,9 @@ on:
     paths: ['Umami.Net/**', 'Umami.Net.Test/**', '.github/workflows/main.yml', 'scripts/test-umami-integration.sh']
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -57,6 +60,15 @@ jobs:
       - name: Pack project
         run: dotnet pack --configuration Release ./Umami.Net/Umami.Net.csproj --no-build --output ./nupkg
 
+      - name: Upload release packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: umami-release-packages
+          path: |
+            nupkg/*.nupkg
+            nupkg/*.snupkg
+          if-no-files-found: error
+
       - name: List generated packages
         run: ls -la ./nupkg
 
@@ -65,3 +77,39 @@ jobs:
         run: dotnet nuget push ./nupkg/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.UMAMI_NUGET_API_KEY }} --skip-duplicate
         env:
           NUGET_API_KEY: ${{ secrets.UMAMI_NUGET_API_KEY }}
+
+  github-release:
+    if: startsWith(github.ref, 'refs/tags/umamiv')
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out tagged release
+        uses: actions/checkout@v4
+
+      - name: Download the published packages
+        uses: actions/download-artifact@v4
+        with:
+          name: umami-release-packages
+          path: nupkg
+
+      - name: Bundle release documentation
+        run: |
+          mkdir release-docs
+          cp Umami.Net/README.md release-docs/Umami.Net-README.md
+          cp Umami.Net/MIGRATION.md release-docs/Umami.Net-Migration.md
+          cp Umami.Net/REVIEW.md release-docs/Umami.Net-Review.md
+          cp Umami.Net/RELEASE.md release-docs/Umami.Net-Release.md
+          cp Umami.Net/ReleaseNotes.txt release-docs/Umami.Net-ReleaseNotes.txt
+          cp Umami.Net.Test/Integration/README.md release-docs/Umami.Net-Integration-Tests.md
+          zip -j Umami.Net-docs.zip release-docs/*
+
+      - name: Create versioned GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" nupkg/*.nupkg nupkg/*.snupkg Umami.Net-docs.zip \
+            --verify-tag --title "Umami.Net ${GITHUB_REF_NAME#umamiv}" \
+            --notes-file Umami.Net/RELEASE.md --latest=false

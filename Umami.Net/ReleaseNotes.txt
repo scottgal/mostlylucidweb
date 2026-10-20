@@ -1,9 +1,11 @@
-1.1.0 (candidate)
+1.1.0 — 20 October 2026
 Reviewed against Umami 3.4.0. Adds current JSON tracking response decoding, explicit per-visitor cache tokens, Web Vitals/performance collection, tagging and historical timestamps, API-key/Cloud authentication, modern analytics queries and annotation CRUD.
 Fixes bounded reauthentication, POST token verification, response disposal, event-data/identity preservation, visitor user-agent/IP/query capture, v3 metrics mapping and camelCase UTM filters. Preserves the legacy public entry points and normalizes old/new stats responses.
 Bounds the background queue, drains on shutdown, adds cancellation and avoids automatic retries of non-idempotent tracking/resource writes. Removes registration-wide logging overrides and token/body logging. API version selection is explicit rather than claimed automatic detection.
+Adds 51 real integration cases per target against disposable Umami 3.4.0/PostgreSQL 16, native .NET 8/9/10 CI gates, TRX artifacts, a local stack runner, full usage docs and a migration guide.
 
-﻿0.2.0
+
+0.2.0
 Adds new Identify endpoints. 
 These can be used on user signin to identify the user.
 Task<HttpResponseMessage> Identify(string? email =null, string? username = null, 
