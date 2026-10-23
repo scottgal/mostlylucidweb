@@ -53,9 +53,23 @@ That changes the cost of trying a dimension. We can test several well-defined qu
 
 The model does not discover the application's objective for us. We still choose which differences should matter.
 
-# A Decision Model Acts as a Feature Producer
+# A Vectoriser Built from Classifiers
 
 A decision model accepts a situation and defined possible answers, then scores those answers. Its output is designed for code to consume.
+
+That is classification. “Is the delivery aggressive?” distinguishes two classes: the condition is present or absent. “Which team should handle this?” distinguishes several categories. The useful move here is to retain the answer scores as coordinates, rather than keeping only the winning label.
+
+Our question-based vectoriser is therefore a **bank of classifiers**. Each question supplies a defined distinction; the decision model provides a reusable way to evaluate it against the input. We can ask several questions of the same recording and collect their outputs:
+
+```text
+recording → [aggressive? explicit threat? asks for human?]
+          → [       0.88,            0.07,           0.96]
+          → a vector for comparison, grouping or recommendation
+```
+
+These are illustrative scores. The three conditions can coexist: this is several classification readings over one input, rather than one mutually exclusive label for the whole message.
+
+Classification supplies features; the subsequent comparison or ranking uses them. A numeric conversion or general embedding encoder can also produce features without assigning named classes. Vectorisation is the broader operation.
 
 For text, [Jev](https://docs.typesafe.ai/introduction) and [Nimble](https://ollama.com/library/nimble) expose typed questions. Their familiar shapes include yes/no judgements, choices among categories and positions on an ordered rubric.
 

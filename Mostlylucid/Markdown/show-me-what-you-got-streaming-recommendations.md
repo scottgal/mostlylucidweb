@@ -76,10 +76,12 @@ These overlap, but they ask different questions:
 |--------|----------|---------|
 | Search | What matches this explicit request? | "Waterproof walking boots under £120" |
 | Recommendation | What might be useful in this context? | Boots related to the products currently being compared |
-| Classification | Which known kind of behaviour does this resemble? | A session mostly exploring outdoor equipment |
+| Classification | Which defined categories or conditions fit this observation? | Comparison-heavy browsing |
 | Prediction | What outcome is likely next? | Which item the visitor may add to their basket |
 
 Search gives us a query. Recommendation often has to construct one from behaviour.
+
+Classification can help build that characterisation. A classifier distinguishes defined categories or conditions, such as whether a request contains a threat. We can retain its scores as features instead of reducing the result to one label. Several such readings give us coordinates for later comparison and recommendation.
 
 A recommendation can rank usefulness without predicting a purchase. Those are different objectives, even when both produce a numerical score.
 
@@ -308,7 +310,9 @@ Measured behavioural features and semantic embeddings describe different things.
 
 We can also choose the semantic dimensions ourselves. Does a voice message use aggressive delivery? Does a photograph show package damage? Does a support request ask for a person? A capable decision model can supply readings along these named dimensions, using the appropriate text, image or audio evidence.
 
-That gives us an explicit semantic vector rather than unnamed latent coordinates. The interpretation still comes from a model, and an unanswered question must remain distinct from a negative answer.
+Each yes/no question is a binary classification task. Several questions act as a bank of classifiers whose scores form an explicit semantic vector. The interpretation still comes from a model, and an unanswered question must remain distinct from a negative answer.
+
+This is one way to produce features. Encoding a measured price and generating a general text embedding are also vectorisation operations; they do not necessarily classify the input into named categories.
 
 [Part 1.5: Vectorise Anything With Decision Models](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) develops this question-defined representation, with voice and image examples and a small existing code example from StyloMail. It is an optional bridge between choosing a representation and using it to recommend candidates.
 
