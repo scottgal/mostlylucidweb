@@ -227,7 +227,7 @@ Unlike a geographical map, the axes need not have familiar names. A learned repr
 
 This is why "turn text into numbers" only tells half the story. Arbitrarily assigning each product a number would also produce numbers. An embedding is useful when its structure supports the comparisons we want to make.
 
-For this article, there are two ways to construct the space worth separating.
+The source of those coordinates matters. We can measure features directly, use a learned embedding, or ask a model explicit questions about the observations.
 
 ## Measured Behavioural Features
 
@@ -303,6 +303,14 @@ A live interest vector can be constructed by combining the embeddings of items t
 **The coordinate system must match.** Two models producing 384 numbers do not necessarily produce comparable vectors. Model version, preprocessing, pooling, and normalisation belong to the representation's definition. A jointly trained pair of encoders can also be compatible, as in dense retrieval, without being identical encoders.
 
 Measured behavioural features and semantic embeddings describe different things. We can combine their scores through policy, or deliberately learn a shared representation. We cannot assume their raw coordinates are interchangeable.
+
+## Questions as Semantic Features
+
+We can also choose the semantic dimensions ourselves. StyloMail asks whether a message requests credentials, changes payment details or applies urgency. Each answer becomes a named feature whose meaning comes from its question and criteria.
+
+That gives us an explicit semantic vector rather than unnamed latent coordinates. The interpretation still comes from a model, and an unanswered question must remain distinct from a negative answer.
+
+[Part 1.5: Questions as Coordinates](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) follows the existing StyloMail code and connects those readings to the relevance engine. It is an optional bridge between choosing a representation and using it to recommend candidates.
 
 ## Colour or Root Vegetable
 
@@ -571,6 +579,8 @@ The practical opportunity is to start small, add contributors, measure their eff
 # Next: From Characterisation to Recommendation
 
 We now have the ingredients to characterise an entity: observations, representations that preserve useful relationships, and summaries of its behaviour. We have also seen why the meaning of those coordinates matters more than the technology that produced them.
+
+If the dimensions we need require language interpretation, [Part 1.5: Questions as Coordinates](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) shows how StyloMail's existing decision questions produce an explicit semantic characterisation, with a working bridge to Relevance.
 
 The next question is how to use that characterisation. Given this session's interests, which available products should we recommend? Given this service's current state, which diagnostic action is worth considering?
 

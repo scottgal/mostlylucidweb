@@ -152,6 +152,8 @@ dotnet test Mostlylucid.Relevance.Tests/Mostlylucid.Relevance.Tests.csproj
 
 The demo uses products and raw diagnostic telemetry through the same API. Diagnostic state labels and action prototypes are supplied explicitly; the preview does not automatically discover those labels or execute any action. The synthetic diagnostic destination probabilities are a mathematical demonstration, not measured production accuracy.
 
+For question-defined semantic coordinates, the optional [StyloMail integration sample](../samples/RelevanceMail/README.md) consumes real `StyloMail.Core` evidence and ranks policy-eligible review playbooks. It requires a separate StyloMail checkout and has its own tests, keeping this solution independent of mail-specific dependencies. Incomplete evidence explicitly abstains; the bridge does not replace StyloMail's delivery policy or trusted profiles.
+
 Implementation sequence and SQLite research: [Part 2 plan](../docs/relevance/part2-implementation-plan.md).
 
 ## Sample API documentation

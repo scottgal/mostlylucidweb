@@ -4,6 +4,8 @@ In [Part 1](/blog/show-me-what-you-got-streaming-recommendations), we looked at 
 
 Now we can ask the next question: **given what we know about this entity, what should we recommend?**
 
+The optional [Part 1.5: Questions as Coordinates](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) builds a semantic characterisation from StyloMail's existing decision-model questions. It also includes a bridge that uses this engine to rank eligible mail-review playbooks. The retrieval ideas here apply to those explicit semantic coordinates as well as measured features.
+
 A shopper has compared walking boots around £100. We have a catalogue of available products. How do we turn that characterisation into a useful list? How do we respect their budget, combine price with other signals, and react when their behaviour changes?
 
 We will follow those questions through a working C# relevance engine. The interesting calculations are small enough to inspect. We can work out what they do, run the examples, and see where their usefulness ends.

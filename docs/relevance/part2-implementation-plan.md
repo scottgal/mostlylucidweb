@@ -14,6 +14,8 @@ The implemented baseline includes async converter plugins, scalar formulas, SQLi
 
 The interactive companion is `Mostlylucid.Relevance.Demo`: a generated shop plus a structured-log monitor and reversible local rate-limit handler. Its before/after intervention notebook is observational. The planned `Mostlylucid.Relevance.Learning` project owns action-selection propensities, controlled comparisons and intervention-effect evaluation.
 
+The optional `samples/RelevanceMail` bridge demonstrates a third domain using the real StyloMail.Core question/evidence types. Ordered question rubrics, producer, preprocessing and tenant identity define its representation. Complete semantic assessments rank host-owned review playbooks behind an existing policy action; incomplete, partial or stale assessments abstain. Each immutable assessment gets its own subject, with no automatic update to trusted sender baselines. The component is not installed in StyloMail's live host. Its separate test project requires the StyloMail checkout; it is intentionally outside the general solution.
+
 ## SQLite research and initial decision
 
 | Option | Evidence relevant to this workload | Decision |
