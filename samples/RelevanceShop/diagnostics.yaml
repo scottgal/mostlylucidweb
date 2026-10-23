@@ -1,0 +1,46 @@
+id: diagnostics-demo-v1
+filters: [available]
+streams:
+  actions:
+    kind: candidate
+  telemetry:
+    kind: observation
+    point_source: input
+    weights: {sample: 1}
+
+points:
+  latency:
+    path: latency_ms
+    converter: formula
+    expression: "x / 1000"
+    metric: l2
+    displays: Response latency in seconds.
+  errors:
+    path: error_fraction
+    converter: numeric
+    metric: l2
+    displays: Fraction of requests that failed.
+  retries:
+    path: retries_per_request
+    converter: numeric
+    metric: l2
+    displays: Mean retries per request.
+  queue:
+    path: queue_depth
+    converter: formula
+    expression: "x / 100"
+    metric: l2
+    displays: Queue size in hundreds of pending items.
+
+placements:
+  diagnostics:
+    heads: {latency: 1, errors: 1, retries: 1, queue: 1}
+    where: {available: true}
+
+destinations:
+  states: [healthy, degraded, outage, recovered]
+  outcomes: [outage, recovered]
+  horizon_events: 8
+  # Small synthetic teaching dataset, deliberately not a production confidence threshold.
+  min_transitions: 3
+  smoothing: 0

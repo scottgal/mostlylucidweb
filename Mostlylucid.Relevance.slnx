@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Mostlylucid.Relevance/Mostlylucid.Relevance.csproj" />
+  <Project Path="Mostlylucid.Relevance.Sqlite/Mostlylucid.Relevance.Sqlite.csproj" />
+  <Project Path="Mostlylucid.Relevance.Tests/Mostlylucid.Relevance.Tests.csproj" />
+  <Project Path="samples/RelevanceShop/RelevanceShop.csproj" />
+  <Project Path="Mostlylucid.Relevance.Demo/Mostlylucid.Relevance.Demo.csproj" />
+</Solution>

@@ -1,0 +1,45 @@
+id: relevance-demo-shop-v1
+filters: [category, available, price]
+streams:
+  products: {kind: candidate}
+  events:
+    kind: observation
+    weights: {view: 1, compare: 2, cart: 3, remove: 0, purchase: 4, cancel: 0}
+  outcomes: {kind: feedback}
+points:
+  category:
+    path: category
+    converter: categorical
+    categories: [outdoors, electronics, home]
+    metric: cosine
+    displays: Distribution of attention across product categories.
+  price:
+    path: price
+    converter: formula
+    expression: "x / 200"
+    metric: l2
+    displays: Price affinity, scaled in hundreds of pounds.
+  colour:
+    path: swatch
+    converter: rgb-oklab
+    metric: l2
+    displays: Approximate perceptual colour similarity of the selected swatches.
+placements:
+  home:
+    heads: {category: 2, price: 1, colour: 0.5}
+    where: {available: true}
+  outdoors:
+    heads: {category: 2, price: 1, colour: 0.5}
+    where: {available: true, category: outdoors}
+  electronics:
+    heads: {category: 2, price: 1, colour: 0.5}
+    where: {available: true, category: electronics}
+  homewares:
+    heads: {category: 2, price: 1, colour: 0.5}
+    where: {available: true, category: home}
+destinations:
+  states: [view, compare, cart, remove, purchase, cancel]
+  outcomes: [purchase, cancel]
+  horizon_events: 8
+  min_transitions: 10
+  smoothing: 0.5

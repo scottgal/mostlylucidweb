@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Mostlylucid.Relevance.Sqlite/Mostlylucid.Relevance.Sqlite.csproj" />
+    <Compile Include="../Mostlylucid.AudienceSegmentation.Demo/Models/Product.cs" Link="Models/Product.cs" />
+    <Content Include="Configuration/*.yaml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

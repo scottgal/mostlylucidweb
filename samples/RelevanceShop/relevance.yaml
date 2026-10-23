@@ -1,0 +1,42 @@
+id: shop-demo-v1
+half_life_minutes: 30
+filters: [category, available, price]
+
+streams:
+  products:
+    kind: candidate
+  events:
+    kind: observation
+    weights: {view: 1, compare: 2, cart: 3, purchase: 4, cancel: 0}
+  outcomes:
+    kind: feedback
+
+destinations:
+  states: [view, compare, cart, purchase, cancel]
+  outcomes: [purchase, cancel]
+  horizon_events: 8
+  min_transitions: 10
+
+# Each point has its own representation and distance. No language model is needed for this demo.
+points:
+  category:
+    path: category
+    converter: categorical
+    categories: [outdoors, electronics, home]
+    metric: cosine
+    displays: Product-interest distribution across the configured categories.
+  price:
+    path: price
+    converter: formula
+    expression: "x / 200"
+    metric: l2
+    displays: Price affinity inferred from the products receiving attention.
+
+# A placement is a surface/filter; its heads are independent candidate rankings combined with RRF.
+placements:
+  home:
+    heads: {category: 1, price: 1}
+    where: {available: true}
+  outdoors:
+    heads: {category: 1, price: 1}
+    where: {available: true, category: outdoors}
