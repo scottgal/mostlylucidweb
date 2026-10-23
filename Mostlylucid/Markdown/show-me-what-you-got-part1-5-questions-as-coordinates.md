@@ -53,6 +53,34 @@ That changes the cost of trying a dimension. We can test several well-defined qu
 
 The model does not discover the application's objective for us. We still choose which differences should matter.
 
+# From LucidRAG Signals to Question-Defined Features
+
+This is a continuation of the work in [DocSummarizer](/blog/building-a-document-summarizer-with-rag) and [lucidRAG](/blog/lucidrag-multi-document-rag-web-app). Those articles build useful representations by combining extraction, specialist models and several kinds of analysis. The application turns their outputs into structured signals that retrieval and reasoning can use.
+
+The modality-specific summarisers make that approach especially clear:
+
+| Earlier implementation | How it characterises the input |
+|------------------------|--------------------------------|
+| [ImageSummarizer](/blog/constrained-fuzzy-image-intelligence) | Combines measured colour and quality, OCR, image classification, semantic embeddings and optional captioning |
+| [AudioSummarizer](/blog/audiosummarizer-forensic-audio-characterization) | Combines acoustic measurements, transcription, speaker diarisation and voice embeddings in a signal ledger |
+| [DataSummarizer](/blog/datasummarizer-how-it-works) | Computes schema and distribution profiles, quality signals and drift, with model-assisted interpretation |
+
+These pipelines do more than run one embedding model. Different analytics expose different properties, and code gives those outputs a consistent meaning. Building a new semantic dimension can mean selecting components, combining their evidence and implementing the interpretation that sits above them.
+
+For the voice example, that could involve transcript analysis alongside acoustic features, speaker segmentation and a classifier interpreting the combination. Loudness is available as a measurement; deciding whether a particular delivery sounds hostile is another layer.
+
+**Decision models simplify that semantic characterisation step.** With a capable audio model, we can define the hostility question and its rubric, supply the relevant recording, and consume a typed reading. We have moved some of the work from constructing a custom analysis pipeline to specifying and evaluating a question.
+
+```text
+Specialist analytics + ML models → application combines signals → semantic feature
+
+Evidence + defined questions → decision-model readings → semantic feature vector
+```
+
+The architecture still benefits from the earlier [Reduced RAG](/blog/reduced-rag) principle: characterise the source once, retain structured evidence, and reuse it. Measured acoustic properties, exact statistics, OCR text and specialist embeddings remain useful contributors. Decision questions give us a simpler producer for suitable semantic properties alongside them.
+
+That is the progression: the summarisers show how much useful characterisation we can assemble; decision models make more of those dimensions accessible through a common question-and-answer interface.
+
 # A Vectoriser Built from Classifiers
 
 A decision model accepts a situation and defined possible answers, then scores those answers. Its output is designed for code to consume.
