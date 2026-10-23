@@ -37,7 +37,7 @@ January 2012–present · Remote
 
 ### Mortgage Automator — AI Development Consultant
 
-January 2026–present · Canada / remote
+January 2026–May 2026 · Canada / remote
 
 - Consult on the effective use of coding language models and design and build supporting systems around business requirements.
 - Combine hands-on product development with guidance on engineering workflows and the practical constraints of AI-assisted delivery.

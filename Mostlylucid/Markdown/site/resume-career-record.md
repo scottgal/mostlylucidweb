@@ -93,8 +93,8 @@ Publish open-source .NET libraries, CLI tools and detailed engineering articles.
 ### Mortgage Automator — AI Development Consultant {#section-4e6dba45b66e}
 
 
-<p id="section-4e6dba45b66e-6099bb0cbfc2-prose">
-Mortgage Automator — AI Development Consultant | January 2026–present · Canada / remote
+<p id="section-4e6dba45b66e-f7c0b6f74696-prose">
+Mortgage Automator — AI Development Consultant | January 2026–May 2026 · Canada / remote
 </p>
 
 
@@ -1139,10 +1139,10 @@ Open to hands-on engineering leadership, principal-level roles, contract work an
       "review": "accepted"
     },
     {
-      "id": "section-4e6dba45b66e-6099bb0cbfc2",
+      "id": "section-4e6dba45b66e-f7c0b6f74696",
       "subject": "section-4e6dba45b66e",
       "type": "experience",
-      "statement": "Mortgage Automator — AI Development Consultant | January 2026–present · Canada / remote",
+      "statement": "Mortgage Automator — AI Development Consultant | January 2026–May 2026 · Canada / remote",
       "concepts": {
         "skills": [
           "skill-32e83e92d45d"
@@ -1152,12 +1152,12 @@ Open to hands-on engineering leadership, principal-level roles, contract work an
       },
       "supported_by": [
         {
-          "id": "section-4e6dba45b66e-6099bb0cbfc2-prose",
+          "id": "section-4e6dba45b66e-f7c0b6f74696-prose",
           "type": "prose",
-          "ref": "#section-4e6dba45b66e-6099bb0cbfc2-prose",
+          "ref": "#section-4e6dba45b66e-f7c0b6f74696-prose",
           "authors": [],
           "fingerprint": {
-            "text": "fnv1a64:15576b36c82f01ed"
+            "text": "fnv1a64:168f97308b4158cf"
           }
         }
       ],
