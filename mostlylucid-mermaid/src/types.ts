@@ -15,7 +15,8 @@ export interface PanZoomInstance {
     resize(): void;
     destroy(): void;
     isPanEnabled(): boolean;
-    enablePan(enabled: boolean): void;
+    enablePan(): void;
+    disablePan(): void;
 }
 
 /**
@@ -27,6 +28,14 @@ export type ExportFormat = 'png' | 'svg';
  * Theme type
  */
 export type Theme = 'dark' | 'default';
+
+/** Rendering boundary: enhancements work with the SVG rather than a renderer's internal classes. */
+export interface DiagramRenderer {
+    /** Stable renderer name exposed on the diagram container for scoped CSS. */
+    name: string;
+    /** Produce SVG from the original source. The host owns and loads the renderer dependency. */
+    render(source: string, context: { id: string; theme: Theme }): string | Promise<string>;
+}
 
 /**
  * Control button action types
@@ -61,6 +70,8 @@ export interface IconConfig {
  * Enhancement configuration options
  */
 export interface EnhancementConfig {
+    /** Opt-in SVG renderer. Omit to keep the existing window.mermaid integration. */
+    renderer?: DiagramRenderer;
     /**
      * Icon classes for control buttons
      * Defaults to Boxicons (bx-*)

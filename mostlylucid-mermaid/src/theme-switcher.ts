@@ -7,7 +7,7 @@
  * @module theme-switcher
  */
 
-import { enhanceMermaidDiagrams } from './enhancements.js';
+import { enhanceMermaidDiagrams, cleanupMermaidEnhancements, getConfig } from './enhancements.js';
 import type { Theme } from './types';
 
 const elementSelector = 'div.mermaid, pre.mermaid';
@@ -19,6 +19,7 @@ let listenersAttached = false;
 let htmxIntegrationSetup = false;
 let printHandlersSetup = false;
 let currentTheme: Theme = 'default';
+let renderId = 0;
 
 /**
  * Normalize code fence blocks to Mermaid-compatible format
@@ -45,26 +46,38 @@ const normalizeMermaidCodeFences = () => {
  * @param {string} theme - Theme name ('dark' or 'default')
  */
 const loadMermaid = async (theme: Theme): Promise<void> => {
-    if (!window.mermaid) {
+    const renderer = getConfig().renderer;
+    if (!renderer && !window.mermaid) {
         console.warn('Mermaid library not found. Make sure mermaid is loaded before calling initMermaid()');
         return;
     }
 
     try {
-        window.mermaid.initialize({
-            startOnLoad: false,
-            theme,
-            // Force transparent background so container styles (light/dark) show through
-            themeVariables: {
-                background: 'transparent'
+        if (renderer) {
+            cleanupMermaidEnhancements();
+            for (const element of document.querySelectorAll(elementSelector)) {
+                const source = element.getAttribute('data-original-code') ?? element.textContent ?? '';
+                element.innerHTML = await renderer.render(source, { id: `diagram-${++renderId}`, theme });
+                element.setAttribute('data-renderer', renderer.name);
+                element.setAttribute('data-diagram-theme', theme);
+                element.setAttribute('data-processed', 'true');
             }
-        });
+        } else {
+            window.mermaid!.initialize({
+                startOnLoad: false,
+                theme,
+                // Force transparent background so container styles (light/dark) show through
+                themeVariables: {
+                    background: 'transparent'
+                }
+            });
 
-        // Use nodes array instead of querySelector for better mobile/Cloudflare compatibility
-        const elements = document.querySelectorAll(elementSelector);
-        await window.mermaid.run({
-            nodes: Array.from(elements),
-        });
+            // Use nodes array instead of querySelector for better mobile/Cloudflare compatibility
+            const elements = document.querySelectorAll(elementSelector);
+            await window.mermaid!.run({
+                nodes: Array.from(elements),
+            });
+        }
 
         // Enhance diagrams with pan/zoom and export after rendering completes
         // Use requestAnimationFrame for better timing
@@ -109,7 +122,7 @@ const resetProcessed = (): void => {
         const originalCode = el.getAttribute('data-original-code');
         if (originalCode != null) {
             el.removeAttribute('data-processed');
-            el.innerHTML = originalCode;
+            el.textContent = originalCode;
         }
     });
 };

@@ -4,10 +4,10 @@
   "description": "Enhance Mermaid.js diagrams with interactive pan/zoom, fullscreen lightbox, export to PNG/SVG, and automatic theme switching",
   "main": "dist/index.js",
   "module": "src/index.ts",
-  "types": "src/types.ts",
+  "types": "dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/types.ts",
+      "types": "./dist/index.d.ts",
       "import": "./src/index.ts",
       "require": "./dist/index.js"
     },
@@ -102,5 +102,10 @@
   },
   "engines": {
     "node": ">=14.0.0"
+  },
+  "peerDependenciesMeta": {
+    "mermaid": {
+      "optional": true
+    }
   }
 }

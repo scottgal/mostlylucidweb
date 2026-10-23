@@ -53,6 +53,8 @@ RUN dotnet restore "./Mostlylucid/Mostlylucid.csproj"
 
 # Copy the entire source code to the container
 COPY ./Mostlylucid/ ./Mostlylucid/
+# Webpack consumes the shared renderer/touch fixes directly until the next npm release.
+COPY ./mostlylucid-mermaid/src/ ./mostlylucid-mermaid/src/
 COPY ./Mostlylucid.Test/ ./Mostlylucid.Test/
 COPY ./Mostlylucid.Shared/ ./Mostlylucid.Shared/
 COPY ./Mostlylucid.Services/ ./Mostlylucid.Services/

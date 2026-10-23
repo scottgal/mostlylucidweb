@@ -24,8 +24,11 @@ export {
     initMermaid
 } from './theme-switcher.js';
 
+export { createPeleRenderer } from './renderers.js';
+
 export type {
     EnhancementConfig,
+    DiagramRenderer,
     IconConfig,
     PanZoomInstance,
     Theme,

@@ -329,3 +329,25 @@
         display: none !important;
     }
 }
+
+/* Opt-in Pele colours; hosts may override these variables on diagram containers. */
+.mermaid[data-renderer="pele"] {
+    --pele-bg: transparent;
+    --pele-fg: #172c26;
+    --pele-muted: #61736b;
+    --pele-surface: #edf3ed;
+    --pele-surface-alt: #f6f8f4;
+    --pele-line: #526d60;
+    --pele-border: #a3b6a8;
+    --pele-accent: #26735c;
+    --pele-font: system-ui, sans-serif;
+}
+.mermaid[data-renderer="pele"][data-diagram-theme="dark"] {
+    --pele-fg: #e7f1ea;
+    --pele-muted: #aac1b1;
+    --pele-surface: #20352d;
+    --pele-surface-alt: #182a23;
+    --pele-line: #94b5a1;
+    --pele-border: #567562;
+    --pele-accent: #91d4b5;
+}

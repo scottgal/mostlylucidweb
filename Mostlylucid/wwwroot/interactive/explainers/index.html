@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inside the machine / Mostlylucid explainers</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23295748'/%3E%3Ctext x='10' y='29' fill='white' font-size='28'%3E∴%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<script defer src="/js/dist/explainers.js"></script>
+</head>
+<body>
+<header><a class="brand" href="/" target="_top"><span class="brand-mark">∴</span> mostlylucid <span class="muted">/ explainers</span></a><div class="header-actions"><button id="theme" type="button">Dark mode</button><button id="expand" type="button">Expand ↗</button></div></header>
+<nav aria-label="Explainer"><button data-view="vectors" aria-pressed="true">01 / Vector space</button><button data-view="proxy" aria-pressed="false">02 / The proxy</button><span class="replay-label">Interactive teaching replay</span></nav>
+<section class="hero"><p class="eyebrow">INSIDE THE MACHINE</p><h1 id="heading">Watch evidence become<br>a <em>recommendation.</em></h1><p id="intro">A point is an observation. A centroid is a summary. Add evidence and follow what changes.</p></section>
+<main>
+<section id="vector-view" aria-label="Vector space explainer">
+<div class="workbench">
+<div class="visual-card"><div class="card-heading"><div><span class="eyebrow">THE FEATURE SPACE</span><h2>Small observations. Moving interests.</h2></div><button id="dimension" aria-pressed="false">Explore in 3D</button></div>
+<div class="legend"><span><i class="dot outdoors"></i>Outdoors</span><span><i class="dot electronics"></i>Electronics</span><span><i class="dot home"></i>Home</span><span><i class="centroid-key"></i>Current centroid</span></div>
+<div id="plot" role="group" aria-label="Candidate vectors and current weighted centroid"><div id="fallback"></div><div id="plot-status" class="plot-status">Literal teaching coordinates</div><span class="axis x-axis">Outdoors affinity →</span><span class="axis y-axis">Electronics affinity →</span></div>
+<div class="plot-tools"><button id="interact" aria-pressed="false">Enable plot interaction</button><button id="reset-camera">Reset camera</button><span id="plot-hint">Scroll the page normally. Select a point to inspect it.</span></div>
+<div class="filters"><label>Surface<select id="category"><option value="all">All categories</option><option value="outdoors">Outdoors</option><option value="electronics">Electronics</option><option value="home">Home</option></select></label><label>Maximum price <output id="budget-value">£250</output><input id="budget" type="range" min="25" max="250" value="250"></label><label class="check"><input id="available" type="checkbox" checked>Available only</label></div>
+</div>
+<aside class="inspector"><span class="eyebrow">WHAT THE SYSTEM KNOWS</span><h2 id="vector-title">No personal evidence yet</h2><p id="vector-caption" class="muted">Step forward to observe the first product.</p><div id="mean-values"></div><div class="mass-row"><span>Evidence mass</span><strong id="mass">0.000</strong></div><div class="knobs"><label>Memory half-life <output id="half-life-value">30 min</output><input id="half-life" type="range" min="5" max="60" value="30"></label><label>Basket event weight <output id="cart-weight-value">3</output><input id="cart-weight" type="range" min="1" max="6" value="3"></label><button id="idle">Wait 30 minutes</button><p id="idle-note" class="small muted">Idle decay reduces mass, not the centroid's direction.</p></div><h3>Nearest eligible candidates</h3><div id="ranked"></div><details id="point-details"><summary>Inspect a candidate</summary><div id="point-detail">Choose a point or use the candidate list.</div></details></aside>
+</div>
+<p class="note">Synthetic labelled groups, not discovered clusters. Coordinates are explicit features, not model output. The 2D display shows two of three coordinates; all three determine the L2 ranking.</p>
+</section>
+<section id="proxy-view" aria-label="Protective reverse proxy explainer" hidden>
+<div class="proxy-options"><label>Request scenario<select id="scenario"><option value="browser">Ordinary browser</option><option value="crawler">Known crawler</option><option value="unfamiliar">Unfamiliar client</option><option value="burst">Scripted burst</option></select></label><p class="small muted">Client → TLS edge → gateway → origin. No application SDK needed.</p></div>
+<div class="workbench"><div class="visual-card"><div class="card-heading"><div><span class="eyebrow">THE REQUEST PATH</span><h2>See where the request actually goes.</h2></div><span class="pill">Pele + enhancements</span></div><div id="proxy-stage" class="mermaid"></div><p class="small muted diagram-hint">Scroll normally. Use the toolbar to enable diagram interaction, zoom, export or open fullscreen.</p><div class="proxy-counters"><div><span>Origin reached</span><strong id="origin-reached">Not yet</strong></div><div><span>Policy path</span><strong id="policy-path">Not evaluated</strong></div><div><span>Source</span><strong>Synthetic trace</strong></div></div></div><aside class="inspector"><span class="eyebrow">FOLLOW THE EVIDENCE</span><h2 id="proxy-title"></h2><p id="proxy-caption" class="muted"></p><div id="proxy-evidence"></div><h3>Request ledger</h3><ol id="proxy-ledger"></ol><p class="small muted">A challenge is a response from the gateway. The origin stays untouched in this trace. Background telemetry has its own lane.</p></aside></div>
+<p class="note">An educational replay of a protective reverse-proxy topology, not live Stylo.Bot traffic or a complete detector implementation.</p>
+</section>
+<section class="playback" aria-label="Replay controls"><div class="play-buttons"><button id="play" class="primary">Play</button><button id="back" aria-label="Previous step">←</button><button id="next" aria-label="Next step">Next →</button><button id="reset">Reset</button></div><label class="scrubber"><span id="step-label">Before the first observation</span><input id="scrub" type="range" min="0" max="5" value="0" aria-label="Replay position"></label><span id="step-count" class="step-count">0 / 5</span></section>
+<p id="announcement" class="sr-only" aria-live="polite"></p>
+<details class="accessible-data"><summary>View the current data as a table</summary><table><thead><tr><th>Entity</th><th>Values / evidence</th><th>Result</th></tr></thead><tbody id="data-table"></tbody></table></details>
+</main>
+<footer><span>Explain the calculation. Keep the evidence.</span><a id="article-link" href="/blog/show-me-what-you-got-streaming-recommendations" target="_top">Read the article ↗</a></footer>
+<noscript><p>JavaScript is required for replay. Read the linked articles for the equations, example values and request path.</p></noscript>
+</body></html>

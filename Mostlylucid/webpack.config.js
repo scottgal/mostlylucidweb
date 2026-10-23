@@ -8,6 +8,7 @@ module.exports = (env, argv) => {
         mode: isProduction ? 'production' : 'development',
         entry: {
             main: './src/js/main.js',
+            explainers: './src/js/explainers/index.js',
         },
         output: {
             filename: '[name].js',
@@ -23,12 +24,13 @@ module.exports = (env, argv) => {
                     use: ['style-loader', 'css-loader'],
                 },
                 {
-                    test: /\.js$/,
+                    test: /\.[jt]s$/,
                     exclude: /node_modules/,
                     use: {
                         loader: 'babel-loader',
                         options: {
                             presets: [
+                                '@babel/preset-typescript',
                                 ['@babel/preset-env', {
                                     targets: '> 0.25%, not dead',
                                     modules: false, // ✅ for tree shaking
@@ -48,9 +50,13 @@ module.exports = (env, argv) => {
             ],
         },
         resolve: {
-            extensions: ['.js', '.mjs'],
+            extensions: ['.js', '.mjs', '.ts'],
+            extensionAlias: { '.js': ['.js', '.ts'] },
+            modules: [path.resolve(__dirname, 'node_modules'), 'node_modules'],
             alias: {
-                '@mostlylucid/mermaid-enhancements$': path.resolve(__dirname, 'node_modules/@mostlylucid/mermaid-enhancements/dist/index.min.js')
+                '@mostlylucid/mermaid-enhancements$': path.resolve(__dirname, '../mostlylucid-mermaid/src/index.ts'),
+                '@mostlylucid/mermaid-enhancements/min$': path.resolve(__dirname, '../mostlylucid-mermaid/src/index.ts'),
+                '@mostlylucid/mermaid-enhancements/styles.css$': path.resolve(__dirname, '../mostlylucid-mermaid/src/styles.css')
             }
         },
         optimization: {

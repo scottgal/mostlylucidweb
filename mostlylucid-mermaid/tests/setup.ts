@@ -23,6 +23,13 @@ vi.mock('svg-pan-zoom', () => ({
     destroy: vi.fn(),
     isPanEnabled: vi.fn(() => false),
     enablePan: vi.fn(),
+    disablePan: vi.fn(),
+    enableZoom: vi.fn(),
+    disableZoom: vi.fn(),
+    enableMouseWheelZoom: vi.fn(),
+    disableMouseWheelZoom: vi.fn(),
+    enableDblClickZoom: vi.fn(),
+    disableDblClickZoom: vi.fn(),
   })),
 }));
 

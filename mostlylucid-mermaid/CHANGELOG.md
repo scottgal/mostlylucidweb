@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Add an optional renderer contract and an injected Pele adapter; Mermaid stays the default.
+- Keep source text and themed SVG presentation when rendering, opening fullscreen and exporting.
+- Require explicit gesture activation. Correct the pan-disable API call so finger scrolling can return to the page.
+- Generate public function declarations through the package's root types entry. Mermaid's peer dependency is optional for adapter-only consumers.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),

@@ -12,6 +12,7 @@ import flatpickr from "flatpickr";
 import 'flatpickr/dist/flatpickr.min.css';
 import '../css/flatpickr-overrides.css';
 import "./blog-index";
+import "./explainer-embeds";
 import { renderMath } from './katex-render';
 
 

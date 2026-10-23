@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { initMermaid } from '../memmaid_theme_switch';
+import { initMermaid } from '../../../../mostlylucid-mermaid/src/theme-switcher';
 
 // Mock mermaid
 const mermaidMock = {
@@ -37,9 +37,10 @@ describe('Mermaid Theme Integration', () => {
   describe('Code fence normalization', () => {
     it('should convert pre > code.language-mermaid to pre.mermaid', async () => {
       document.body.innerHTML = `
-        <pre><code class="language-mermaid">graph TD
-    A-->B</code></pre>
+        <pre><code class="language-mermaid"></code></pre>
       `;
+      // Set source as text, as an escaped Markdown code fence does in the browser.
+      document.querySelector('code').textContent = 'graph TD\n    A-->B';
 
       await initMermaid();
 
@@ -95,7 +96,8 @@ describe('Mermaid Theme Integration', () => {
   describe('Data attribute management', () => {
     it('should save original code to data attribute', async () => {
       const diagramCode = 'graph TD\n    A-->B';
-      document.body.innerHTML = `<pre class="mermaid">${diagramCode}</pre>`;
+      document.body.innerHTML = '<pre class="mermaid"></pre>';
+      document.querySelector('pre').textContent = diagramCode;
 
       await initMermaid();
 

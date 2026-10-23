@@ -744,3 +744,24 @@ The export feature requires modern browsers with Canvas API support. Check brows
 ---
 
 Made with love for the Mermaid.js community
+
+
+## Opt-in Pele renderer (next release)
+
+The source now supports renderer adapters. Mermaid remains the default; Pele is supplied by the host and is not bundled by this package. These additions have not yet been published to npm.
+
+```typescript
+import { render } from 'pele';
+import { configure, createPeleRenderer, init } from '@mostlylucid/mermaid-enhancements';
+
+configure({ renderer: createPeleRenderer((source, options) => render(source, options)) });
+await init();
+```
+
+The adapter consumes original Mermaid source and returns SVG. Pan/zoom, fullscreen and export work against that SVG, keeping renderer-specific layout out of the controls. CSS variables style Pele; Mermaid theme variables do not translate automatically. Use unique SVG prefixes per render and retain the source for later theme changes. Pele syntax/layout differences should be qualified on the diagrams your site uses.
+
+### Touch scrolling
+
+Diagrams start passive. A tap or click on the SVG does not enable gestures. Use the explicit **Enable Pan & Zoom** toolbar button to capture gestures inside the diagram; disable it to return to ordinary page scrolling. Zoom buttons remain available separately.
+
+The disable path now calls `disablePan()` rather than `enablePan(false)`: svg-pan-zoom's enable method takes no boolean and would leave panning enabled. Fullscreen uses the same explicit interaction rule. Cloned diagrams retain resolved presentation colours and their original bounds for fullscreen/export.

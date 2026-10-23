@@ -525,6 +525,13 @@ Internet → Caddy (TLS) → Stylobot Gateway ([YARP](https://microsoft.github.i
 
 The gateway is a standalone Docker container (`scottgal/stylobot-gateway`) that runs detection on all traffic and forwards results as HTTP headers. Your app reads headers - **no SDK needed, any language**. If "gateway" is unfamiliar, think "[reverse proxy](https://en.wikipedia.org/wiki/Reverse_proxy) that sits in front of your app and adds security/traffic logic."
 
+**Follow a request through the gateway.** Step through an ordinary browser request, then switch to an unfamiliar client. Watch where the challenge response comes from and whether the origin receives the request. This is an educational replay with synthetic evidence, rather than live Stylo.Bot telemetry.
+
+<iframe class="article-explainer" src="/interactive/explainers/?view=proxy&amp;embed=1" title="Interactive protective reverse proxy request replay" width="100%" height="1100" loading="lazy" style="border:0;border-radius:12px;"></iframe>
+
+[Open the proxy explorer](/interactive/explainers/?view=proxy). TLS terminates at the edge in this example; the gateway receives readable HTTP from that trusted edge. Background telemetry has its own branch.
+
+
 ```yaml
 services:
   gateway:

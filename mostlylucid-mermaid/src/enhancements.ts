@@ -161,6 +161,7 @@ function createControlButtons(container: HTMLElement, diagramId: string, isLight
         button.setAttribute('aria-label', btn.title);
         button.setAttribute('data-action', btn.action);
         button.setAttribute('data-diagram-id', diagramId);
+        if (btn.action === 'pan') button.setAttribute('aria-pressed', 'false');
 
         // Pan button starts as inactive (pan/zoom disabled by default)
         // User must click it to enable pan/zoom functionality
@@ -178,6 +179,8 @@ function createControlButtons(container: HTMLElement, diagramId: string, isLight
  * @returns {Object|null} Pan-zoom instance or null on failure
  */
 function initPanZoom(svgElement: SVGElement, diagramId: string): PanZoomInstance | null {
+    svgElement.style.touchAction = 'pan-y pinch-zoom';
+    svgElement.dataset.interactive = 'false';
     // Clean up existing instance if present
     if (panZoomInstances.has(diagramId)) {
         try {
@@ -297,20 +300,28 @@ function handleControlClick(event: Event): void {
                 const isPanEnabled = panZoomInstance.isPanEnabled();
                 if (isPanEnabled) {
                     // Disable pan and zoom
-                    panZoomInstance.enablePan(false);
+                    panZoomInstance.disablePan();
+                    const svg = container?.querySelector('svg');
+                    if (svg) { svg.style.touchAction = 'pan-y pinch-zoom'; svg.dataset.interactive = 'false'; }
                     (panZoomInstance as any).disableZoom();
                     (panZoomInstance as any).disableMouseWheelZoom();
                     (panZoomInstance as any).disableDblClickZoom();
                     button.classList.remove('active');
                     button.setAttribute('title', 'Enable Pan & Zoom');
+                    button.setAttribute('aria-label', 'Enable Pan & Zoom');
+                    button.setAttribute('aria-pressed', 'false');
                 } else {
                     // Enable pan and zoom (including touch)
-                    panZoomInstance.enablePan(true);
+                    panZoomInstance.enablePan();
+                    const svg = container?.querySelector('svg');
+                    if (svg) { svg.style.touchAction = 'none'; svg.dataset.interactive = 'true'; }
                     (panZoomInstance as any).enableZoom();
                     (panZoomInstance as any).enableMouseWheelZoom();
                     (panZoomInstance as any).enableDblClickZoom();
                     button.classList.add('active');
                     button.setAttribute('title', 'Disable Pan & Zoom');
+                    button.setAttribute('aria-label', 'Disable Pan & Zoom');
+                    button.setAttribute('aria-pressed', 'true');
                 }
             }
             break;
@@ -321,6 +332,25 @@ function handleControlClick(event: Event): void {
             if (container) exportDiagram(container as HTMLElement, 'svg', diagramId);
             break;
     }
+}
+
+/** Preserve inherited/CSS-variable paints when moving an SVG outside its themed container. */
+function cloneWithPresentation(source: SVGElement): SVGElement {
+    const clone = source.cloneNode(true) as SVGElement;
+    const originals = [source, ...Array.from(source.querySelectorAll('*'))];
+    const copies = [clone, ...Array.from(clone.querySelectorAll('*'))];
+    const properties = ['fill', 'stroke', 'stroke-width', 'color', 'font-family', 'font-size', 'font-weight', 'opacity'];
+    originals.forEach((element, index) => {
+        const style = getComputedStyle(element);
+        const target = copies[index] as SVGElement;
+        for (const property of properties) {
+            const value = style.getPropertyValue(property);
+            if (value && target.style) target.style.setProperty(property, value);
+        }
+    });
+    if (source.dataset.originalViewbox) clone.setAttribute('viewBox', source.dataset.originalViewbox);
+    clone.querySelector('.svg-pan-zoom_viewport')?.removeAttribute('transform');
+    return clone;
 }
 
 /**
@@ -345,7 +375,7 @@ function openFullscreenLightbox(container: HTMLElement, diagramId: string): void
     `;
 
     // Clone the SVG
-    const clonedSvg = svgElement.cloneNode(true) as SVGElement;
+    const clonedSvg = cloneWithPresentation(svgElement);
 
     // Remove any inline size constraints
     clonedSvg.removeAttribute('width');
@@ -428,7 +458,7 @@ async function exportDiagram(container: HTMLElement, format: ExportFormat, diagr
         }
 
         // Clone the SVG to avoid modifying the original
-        const clonedSvg = svgElement.cloneNode(true) as SVGElement;
+        const clonedSvg = cloneWithPresentation(svgElement);
 
         // Get the viewBox or calculate from bounding box
         let viewBox = clonedSvg.getAttribute('viewBox');
@@ -549,6 +579,14 @@ export function enhanceMermaidDiagrams() {
         const svgElement = diagram.querySelector('svg');
         if (!svgElement) return;
 
+        // svg-pan-zoom manages the viewport. Keep the source bounds for fullscreen and clean exports.
+        if (!svgElement.dataset.originalViewbox && svgElement.getAttribute('viewBox')) {
+            svgElement.dataset.originalViewbox = svgElement.getAttribute('viewBox')!;
+        }
+
+        svgElement.style.touchAction = 'pan-y pinch-zoom';
+        svgElement.dataset.interactive = 'false';
+
         // Remove inline max-width constraint that Mermaid adds
         svgElement.style.maxWidth = 'none';
 
@@ -565,27 +603,8 @@ export function enhanceMermaidDiagrams() {
                 panZoom.center();
             }, 100);
 
-            // Add click handler to enable pan/zoom when user clicks on diagram
-            svgElement.addEventListener('click', (e: MouseEvent) => {
-                // Only enable if not already enabled
-                if (!panZoom.isPanEnabled()) {
-                    // Enable pan and zoom
-                    panZoom.enablePan(true);
-                    (panZoom as any).enableZoom();
-                    (panZoom as any).enableMouseWheelZoom();
-                    (panZoom as any).enableDblClickZoom();
+            // Explicit toolbar activation only: synthetic clicks after touch scrolling must never arm gestures.
 
-                    // Find and highlight the pan button
-                    const wrapper = svgElement.closest('.mermaid-wrapper');
-                    if (wrapper) {
-                        const panButton = wrapper.querySelector('[data-action="pan"]');
-                        if (panButton) {
-                            panButton.classList.add('active');
-                            panButton.setAttribute('title', 'Disable Pan & Zoom');
-                        }
-                    }
-                }
-            }, { once: false });
         }
     });
 
