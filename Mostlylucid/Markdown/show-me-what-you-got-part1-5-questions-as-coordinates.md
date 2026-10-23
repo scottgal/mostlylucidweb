@@ -1,37 +1,223 @@
-# SHOW ME WHAT YOU GOT (Part 1.5): Questions as Coordinates
+# SHOW ME WHAT YOU GOT (Part 1.5): How Do I Vectorise Almost Anything?
 
-In [Part 1](/blog/show-me-what-you-got-streaming-recommendations), we chose representations that preserve useful relationships. A colour swatch gives us colour coordinates. A session's events give us behavioural features. A text embedding places language in a learned semantic space.
+“How do I vectorise this?”
 
-There is another useful way to characterise an entity: **define the dimensions as questions, then use the answers as coordinates**.
+It is a reasonable question after [Part 1](/blog/show-me-what-you-got-streaming-recommendations). We know how useful vectors can be. We can compare entities, maintain centroids, discover groups and track change. But where do the coordinates come from when the thing we care about is difficult to measure?
 
-Does this message request credentials? Does it introduce a new payment destination? Does it pressure the recipient to act immediately?
+Take a voice message. **Is this message aggressive?**
 
-Those questions already exist in StyloMail. Their answers can become a small, explicit semantic vector. We can then use the relevance engine from [Part 2](/blog/show-me-what-you-got-part2-building-relevance) to compare that characterisation with useful review tasks.
+The transcript might say “That is absolutely fine.” The recording might sound reassuring, sarcastic or threatening. Counting words misses something. Measuring volume helps describe the signal, but a loud recording is not necessarily aggressive. We want a representation that captures the property relevant to our application.
 
-That gives the two projects a practical connection. StyloMail interprets the message and retains the evidence. Relevance ranks eligible candidates from the resulting representation. The same pattern can work over product descriptions, support requests or diagnostic reports, provided we define what the questions mean and what their answers justify.
+Decision models provide a useful new answer: **define the dimensions as questions, then encode the answers**. With a suitable multimodal model, the evidence can be text, images or sound.
+
+I think of this as **enabling embeddings for almost anything**. More precisely, it gives us a way to build task-specific semantic vectors over things a model can interpret, using dimensions whose meanings we choose.
+
+The difficult feature-extraction problem becomes a question-design problem that we can inspect, version and test. It still requires judgement, but we have a practical way to begin without training a separate classifier for every property.
 
 <datetime class="hidden">2026-10-23T15:00</datetime>
-<!-- category -- AI,Architecture,Machine Learning,Behavioural Inference,Recommendations,StyloMail,Jev,Nimble,C# -->
+<!-- category -- AI,Architecture,Machine Learning,Behavioural Inference,Recommendations,Decision Models,Multimodal,C# -->
 
 [TOC]
 
-# A Dimension Can Be a Question
+# Start with the Relationship You Need
 
-Take this message:
+A vector is useful because its coordinates preserve relationships relevant to a decision. The first question is therefore what we want to compare.
 
-> We are changing banks next month. Please verify the replacement details by calling your usual accounts contact. No payment is needed today.
+Suppose we are building a support system. We might want to recognise requests that need a human, find earlier cases with similar communication patterns, or identify conversations whose delivery is becoming hostile.
 
-The payment-change condition is present. Urgent pressure is absent. A request for credentials is absent.
+Those are related tasks, but they need different properties. “These clips contain similar words” is different from “these speakers use similar delivery”.
 
-Compare it with:
+For a voice message, we could begin with these dimensions:
 
-> Transfer today's payment to the replacement account in the next twenty minutes. Do not contact accounts until it is done.
+| Dimension | Question | Evidence needed |
+|-----------|----------|-----------------|
+| Aggressive delivery | Does the speaker use hostile or threatening delivery? | The recording, with a defined rubric |
+| Explicit threat | Does the speaker express a threat in the spoken content? | Spoken words and relevant context |
+| Request for a person | Does the speaker ask to speak with a human? | Spoken content |
 
-Again, the payment-change condition is present. This time urgency is present too, and a further question about bypassing normal verification would be useful.
+We could add shouting, frustration or sarcasm as separate dimensions when useful. They should not all disappear inside a single “bad customer” score.
 
-The shared topic is not enough to distinguish the two situations. We want coordinates describing particular properties of the request.
+The entity is the message, or a defined segment of it. The coordinates are readings of these properties. What the system subsequently does with them is a separate decision.
 
-[StyloMail's semantic dimensions](https://github.com/scottgal/stylomail/blob/d4d60cc77d22e112ac11fbbba83dee65161cb185/src/StyloMail.Core/SemanticDimension.cs) define those properties. The payment question contains:
+> **Modelling aside: choose a property, not an entire verdict.** “Does this clip contain an explicit threat?” gives a dimension a clear job. “Is this customer a problem?” bundles several interpretations together and gives us much less control over the resulting representation.
+
+# Why This Used to Be Awkward
+
+If a useful property is already measured, vectorising it is straightforward. A latency, price or count can become a coordinate after we define its units and scaling.
+
+Language and perception introduce more work. Recognising an aggressive delivery pattern can involve wording, intonation, stress, timing and context. An image property such as “the package is visibly crushed” also needs interpretation rather than a direct database lookup.
+
+We could build rules, extract specialised features, collect labelled examples and train a classifier. Those remain useful approaches. A reusable decision model adds another route: describe the distinction in a question and supply the evidence it needs to judge it.
+
+That changes the cost of trying a dimension. We can test several well-defined questions against a small evaluation set before committing to a specialist training pipeline.
+
+The model does not discover the application's objective for us. We still choose which differences should matter.
+
+# A Decision Model Acts as a Feature Producer
+
+A decision model accepts a situation and defined possible answers, then scores those answers. Its output is designed for code to consume.
+
+For text, [Jev](https://docs.typesafe.ai/introduction) and [Nimble](https://ollama.com/library/nimble) expose typed questions. Their familiar shapes include yes/no judgements, choices among categories and positions on an ordered rubric.
+
+Those shapes give us different kinds of coordinates:
+
+| Question shape | Example | Possible representation |
+|----------------|---------|-------------------------|
+| Yes/no | Is an explicit threat present? | Model-assigned probability of yes |
+| Choice | Which kind of request is this? | An ordered vector of category probabilities |
+| Ordered score | How strong is the hostile delivery under this rubric? | A defined rubric position, with its interpretation retained |
+
+For a yes/no question, the TypeSafe name is **Noul**. Its answer is a value in `[0,1]` representing the probability of yes; it does not include a separate confidence field. [The Noul contract](https://docs.typesafe.ai/primitives/noul) explains that distinction.
+
+That probability is about the proposition we asked. “Aggressive delivery is present” is not the same proposition as “this person intends harm”.
+
+> **Probability aside: presence is not intensity.** A Noul answer near 0.5 means the model gives yes and no similar probability. It does not mean “moderately aggressive”. For intensity, define levels such as calm, firm, hostile and threatening, and decide what those levels actually describe.
+
+For an unordered choice, do not turn category IDs into an invented numerical scale. Retain a one-hot result or the full probability distribution in a fixed category order. For an ordered score, any numerical spacing or normalisation is also a modelling choice.
+
+A general multimodal model can produce structured feature judgements too. A generated JSON field such as `"confidence": 0.93` is not automatically equivalent to a decision model's answer distribution. Preserve how each producer obtained its values.
+
+# Voice Needs the Voice
+
+Return to “That is absolutely fine.”
+
+If we only supply a transcript, we have asked a model to interpret words. It cannot recover the actual delivery from text that discarded it. A transcript pipeline can help with semantic content; audio-native interpretation is the route for dimensions that depend on how something sounds.
+
+This is becoming practical with newer models:
+
+- [Clef and Clef Flash](https://docs.ollama.com/capabilities/decision) accept images alongside text for typed decisions.
+- [Liquid AI's d1-omni](https://www.liquid.ai/blog/d1-open) accepts text with images or audio. Liquid describes the audio-capable checkpoint as experimental.
+- [Gemini's audio documentation](https://ai.google.dev/gemini-api/docs/audio?authuser=0) includes answering questions about recordings and emotion detection, with a structured-output example.
+
+These establish the capability to ask questions over the modality. They are not interchangeable implementations or proof that a particular aggression rubric works on our recordings.
+
+For example, the documented [d1-omni Ollama integration](https://ollama.com/library/d1-omni) supports short English speech clips. Its published notes emphasise requests and speaker intent, rather than validated aggression detection. We can use that interface to explore audio questions while choosing and evaluating an appropriate model for the actual property.
+
+Here is an illustrative request shape for a voice-delivery question:
+
+```json
+{
+  "model": "d1-omni",
+  "state": "Assess the audible speaker delivery in this recording.",
+  "images": ["<base64-encoded WAV clip>"],
+  "questions": {
+    "aggressive_delivery": {
+      "type": "noul",
+      "instructions": "Does the speaker use hostile or threatening delivery in this clip?",
+      "criteria": {
+        "true": "The delivery conveys hostility or intimidation under the evaluation rubric.",
+        "false": "The delivery is calm, neutral or firm without hostility or intimidation."
+      }
+    }
+  }
+}
+```
+
+`images` is the documented field used for the WAV payload by that particular integration; it is not a general audio API convention. This is a request example, not a measured aggression-classification result.
+
+The important separation is between the supplied recording and our description of the property. The model produces a reading; we retain its meaning and provenance as a feature.
+
+If the clip is inaudible, contains several speakers we cannot distinguish, or lacks the context required by the question, that limitation must survive the conversion. Shouting at a football match and threatening a colleague need not mean the same thing under our rubric.
+
+# Images Use the Same Pattern
+
+For a product photograph, the dimensions might be:
+
+```text
+[visible shoulder straps, visible wheels, visible package damage]
+```
+
+For an interface screenshot, they might be:
+
+```text
+[error dialog present, chart visible, sign-in prompt present]
+```
+
+The same question contract applies, with a vision-capable producer supplying the readings. Clef's [documented image API](https://ollama.com/library/clef) receives encoded images shared by the questions.
+
+Ask about what the evidence can support. A photo may show a torn package. It cannot establish whether an unseen item works electrically. A description may claim waterproofing, while a photo shows only the shape of the bag.
+
+This extends the russet example from Part 1. Different representations preserve different interpretations. We can now define semantic dimensions over the source itself, rather than hoping a general embedding has made exactly the distinction our decision requires.
+
+# Turn the Readings into a Vector
+
+Suppose our voice questions return these illustrative values:
+
+```text
+aggressive_delivery  0.88
+explicit_threat      0.07
+asks_for_human       0.96
+```
+
+We fix the coordinate order:
+
+```csharp
+var dimensions = new[]
+{
+    "aggressive_delivery",
+    "explicit_threat",
+    "asks_for_human"
+};
+```
+
+The resulting representation is:
+
+```text
+voice message = [0.88, 0.07, 0.96]
+```
+
+Those teaching values describe strong model-assigned evidence for aggressive delivery and a request for a human, with little evidence for an explicit threat. They are not observed results from a recording.
+
+Each question concerns a property that can coexist with the others. The three numbers do not need to sum to one. Separate questions also need not be statistically independent: correlated properties can give the same evidence extra influence if we weight them carelessly.
+
+Building the array is easy. Ensuring that every position keeps the same meaning is the important part.
+
+We need the ordered question definitions, the producer and model version, the units or answer type, and the preprocessing that selected the evidence. For audio, that includes segmentation: a five-second clip and a whole conversation are different observations.
+
+# Is This an Embedding?
+
+It is a representation of an input in a numerical space. Calling it an embedding is reasonable in that broad sense. The useful distinction is that this is a **question-defined semantic vector**: its axes have explicit meanings selected for our task.
+
+A conventional embedding model learns a broad latent representation. We generally compare its vectors without assigning a human-readable property to each coordinate. Both approaches can be valuable.
+
+| Representation | Good starting point when |
+|----------------|--------------------------|
+| Measured features | We already have the quantities we need |
+| General learned embedding | We want broad similarity, retrieval or semantic neighbourhoods |
+| Question-defined vector | We want comparisons along particular interpretable properties |
+| Combination of contributors | Different aspects of the decision need different evidence |
+
+We are not reversing an embedding model and uncovering its hidden aggression axis. We are defining an axis, then using a model to estimate the corresponding property from evidence.
+
+That is why “enabling embeddings for almost anything” is interesting. The input no longer needs an obvious hand-coded feature extractor for every semantic property. A capable model supplies that interpretation, and the representation remains explicit enough to inspect.
+
+“Almost” still matters. The property must be observable from the supplied evidence, the question must be coherent, and the producer must be capable enough for the use we have in mind.
+
+# Missing Is Not Zero
+
+A missing aggression answer is not a calm delivery. A missing image answer is not evidence that no damage exists.
+
+Retain the distinction between:
+
+| Reading | Meaning |
+|---------|---------|
+| Available value near zero | Model-assigned evidence for no |
+| Available value near 0.5 | A balanced yes/no judgement |
+| Unavailable | No usable reading was produced |
+| Reduced coverage | A reading over incomplete evidence |
+| Not applicable | The question does not apply to this observation |
+
+We can exclude masked dimensions, require a minimum amount of compatible evidence, or abstain when essential readings are missing. Filling them with zero changes the observation.
+
+> **Geometry aside: do not normalise away the property.** Two vectors may point in the same direction while assigning very different yes probabilities. Unit-length normalisation can erase that distinction. A distance over original values, with explicit weights and missing-value rules, can be a better starting hypothesis for these coordinates.
+
+The question schema is also versioned evidence. If “aggressive delivery” changes from a hostility rubric to a volume threshold, the old and new coordinate no longer mean the same thing. Reusing the same ID does not preserve compatibility.
+
+# A Small Existing Example: StyloMail
+
+StyloMail already uses this pattern for text. It asks about credential requests, payment redirection and urgency, keeping each answer as semantic evidence.
+
+One of its [actual question definitions](https://github.com/scottgal/stylomail/blob/d4d60cc77d22e112ac11fbbba83dee65161cb185/src/StyloMail.Core/SemanticDimension.cs) contains:
 
 ```csharp
 Id = "semantic.payment_redirection",
@@ -40,244 +226,32 @@ CriteriaTrue = "Supplies or changes bank account, routing, invoice or payment de
 CriteriaFalse = "No introduction or change of payment destination.",
 ```
 
-The question has a specific job. It does not ask whether the sender is fraudulent or whether payment should be allowed.
+That is the same mechanism as the voice example, with a different source and different dimensions. A legitimate supplier change can score highly without becoming a fraud verdict.
 
-The stable ID lets code recognise the result. The instruction and criteria define what is being judged. Changing the criteria changes the dimension, even if the ID stays the same.
+Its existing [`EvidenceVectors.Semantic`](https://github.com/scottgal/stylomail/blob/d4d60cc77d22e112ac11fbbba83dee65161cb185/src/StyloMail.Assessment/EvidenceVectors.cs) conversion retains availability and masks rather than fabricating zeroes. The [Jev](/blog/stylomail-behavioural-inference-with-jev) and [Nimble](/blog/stylomail-using-nimble-from-csharp) articles cover the provider calls.
 
-> **ML aside: an explicit semantic feature.** A normal embedding model produces latent coordinates whose individual meanings we generally do not name. Here, we choose the meaning of every coordinate. A model still interprets the language, but its output occupies a space defined by our questions.
+The runnable [RelevanceMail sample](https://github.com/scottgal/mostlylucidweb/tree/main/samples/RelevanceMail) reuses those real evidence types, projects selected questions in a stable order and ranks eligible review tasks. Its strict dense-vector path abstains on incomplete input. It demonstrates the connection to the recommendation engine; it does not implement the audio or image examples in this article.
 
-# The Decision Model Supplies the Reading
+# Test the Dimension Before Depending on It
 
-StyloMail already has adapters for Jev and Nimble. The [Jev article](/blog/stylomail-behavioural-inference-with-jev) explains the hosted path; the [Nimble article](/blog/stylomail-using-nimble-from-csharp) follows the local C# call.
+For voice aggression, a useful evaluation set should include clips with similar words and different delivery, loud but friendly speech, quiet hostility, explicit threats and firm complaints without threats.
 
-For a yes/no property, the typed question is **Noul**. It returns a number in `[0,1]` representing the model's probability of yes. Its instruction and true/false criteria define the condition. Noul does not include a separate confidence field. [TypeSafe's Noul documentation](https://docs.typesafe.ai/primitives/noul) describes that contract.
+That is more revealing than testing only obviously angry recordings. We want to know whether the coordinate captures the distinction we defined.
 
-The existing Jev adapter turns dimension definitions into request questions:
+Compare audio input with transcripts alone when testing a delivery-dependent dimension. If the results do not change when the relevant vocal cues change, we have not demonstrated that the model is using them usefully.
 
-```csharp
-questions[dimension.Id] = new JevQuestion
-{
-    Type = NoulType,
-    Instructions = dimension.Instructions,
-    Criteria = new JevNoulCriteria
-    {
-        True = dimension.CriteriaTrue,
-        False = dimension.CriteriaFalse,
-    },
-};
-```
+The image equivalent compares visible damage with harmless folds, shadows and packaging designs. Question changes should be tested on held-out examples rather than repeatedly tuned against the same successful demonstration.
 
-That is an extract from the real [`BuildQuestions` method](https://github.com/scottgal/stylomail/blob/d4d60cc77d22e112ac11fbbba83dee65161cb185/src/StyloMail.Jev/JevSemanticMailClassifier.cs). The surrounding adapter supplies the bounded message state, handles the request and validates the returned answers.
+Then evaluate the downstream use separately. A readable axis and plausible scores do not establish that a recommendation, routing rule or escalation policy improves outcomes.
 
-[Nimble exposes the same family of typed questions through Ollama](https://ollama.com/library/nimble). Interface compatibility does not make different models' readings interchangeable. Keep the producer and its version with the result, and evaluate the questions on examples relevant to the application.
+# From Almost Anything to Relevance
 
-> **Probability aside: a probability of which proposition?** A high payment-redirection answer means the model sees a payment-change request. A legitimate supplier update should score highly too. It does not become a fraud probability, and it is not a measurement of how much money is at risk.
+Once we have a compatible representation, the rest of the vector machinery becomes available: distance, summaries, neighbourhoods, clustering and change over time.
 
-A value near 0.5 is also meaningful: yes and no receive similar probability. It is not “medium urgency”. For ordered intensity, define a suitable scored rubric. It is not a missing answer either.
+A support system could characterise successive voice messages along defined communication dimensions. A catalogue could describe photographs through visible properties. A diagnostic assistant could characterise reports by the conditions they describe. The input modalities differ; the downstream contracts can remain similar.
 
-# Turn the Answers into Coordinates
+Compute the representation when the observation or asset changes, then reuse it for comparisons. A model need not reread the recording every time we ask for a recommendation.
 
-For the integration sample, choose three existing StyloMail questions in a fixed order:
+[Part 2](/blog/show-me-what-you-got-part2-building-relevance) takes the next step: use the characterisation to retrieve eligible candidates, combine useful rankings and update the decision as new observations arrive. Part 4 will build out richer ingestion, including images.
 
-```csharp
-var ids = new[]
-{
-    "semantic.credential_request",
-    "semantic.payment_redirection",
-    "semantic.urgency_pressure"
-};
-
-var questions = ids.Select(id =>
-    SemanticDimensions.All.Single(q => q.Id == id)).ToArray();
-```
-
-A complete assessment can then produce a vector such as:
-
-```text
-[credential request, payment redirection, urgency pressure]
-[             0.034,               0.988,            0.012]
-```
-
-Those are deterministic fixture values in the new sample, not a fresh model measurement. They resemble the legitimate supplier-change case: strong payment-change evidence and little urgency.
-
-The coordinates retain different conditions. Several can be high together, so we do not force them to sum to one. Evaluating questions separately also does not make their answers statistically independent; the same phrasing may influence several readings.
-
-This is a **task-defined semantic feature vector**. It is useful for the properties we asked about. It does not preserve all the relationships a general text embedding might capture.
-
-Nor can we compare it directly with an EmbeddingGemma vector. A shared array length would not create a shared meaning.
-
-## More Than Mail
-
-The questions can describe other domains:
-
-| Entity | Possible dimension | What it describes |
-|--------|--------------------|-------------------|
-| Support request | Does the customer explicitly ask for a person? | A request present in the supplied conversation |
-| Product description | Does the description claim waterproofing? | A claim in the description, not a certified property |
-| Diagnostic report | Does the report describe increasing retries? | Evidence in the report, not a direct measurement of the service |
-| Document | Does this clause require notice before cancellation? | An interpretation of the supplied clause |
-
-We can define new dimensions without training a new model for each question. That makes experimentation approachable. It does not establish that a model can answer any question accurately, or infer facts missing from its input.
-
-Use measured values when they are available. An actual retry count belongs in a numeric feature. A decision model helps interpret a report about retries when the relevant evidence is expressed in language.
-
-# Unknown Must Survive the Conversion
-
-The most consequential line in this kind of integration is often the one that defaults a missing answer to zero.
-
-If the payment question timed out, zero would assert that no payment-change condition was observed. If all questions failed, a vector of zeroes could resemble a routine message. The provider outage would have manufactured reassuring evidence.
-
-StyloMail already represents this distinction in [`EvidenceAvailability`](https://github.com/scottgal/stylomail/blob/d4d60cc77d22e112ac11fbbba83dee65161cb185/src/StyloMail.Core/EvidenceAvailability.cs). A signal can be available, unavailable, not applicable, or produced with reduced coverage.
-
-Its existing [`EvidenceVectors.Semantic`](https://github.com/scottgal/stylomail/blob/d4d60cc77d22e112ac11fbbba83dee65161cb185/src/StyloMail.Assessment/EvidenceVectors.cs) conversion preserves those states in a masked `DimensionVector`:
-
-```csharp
-var vector = EvidenceVectors.Semantic(assessment.Evidence, ids);
-```
-
-An unavailable dimension is excluded from comparison rather than filled with a plausible-looking number. Coverage travels with the representation.
-
-The current Relevance baseline uses dense vectors with fixed dimensions. It does not yet implement StyloMail's masked comparisons. The bridge therefore makes a smaller promise: **all selected questions must have usable answers, or the advisory ranking abstains**.
-
-Its result reports the issue and supplies no recommendations. It does not ask the engine for a cold-start list and present that as evidence-based advice.
-
-The projection checks each selected ID rather than trusting response order:
-
-```csharp
-var rows = assessment.Evidence
-    .Where(e => e.SignalId == questions[i].Id
-        && e.Origin == EvidenceOrigin.Semantic)
-    .ToArray();
-```
-
-Exactly one matching semantic row must exist. Its value must be finite and within range, its availability complete, and its producer the expected version. Reduced or reason-tagged partial reads abstain too. A stale cached assessment also abstains in this sample.
-
-An explicit zero passes these checks. Missing, zero and balanced uncertainty remain three different situations.
-
-> **Coverage aside: complete is not certain.** Three valid answers give us complete coverage of these three questions. The answers may still be uncertain or wrong. Coverage is about what was produced, not whether the model's judgement has been validated.
-
-# Questions Become a Representation Schema
-
-Suppose we change the urgency question from “does it pressure the recipient?” to “does it mention a date?”
-
-Both return one number. They can even use the same property name. But old and new vectors now describe different things.
-
-The bridge fingerprints the ordered question definitions, their schema version, the expected evidence producer, preprocessing version and tenant identity. Changing any of those creates a separate engine scope. The full rubric participates, not just the array length.
-
-Preprocessing matters because a model reading the whole conversation receives different evidence from one reading only the newest paragraph. A moving model alias also needs resolving or pinning before readings are mixed.
-
-The calling host must supply versions from its actual classification configuration. An adapter cannot recover the wording of an earlier question from three returned numbers.
-
-This connects back to Part 1's colour example. Encoding is part of the model of the problem. A coordinate's name is insufficient to establish its meaning.
-
-# Give StyloMail a Relevance Component
-
-Now we have something Relevance can consume: a complete, versioned characterisation of a message.
-
-The next question is what to compare it with. The sample supplies review playbooks with prototype conditions:
-
-| Playbook | Credential request | Payment change | Urgency |
-|----------|-------------------:|---------------:|--------:|
-| Verify supplier change | 0.01 | 0.99 | 0.02 |
-| Review credential request | 0.99 | 0.01 | 0.99 |
-| Escalate urgent payment change | 0.01 | 0.99 | 0.99 |
-
-These are host-defined examples of conditions in which the task is worth considering. They are not learned outcomes or probabilities that the task will succeed.
-
-The prototype and observation use the same question order and meanings. We can compare them with L2 distance. The question vector is stored using Relevance's existing `vector` converter; no new embedding runtime is required.
-
-For example, the supplier fixture `[0.034, 0.988, 0.012]` is close to the supplier-verification prototype `[0.01, 0.99, 0.02]`:
-
-```text
-distance = sqrt(0.024² + (-0.002)² + (-0.008)²)
-         ≈ 0.0254
-```
-
-A low distance here means similar answers to these selected questions. It does not establish that the message is legitimate or that a particular action causes a better result.
-
-Ranking is relative to the eligible prototypes. The sample has no absolute distance threshold declaring a match good enough, so even complete evidence can return weak matches. Inspect the distances and evaluate that rejection policy before relying on the suggestions.
-
-> **Geometry aside: keep magnitude when it means something.** Two question vectors can point in the same direction while assigning very different yes probabilities. Unit-normalising them would erase that distinction. The sample uses L2 on the original coordinates; the distance choice remains a hypothesis to evaluate.
-
-## Relevance Fits Within the Existing Policy
-
-StyloMail already has an explicit rule: probabilistic components produce evidence, and versioned policy selects a [`MailAction`](https://github.com/scottgal/stylomail/blob/d4d60cc77d22e112ac11fbbba83dee65161cb185/src/StyloMail.Core/MailAction.cs).
-
-The review component respects that contract. It receives the action already selected by policy, then ranks playbooks eligible after that action. It returns task IDs such as `verify-supplier`, not a replacement `Allow`, `Reject` or `Quarantine` decision.
-
-Inside the bridge, eligibility is an ordinary hard filter:
-
-```csharp
-var result = await engine.RecommendAsync(
-    subject, "review",
-    Filter.Eq("after", policyAction.ToString()),
-    count: 3, cancellationToken: cancellationToken);
-```
-
-Even a perfect prototype match is excluded if it is only registered for a different policy action. This is where the distinction between relevance and authority becomes executable.
-
-The composition point looks like this:
-
-```csharp
-SemanticAssessment semantic =
-    await classifier.ClassifyAsync(input, cancellationToken);
-
-// Existing policy combines semantic and deterministic evidence.
-MailAction authorisedAction = policyDecision.Action;
-
-MailRecommendation advice = await recommendations.RecommendAsync(
-    assessmentId, authorisedAction, semantic,
-    actualQuestionSchemaVersion, cancellationToken);
-```
-
-This is a composition sketch using StyloMail's existing contracts. The bridge itself is implemented in [`MailRecommendations`](https://github.com/scottgal/mostlylucidweb/blob/main/samples/RelevanceMail/MailRecommendations.cs). It is a working integration sample, not a component already installed in StyloMail's live host.
-
-That is a useful role for Relevance inside StyloMail's core: a reusable advisory component for matching evidence to workflow candidates. Its value can be evaluated without replacing the mail system's evidence, profiles or action policy.
-
-# One Message Is Not a Trusted Sender Baseline
-
-A sender profile and a single message are different entities.
-
-For the first integration, each immutable assessment gets its own subject. We rank tasks for this assessment without averaging its semantic readings into a sender's trusted historical profile.
-
-That matters because a message being evaluated may itself be malicious. Feeding it straight into the baseline used to judge that sender can make the suspicious behaviour appear more ordinary over time.
-
-StyloMail continues to own its trusted update rules and audit history. The bridge stores numeric readings and playbook metadata, while the original evidence retains its timestamp, provenance and coverage notes in StyloMail.
-
-A stable assessment ID supports retries. Reusing it with changed coordinates is rejected; a revised assessment needs its own ID. Retention still bounds saved state, and a deployment must bound the number of tenant/representation engines it keeps alive.
-
-# Run the Bridge Without a Model Call
-
-The sample references the actual `StyloMail.Core` project. It does not duplicate the mail DTOs or require a live model to test the integration.
-
-With `stylomail` and `mostlylucidweb` checked out beside each other, run from the web repository:
-
-```sh
-dotnet run --project samples/RelevanceMail/RelevanceMail.csproj
-dotnet test samples/RelevanceMail.Tests/RelevanceMail.Tests.csproj
-```
-
-For a different layout, supply `-p:StyloMailSourceRoot=/path/to/stylomail`.
-
-The console feeds deterministic fixtures through the adapter. Its output is:
-
-```text
-supplier-change: verify-supplier; policy stays Review
-credential-request: check-credentials; policy stays Review
-urgent-payment: urgent-payment; policy stays Review
-missing urgency answer: insufficient_evidence; no recommendations=True
-```
-
-Those results verify the projection and matching example. They do not measure classification accuracy or demonstrate improved mail outcomes. The [sample README](https://github.com/scottgal/mostlylucidweb/blob/main/samples/RelevanceMail/README.md) describes the ownership, versioning and completion contracts.
-
-Tests exercise evidence ordering, policy eligibility, valid zeroes, missing and duplicate answers, partial reads, stale results, producer mismatches and changed rubrics. The general Relevance solution remains independent of a StyloMail checkout; this cross-project example has its own test project.
-
-# From Defined Questions to Useful Recommendations
-
-We can now define a semantic dimension without training a bespoke classifier for it, retain the model's reading as evidence, and give the resulting vector a precise identity.
-
-That is the bridge between the two parts of the series. Part 1 asks which relationships our representation should preserve. These questions give us another way to construct that representation. [Part 2](/blog/show-me-what-you-got-part2-building-relevance) explains how the engine uses it to retrieve eligible candidates, combine rankings and adapt to new observations.
-
-Later, outcome evidence can tell us whether the recommended playbook helped. That belongs to Part 3's intervention-learning question, alongside recorded exposure and comparison with eligible alternatives.
-
-The first step is already useful: ask a bounded question, keep the meaning of its answer, and let the rest of the system reason from that evidence.
+The practical answer to “how do I vectorise X?” is to decide which relationships matter, define the dimensions that preserve them, and choose producers capable of supplying those readings. Decision models make semantic properties across more kinds of input accessible through that same small pattern: **question → reading → coordinate**.

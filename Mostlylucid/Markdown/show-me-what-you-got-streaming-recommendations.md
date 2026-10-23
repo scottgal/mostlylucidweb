@@ -306,11 +306,11 @@ Measured behavioural features and semantic embeddings describe different things.
 
 ## Questions as Semantic Features
 
-We can also choose the semantic dimensions ourselves. StyloMail asks whether a message requests credentials, changes payment details or applies urgency. Each answer becomes a named feature whose meaning comes from its question and criteria.
+We can also choose the semantic dimensions ourselves. Does a voice message use aggressive delivery? Does a photograph show package damage? Does a support request ask for a person? A capable decision model can supply readings along these named dimensions, using the appropriate text, image or audio evidence.
 
 That gives us an explicit semantic vector rather than unnamed latent coordinates. The interpretation still comes from a model, and an unanswered question must remain distinct from a negative answer.
 
-[Part 1.5: Questions as Coordinates](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) follows the existing StyloMail code and connects those readings to the relevance engine. It is an optional bridge between choosing a representation and using it to recommend candidates.
+[Part 1.5: How Do I Vectorise Almost Anything?](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) develops this question-defined representation, with voice and image examples and a small existing code example from StyloMail. It is an optional bridge between choosing a representation and using it to recommend candidates.
 
 ## Colour or Root Vegetable
 
@@ -580,7 +580,7 @@ The practical opportunity is to start small, add contributors, measure their eff
 
 We now have the ingredients to characterise an entity: observations, representations that preserve useful relationships, and summaries of its behaviour. We have also seen why the meaning of those coordinates matters more than the technology that produced them.
 
-If the dimensions we need require language interpretation, [Part 1.5: Questions as Coordinates](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) shows how StyloMail's existing decision questions produce an explicit semantic characterisation, with a working bridge to Relevance.
+If the dimensions we need require interpretation, [Part 1.5: How Do I Vectorise Almost Anything?](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) shows how decision questions produce explicit semantic characterisations from text, images and sound. The question defines the coordinate; a suitable model supplies the reading.
 
 The next question is how to use that characterisation. Given this session's interests, which available products should we recommend? Given this service's current state, which diagnostic action is worth considering?
 
