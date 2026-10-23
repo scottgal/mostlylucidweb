@@ -1,4 +1,4 @@
-# SHOW ME WHAT YOU GOT (Part 1.5): How Do I Vectorise Almost Anything?
+# SHOW ME WHAT YOU GOT (Part 1.5): Embed Anything With Decision Models
 
 “How do I vectorise this?”
 

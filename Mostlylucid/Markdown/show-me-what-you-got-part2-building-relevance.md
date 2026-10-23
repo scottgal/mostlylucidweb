@@ -4,7 +4,7 @@ In [Part 1](/blog/show-me-what-you-got-streaming-recommendations), we looked at 
 
 Now we can ask the next question: **given what we know about this entity, what should we recommend?**
 
-The optional [Part 1.5: How Do I Vectorise Almost Anything?](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) explains how decision models turn questions about text, images and sound into explicit semantic coordinates. The retrieval ideas here apply to those characterisations as well as measured features.
+The optional [Part 1.5: Embed Anything With Decision Models](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) explains how decision models turn questions about text, images and sound into explicit semantic coordinates. The retrieval ideas here apply to those characterisations as well as measured features.
 
 A shopper has compared walking boots around £100. We have a catalogue of available products. How do we turn that characterisation into a useful list? How do we respect their budget, combine price with other signals, and react when their behaviour changes?
 

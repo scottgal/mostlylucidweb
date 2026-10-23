@@ -310,7 +310,7 @@ We can also choose the semantic dimensions ourselves. Does a voice message use a
 
 That gives us an explicit semantic vector rather than unnamed latent coordinates. The interpretation still comes from a model, and an unanswered question must remain distinct from a negative answer.
 
-[Part 1.5: How Do I Vectorise Almost Anything?](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) develops this question-defined representation, with voice and image examples and a small existing code example from StyloMail. It is an optional bridge between choosing a representation and using it to recommend candidates.
+[Part 1.5: Embed Anything With Decision Models](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) develops this question-defined representation, with voice and image examples and a small existing code example from StyloMail. It is an optional bridge between choosing a representation and using it to recommend candidates.
 
 ## Colour or Root Vegetable
 
@@ -580,7 +580,7 @@ The practical opportunity is to start small, add contributors, measure their eff
 
 We now have the ingredients to characterise an entity: observations, representations that preserve useful relationships, and summaries of its behaviour. We have also seen why the meaning of those coordinates matters more than the technology that produced them.
 
-If the dimensions we need require interpretation, [Part 1.5: How Do I Vectorise Almost Anything?](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) shows how decision questions produce explicit semantic characterisations from text, images and sound. The question defines the coordinate; a suitable model supplies the reading.
+If the dimensions we need require interpretation, [Part 1.5: Embed Anything With Decision Models](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) shows how decision questions produce explicit semantic characterisations from text, images and sound. The question defines the coordinate; a suitable model supplies the reading.
 
 The next question is how to use that characterisation. Given this session's interests, which available products should we recommend? Given this service's current state, which diagnostic action is worth considering?
 
