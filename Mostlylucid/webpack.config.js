@@ -1,5 +1,7 @@
 ﻿const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
+const fs = require('fs');
+const {createHash} = require('crypto');
 
 module.exports = (env, argv) => {
     const isProduction = argv.mode === 'production';
@@ -17,6 +19,23 @@ module.exports = (env, argv) => {
             publicPath: '/js/dist/',
             clean: true,
         },
+        plugins: [{
+            apply(compiler) {
+                // The standalone HTML has no Razor tag helper to append asset versions.
+                compiler.hooks.afterEmit.tap('VersionExplainerAssets', () => {
+                    const htmlPath = path.resolve(__dirname, 'wwwroot/interactive/explainers/index.html');
+                    const version = createHash('sha256')
+                        .update(fs.readFileSync(path.resolve(__dirname, 'wwwroot/js/dist/explainers.js')))
+                        .update(fs.readFileSync(path.resolve(__dirname, 'wwwroot/interactive/explainers/style.css')))
+                        .digest('hex').slice(0, 12);
+                    const html = fs.readFileSync(htmlPath, 'utf8');
+                    const updated = html
+                        .replace(/(href="style\.css)(?:\?v=[^"]*)?"/, `$1?v=${version}"`)
+                        .replace(/(src="\/js\/dist\/explainers\.js)(?:\?v=[^"]*)?"/, `$1?v=${version}"`);
+                    if (updated !== html) fs.writeFileSync(htmlPath, updated);
+                });
+            }
+        }],
         module: {
             rules: [
                 {

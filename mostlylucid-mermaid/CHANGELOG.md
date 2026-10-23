@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Repair the local demo's obsolete imports; build both renderers locally and add a compatibility checklist/matrix.
+- Cancel delayed fits and disconnect resize observers on cleanup; refit passive diagrams after resize.
+- Close fullscreen dialogs through one cleanup path, trap keyboard focus and restore the opener.
+- Serialize async theme renders, isolate adapter errors, and honour HTMX opt-in for root diagrams and code fences.
+- Export source geometry without CSS viewport transforms, preserve local marker references, and remove failed PNG staging nodes.
+- Preserve custom icons across configuration updates; prevent form submission from toolbar buttons; restore slid toolbars through the public APIs.
+- Point public package imports/requires at built browser bundles.
+
+
 - Add an optional renderer contract and an injected Pele adapter; Mermaid stays the default.
 - Keep source text and themed SVG presentation when rendering, opening fullscreen and exporting.
 - Require explicit gesture activation. Correct the pan-disable API call so finger scrolling can return to the page.

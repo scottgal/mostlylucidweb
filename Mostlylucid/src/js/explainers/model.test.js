@@ -42,3 +42,30 @@ describe('deterministic explainer mathematics', () => {
         expect(proxySteps('burst').some(s => s.node === 'Origin')).toBe(false);
     });
 });
+
+describe('eligibility and destination boundaries', () => {
+    const points = [
+        {id:'b',values:[0,0,0],available:true,price:50,group:'home'},
+        {id:'a',values:[0,0,0],available:false,price:50,group:'home'},
+        {id:'c',values:[0,0,0],available:true,price:51,group:'electronics'}
+    ];
+    it('distinguishes a supported summary with no eligible items from expired evidence', () => {
+        const current={mean:[0,0,0],mass:1};
+        expect(rank(current,{budget:49},4,points)).toEqual([]);
+        expect(current.mass).toBe(1);
+        expect(rank({...current,mass:.099},{},4,points)).toEqual([]);
+        expect(rank({...current,mass:.1},{},4,points)).toHaveLength(2);
+    });
+    it('applies inclusive budgets, category and availability flags, with stable tie ordering', () => {
+        const current={mean:[0,0,0],mass:1};
+        expect(rank(current,{budget:50,category:'home'},4,points).map(p=>p.id)).toEqual(['b']);
+        expect(rank(current,{budget:50,category:'home',available:false},4,points).map(p=>p.id)).toEqual(['a','b']);
+    });
+    it.each(['browser','crawler','unfamiliar','burst'])('keeps the full %s trace consistent with its selected policy', key => {
+        const steps=proxySteps(key), allowed=key==='browser'||key==='crawler';
+        expect(steps).toHaveLength(8);
+        expect(steps.slice(0,5).some(s=>s.origin)).toBe(false);
+        expect(steps.slice(5).every(s=>s.origin===allowed)).toBe(true);
+        expect(steps[5].node).toBe(allowed?'Origin':'Challenge');
+    });
+});

@@ -20,6 +20,7 @@ let htmxIntegrationSetup = false;
 let printHandlersSetup = false;
 let currentTheme: Theme = 'default';
 let renderId = 0;
+let renderQueue: Promise<void> = Promise.resolve();
 
 /**
  * Normalize code fence blocks to Mermaid-compatible format
@@ -45,7 +46,13 @@ const normalizeMermaidCodeFences = () => {
  * Load and render Mermaid diagrams with the specified theme
  * @param {string} theme - Theme name ('dark' or 'default')
  */
-const loadMermaid = async (theme: Theme): Promise<void> => {
+// Renderers may be asynchronous. Serialize DOM replacement so an older theme cannot win.
+const loadMermaid = (theme: Theme): Promise<void> => {
+    const pending = renderQueue.then(() => renderMermaid(theme));
+    renderQueue = pending.catch(error => console.error('Mermaid render error:', error));
+    return renderQueue;
+};
+const renderMermaid = async (theme: Theme): Promise<void> => {
     const renderer = getConfig().renderer;
     if (!renderer && !window.mermaid) {
         console.warn('Mermaid library not found. Make sure mermaid is loaded before calling initMermaid()');
@@ -53,11 +60,24 @@ const loadMermaid = async (theme: Theme): Promise<void> => {
     }
 
     try {
+        normalizeMermaidCodeFences();
+        saveOriginalData();
+        cleanupMermaidEnhancements();
+        resetProcessed();
         if (renderer) {
-            cleanupMermaidEnhancements();
             for (const element of document.querySelectorAll(elementSelector)) {
                 const source = element.getAttribute('data-original-code') ?? element.textContent ?? '';
-                element.innerHTML = await renderer.render(source, { id: `diagram-${++renderId}`, theme });
+                try {
+                    const svg = await renderer.render(source, { id: `diagram-${++renderId}`, theme });
+                    if (!element.isConnected) continue;
+                    element.innerHTML = svg;
+                    element.removeAttribute('data-render-error');
+                } catch (error) {
+                    // A bad diagram must not prevent subsequent diagrams from rendering.
+                    element.textContent = 'Diagram could not be rendered. Check its source.';
+                    element.setAttribute('data-render-error', 'true');
+                    console.error('Diagram render error:', error);
+                }
                 element.setAttribute('data-renderer', renderer.name);
                 element.setAttribute('data-diagram-theme', theme);
                 element.setAttribute('data-processed', 'true');
@@ -76,6 +96,12 @@ const loadMermaid = async (theme: Theme): Promise<void> => {
             const elements = document.querySelectorAll(elementSelector);
             await window.mermaid!.run({
                 nodes: Array.from(elements),
+                suppressErrors: true,
+            });
+            elements.forEach(element => {
+                element.setAttribute('data-renderer', 'mermaid');
+                element.setAttribute('data-diagram-theme', theme);
+                element.removeAttribute('data-render-error');
             });
         }
 
@@ -104,10 +130,7 @@ const saveOriginalData = (): void => {
     elements.forEach((el) => {
         if (el.getAttribute('data-processed') != null) return;
         // Store the raw text content so special characters aren't HTML-escaped
-        const textContent = el.textContent;
-        if (textContent) {
-            el.setAttribute('data-original-code', textContent);
-        }
+        el.setAttribute('data-original-code', el.textContent ?? '');
     });
 };
 
@@ -172,12 +195,6 @@ export async function initMermaid() {
         return;
     }
 
-    // If something else pre-processed diagrams before our init, reset them to original code
-    const preProcessedExists = Array.from(mermaidElements).some(el => el.getAttribute('data-processed') != null);
-    if (preProcessedExists) {
-        resetProcessed();
-    }
-
     // Always give the page a tiny chance to apply theme classes before we detect theme
     // This ensures correct initial theme even when classes are toggled very early in page load
     await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
@@ -185,7 +202,6 @@ export async function initMermaid() {
     const handleDarkThemeSet = async (): Promise<void> => {
         try {
             currentTheme = 'dark';
-            resetProcessed();
             await loadMermaid('dark');
         } catch (error) {
             console.error('Error during dark theme set:', error);
@@ -195,7 +211,6 @@ export async function initMermaid() {
     const handleLightThemeSet = async (): Promise<void> => {
         try {
             currentTheme = 'default';
-            resetProcessed();
             await loadMermaid('default');
         } catch (error) {
             console.error('Error during light theme set:', error);
@@ -226,8 +241,8 @@ export async function initMermaid() {
             mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)');
             mediaChangeHandler = async (e: MediaQueryListEvent): Promise<void> => {
                 try {
-                    resetProcessed();
-                    await loadMermaid(e.matches ? 'dark' : 'default');
+                    currentTheme = e.matches ? 'dark' : 'default';
+                    await loadMermaid(currentTheme);
                 } catch (err) {
                     console.error('Error handling OS theme change:', err);
                 }
@@ -287,6 +302,7 @@ function setupHtmxIntegration(): void {
 
     // Listen for HTMX afterSettle event
     document.body.addEventListener('htmx:afterSettle', async (event: Event) => {
+        if (getConfig().htmx?.enabled !== true) return;
         console.log('[Mermaid Theme] HTMX afterSettle detected, re-initializing diagrams');
 
         // Re-initialize Mermaid for any new diagrams in the swapped content
@@ -294,8 +310,9 @@ function setupHtmxIntegration(): void {
         const target = detail?.target || document.body;
 
         // Check if there are new Mermaid diagrams in the swapped content
-        const newDiagrams = target.querySelectorAll?.(elementSelector);
-        if (newDiagrams && newDiagrams.length > 0) {
+        const selector = `${elementSelector}, pre > code.language-mermaid`;
+        const hasDiagrams = target.matches?.(selector) || target.querySelector?.(selector);
+        if (hasDiagrams) {
             await initMermaid();
         }
     });
@@ -319,7 +336,6 @@ function setupPrintHandlers(): void {
     const handleBeforePrint = async (): Promise<void> => {
         console.log('[Mermaid Theme] Print mode detected, switching to light theme');
         try {
-            resetProcessed();
             await loadMermaid('default');
         } catch (error) {
             console.error('Error switching to light theme for print:', error);
@@ -330,7 +346,6 @@ function setupPrintHandlers(): void {
     const handleAfterPrint = async (): Promise<void> => {
         console.log('[Mermaid Theme] Print complete, restoring original theme');
         try {
-            resetProcessed();
             await loadMermaid(currentTheme);
         } catch (error) {
             console.error('Error restoring theme after print:', error);

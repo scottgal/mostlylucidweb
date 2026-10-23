@@ -400,9 +400,9 @@ That centroid summarises the observed interest. With an appropriate comparison m
 
 Step through a few observations below, then increase the basket weight. The interest summary moves because the evidence changed. Try **Wait 30 minutes** too: evidence mass falls while the average stays in the same place. Freshness and position answer different questions.
 
-<iframe class="article-explainer" src="/interactive/explainers/?view=vectors&amp;embed=1" title="Interactive weighted centroid and recommendation replay" width="100%" height="1100" loading="lazy" style="border:0;border-radius:12px;"></iframe>
+<iframe class="article-explainer" src="/interactive/explainers/index.html?v=20261023&amp;view=vectors&amp;embed=1" title="Interactive weighted centroid and recommendation replay" width="100%" height="1100" loading="lazy" style="border:0;border-radius:12px;"></iframe>
 
-[Open the interactive explorer](/interactive/explainers/?view=vectors). The examples use three named teaching coordinates and synthetic groups. All three coordinates determine the distances; the default plot displays two. This previews matching in Part 2 without requiring a trained model.
+<a href="/interactive/explainers/index.html?v=20261023&amp;view=vectors" hx-boost="false">Open the interactive explorer</a>. The examples use three named teaching coordinates and synthetic groups. All three coordinates determine the distances; the default plot displays two. This previews matching in Part 2 without requiring a trained model.
 
 ## A Centroid Is Not a Cluster
 

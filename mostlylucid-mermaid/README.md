@@ -765,3 +765,14 @@ The adapter consumes original Mermaid source and returns SVG. Pan/zoom, fullscre
 Diagrams start passive. A tap or click on the SVG does not enable gestures. Use the explicit **Enable Pan & Zoom** toolbar button to capture gestures inside the diagram; disable it to return to ordinary page scrolling. Zoom buttons remain available separately.
 
 The disable path now calls `disablePan()` rather than `enablePan(false)`: svg-pan-zoom's enable method takes no boolean and would leave panning enabled. Fullscreen uses the same explicit interaction rule. Cloned diagrams retain resolved presentation colours and their original bounds for fullscreen/export.
+
+
+### Local compatibility lab and article integration checks
+
+Run `npm ci`, then `npm run dev:demo` **from `mostlylucid-mermaid/`**. The demo builds the local public enhancement bundle and local Mermaid/Pele dependencies; it does not use an older CDN package. `npm run build:demo` builds without starting a server.
+
+The compatibility page includes nine fixture diagrams, renderer selection, a deliberately slow async renderer, grouped/granular toolbar presets, custom icons, dynamic HTMX insertion (both root nodes and code fences), cleanup/reinitialization and malformed-input recovery. Its **Run compatibility checks** button exercises both renderers. Follow the adjacent manual checklist for real touch gestures, downloaded files, OS themes, reduced motion and print.
+
+Use the [site-update article](../Mostlylucid/Markdown/site-update-interactive-explainers-pele-and-deckgl.md) as the integration surface in the ASP.NET site. It contains normal flowchart, sequence and state code fences plus the Pele proxy embed. Test the real article's controls, both themes, mobile scrolling, downloads and HTMX navigation. The standalone static server cannot establish that ASP.NET serves the same URLs correctly.
+
+Browser consumers receive the built public bundle from the package root; CommonJS consumers receive the UMD build. This package requires a browser DOM. Mermaid and Pele in `devDependencies` are for the lab; the published enhancements remain renderer-neutral.

@@ -2,14 +2,14 @@
   "name": "@mostlylucid/mermaid-enhancements",
   "version": "1.0.0",
   "description": "Enhance Mermaid.js diagrams with interactive pan/zoom, fullscreen lightbox, export to PNG/SVG, and automatic theme switching",
-  "main": "dist/index.js",
-  "module": "src/index.ts",
+  "main": "dist/index.umd.js",
+  "module": "dist/index.bundle.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./src/index.ts",
-      "require": "./dist/index.js"
+      "import": "./dist/index.bundle.js",
+      "require": "./dist/index.umd.js"
     },
     "./bundle": {
       "types": "./dist/index.d.ts",
@@ -19,7 +19,7 @@
     "./min": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.min.js",
-      "require": "./dist/index.min.js"
+      "require": "./dist/index.umd.js"
     },
     "./styles.css": "./src/styles.css"
   },
@@ -27,7 +27,10 @@
   "jsdelivr": "dist/index.bundle.min.js",
   "files": [
     "src/",
-    "dist/",
+    "dist/*.js",
+    "dist/*.js.map",
+    "dist/*.d.ts",
+    "dist/*.d.ts.map",
     "README.md",
     "LICENSE"
   ],
@@ -37,9 +40,9 @@
     "bundle": "rollup -c",
     "build:all": "npm run build && npm run minify && npm run bundle",
     "prepublishOnly": "npm run build:all",
-    "dev": "cd examples && npx http-server -p 2000 -o",
-    "dev:demo": "npm run build:all && npx http-server -p 2000 -o examples/demo.html",
-    "dev:demo:serve": "npx http-server -p 2000 -o examples/demo.html",
+    "dev": "npm run dev:demo",
+    "dev:demo": "npm run build:demo && http-server -p 2000 -o examples/demo.html",
+    "dev:demo:serve": "http-server -p 2000 -o examples/demo.html",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
@@ -47,7 +50,8 @@
     "verify-cdn": "bash scripts/verify-cdn.sh",
     "publish:patch": "node -e \"process.platform === 'win32' ? require('child_process').execSync('scripts\\\\publish.bat patch', {stdio: 'inherit'}) : require('child_process').execSync('bash scripts/publish.sh patch', {stdio: 'inherit'})\"",
     "publish:minor": "node -e \"process.platform === 'win32' ? require('child_process').execSync('scripts\\\\publish.bat minor', {stdio: 'inherit'}) : require('child_process').execSync('bash scripts/publish.sh minor', {stdio: 'inherit'})\"",
-    "publish:major": "node -e \"process.platform === 'win32' ? require('child_process').execSync('scripts\\\\publish.bat major', {stdio: 'inherit'}) : require('child_process').execSync('bash scripts/publish.sh major', {stdio: 'inherit'})\""
+    "publish:major": "node -e \"process.platform === 'win32' ? require('child_process').execSync('scripts\\\\publish.bat major', {stdio: 'inherit'}) : require('child_process').execSync('bash scripts/publish.sh major', {stdio: 'inherit'})\"",
+    "build:demo": "npm run build:all && node scripts/build-demo.mjs"
   },
   "keywords": [
     "mermaid",
@@ -91,9 +95,12 @@
     "@testing-library/dom": "^10.4.1",
     "@types/node": "^20.19.24",
     "@vitest/ui": "^4.0.8",
+    "esbuild": "0.25.12",
     "happy-dom": "^20.0.10",
     "http-server": "^14.1.1",
     "jsdom": "^27.1.0",
+    "mermaid": "11.17.2",
+    "pele": "1.9.0",
     "rollup": "^4.53.1",
     "terser": "^5.44.1",
     "tslib": "^2.8.1",

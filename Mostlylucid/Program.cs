@@ -289,10 +289,11 @@ try
         DefaultContentType = "application/octet-stream", // Fallback for unknown types
         OnPrepareResponse = ctx =>
         {
+            // Explainer HTML must revalidate so it can point at the current versioned JS/CSS.
+            var revalidate = ctx.Context.Request.Path.StartsWithSegments("/resumes") ||
+                             ctx.Context.Request.Path.StartsWithSegments("/interactive/explainers");
             ctx.Context.Response.Headers.Append("Cache-Control",
-                ctx.Context.Request.Path.StartsWithSegments("/resumes")
-                    ? "no-cache"
-                    : $"public, max-age={cacheMaxAgeOneWeek}");
+                revalidate ? "no-cache" : $"public, max-age={cacheMaxAgeOneWeek}");
             var fileExt = Path.GetExtension(ctx.File.Name);
             if (fileExt.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
             {

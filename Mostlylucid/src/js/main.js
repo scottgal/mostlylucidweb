@@ -179,7 +179,9 @@ function registerHTMXListener() {
 
     // Only trigger updates after HTMX swaps content in #contentcontainer or #commentlist
     document.body.addEventListener('htmx:afterSettle', async function(evt) {
-        const targetId = evt.detail.target.id;
+        // History restores can omit detail.target; use the restored content container.
+        const target = evt.detail?.target ?? document.getElementById('contentcontainer');
+        const targetId = target?.id;
         if (targetId !== 'contentcontainer' && targetId !== 'commentlist' && targetId!=="blogpost") {
             console.log("Ignoring swap event for target:", targetId);
             return;
@@ -196,7 +198,7 @@ function registerHTMXListener() {
 
         try {
             // Highlight code blocks in swapped content BEFORE Mermaid (important!)
-            highlightCodeBlocks(evt.detail.target);
+            highlightCodeBlocks(target);
             console.log('Highlight.js applied after HTMX swap');
         } catch (err) {
             console.error('Failed to highlight after HTMX swap:', err);
@@ -213,7 +215,7 @@ function registerHTMXListener() {
         try {
             // Double-check highlighting after Mermaid renders
             await new Promise(resolve => requestAnimationFrame(resolve));
-            highlightCodeBlocks(evt.detail.target);
+            highlightCodeBlocks(target);
         } catch (err) {
             console.error('Failed to re-highlight after Mermaid:', err);
         }
@@ -227,14 +229,14 @@ function registerHTMXListener() {
 
         // Rewrite any broken links in the swapped content
         try {
-            initBrokenLinks(evt.detail.target);
+            initBrokenLinks(target);
         } catch (err) {
             console.error('Failed to rewrite broken links:', err);
         }
 
         // Render math expressions in swapped content
         try {
-            renderMath(evt.detail.target);
+            renderMath(target);
             console.log('KaTeX applied after HTMX swap');
         } catch (err) {
             console.error('Failed to render math after HTMX swap:', err);

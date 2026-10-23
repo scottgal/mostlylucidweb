@@ -6,3 +6,6 @@
 /* Keep the toolbar above the drawing instead of covering its first node. */
 .visual-card .mermaid-wrapper{padding-top:52px}
 @media print{#plot canvas{display:none!important}#fallback{display:block!important}:root,.dark{--paper:white;--ink:black;--muted:#444;--line:#bbb;--soft:#eee;background:white;color:black;color-scheme:light}}
+
+/* Include child margins in the reported natural height; even a tiny inner scroll range can capture a touch gesture. */
+.embed body{display:flow-root}

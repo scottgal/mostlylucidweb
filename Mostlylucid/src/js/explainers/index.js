@@ -72,6 +72,7 @@ function controller() {
 }
 function selectPoint(point) {
     selected = point;
+    if (deck) drawSpace();
     $('point-details').open = true;
     $('point-detail').textContent = `${point.name}; £${point.price}; ${point.available ? 'available' : 'unavailable'}. Coordinates ${format(point.values)}.`;
 }
@@ -144,13 +145,13 @@ function vectorUpdate() {
     $('vector-caption').textContent = cursor ? events[cursor-1].text + `. Observation at minute ${events[cursor-1].minute}.` : 'Step forward to observe the first product.';
     $('mass').textContent = current.mass.toFixed(3);
     $('mean-values').innerHTML = ['Outdoors','Electronics','Home'].map((name,i)=>`<div class="value-row"><span>${name}<strong>${current.mean?current.mean[i].toFixed(3):'—'}</strong></span><div class="track"><i style="width:${(current.mean?.[i]??0)*100}%"></i></div></div>`).join('');
-    $('ranked').innerHTML = ranked.length ? ranked.map(p=>`<button class="ranked-item" data-candidate="${p.id}"><span>${p.name}<br>£${p.price}</span><small>L2 ${p.distance.toFixed(3)}</small></button>`).join('') : '<p class="ranked-empty">No usable personal evidence. No personalised list is invented here.</p>';
+    $('ranked').innerHTML = ranked.length ? ranked.map(p=>`<button class="ranked-item" data-candidate="${p.id}"><span>${p.name}<br>£${p.price}</span><small>L2 ${p.distance.toFixed(3)}</small></button>`).join('') : (current.mean && current.mass >= .1 ? '<p class="ranked-empty">No candidates match these filters. Try a different budget or category.</p>' : '<p class="ranked-empty">No usable personal evidence. No personalised list is invented here.</p>');
     $('ranked').querySelectorAll('button').forEach(b=>b.onclick=()=>selectPoint(candidates.find(p=>p.id===b.dataset.candidate)));
     $('budget-value').textContent = `£${$('budget').value}`;
     $('half-life-value').textContent = `${$('half-life').value} min`;
     $('cart-weight-value').textContent = $('cart-weight').value;
     $('idle-note').textContent = `${idle} idle minutes. Mass decays while the mean stays in place. Below 0.1, personal ranking abstains.`;
-    $('data-table').innerHTML = ranked.map(p=>`<tr><td>${p.name}</td><td>${format(p.values)}</td><td>Distance ${p.distance.toFixed(4)}; £${p.price}</td></tr>`).join('') || '<tr><td>Current entity</td><td>No usable summary</td><td>No personal ranking</td></tr>';
+    $('data-table').innerHTML = ranked.map(p=>`<tr><td>${p.name}</td><td>${format(p.values)}</td><td>Distance ${p.distance.toFixed(4)}; £${p.price}</td></tr>`).join('') || (current.mean && current.mass >= .1 ? `<tr><td>Current entity</td><td>${format(current.mean)}</td><td>No eligible candidates</td></tr>` : '<tr><td>Current entity</td><td>No usable summary</td><td>No personal ranking</td></tr>');
     drawSpace();
 }
 function proxyUpdate() {
@@ -205,7 +206,7 @@ function postSize(){
 }
 $('play').onclick=()=>{if(timer){pause();return;}if(cursor===max()){cursor=0;idle=0;update();}timer=setInterval(advance,prefersReducedMotion?2400:1500);$('play').textContent='Pause';};
 $('next').onclick=()=>{pause();advance();};$('back').onclick=()=>{pause();cursor--;idle=0;update();};
-$('reset').onclick=()=>{pause();cursor=0;idle=0;selected=null;update();};
+$('reset').onclick=()=>{pause();cursor=0;idle=0;selected=null;$('point-details').open=false;$('point-detail').textContent='';update();};
 $('scrub').oninput=()=>{pause();cursor=Number($('scrub').value);idle=0;update();};
 for(const id of ['category','budget','available','half-life','cart-weight'])$(id).addEventListener('input',update);
 $('idle').onclick=()=>{pause();idle+=30;update();};
@@ -221,8 +222,10 @@ if(matchMedia('(prefers-color-scheme: dark)').matches)toggleTheme();
 const sizeObserver=new ResizeObserver(()=>{postSize();}); sizeObserver.observe(document.body);
 let resizeTimeout;
 addEventListener('resize',()=>{clearTimeout(resizeTimeout);resizeTimeout=setTimeout(async()=>{if(view==='proxy')await mountProxy();else if(deck)deck.setProps({initialViewState:camera()});update();},150);});
-addEventListener('pagehide',()=>{pause();clearTimeout(resizeTimeout);sizeObserver.disconnect();deck?.finalize();cleanupMermaidEnhancements();});
+addEventListener('pagehide',()=>{pause();clearTimeout(resizeTimeout);sizeObserver.disconnect();deck?.finalize();deck=null;cleanupMermaidEnhancements();proxyDirection=null;});
+// Safari/Chromium may restore this document from the back/forward cache without re-running the module.
+addEventListener('pageshow',async event=>{if(!event.persisted)return;sizeObserver.observe(document.body);if(view==='proxy')await mountProxy();update();});
 addEventListener('message',event=>{if(event.origin===location.origin&&event.source===window.parent&&event.data?.type==='mostlylucid-explainer-theme'){
-    document.documentElement.classList.toggle('dark',event.data.dark===true);syncDiagramTheme();if(view==='vectors')drawSpace();
+    document.documentElement.classList.toggle('dark',event.data.dark===true);$('theme').textContent=event.data.dark===true?'Light mode':'Dark mode';syncDiagramTheme();if(view==='vectors')drawSpace();
 }});
 await switchView(view);

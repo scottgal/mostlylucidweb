@@ -27,11 +27,11 @@ Those are the moments I wanted the site to show.
 
 # Watch Evidence Become a Recommendation
 
-[Open the vector explorer](/interactive/explainers/?view=vectors).
+<a href="/interactive/explainers/index.html?v=20261023&amp;view=vectors" hx-boost="false">Open the vector explorer</a>.
 
 ![The vector explorer shows observations, an evolving centroid and eligible recommendations alongside their supporting values.](/articleimages/explainer-vectors.png)
 
-<iframe class="article-explainer" src="/interactive/explainers/?view=vectors&amp;embed=1" title="Interactive vector and centroid explorer" width="100%" height="1100" loading="lazy" style="border:0;border-radius:12px;"></iframe>
+<iframe class="article-explainer" src="/interactive/explainers/index.html?v=20261023&amp;view=vectors&amp;embed=1" title="Interactive vector and centroid explorer" width="100%" height="1100" loading="lazy" style="border:0;border-radius:12px;"></iframe>
 
 Start with **Next**. Each step adds an observation to a small synthetic session. The display shows the current summary, the remaining evidence mass, and the nearest eligible candidates.
 
@@ -74,11 +74,11 @@ That gives us a position and its supporting mass. Mass is useful bookkeeping; it
 
 # Follow a Request Through the Proxy
 
-[Open the proxy explorer](/interactive/explainers/?view=proxy).
+<a href="/interactive/explainers/index.html?v=20261023&amp;view=proxy" hx-boost="false">Open the proxy explorer</a>.
 
 ![The proxy replay highlights the active request stage and shows the evidence and policy path beside the diagram.](/articleimages/explainer-proxy.png)
 
-<iframe class="article-explainer" src="/interactive/explainers/?view=proxy&amp;embed=1" title="Interactive protective proxy request replay" width="100%" height="1100" loading="lazy" style="border:0;border-radius:12px;"></iframe>
+<iframe class="article-explainer" src="/interactive/explainers/index.html?v=20261023&amp;view=proxy&amp;embed=1" title="Interactive protective proxy request replay" width="100%" height="1100" loading="lazy" style="border:0;border-radius:12px;"></iframe>
 
 The second view answers a different question: **where does the request actually go?**
 
@@ -168,6 +168,43 @@ svg.style.touchAction = 'pan-y pinch-zoom';
 Tapping the diagram no longer arms pan and zoom. The toolbar button does. Disabling it returns gesture control to the page. The vector explorer uses the same explicit interaction choice.
 
 In the browser touch-emulation check, a finger swipe scrolled the page by 251 pixels while the diagram's transform remained unchanged. There are regression tests for the tap and enable/disable behaviour too. That's a useful check of the reported failure, although it doesn't cover every physical device and browser combination.
+
+# Try the Controls on This Article
+
+The flowchart above is an ordinary article diagram. The proxy replay uses Pele inside its embedded view. Both should offer the same controls: zoom in and out, reset, enable or disable gestures, hide and restore the toolbar, open fullscreen, and export PNG or SVG.
+
+Try them here. On a phone, tap a diagram and scroll past it before enabling interaction. After enabling and disabling gestures, try scrolling again. In fullscreen, Tab should stay inside the dialog, and closing it should return focus to the button you used to open it.
+
+A sequence diagram gives us a useful second shape to test. It also explains the rendering boundary:
+
+```mermaid
+sequenceDiagram
+    participant Article
+    participant Renderer
+    participant Controls
+    participant Reader
+    Article->>Renderer: Original diagram source
+    Renderer-->>Article: SVG
+    Article->>Controls: Enhance the rendered SVG
+    Reader->>Controls: Open fullscreen or export
+    Controls-->>Reader: Independent copy with its colours
+    Reader->>Article: Change theme
+    Article->>Renderer: Render original source again
+```
+
+The gesture states should be equally predictable:
+
+```mermaid
+stateDiagram-v2
+    [*] --> Reading
+    Reading --> Exploring: Enable Pan and Zoom
+    Exploring --> Reading: Disable Pan and Zoom
+    Reading --> Fullscreen: Open fullscreen
+    Fullscreen --> Reading: Close or Escape
+    Reading --> Reading: Tap then scroll
+```
+
+These diagrams make the article a useful integration check as well as an explanation. Changing theme, navigating away and back, or resizing the page should leave one working toolbar per diagram. An exported file should open independently with its labels, connectors and colours intact.
 
 # Keeping These Useful Inside Articles
 

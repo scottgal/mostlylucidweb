@@ -17,6 +17,12 @@ export interface PanZoomInstance {
     isPanEnabled(): boolean;
     enablePan(): void;
     disablePan(): void;
+    enableZoom(): void;
+    disableZoom(): void;
+    enableMouseWheelZoom(): void;
+    disableMouseWheelZoom(): void;
+    enableDblClickZoom(): void;
+    disableDblClickZoom(): void;
 }
 
 /**
@@ -40,7 +46,7 @@ export interface DiagramRenderer {
 /**
  * Control button action types
  */
-export type ControlAction = 'fullscreen' | 'zoomIn' | 'zoomOut' | 'reset' | 'pan' | 'exportPng' | 'exportSvg';
+export type ControlAction = 'fullscreen' | 'zoomIn' | 'zoomOut' | 'reset' | 'pan' | 'exportPng' | 'exportSvg' | 'hideToolbar' | 'close';
 
 /**
  * Control button configuration
@@ -174,7 +180,7 @@ declare global {
     interface Window {
         mermaid?: {
             initialize(options: MermaidOptions): void;
-            run(options?: { querySelector?: string; nodes?: Element[] }): Promise<void>;
+            run(options?: { querySelector?: string; nodes?: Element[]; suppressErrors?: boolean }): Promise<void>;
         };
         __themeState?: 'dark' | 'light';
         enhanceMermaidDiagrams?: () => void;

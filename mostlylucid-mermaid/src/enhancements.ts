@@ -7,10 +7,37 @@
  */
 
 import svgPanZoom from 'svg-pan-zoom';
-import { toPng, toSvg } from 'html-to-image';
+import { toPng } from 'html-to-image';
 import type { PanZoomInstance, ExportFormat, EnhancementConfig, IconConfig } from './types';
 
 const panZoomInstances = new Map<string, PanZoomInstance>();
+const diagramElements = new Map<string, SVGElement>();
+const resizeObservers = new Map<string, ResizeObserver>();
+const fitTimers = new Map<string, ReturnType<typeof setTimeout>>();
+const closeLightboxes = new Map<string, () => void>();
+let cloneId = 0;
+
+// A render or navigation can destroy an instance before its delayed layout pass.
+function destroyInstance(id: string): void {
+    clearTimeout(fitTimers.get(id));
+    fitTimers.delete(id);
+    resizeObservers.get(id)?.disconnect();
+    resizeObservers.delete(id);
+    try { panZoomInstances.get(id)?.destroy(); }
+    catch (error) { console.warn('Failed to destroy pan-zoom instance:', error); }
+    panZoomInstances.delete(id);
+    const svg = diagramElements.get(id);
+    if (svg) { svg.style.touchAction = 'pan-y pinch-zoom'; svg.dataset.interactive = 'false'; }
+    diagramElements.delete(id);
+}
+function fitAfterLayout(svg: SVGElement, id: string, instance: PanZoomInstance): void {
+    clearTimeout(fitTimers.get(id));
+    fitTimers.set(id, setTimeout(() => {
+        fitTimers.delete(id);
+        if (!svg.isConnected || panZoomInstances.get(id) !== instance) return;
+        instance.resize(); instance.fit(); instance.center();
+    }, 100));
+}
 
 /**
  * Default icon configuration (Boxicons)
@@ -71,6 +98,7 @@ export function configure(config: EnhancementConfig): void {
         ...config,
         icons: {
             ...defaultIcons,
+            ...globalConfig.icons,
             ...config.icons
         },
         controls: {
@@ -101,6 +129,7 @@ export function getConfig(): EnhancementConfig {
  */
 function createControlButtons(container: HTMLElement, diagramId: string, isLightbox: boolean = false): void {
     // Remove existing controls if they exist (for reconfiguration)
+    container.querySelector('.mermaid-show-toolbar')?.remove();
     const existingControls = container.querySelector('.mermaid-controls');
     if (existingControls) {
         existingControls.remove();
@@ -156,6 +185,7 @@ function createControlButtons(container: HTMLElement, diagramId: string, isLight
         if (btn.enabled === false) return;
 
         const button = document.createElement('button');
+        button.type = 'button';
         button.className = `mermaid-control-btn ${btn.icon}`;
         button.setAttribute('title', btn.title);
         button.setAttribute('aria-label', btn.title);
@@ -181,15 +211,7 @@ function createControlButtons(container: HTMLElement, diagramId: string, isLight
 function initPanZoom(svgElement: SVGElement, diagramId: string): PanZoomInstance | null {
     svgElement.style.touchAction = 'pan-y pinch-zoom';
     svgElement.dataset.interactive = 'false';
-    // Clean up existing instance if present
-    if (panZoomInstances.has(diagramId)) {
-        try {
-            panZoomInstances.get(diagramId)?.destroy();
-        } catch (e) {
-            console.warn('Failed to destroy existing pan-zoom instance:', e);
-        }
-        panZoomInstances.delete(diagramId);
-    }
+    destroyInstance(diagramId);
 
     try {
         const panZoomInstance = svgPanZoom(svgElement, {
@@ -210,6 +232,16 @@ function initPanZoom(svgElement: SVGElement, diagramId: string): PanZoomInstance
         });
 
         panZoomInstances.set(diagramId, panZoomInstance);
+        diagramElements.set(diagramId, svgElement);
+        if (typeof ResizeObserver !== 'undefined') {
+            const observer = new ResizeObserver(() => {
+                if (!svgElement.isConnected || panZoomInstances.get(diagramId) !== panZoomInstance) return;
+                if (panZoomInstance.isPanEnabled()) panZoomInstance.resize();
+                else fitAfterLayout(svgElement, diagramId, panZoomInstance);
+            });
+            observer.observe(svgElement);
+            resizeObservers.set(diagramId, observer);
+        }
         return panZoomInstance;
     } catch (error) {
         console.error('Failed to initialize pan-zoom:', error);
@@ -244,12 +276,13 @@ function handleControlClick(event: Event): void {
                 let showButton = container?.querySelector('.mermaid-show-toolbar') as HTMLElement;
                 if (!showButton && container) {
                     showButton = document.createElement('button');
+                    (showButton as HTMLButtonElement).type = 'button';
                     showButton.className = 'mermaid-show-toolbar bx bx-chevron-left';
                     showButton.setAttribute('title', 'Show Toolbar');
                     showButton.setAttribute('aria-label', 'Show Toolbar');
                     showButton.setAttribute('data-diagram-id', diagramId);
                     showButton.addEventListener('click', () => {
-                        controls.classList.remove('hidden-slide');
+                        container.querySelector('.mermaid-controls')?.classList.remove('hidden-slide');
                         showButton.style.display = 'none';
                     });
                     container.appendChild(showButton);
@@ -260,20 +293,7 @@ function handleControlClick(event: Event): void {
             }
             break;
         case 'close':
-            // Close lightbox
-            const lightbox = button.closest('.mermaid-lightbox');
-            if (lightbox) {
-                // Clean up pan-zoom instance
-                if (panZoomInstances.has(diagramId)) {
-                    try {
-                        panZoomInstances.get(diagramId)?.destroy();
-                    } catch (e) {
-                        console.warn('Failed to destroy lightbox pan-zoom instance:', e);
-                    }
-                    panZoomInstances.delete(diagramId);
-                }
-                lightbox.remove();
-            }
+            closeLightboxes.get(diagramId)?.();
             break;
         case 'fullscreen':
             // Fullscreen only works for in-page diagrams
@@ -303,9 +323,9 @@ function handleControlClick(event: Event): void {
                     panZoomInstance.disablePan();
                     const svg = container?.querySelector('svg');
                     if (svg) { svg.style.touchAction = 'pan-y pinch-zoom'; svg.dataset.interactive = 'false'; }
-                    (panZoomInstance as any).disableZoom();
-                    (panZoomInstance as any).disableMouseWheelZoom();
-                    (panZoomInstance as any).disableDblClickZoom();
+                    panZoomInstance.disableZoom();
+                    panZoomInstance.disableMouseWheelZoom();
+                    panZoomInstance.disableDblClickZoom();
                     button.classList.remove('active');
                     button.setAttribute('title', 'Enable Pan & Zoom');
                     button.setAttribute('aria-label', 'Enable Pan & Zoom');
@@ -315,9 +335,9 @@ function handleControlClick(event: Event): void {
                     panZoomInstance.enablePan();
                     const svg = container?.querySelector('svg');
                     if (svg) { svg.style.touchAction = 'none'; svg.dataset.interactive = 'true'; }
-                    (panZoomInstance as any).enableZoom();
-                    (panZoomInstance as any).enableMouseWheelZoom();
-                    (panZoomInstance as any).enableDblClickZoom();
+                    panZoomInstance.enableZoom();
+                    panZoomInstance.enableMouseWheelZoom();
+                    panZoomInstance.enableDblClickZoom();
                     button.classList.add('active');
                     button.setAttribute('title', 'Disable Pan & Zoom');
                     button.setAttribute('aria-label', 'Disable Pan & Zoom');
@@ -339,7 +359,7 @@ function cloneWithPresentation(source: SVGElement): SVGElement {
     const clone = source.cloneNode(true) as SVGElement;
     const originals = [source, ...Array.from(source.querySelectorAll('*'))];
     const copies = [clone, ...Array.from(clone.querySelectorAll('*'))];
-    const properties = ['fill', 'stroke', 'stroke-width', 'color', 'font-family', 'font-size', 'font-weight', 'opacity'];
+    const properties = ['fill', 'stroke', 'stroke-width', 'color', 'font-family', 'font-size', 'font-weight', 'font-style', 'opacity', 'text-anchor', 'dominant-baseline', 'marker-start', 'marker-mid', 'marker-end', 'stroke-dasharray', 'display', 'line-height', 'margin', 'padding', 'white-space', 'text-align', 'letter-spacing', 'word-spacing', 'box-sizing'];
     originals.forEach((element, index) => {
         const style = getComputedStyle(element);
         const target = copies[index] as SVGElement;
@@ -349,7 +369,40 @@ function cloneWithPresentation(source: SVGElement): SVGElement {
         }
     });
     if (source.dataset.originalViewbox) clone.setAttribute('viewBox', source.dataset.originalViewbox);
-    clone.querySelector('.svg-pan-zoom_viewport')?.removeAttribute('transform');
+    const viewport = clone.querySelector<SVGElement>('.svg-pan-zoom_viewport');
+    viewport?.removeAttribute('transform');
+    viewport?.style.removeProperty('transform');
+    viewport?.style.removeProperty('transform-origin');
+    // A fullscreen copy shares a document with its source. Keep marker/gradient IDs distinct.
+    const ids = new Map<string, string>();
+    [clone, ...Array.from(clone.querySelectorAll('[id]'))].filter(element => element.id).forEach(element => {
+        const old = element.id, next = `diagram-copy-${cloneId}-${old}`;
+        ids.set(old, next); element.id = next;
+    });
+    cloneId++;
+    // Mermaid scopes its embedded stylesheet to the root SVG ID. Keep those selectors valid.
+    clone.querySelectorAll('style').forEach(style => {
+        let css = style.textContent ?? '';
+        for (const [old, next] of Array.from(ids).sort((a,b) => b[0].length - a[0].length)) {
+            css = css.split(`#${old}`).join(`#${next}`);
+        }
+        style.textContent = css;
+    });
+    [clone, ...Array.from(clone.querySelectorAll('*'))].forEach(element => {
+        for (const attribute of Array.from(element.attributes)) {
+            let value = attribute.value;
+            // Computed paints may turn local URLs into absolute document URLs.
+            value = value.replace(/url\(["']?([^"')]+)["']?\)/g, (whole, target: string) => {
+                const fragment = target.slice(target.lastIndexOf('#') + 1);
+                return ids.has(fragment) ? `url(#${ids.get(fragment)})` : whole;
+            });
+            if (attribute.name === 'href' || attribute.name === 'xlink:href') {
+                const next = ids.get(value.replace(/^#/, ''));
+                if (next) value = `#${next}`;
+            }
+            element.setAttribute(attribute.name, value);
+        }
+    });
     return clone;
 }
 
@@ -393,53 +446,47 @@ function openFullscreenLightbox(container: HTMLElement, diagramId: string): void
     const lightboxDiagramId = `${diagramId}-lightbox`;
     createControlButtons(wrapper, lightboxDiagramId, true);
 
-    // Add to body
+    // One modal at a time. Every close route uses the same timer/listener cleanup.
+    closeLightboxes.forEach(close => close());
+    const opener = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    lightbox.setAttribute('role', 'dialog');
+    lightbox.setAttribute('aria-modal', 'true');
+    lightbox.setAttribute('aria-label', 'Diagram fullscreen view');
+    lightbox.tabIndex = -1;
     document.body.appendChild(lightbox);
-
-    // Wait for layout to complete before initializing pan-zoom
-    setTimeout(() => {
-        const panZoom = initPanZoom(clonedSvg, lightboxDiagramId);
-        if (panZoom) {
-            // Force the diagram to fit the container
-            panZoom.resize();
-            panZoom.fit();
-            panZoom.center();
-        }
-    }, 100);
-
-    // Close on background click
-    lightbox.addEventListener('click', (e: Event) => {
-        if (e.target === lightbox) {
-            // Clean up pan-zoom instance
-            if (panZoomInstances.has(lightboxDiagramId)) {
-                try {
-                    panZoomInstances.get(lightboxDiagramId)?.destroy();
-                } catch (e) {
-                    console.warn('Failed to destroy lightbox pan-zoom instance:', e);
-                }
-                panZoomInstances.delete(lightboxDiagramId);
-            }
-            lightbox.remove();
-        }
-    });
-
-    // ESC key to close
-    const escHandler = (e: KeyboardEvent): void => {
-        if (e.key === 'Escape') {
-            // Clean up pan-zoom instance
-            if (panZoomInstances.has(lightboxDiagramId)) {
-                try {
-                    panZoomInstances.get(lightboxDiagramId)?.destroy();
-                } catch (e) {
-                    console.warn('Failed to destroy lightbox pan-zoom instance:', e);
-                }
-                panZoomInstances.delete(lightboxDiagramId);
-            }
-            lightbox.remove();
-            document.removeEventListener('keydown', escHandler);
+    document.body.style.overflow = 'hidden';
+    let closed = false;
+    const close = () => {
+        if (closed) return;
+        closed = true;
+        clearTimeout(openTimer);
+        destroyInstance(lightboxDiagramId);
+        document.removeEventListener('keydown', keyHandler);
+        closeLightboxes.delete(lightboxDiagramId);
+        lightbox.remove();
+        document.body.style.overflow = previousOverflow;
+        if (opener?.isConnected) opener.focus();
+    };
+    const keyHandler = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') { event.preventDefault(); close(); }
+        if (event.key === 'Tab') {
+            const buttons = Array.from(lightbox.querySelectorAll<HTMLButtonElement>('button')).filter(button => getComputedStyle(button).display !== 'none');
+            const first = buttons[0], last = buttons[buttons.length - 1];
+            if (!first) { event.preventDefault(); lightbox.focus(); return; }
+            if (event.shiftKey && (document.activeElement === first || document.activeElement === lightbox)) { event.preventDefault(); last.focus(); }
+            else if (!event.shiftKey && (document.activeElement === last || document.activeElement === lightbox)) { event.preventDefault(); first.focus(); }
         }
     };
-    document.addEventListener('keydown', escHandler);
+    const openTimer = setTimeout(() => {
+        if (!lightbox.isConnected || closed) return;
+        const instance = initPanZoom(clonedSvg, lightboxDiagramId);
+        if (instance) fitAfterLayout(clonedSvg, lightboxDiagramId, instance);
+    }, 100);
+    closeLightboxes.set(lightboxDiagramId, close);
+    document.addEventListener('keydown', keyHandler);
+    lightbox.addEventListener('click', event => { if (event.target === lightbox) close(); });
+    (lightbox.querySelector<HTMLButtonElement>('[data-action="close"]') ?? lightbox).focus();
 }
 
 /**
@@ -449,6 +496,7 @@ function openFullscreenLightbox(container: HTMLElement, diagramId: string): void
  * @param {string} diagramId - Unique ID for the diagram
  */
 async function exportDiagram(container: HTMLElement, format: ExportFormat, diagramId: string): Promise<void> {
+    let tempDiv: HTMLDivElement | undefined;
     try {
         // Find the SVG element
         const svgElement = container.querySelector('svg');
@@ -469,19 +517,19 @@ async function exportDiagram(container: HTMLElement, format: ExportFormat, diagr
         }
 
         // Parse viewBox to get dimensions
-        const [, , vbWidth, vbHeight] = viewBox.split(' ').map(Number);
+        const [, , vbWidth, vbHeight] = viewBox.trim().split(/[\s,]+/).map(Number);
 
         // Set explicit dimensions based on viewBox for proper export
         clonedSvg.setAttribute('width', String(vbWidth));
         clonedSvg.setAttribute('height', String(vbHeight));
 
         // Remove inline styles (pan-zoom transforms) but keep viewBox
-        clonedSvg.removeAttribute('style');
+        clonedSvg.style.removeProperty('transform');
         clonedSvg.style.backgroundColor = 'transparent';
         clonedSvg.style.maxWidth = 'none';
 
         // Create a temporary container
-        const tempDiv = document.createElement('div');
+        tempDiv = document.createElement('div');
         tempDiv.style.position = 'absolute';
         tempDiv.style.left = '-9999px';
         tempDiv.appendChild(clonedSvg);
@@ -498,9 +546,8 @@ async function exportDiagram(container: HTMLElement, format: ExportFormat, diagr
             });
             downloadFile(dataUrl, `${filename}.png`);
         } else {
-            dataUrl = await toSvg(clonedSvg as unknown as HTMLElement, {
-                backgroundColor: 'transparent'
-            });
+            clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+            dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(new XMLSerializer().serializeToString(clonedSvg))}`;
             downloadFile(dataUrl, `${filename}.svg`);
         }
 
@@ -510,6 +557,8 @@ async function exportDiagram(container: HTMLElement, format: ExportFormat, diagr
         console.log(`Diagram exported as ${format.toUpperCase()}`);
     } catch (error) {
         console.error('Failed to export diagram:', error);
+    } finally {
+        tempDiv?.remove();
     }
 }
 
@@ -596,14 +645,7 @@ export function enhanceMermaidDiagrams() {
         // Initialize pan/zoom and fit to view
         const panZoom = initPanZoom(svgElement, diagramId);
         if (panZoom) {
-            // Fit the diagram to the container by default so entire diagram is visible
-            setTimeout(() => {
-                panZoom.resize();
-                panZoom.fit();
-                panZoom.center();
-            }, 100);
-
-            // Explicit toolbar activation only: synthetic clicks after touch scrolling must never arm gestures.
+            fitAfterLayout(svgElement, diagramId, panZoom);
 
         }
     });
@@ -626,91 +668,36 @@ export function enhanceMermaidDiagrams() {
  * cleanupMermaidEnhancements();
  */
 export function cleanupMermaidEnhancements() {
-    panZoomInstances.forEach((instance, id) => {
-        try {
-            instance.destroy();
-        } catch (e) {
-            console.warn(`Failed to destroy pan-zoom instance ${id}:`, e);
-        }
-    });
-    panZoomInstances.clear();
+    closeLightboxes.forEach(close => close());
+    for (const id of panZoomInstances.keys()) destroyInstance(id);
+    for (const timer of fitTimers.values()) clearTimeout(timer);
+    fitTimers.clear();
 }
 
-/**
- * Hide toolbar for a specific diagram or all diagrams
- * @param diagramId - Optional diagram ID. If omitted, hides all toolbars
- *
- * @example
- * // Hide specific diagram's toolbar
- * hideToolbar('mermaid-123');
- *
- * @example
- * // Hide all toolbars
- * hideToolbar();
- */
+// Filter by values instead of interpolating a caller's ID into a CSS selector.
+function toolbars(diagramId?: string): HTMLElement[] {
+    return Array.from(document.querySelectorAll<HTMLElement>('.mermaid-controls')).filter(toolbar =>
+        !diagramId || toolbar.querySelector<HTMLElement>('[data-diagram-id]')?.dataset.diagramId === diagramId);
+}
+function setToolbarVisibility(toolbar: HTMLElement, visible: boolean): void {
+    toolbar.style.display = visible ? 'flex' : 'none';
+    if (visible) toolbar.classList.remove('hidden-slide');
+    const showButton = toolbar.parentElement?.querySelector<HTMLElement>('.mermaid-show-toolbar');
+    if (showButton) showButton.style.display = 'none';
+}
+
+/** Hide the toolbar for one generated diagram ID, or every toolbar when omitted. */
 export function hideToolbar(diagramId?: string): void {
-    if (diagramId) {
-        const wrapper = document.querySelector(`[data-diagram-id="${diagramId}"]`);
-        const controls = wrapper?.querySelector('.mermaid-controls');
-        if (controls) {
-            (controls as HTMLElement).style.display = 'none';
-        }
-    } else {
-        document.querySelectorAll('.mermaid-controls').forEach(controls => {
-            (controls as HTMLElement).style.display = 'none';
-        });
-    }
+    toolbars(diagramId).forEach(toolbar => setToolbarVisibility(toolbar, false));
 }
 
-/**
- * Show toolbar for a specific diagram or all diagrams
- * @param diagramId - Optional diagram ID. If omitted, shows all toolbars
- *
- * @example
- * // Show specific diagram's toolbar
- * showToolbar('mermaid-123');
- *
- * @example
- * // Show all toolbars
- * showToolbar();
- */
+/** Show toolbars, restoring any toolbar previously slid away with its hide button. */
 export function showToolbar(diagramId?: string): void {
-    if (diagramId) {
-        const wrapper = document.querySelector(`[data-diagram-id="${diagramId}"]`);
-        const controls = wrapper?.querySelector('.mermaid-controls');
-        if (controls) {
-            (controls as HTMLElement).style.display = 'flex';
-        }
-    } else {
-        document.querySelectorAll('.mermaid-controls').forEach(controls => {
-            (controls as HTMLElement).style.display = 'flex';
-        });
-    }
+    toolbars(diagramId).forEach(toolbar => setToolbarVisibility(toolbar, true));
 }
 
-/**
- * Toggle toolbar visibility for a specific diagram or all diagrams
- * @param diagramId - Optional diagram ID. If omitted, toggles all toolbars
- *
- * @example
- * // Toggle specific diagram's toolbar
- * toggleToolbar('mermaid-123');
- *
- * @example
- * // Toggle all toolbars
- * toggleToolbar();
- */
+/** Toggle one toolbar or every toolbar. Hidden slide state counts as hidden. */
 export function toggleToolbar(diagramId?: string): void {
-    if (diagramId) {
-        const wrapper = document.querySelector(`[data-diagram-id="${diagramId}"]`);
-        const controls = wrapper?.querySelector('.mermaid-controls') as HTMLElement;
-        if (controls) {
-            controls.style.display = controls.style.display === 'none' ? 'flex' : 'none';
-        }
-    } else {
-        document.querySelectorAll('.mermaid-controls').forEach(controls => {
-            const el = controls as HTMLElement;
-            el.style.display = el.style.display === 'none' ? 'flex' : 'none';
-        });
-    }
+    toolbars(diagramId).forEach(toolbar => setToolbarVisibility(toolbar,
+        toolbar.style.display === 'none' || toolbar.classList.contains('hidden-slide')));
 }
