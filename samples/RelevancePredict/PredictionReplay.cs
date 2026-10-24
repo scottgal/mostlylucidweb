@@ -1,9 +1,9 @@
 namespace Mostlylucid.Relevance.PredictDemo;
 
 /// <summary>One visible prefix and its actual engine forecast. No future label is supplied to the predictor.</summary>
-public sealed record ReplayFrame(string? Event, DestinationPrediction Prediction);
+public sealed record ReplayFrame(string? Event, DestinationPrediction Prediction, DateTimeOffset? At = null);
 /// <summary>A labelled synthetic visit for the article; names describe the observed path, not hidden intent.</summary>
-public sealed record ReplayParticipant(string Id, string Name, IReadOnlyList<ReplayFrame> Frames);
+public sealed record ReplayParticipant(string Id, string Name, IReadOnlyList<ReplayFrame> Frames, int? ComparisonFrame = null);
 /// <summary>Captured forecasts for browser playback; the browser never estimates probabilities from plotted distance.</summary>
 public sealed record PredictionReplayData(string Version, int Seed, int TrainingVisits, int HorizonEvents,
     IReadOnlyList<ReplayParticipant> Participants);

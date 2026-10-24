@@ -26,7 +26,7 @@ public sealed class RelevanceEngine : IAsyncDisposable
     /// <param name="converters">Additional converters with unique names; built-in names cannot be replaced.</param>
     /// <param name="clock">Clock for decay, retention and event-time validation; defaults to UTC system time.</param>
     /// <param name="worker">An already started, externally owned worker, or null to create and start one.</param>
-    /// <param name="predictor">Caller-owned prediction strategy; defaults to the finite-horizon Markov baseline.</param>
+    /// <param name="predictor">Caller-owned strategy; defaults to trajectory prediction when configured, otherwise the Markov baseline.</param>
     /// <exception cref="ArgumentException">Configuration, converter names or dimensions are invalid.</exception>
     public RelevanceEngine(RelevanceDefinition definition, IRelevanceStore store,
         IEnumerable<IPointConverter>? converters = null, TimeProvider? clock = null, RelevanceWorker? worker = null,
@@ -37,7 +37,8 @@ public sealed class RelevanceEngine : IAsyncDisposable
         this.definition.Validate();
         this.store = store;
         this.clock = clock ?? TimeProvider.System;
-        this.predictor = predictor ?? new MarkovDestinationPredictor();
+        this.predictor = predictor ?? (this.definition.Destinations?.Trajectory is null
+            ? new MarkovDestinationPredictor() : new TrajectoryDestinationPredictor());
         var registry = new IPointConverter[] { new NumericConverter(), new CategoricalConverter(), new PrecomputedConverter(),
                 new FormulaConverter(), new BooleanConverter(), new OklabConverter() }
             .Concat(converters ?? []).ToDictionary(c => c.Name, StringComparer.Ordinal);
@@ -47,6 +48,12 @@ public sealed class RelevanceEngine : IAsyncDisposable
             var dimensions = converter.Dimensions(point);
             if (dimensions is < 1 or > 65_536) throw new ArgumentException("Point dimensions must be between 1 and 65536.");
             points[name] = (converter, RelevanceDefinition.Hash(new { point, converter.Version, dimensions }), dimensions);
+        }
+        if (this.definition.Destinations?.Trajectory is { } trajectory)
+        {
+            if (trajectory.Points.Any(p => !points.ContainsKey(p)) || trajectory.Points.Sum(p => points[p].Dimensions) > 64
+                || this.definition.Streams.Values.Any(s => s.Kind == "observation" && s.PointSource != "input"))
+                throw new ArgumentException("Trajectories require declared points (at most 64 coordinates) and input-sourced observations.");
         }
         // Include storage semantics as well as vector semantics. Old deduplication layouts need explicit replay.
         schema = RelevanceDefinition.Hash(new { StorageContract = 2, this.definition, Points = points.Select(p => new { p.Key, p.Value.Signature }).ToArray() });
@@ -83,7 +90,15 @@ public sealed class RelevanceEngine : IAsyncDisposable
     {
         if (!definition.Streams.TryGetValue(source, out var stream)) throw new ArgumentException($"Unknown stream '{source}'.");
         var id = RequiredString(data, stream.Path("id"));
-        var encoded = stream.Kind == "candidate" || stream.Kind == "observation" && stream.PointSource == "input"
+        var unmeasuredEndpoint = false;
+        if (stream.Kind == "observation" && definition.Destinations?.Trajectory is { } trajectory)
+        {
+            var next = DataValues.TryRead(data, stream.Path("state"), out var state) ? state.GetString()
+                : DataValues.Read(data, stream.Path("type")).GetString();
+            unmeasuredEndpoint = next is not null && definition.Destinations.Outcomes.Contains(next)
+                && !trajectory.Points.Any(p => DataValues.TryRead(data, definition.Points[p].Path, out _));
+        }
+        var encoded = stream.Kind == "candidate" || stream.Kind == "observation" && stream.PointSource == "input" && !unmeasuredEndpoint
             ? await EncodeCandidateAsync(id, data, stream.Kind == "candidate", cancellationToken) : null;
         var now = clock.GetUtcNow();
         return await store.TransactAsync(tx =>
@@ -188,7 +203,8 @@ public sealed class RelevanceEngine : IAsyncDisposable
     /// <param name="cancellationToken">Cancellation for queue admission, snapshot acquisition and prediction.</param>
     /// <returns>Outcome estimates, unresolved mass, support and the observation timestamp.</returns>
     /// <remarks>
-    /// The baseline pools transition counts across this engine ID and uses an event-count horizon, not wall time.
+    /// The Markov baseline uses an event-count horizon. Configured trajectory prediction uses seconds from ObservedAt,
+    /// measured centroid motion, and completed-episode reference populations. Expired trajectory windows abstain.
     /// Sparse evidence abstains. Estimates are not calibrated by the engine, and distance is never renamed probability.
     /// The injected predictor runs outside the store transaction but still occupies the single worker.
     /// </remarks>
@@ -205,7 +221,7 @@ public sealed class RelevanceEngine : IAsyncDisposable
                 tx.BindSchema(definition.Id, schema);
                 tx.Prune(clock.GetUtcNow());
                 return new PredictionContext(subject, tx.Get<SubjectState>(definition.Id, "state", subject),
-                    tx.Get<TransitionModel>(definition.Id, "transitions", "model") ?? new TransitionModel(), definition.Destinations);
+                    tx.Get<TransitionModel>(definition.Id, "transitions", "model") ?? new TransitionModel(), definition.Destinations, clock.GetUtcNow());
             }, ct);
             return await predictor.PredictAsync(snapshot, ct);
         }, cancellationToken);
@@ -248,7 +264,7 @@ public sealed class RelevanceEngine : IAsyncDisposable
             for (var i = 0; i < summary.Sum.Length; i++) summary.Sum[i] *= decay;
             summary.Mass *= decay;
         }
-        if (weight > 0)
+        if (weight > 0 && !(stream.PointSource == "input" && encoded is null))
         {
             var candidate = encoded ?? tx.Get<Candidate>(definition.Id, "candidate", RequiredString(data, stream.Path("candidate"))) ?? throw new ArgumentException("Unknown candidate.");
             foreach (var (point, vector) in candidate.Points)
@@ -264,6 +280,8 @@ public sealed class RelevanceEngine : IAsyncDisposable
         {
             var next = DataValues.TryRead(data, stream.Path("state"), out var explicitState) ? explicitState.GetString() : type;
             if (next is null || !destinations.States.Contains(next)) throw new ArgumentException("Unknown transition state.");
+            if (destinations.Trajectory is { } trajectory)
+                ObserveTrajectory(tx, state, stream, data, encoded, next, at, now, trajectory, destinations);
             var model = tx.Get<TransitionModel>(definition.Id, "transitions", "model") ?? new TransitionModel();
             if (state.LastState is { } previous && !destinations.Outcomes.Contains(previous))
             {
@@ -277,6 +295,58 @@ public sealed class RelevanceEngine : IAsyncDisposable
         state.At = at;
         tx.Put(definition.Id, "state", subject, state, at.AddHours(definition.StateRetentionHours));
         if (tx.Count(definition.Id, "state") > definition.MaxStateRecords) throw new InvalidOperationException("Active state capacity reached.");
+    }
+
+    private void ObserveTrajectory(IRelevanceTransaction tx, SubjectState state, StreamDefinition stream, JsonElement data,
+        Candidate? input, string next, DateTimeOffset at, DateTimeOffset now, TrajectoryDefinition trajectory, DestinationDefinition destinations)
+    {
+        state.Trajectory ??= new TrajectoryState();
+        if (state.Trajectory.Closed) throw new ArgumentException("The trajectory episode is closed; use a new subject ID for a new episode.");
+        if (input is null)
+        {
+            if (!destinations.Outcomes.Contains(next)) throw new ArgumentException("Measurements are required for a non-terminal trajectory observation.");
+            // An outcome closes the known journey. It is not a new measurement and must not invent zero velocity.
+            LearnTrajectoryOutcome(tx, state.Trajectory, next, at, now, trajectory);
+            return;
+        }
+        var group = DataValues.TryRead(data, stream.Path("baseline_group"), out var groupValue)
+            ? groupValue.GetString() : trajectory.BaselineStates.Count > 0
+                ? throw new ArgumentException("Supply baseline_group to keep unrelated normal populations separate.") : "population";
+        if (string.IsNullOrWhiteSpace(group)) throw new ArgumentException("Reference group cannot be blank.");
+        var vector = trajectory.Points.SelectMany(p => input.Points[p].Values.Select(v => (double)v)).ToArray();
+        var frame = TrajectoryTracking.Advance(state.Trajectory, vector, next, group, at, trajectory);
+        if (trajectory.BaselineStates.Count > 0)
+        {
+            var reference = tx.Get<NormalReference>(definition.Id, "normal", group) ?? new NormalReference();
+            if (trajectory.BaselineStates.Contains(next))
+            {
+                reference.Observe(vector, at, trajectory.BaselineHalfLifeSeconds);
+                tx.Put(definition.Id, "normal", group, reference, now.AddHours(definition.StateRetentionHours));
+                if (tx.Count(definition.Id, "normal") > definition.MaxStateRecords) throw new InvalidOperationException("Normal reference capacity reached.");
+            }
+            frame = frame with { Normal = reference.Evidence(frame.Centroid, at, trajectory) };
+        }
+        state.Trajectory.Current = frame;
+        if (!destinations.Outcomes.Contains(next))
+        {
+            if (frame.MotionReady)
+            {
+                _ = TrajectoryTracking.Features(frame, trajectory); // Reject invalid unit scales before retaining a landmark.
+                state.Trajectory.Landmarks.TryAdd(next, frame);
+            }
+            return;
+        }
+        LearnTrajectoryOutcome(tx, state.Trajectory, next, at, now, trajectory);
+    }
+
+    private void LearnTrajectoryOutcome(IRelevanceTransaction tx, TrajectoryState state, string outcome,
+        DateTimeOffset at, DateTimeOffset now, TrajectoryDefinition trajectory)
+    {
+        var model = tx.Get<TransitionModel>(definition.Id, "transitions", "model") ?? new TransitionModel();
+        model.Trajectories ??= new TrajectoryModel();
+        TrajectoryTracking.Learn(model.Trajectories, state, outcome, at, trajectory);
+        tx.Put(definition.Id, "transitions", "model", model, now.AddHours(definition.StateRetentionHours));
+        state.Closed = true;
     }
 
     private void Feedback(IRelevanceTransaction tx, StreamDefinition stream, JsonElement data, DateTimeOffset now)
@@ -330,6 +400,8 @@ public sealed class RelevanceEngine : IAsyncDisposable
 /// <summary>Persisted per-entity evidence supplied to destination strategies as a detached snapshot.</summary>
 public sealed class SubjectState
 {
+    /// <summary>Optional timestamped kinematics and pending first-state landmarks for the current episode.</summary>
+    public TrajectoryState? Trajectory { get; set; }
     /// <summary>Timestamp of the latest accepted observation; decay is measured from this instant.</summary>
     public DateTimeOffset At { get; set; }
     /// <summary>Last explicit transition state, or event type when no state was supplied.</summary>

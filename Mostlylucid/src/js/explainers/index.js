@@ -191,13 +191,17 @@ function update() {
 function pause(){clearInterval(timer);timer=null;$('play').textContent='Play';}
 function advance(){if(cursor>=max()){pause();return;}cursor++;idle=0;update();if(cursor===max())pause();}
 async function switchView(next){
-    pause(); view=next;cursor=view==='prediction'?2:0;idle=0;
+    pause(); view=next;cursor=view==='prediction'?20:0;idle=0;
     document.documentElement.dataset.view=view;
     // Keep the prediction controls beside the map, ahead of the longer evidence inspector on phones.
     if(view==='prediction')$('prediction-view').before(document.querySelector('.playback'));
     else $('announcement').before(document.querySelector('.playback'));
     $('vector-view').hidden=view!=='vectors'; $('proxy-view').hidden=view!=='proxy'; $('prediction-view').hidden=view!=='prediction';
-    if(view==='prediction'&&!predictionView)predictionView=createPredictionView(update);
+    if(view==='prediction'&&!predictionView)predictionView=createPredictionView(options=>{
+        if(options?.compare){pause();cursor=options.compare==='pace'?150:60;}
+        update();
+    });
+    if(view==='prediction')predictionView.endComparison();
     document.querySelectorAll('nav [data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
     $('heading').innerHTML=view==='prediction'?'Watch a journey.<br>Predict the <em>destination.</em>':view==='vectors'?'Watch evidence become<br>a <em>recommendation.</em>':'Follow a request.<br>See the <em>decision.</em>';
     $('intro').textContent=view==='prediction'?'24 individual journeys. Watch comparisons, basket removals and checkout attempts split their paths towards different outcomes.':view==='vectors'?'A point is an observation. A centroid is a summary. Add evidence and follow what changes.':'A proxy sits in the request path. Observations inform policy before the origin receives anything.';
@@ -205,7 +209,8 @@ async function switchView(next){
     if(view==='proxy')await mountProxy();
     update();
     if(view==='vectors'&&deck)deck.setProps({initialViewState:camera()});
-    $('scrub').step=view==='prediction'?'0.01':'1';
+    $('scrub').step=view==='prediction'?'0.1':'1';
+    $('prediction-speed-label').hidden=view!=='prediction';
     if(view==='prediction'&&!prefersReducedMotion)startPlayback(true);
 }
 function toggleTheme(){
@@ -217,16 +222,18 @@ function postSize(){
     if(window.parent!==window) requestAnimationFrame(()=>window.parent.postMessage({type:'mostlylucid-explainer-size',height:Math.ceil(document.body.getBoundingClientRect().height)+4},location.origin));
 }
 function startPlayback(loop=false){
+    if(view==='prediction')predictionView.endComparison();
     if(cursor>=max()){cursor=0;idle=0;update();}
-    let held=0;
+    let held=0,tickAt=performance.now();
     timer=setInterval(()=>{
+        const tick=performance.now(),elapsed=(tick-tickAt)/1000;tickAt=tick;
         if(view!=='prediction'){advance();return;}
         if(!predictionVisible||document.hidden)return;
         if(cursor>=max()){
             if(!loop){pause();return;}
             if(++held<45)return;
             cursor=0;held=0;
-        }else cursor=Math.min(max(),cursor+.022);
+        }else cursor=Math.min(max(),cursor+elapsed*Number($('prediction-speed').value));
         update();
     },view==='prediction'?33:1500);
     $('play').textContent='Pause';

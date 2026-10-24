@@ -101,3 +101,11 @@ The spatial layout is an authored arrangement of named behavioural states, with 
 Shared play/pause/reset/scrub controls, touch scrolling, SVG fallback and print support remain. The initial probability-anchor display was replaced because coincident prefixes hid the individual journeys and did not communicate the behaviour tracks.
 
 Validation for this replacement: 53 frontend tests and 59 C# tests passed. Browser assertions counted 24 distinct head elements and 24 trails, then verified at least 12 heads changed position during a controlled playback interval. At 390px the view has no horizontal overflow. The checked-in snapshot now shows the field of diverging tracks rather than the probability-anchor display.
+
+## Physical-time trajectory view
+
+The prediction view now imports `temporal-shop-replay.json` and `temporal-operations-replay.json`, captured from the actual elapsed-time predictor. The UTC playhead advances recorded seconds, with 1×/10×/30×/60× playback. Head positions project the first two converter-defined centroid coordinates; small identity offsets preserve selection. Probability inference uses the source centroid, velocity, acceleration, elapsed time and learned outcome populations, not the display offsets or screen distances.
+
+Compare direction pins A/B at identical raw input vectors with opposite rates; compare pace pins A/C at their own landmarks, reached after 20 and 120 seconds. Both cards show real forecasts for the same 60-second target. The service view displays a separate learned normal reference and deviation; only qualified healthy samples update it. Playback interpolation is not an additional sensor measurement. Recorded forecast windows that have elapsed are labelled explicitly.
+
+Comparison cards and motion evidence exceed the original 2,400px mobile iframe bound. The source/origin-checked resizing handler now admits up to 8,000px, allowing comparison and accessible-table expansion without a nested scrolling viewport.

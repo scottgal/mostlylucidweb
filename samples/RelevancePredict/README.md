@@ -70,3 +70,17 @@ The fixture tests cover stable generation, partition/time boundaries, censored l
 
 Article: [SHOW ME WHAT YOU GOT (Part 3): Predict](../../Mostlylucid/Markdown/show-me-what-you-got-part3-predict.md).
 Next: [Part 4 experimentation](../../docs/relevance/part4-intervention-learning.md), including products, offers, prices, timed messages and allowed operational changes.
+
+## Physical-time prediction
+
+```sh
+dotnet run --project samples/RelevanceShop -- predict-time --output /tmp/relevance-time-814
+```
+
+`TemporalPredictionDemo` starts fresh SQLite storage for shopping and incident domains. Each learns from 600 completed synthetic episodes with variable measurement timing and small feature noise. A separate later 300-visit population is forecast at its first motion-ready landmark against a frozen model. Missing feedback is unscored. The demo emits actual Brier scores against a training-only prior, then captures 24 visits per domain on their recorded UTC timelines.
+
+The first three replay visits share the same current observation but differ in direction or pace. Their forecasts use the actual engine's fast centroid, velocity, acceleration and elapsed time, with a 60-second target window. The incident example seeds its normal reference from 40 earlier qualified healthy samples and never admits degraded observations. Its reference half-life is 24 hours, independent of the two-second live-centroid half-life.
+
+Output: `temporal-shop-replay.json`, `temporal-operations-replay.json`, and `temporal-output.txt`. The article's captured versions live in `artifacts/seed-814`; the frontend imports them directly. Population models are frozen for evaluation/replay. The normal-reference bootstrap is sample infrastructure; ordinary integrations use the existing save/predict API and persisted store.
+
+The statistical predictor uses bounded feature-cell centroids and observed destination frequencies. It has no neural model or separate retraining stage. These controlled simulator results do not establish production calibration, handle informative censoring automatically, or estimate intervention effects.

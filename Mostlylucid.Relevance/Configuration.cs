@@ -85,6 +85,8 @@ public sealed class RelevanceDefinition
             ValidateFilter(placement.BuildFilter());
         }
         Destinations?.Validate();
+        if (Destinations?.Trajectory is { } trajectory && trajectory.HorizonSeconds > StateRetentionHours * 3600.0)
+            throw new ArgumentException("The trajectory forecast horizon cannot exceed episode state retention.");
     }
 
     /// <summary>Rejects undeclared fields, unsupported operators and non-scalar or non-finite values.</summary>
@@ -154,6 +156,9 @@ public sealed class PointDefinition
 /// <summary>Finite-horizon transition baseline settings; observed counts are pooled by engine ID.</summary>
 public sealed class DestinationDefinition
 {
+    /// <summary>Optional elapsed-time trajectory estimator; omitted configurations retain the event-count Markov baseline.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public TrajectoryDefinition? Trajectory { get; set; }
     /// <summary>Distinct observed state vocabulary, from 2 to 64 entries.</summary>
     public List<string> States { get; set; } = [];
     /// <summary>Non-empty subset of states treated as absorbing destinations during a prediction.</summary>
@@ -171,6 +176,7 @@ public sealed class DestinationDefinition
             || Outcomes.Count == 0 || Outcomes.Distinct().Count() != Outcomes.Count || Outcomes.Any(o => !States.Contains(o))
             || HorizonEvents is < 1 or > 256 || MinTransitions < 1 || !double.IsFinite(Smoothing) || Smoothing < 0)
             throw new ArgumentException("Invalid destination states, outcomes, horizon or probability settings.");
+        Trajectory?.Validate(this);
     }
 }
 

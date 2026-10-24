@@ -27,17 +27,13 @@ We need both. Two people can be interested in the same products while being at d
 
 Their interest vectors can be very similar. Their likely next actions need not be.
 
-The interactive replay below follows **24 individual behavioural tracks** together. It starts moving when the plot comes into view. Each coloured trail belongs to one user; its moving head shows the current observation. Comparisons, basket removals, resumed browsing and checkout attempts make the journeys advance, turn back and diverge.
+The interactive replay follows **24 timestamped behavioural trajectories** together. The heads track smoothed behavioural centroids; the trails preserve their routes. The right-hand panel shows the actual C# forecast, velocity, acceleration, observation time and deadline.
 
-<iframe class="article-explainer" src="/interactive/explainers/index.html?v=20261024-tracks&amp;view=prediction&amp;embed=1" title="24 moving user behaviour tracks and their destinations" width="100%" height="1500" loading="lazy" style="border:0;border-radius:12px;"></iframe>
+<iframe class="article-explainer" src="/interactive/explainers/index.html?v=20261024-temporal&amp;view=prediction&amp;embed=1" title="24 timestamped behavioural trajectories, predictions and learned normal references" width="100%" height="1500" loading="lazy" style="border:0;border-radius:12px;"></iframe>
 
-[Open the behavioural tracks](/interactive/explainers/index.html?view=prediction) or [view a static snapshot](/articleimages/explainer-prediction.png). Pause, scrub or select any moving user or trail to inspect its observed events and actual C# forecast. With reduced motion enabled, use Play or step through the observations.
+[Open the temporal replay](/interactive/explainers/index.html?view=prediction). Use **Compare direction** or **Compare pace**, and switch **Traffic** between shoppers and service incidents. The replay uses recorded UTC times. Its playback speed is separate from the forecast horizon.
 
-The display uses an authored layout of behavioural states, with separate lanes to keep individual users visible. Moving back from a basket to browsing therefore pulls a track away from checkout. Positions are illustrative, not learned embedding coordinates, and distance does not generate the probabilities. Those come from the same frozen model trained on the 1,000 visits used below. An incomplete visit stops at its last observation rather than being sent to an invented destination.
-
-Three teaching paths and 21 generated holdout journeys provide the tracks. Starts are staggered and motion interpolates between observations so we can see their different routes. Changing the objective changes desirability without rewriting either the observed route or the outcome forecast. Part 4 adds interventions that can change the subsequent behaviour.
-
-The [C# replay capture](https://github.com/scottgal/mostlylucidweb/blob/main/samples/RelevancePredict/PredictionReplay.cs) saves each prefix's actual `PredictAsync` result to `replay.json`. The browser displays those results rather than implementing another predictor.
+The display is a fixed view of two explicit feature coordinates, with small presentation offsets to keep users selectable. It is not a learned embedding projection, and screen distance does not supply the outcome probabilities. Those come from the frozen temporal model trained on 600 earlier episodes per domain. An incomplete visit stops at its last observation without an invented endpoint.
 
 The prediction gives us a baseline for choosing what to investigate. It can help identify a point where reassurance, a better comparison, a different product or a useful offer might change the result. Measuring whether that change actually helps is the next step.
 
@@ -54,9 +50,156 @@ flowchart TD
 
 The feedback arrow comes from **actual endpoints**. A predicted purchase does not count as a purchase and cannot train the system as one.
 
-# Give the System Enough Experience
+# Position Is Not a Trajectory
 
-Six hand-written products are useful for explaining distance calculations. For learning from journeys, we want more variation and enough observations to support an estimate.
+Two shoppers can supply the same current behavioural vector while moving in opposite directions. A service can report 500 ms latency while recovering, or report the same latency while deteriorating. Position alone loses that distinction.
+
+The `predict-time` command runs the temporal example used by the visualiser:
+
+```sh
+dotnet run --project samples/RelevanceShop -- predict-time \
+  --output /tmp/relevance-predict-time-814
+```
+
+It starts with fresh SQLite storage, learns from 600 earlier episodes per domain, and forecasts fresh journeys. The [captured output](https://github.com/scottgal/mostlylucidweb/blob/main/samples/RelevancePredict/artifacts/seed-814/temporal-output.txt) comes from the [C# temporal demo](https://github.com/scottgal/mostlylucidweb/blob/main/samples/RelevancePredict/TemporalPredictionDemo.cs).
+
+At their comparison landmarks, A, B and C have the same observed shopping vector: `[0.500, 0.200]`. Their categorical state is also the same, `observing`. Their histories differ:
+
+| Visit | First-coordinate velocity | Elapsed journey time | Purchase within 60s |
+|-------|--------------------------:|---------------------:|--------------------:|
+| A: moving forward | +0.01499/s | 20s | 85.5% |
+| B: moving back | -0.01499/s | 20s | 22.0% |
+| C: same route, slower | +0.00250/s | 120s | 0.0% |
+
+A's purchase/cancel/leave distribution is **85.5% / 7.5% / 7.0%**. B's is **22.0% / 37.5% / 40.5%**. C has 100% unresolved mass: matched historical visits reached their endpoints outside this particular 60-second window. That is different from an unsupported forecast; C's estimate has 56 matched episode landmarks.
+
+Use **Compare direction** to highlight A and B together, or **Compare pace** for A and C. The other 22 tracks stay visible. Each comparison pins the visits at their own recorded landmarks, rather than pretending they reached that position at the same clock time.
+
+> **Representation aside:** these are normalised observations supplied by the simulator, not an LLM's purchase-intent score. Their meaning and scale are modelling choices, as in [Part 1.5](/blog/show-me-what-you-got-part1-5-questions-as-coordinates). The operational example uses latency in seconds and error fraction. Converters let another application supply its own dimensions.
+
+## Measure Movement in Actual Time
+
+The engine maintains a fast behavioural centroid. For an observation \(x_t\), elapsed time \(\Delta t\), and a half-life \(h\) in seconds:
+
+\[
+\alpha(\Delta t)=1-2^{-\Delta t/h}
+\]
+
+\[
+\mu_t=\mu_{t-1}+\alpha(\Delta t)(x_t-\mu_{t-1})
+\]
+
+A ten-second interval and a one-minute interval produce different adaptation weights. The centroid is a smoothed characterisation, so it can lag the latest observation slightly; equal raw input vectors need not give exactly equal smoothed centroids.
+
+Velocity measures how that centroid changes per second:
+
+\[
+v_t=\frac{\mu_t-\mu_{t-1}}{\Delta t}
+\]
+
+Acceleration compares successive velocity estimates. With irregular sampling, those velocities describe different interval midpoints:
+
+```csharp
+var acceleration = (velocity - previousVelocity)
+    / ((intervalSeconds + previousIntervalSeconds) / 2);
+```
+
+The implementation applies this coordinate by coordinate. Velocity has coordinate units per second; acceleration has coordinate units per second squared. Three observations are needed before both are available. The tests include an irregularly sampled quadratic trajectory, so changing the sampling intervals cannot quietly change the units.
+
+The engine rejects equal or out-of-order timestamps in temporal mode. A sufficiently long gap resets derivative history and pending landmarks. We do not draw a line across an unobserved interval and call it measured velocity.
+
+# Time Has Three Different Jobs
+
+The temporal configuration separates three timescales:
+
+| Setting | Demo value | Meaning |
+|---------|-----------:|---------|
+| Behavioural centroid half-life | 2 seconds | How quickly current characterisation adapts |
+| Forecast horizon | 60 seconds | When the predicted destination must be reached |
+| Normal-reference half-life | 24 hours | How slowly qualified normal experience fades |
+
+Playback speed is a fourth, purely visual setting. At 30×, one screen second represents thirty seconds of recorded observations. It does not change the model or its horizon.
+
+The configuration is explicit:
+
+```yaml
+trajectory:
+  points: [behaviour]
+  horizon_seconds: 60
+  half_life_seconds: 2
+  velocity_scale: 0.01
+  acceleration_scale: 0.002
+  elapsed_scale_seconds: 60
+  baseline_states: [healthy]
+  baseline_half_life_seconds: 86400
+```
+
+The `baseline_states` entries apply to the service example. Shopping prediction uses the same temporal machinery without declaring a healthy-service reference.
+
+A clock reading alone is not a new behavioural observation. If idle time matters, the application must measure it; the engine does not infer zero velocity merely because no event arrived.
+
+A forecast is anchored at its returned `ObservedAt`, with a `HorizonSeconds` value. In temporal mode `HorizonEvents` is zero. If the window has already expired when `PredictAsync` is called, the engine abstains with `stale_trajectory`. The visualiser labels a recorded forecast whose window has elapsed, rather than presenting it as a fresh prediction.
+
+## How Those Features Become a Forecast
+
+The predictor matches an explicitly scaled context containing:
+
+```text
+centroid coordinates
+velocity coordinates
+acceleration coordinates
+elapsed seconds since the continuous episode began
+```
+
+It groups similar contexts into bounded feature cells, maintaining a centroid and outcome counts for each cell. This uses configured bins and incremental statistics; it is not claiming to discover neural embeddings or Leiden communities.
+
+When an actual endpoint arrives, the first motion-ready landmark for each observed state contributes one example. If the endpoint was reached within 60 seconds of that landmark, its destination count increases. If the observed first endpoint came later, the within-window unresolved count increases. A visit that stops producing feedback supplies neither an invented endpoint nor a failed purchase label.
+
+At prediction time, eligible nearby contexts supply a reference population. The **observed destination frequencies** in that population supply the probabilities. Geometric closeness selects relevant experience; it is not itself renamed a probability. Minimum support and distance bounds allow the engine to abstain. Context capacity is bounded, and updates happen through the existing asynchronous channel and save transaction.
+
+> **Training aside:** this is what the system learns. It accumulates context centroids and actual within-window results, then uses them for later forecasts. A neural model could replace this estimator through `IDestinationPredictor`, but the statistical baseline already uses measured direction, rate, acceleration and time.
+
+# Normal Behaviour Gives Drift a Reference
+
+For incident analysis, movement needs a reference. Five hundred milliseconds of latency is a different observation for a service normally running at 100 ms than for one normally running at 600 ms.
+
+Switch the visualiser's **Traffic** selector to **Service incidents**. The hollow marker shows the learned normal centroid. Its reference is built from explicitly qualified `healthy` observations, using a slow, time-decayed mean and variance. The live centroid adapts on the faster two-second timescale.
+
+The application supplies a reference group such as a service class. We keep unrelated systems separate. Incident observations still update their live trajectory, but they do not update the healthy reference. Otherwise an outage could gradually teach the detector that failing is normal.
+
+The sample's reference is approximately **100 ms latency and 1% error fraction**. Two services then reach the same current observation, **500 ms and 5% errors**, with different motion:
+
+| Service | Latency movement | Outage within 60s | Recovery within 60s |
+|---------|------------------|-----------------:|-------------------:|
+| A | Increasing | 76.0% | 24.0% |
+| B | Decreasing | 22.6% | 77.4% |
+
+A's first-coordinate velocity corresponds to roughly 15 ms more latency per second; B's corresponds to roughly 15 ms less.
+
+The reference centroid stays at approximately `[0.1000, 0.0100]` while those incident tracks move. Variability supplies a scale for reporting deviation from normal, with a positive variance floor for nearly constant signals.
+
+That deviation is a distance, not an outage probability. The destination forecast comes from learned outcomes of comparable trajectories. The engine can therefore report a substantial departure from normal while still withholding a destination forecast if it lacks enough motion or outcome evidence.
+
+> **Normality aside:** `healthy` is an admission rule, not a label the predictor awards itself. It might come from verified operating periods or an application policy. The reference needs sufficient effective mass; old or missing normal evidence cannot justify a confident drift score. A legitimate new operating regime needs deliberate admission, rather than silently accepting an incident into the reference.
+
+## Check the Temporal Forecasts on Later Episodes
+
+Each domain has 600 training episodes and a separate later population of 300 visits. A frozen outcome model predicts at the first motion-ready landmark, before future labels are revealed. Missing feedback is excluded from scoring, not counted as a bad outcome. Normal references use earlier qualified observations.
+
+The actual run reports:
+
+| Domain | Scored | Censored | Model Brier | Training-only prior |
+|--------|-------:|---------:|------------:|--------------------:|
+| Shopping | 270 | 30 | 0.3405 | 0.7197 |
+| Operations | 264 | 36 | 0.2180 | 0.6657 |
+
+Lower Brier scores are better. Both compare with a prior for the **same time-defined target**. These are controlled simulator results, with uncalibrated estimates, rather than production performance or intervention uplift.
+
+This estimator learns from completed episodes. If feedback disappears selectively, the resulting reference population can be biased. A production application may need a censoring-aware estimator. Keeping the estimator replaceable does not remove that modelling responsibility.
+
+# Give the State Baseline Enough Experience
+
+To isolate the state-transition mathematics, the repository also includes a simpler `predict` command. This example has an event-count horizon and a separate Bogus catalogue/visit fixture. It is a foundation for understanding the update rule, rather than a head-to-head benchmark against the temporal dataset above.
 
 The new `predict` command uses [Bogus](https://github.com/bchavez/Bogus) for fake catalogue and user data, with a small C# simulator supplying behaviour and eventual outcomes:
 
@@ -242,7 +385,7 @@ These are possible integrations, rather than additional outcomes implemented in 
 
 The aim is to spot a trajectory early enough to change it. A warning identifies where an intervention may be useful; the experiment establishes whether that intervention actually prevents the unwanted outcome.
 
-# This Is What Training Does
+# The State Baseline Learns Transition Counts
 
 Suppose a historical user moves from `checkout` to `purchase`. The engine increments that connection:
 
@@ -328,7 +471,7 @@ A transport retry of the cancellation is recognised as a duplicate, so it does n
 
 That is the training loop directly: an observation changes a learned parameter, and a later prediction changes as a result. With enough experience, the relationships can become useful inputs to deciding which journey to investigate or improve.
 
-# Fresh Users, Different Trajectories
+# State-Only Forecasts for Fresh Users
 
 Now introduce three fresh shoppers. For this controlled comparison they interact with the **same product**, giving the matcher the same location to work from. Their paths differ.
 
@@ -347,6 +490,8 @@ They map to `considered_cart`, `impulsive_cart` and `returning_cart`, respective
 | After removal and return | 33.2% | 30.6% | 36.2% |
 
 Their supporting transition counts are 357, 336 and 229. These forecasts have zero unresolved mass within the configured horizon. They describe different learned route distributions, not different meanings assigned to the same distance score.
+
+> **State aside:** this simpler first-order baseline gives the same forecast to users with the same encoded state and population model. Prefix memory distinguishes `considered_cart` from `impulsive_cart`. The temporal estimator above goes further: even with the same categorical state, it conditions on measured centroid motion and elapsed time. Neither estimator receives a user's future endpoint as an input.
 
 The product picks remain the same:
 
@@ -464,17 +609,13 @@ The [sample source](https://github.com/scottgal/mostlylucidweb/tree/main/samples
 
 > **Part 4 aside: feedback can improve the catalogue too.** A pattern of questions, missing descriptions or poorly performing journeys can suggest a content experiment: clarify the product copy, supply a missing specification, test a different image, or investigate a pricing hypothesis. We can feed those observations back to retail and marketing, then compare the change with a control. Missing data is a reason to investigate; it does not by itself prove that filling a field, lowering a price or rewriting a paragraph will improve conversion.
 
-# The Same Loop Applies to Operations
+# From Incident Prediction to an Intervention
 
-The operations monitor in Part 2 already has a corresponding structure: a service supplies observations, the engine characterises the situation, and allowed diagnostic actions are candidates.
+The operational example above gives us the current trajectory, a learned normal reference and an expected route towards outage or recovery. The next practical question is whether an allowed change improves that route.
 
-Destination prediction adds the expected route towards recovery, continuing degradation or outage. A telemetry sample can move a service between observed states, and a later recovery or outage updates the learned transition model through the same ingestion mechanism.
+Would reducing a connection limit help this kind of incident? Would a different retry policy improve recovery? We can record the context, make a bounded change, and measure the response against an alternative.
 
-The organisation supplies the target and the state meanings. A service whose error rate is rising while its queue drains is not necessarily on the same trajectory as one whose queue and retry rate are both accelerating. Preserve the distinctions relevant to the action you might take.
-
-Then the practical question is familiar: would reducing an allowed connection limit help this kind of incident? Would a different retry policy improve recovery? We can record the context, make a bounded change, and measure the response against an alternative.
-
-That is the same directed learning loop as a different product, a special offer or a timed email. The outcomes and costs differ; the need for observations, baselines and measured responses remains.
+That is the same directed learning loop as showing a different product, a special offer or a timed email. The outcomes and costs differ; the need for observed trajectories, baselines and measured responses remains. Predicting an unwanted result identifies a context worth investigating; it does not prove that any particular intervention will prevent it.
 
 # A Small, Direct Version of DiSE
 

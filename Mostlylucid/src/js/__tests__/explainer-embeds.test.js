@@ -16,8 +16,9 @@ describe('article explainer boundary',()=>{
     it('sizes only a matching, same-origin child and bounds numeric input',()=>{
         size(1200,'https://unrelated.example');expect(frame.height).toBe('900');
         size(1200,location.origin,window);expect(frame.height).toBe('900');
-        for(const invalid of [NaN,Infinity,299,2401,'invalid']){size(invalid);expect(frame.height).toBe('900');}
+        for(const invalid of [NaN,Infinity,299,8001,'invalid']){size(invalid);expect(frame.height).toBe('900');}
         size(1639);expect(frame.height).toBe('1639');size(1056);expect(frame.height).toBe('1056');
+        size(3000);expect(frame.height).toBe('3000');size(1200);expect(frame.height).toBe('1200');
     });
     it('propagates theme changes on the root or body to embedded views',async()=>{
         const send=vi.spyOn(frame.contentWindow,'postMessage');

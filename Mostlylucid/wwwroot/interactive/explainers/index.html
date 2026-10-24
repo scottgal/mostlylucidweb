@@ -4,8 +4,8 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Inside the machine / Mostlylucid explainers</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23295748'/%3E%3Ctext x='10' y='29' fill='white' font-size='28'%3E∴%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css?v=2651102a8f71">
-<script defer src="/js/dist/explainers.js?v=2651102a8f71"></script>
+<link rel="stylesheet" href="style.css?v=007826871d44">
+<script defer src="/js/dist/explainers.js?v=007826871d44"></script>
 </head>
 <body>
 <header><a class="brand" href="/" target="_top"><span class="brand-mark">∴</span> mostlylucid <span class="muted">/ explainers</span></a><div class="header-actions"><button id="theme" type="button">Dark mode</button><button id="expand" type="button">Expand ↗</button></div></header>
@@ -31,19 +31,21 @@
 </section>
 <section id="prediction-view" aria-label="Destination prediction explainer" hidden>
 <div class="workbench">
-<div class="visual-card"><div class="card-heading"><div><span class="eyebrow">THE BEHAVIOURAL TRACKS</span><h2>24 users. Watch their journeys diverge.</h2></div></div>
+<div class="visual-card"><div class="card-heading"><div><span class="eyebrow">THE BEHAVIOURAL TRACKS</span><h2 id="prediction-domain-heading">24 users. Watch their journeys diverge.</h2></div><div class="comparison-actions"><button id="prediction-compare" aria-pressed="false">Compare direction</button><button id="prediction-pace" aria-pressed="false">Compare pace</button></div></div>
+<div id="prediction-pair" hidden><p id="prediction-pair-note" class="small muted"></p><div id="prediction-pair-cards"></div></div>
 <div class="legend"><span>Each coloured trail is one user</span><span>Dots mark observations</span><span>Moving heads show current behaviour</span></div>
+<div class="temporal-toolbar"><label>Traffic<select id="prediction-domain"><option value="shop">Shopping journeys</option><option value="operations">Service incidents</option></select></label><output id="prediction-clock"></output></div>
 <div id="prediction-plot" role="group" aria-label="Multiple user behaviour tracks moving towards and away from destinations"><div id="prediction-fallback"></div><span id="prediction-renderer" class="plot-status">Observed behaviour / deck.gl</span></div>
 <div id="prediction-live" class="prediction-live" aria-live="off"></div>
 <div id="prediction-users" class="plot-tools" aria-label="Select a user to inspect"></div>
-<p class="prediction-map-note small muted">Follow the heads, then read the trails: basket removal and resumed browsing pull users back; checkout advances them towards purchase. Positions are an authored state layout with separate display lanes, not learned embedding coordinates. Select a track for its real forecast.</p>
+<p class="prediction-map-note small muted">Heads follow the measured behavioural centroids on a shared UTC timeline. The two feature coordinates are fixed; small display offsets keep users selectable. Forecasts also use velocity, acceleration and elapsed time in the source space. Compare direction or pace to see why the same observed position can have different futures.</p>
 <div class="filters"><label>What are we optimising for?<select id="prediction-objective"><option value="purchase">Complete purchases</option><option value="cancellation">Avoid cancellation</option></select></label><div id="prediction-destinations" class="destination-utilities"></div></div>
 </div>
-<aside class="inspector prediction-inspector"><span class="eyebrow">CAPTURED C# ENGINE OUTPUT</span><h2 id="prediction-title"></h2><p id="prediction-prefix" class="muted"></p><div class="evidence-item"><span>Current state</span><strong id="prediction-state"></strong></div><p id="prediction-status" class="small muted"></p><div id="prediction-values"></div><p id="prediction-support" class="small muted"></p><h3>Utility / possible range</h3><strong id="prediction-utility"></strong><p id="prediction-utility-note" class="small muted"></p></aside>
+<aside class="inspector prediction-inspector"><span class="eyebrow">CAPTURED C# ENGINE OUTPUT</span><h2 id="prediction-title"></h2><p id="prediction-prefix" class="muted"></p><div class="evidence-item"><span>Current state</span><strong id="prediction-state"></strong></div><p id="prediction-status" class="small muted"></p><p id="prediction-window" class="small muted"></p><p id="prediction-motion" class="small muted"></p><p id="prediction-normal" class="small muted" hidden></p><div id="prediction-values"></div><p id="prediction-support" class="small muted"></p><h3>Utility / possible range</h3><strong id="prediction-utility"></strong><p id="prediction-utility-note" class="small muted"></p></aside>
 </div>
-<p class="note">24 synthetic visits: three teaching paths and 21 generated holdout journeys. Starts are staggered for visibility; movement interpolates between captured observations. The paths use observed states, never future outcomes. Incomplete visits stop without inventing an endpoint. Forecasts come from the frozen C# model trained on 1,000 visits; no intervention effect is simulated.</p>
+<p class="note">24 synthetic timestamped visits against a frozen model trained on 600 earlier episodes. The UTC clock and playback speed use recorded event time. Forecast horizon: 60 seconds from the displayed observation. Fast centroid half-life: 2 seconds. Service normal-reference half-life: 24 hours; only qualified healthy observations update it. Unfinished visits are not labelled as failures. No intervention effect is simulated.</p>
 </section>
-<section class="playback" aria-label="Replay controls"><div class="play-buttons"><button id="play" class="primary">Play</button><button id="back" aria-label="Previous step">←</button><button id="next" aria-label="Next step">Next →</button><button id="reset">Reset</button></div><label class="scrubber"><span id="step-label">Before the first observation</span><input id="scrub" type="range" min="0" max="5" value="0" aria-label="Replay position"></label><span id="step-count" class="step-count">0 / 5</span></section>
+<section class="playback" aria-label="Replay controls"><div class="play-buttons"><button id="play" class="primary">Play</button><button id="back" aria-label="Previous step">←</button><button id="next" aria-label="Next step">Next →</button><button id="reset">Reset</button></div><label class="scrubber"><span id="step-label">Before the first observation</span><input id="scrub" type="range" min="0" max="5" value="0" aria-label="Replay position"></label><label id="prediction-speed-label" hidden>Replay speed<select id="prediction-speed"><option value="1">1× real time</option><option value="10">10×</option><option value="30" selected>30×</option><option value="60">60×</option></select></label><span id="step-count" class="step-count">0 / 5</span></section>
 <p id="announcement" class="sr-only" aria-live="polite"></p>
 <details class="accessible-data"><summary>View the current data as a table</summary><table><thead><tr><th>Entity</th><th>Values / evidence</th><th>Result</th></tr></thead><tbody id="data-table"></tbody></table></details>
 </main>

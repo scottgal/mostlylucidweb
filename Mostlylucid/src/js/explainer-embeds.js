@@ -2,7 +2,7 @@
 window.addEventListener('message', event => {
     if (event.origin !== window.location.origin || event.data?.type !== 'mostlylucid-explainer-size') return;
     const height = Number(event.data.height);
-    if (!Number.isFinite(height) || height < 300 || height > 2400) return;
+    if (!Number.isFinite(height) || height < 300 || height > 8000) return;
     const frame = Array.from(document.querySelectorAll('iframe.article-explainer')).find(f => f.contentWindow === event.source);
     if (!frame) return;
     const pixels = Math.ceil(height);

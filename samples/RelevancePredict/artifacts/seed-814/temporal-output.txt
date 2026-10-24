@@ -1,0 +1,13 @@
+TIME HOLDOUT domain=shop horizon=60_seconds scored=270 censored=30 brier=0.3405 training_prior=0.7197
+TIME MODEL domain=shop training_episodes=600 horizon=60_seconds centroid_half_life=2_seconds
+A state=observing position=0.500 velocity=0.01499/s acceleration=0.000045/s2 elapsed=20s purchase=85.5 % cancel=7.5 % leave=7.0 % unresolved=0.0 % support=200
+B state=observing position=0.500 velocity=-0.01499/s acceleration=-0.000045/s2 elapsed=20s purchase=22.0 % cancel=37.5 % leave=40.5 % unresolved=0.0 % support=200
+C state=observing position=0.500 velocity=0.00250/s acceleration=0.000000/s2 elapsed=120s purchase=0.0 % cancel=0.0 % leave=0.0 % unresolved=100.0 % support=56
+TIME HOLDOUT domain=operations horizon=60_seconds scored=264 censored=36 brier=0.2180 training_prior=0.6657
+TIME MODEL domain=operations training_episodes=600 horizon=60_seconds centroid_half_life=2_seconds
+A state=degraded position=0.500 velocity=0.01499/s acceleration=0.000045/s2 elapsed=20s outage=76.0 % recovered=24.0 % unresolved=0.0 % support=125
+NORMAL A centroid=0.1000 deviation=56.17 effective_mass=35.64 half_life=86400_seconds
+B state=degraded position=0.500 velocity=-0.01499/s acceleration=-0.000045/s2 elapsed=20s outage=22.6 % recovered=77.4 % unresolved=0.0 % support=186
+NORMAL B centroid=0.1000 deviation=57.54 effective_mass=35.64 half_life=86400_seconds
+C state=degraded position=0.500 velocity=0.00250/s acceleration=0.000000/s2 elapsed=120s outage=0.0 % recovered=0.0 % unresolved=100.0 % support=44
+NORMAL C centroid=0.1000 deviation=56.86 effective_mass=35.61 half_life=86400_seconds

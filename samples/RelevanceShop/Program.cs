@@ -1,6 +1,12 @@
 using Mostlylucid.Relevance;
 using Mostlylucid.Relevance.Sqlite;
 
+if (args.FirstOrDefault() == "predict-time")
+{
+    await Mostlylucid.Relevance.PredictDemo.TemporalPredictionDemo.RunAsync(args.Skip(1).ToArray());
+    return;
+}
+
 // Part 3 uses a fresh Bogus population and reports actual destination forecasts.
 if (args.FirstOrDefault() == "predict")
 {

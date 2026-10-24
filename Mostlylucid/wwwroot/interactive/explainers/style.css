@@ -27,3 +27,9 @@ nav{flex-wrap:wrap}
 
 .prediction-live{padding:0 23px;font:12px ui-monospace,monospace;color:var(--ink);min-height:20px}
 #prediction-users label{min-width:210px;flex:1}
+
+#prediction-pair{padding:0 23px 14px}#prediction-pair-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}.comparison-card{border-left:3px solid;padding:10px 12px;background:var(--soft);font-size:11px;line-height:1.6;min-width:0}.comparison-card p{margin:7px 0;overflow-wrap:anywhere}.comparison-card code{font-size:10px}.comparison-card b{font-size:16px}
+@media(max-width:720px){#prediction-pair{padding:0 17px 12px}#prediction-pair-cards{grid-template-columns:1fr}.card-heading:has(#prediction-compare){flex-wrap:wrap}#prediction-compare{margin-bottom:12px}}
+
+.temporal-toolbar{padding:8px 23px;display:flex;align-items:center;gap:18px;justify-content:space-between}.temporal-toolbar label{min-width:140px}.temporal-toolbar output{font:11px ui-monospace,monospace;float:none}.comparison-actions{display:flex;gap:6px;flex-wrap:wrap}#prediction-speed-label{min-width:90px}#prediction-speed-label select{margin-top:3px;padding:5px}#prediction-motion,#prediction-normal{overflow-wrap:anywhere}
+@media(max-width:720px){.temporal-toolbar{padding:8px 17px;flex-wrap:wrap}.temporal-toolbar output{font-size:10px}.comparison-actions{margin-bottom:12px}#prediction-speed-label{order:2;margin-left:auto}.prediction-inspector{font-size:11px}}

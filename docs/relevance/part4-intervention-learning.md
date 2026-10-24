@@ -93,3 +93,7 @@ Use observed journeys to propose tests of missing product information, clearer d
 A high purchase forecast does not imply discount responsiveness, and low propensity does not imply high uplift. Include costs, margin, unsubscribe/complaint rates, consent and contact eligibility in the relevant marketing objective. Pricing experiments need explicit assignment units and protection against concurrent offers or spillover. The outcome ledger should support later training of a treatment-aware model.
 
 This is the direct DiSE connection: choose a bounded directed change, observe the response and update preferences from measured results. Start with transparent assignment and counts; add a trained model only when it improves the measured decision.
+
+## Timestamped context for interventions
+
+Part 3 now supplies actual centroid position, velocity, acceleration, elapsed episode time and qualified normal-reference evidence. Snapshot their representation/version and observation timestamp in the decision ledger, rather than reconstructing them after the response. A forecast's horizon starts at its observation; an experiment's attribution window starts at actual exposure/application. Both use physical time, but they are distinct windows. A return towards the normal centroid is evidence to measure alongside sustained recovery, throughput and intervention costs, not proof that the action caused recovery.

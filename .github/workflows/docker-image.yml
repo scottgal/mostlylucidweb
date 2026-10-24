@@ -9,7 +9,36 @@ on:
   workflow_dispatch:
 
 jobs:
+  verify-prediction:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            Mostlylucid/package-lock.json
+            mostlylucid-mermaid/package-lock.json
+      - name: Test prediction engine and persistent providers
+        run: dotnet test Mostlylucid.Relevance.Tests/Mostlylucid.Relevance.Tests.csproj -c Release
+      - name: Verify captured temporal examples against the engine
+        run: |
+          dotnet run --project samples/RelevanceShop -c Release -- predict-time --output "$RUNNER_TEMP/relevance-time"
+          python3 scripts/verify-temporal-replay.py samples/RelevancePredict/artifacts/seed-814 "$RUNNER_TEMP/relevance-time"
+      - name: Test the article player and shared renderer
+        run: |
+          npm --prefix mostlylucid-mermaid ci --ignore-scripts
+          npm --prefix mostlylucid-mermaid run build:all
+          npm --prefix mostlylucid-mermaid test
+          npm --prefix Mostlylucid ci --ignore-scripts
+          npm --prefix Mostlylucid test
+
   build-and-push:
+    needs: verify-prediction
     runs-on: ubuntu-latest
 
     steps:
@@ -72,7 +101,7 @@ jobs:
             ${{ env.TAGS }} -c 'mkdir -p /app/site-content/translated; exec dotnet /app/Mostlylucid.dll'
           docker exec mostlylucid-release-check dotnet /app/resume-compiler/LucidResumeHost.dll --probe http://127.0.0.1:8080
           docker exec mostlylucid-release-check dotnet /app/resume-compiler/LucidResumeHost.dll --probe https://localhost:7240
-          docker exec mostlylucid-release-check sh -c 'test -s /app/wwwroot/js/dist/explainers.js && grep -q "24 users. Watch their journeys diverge." /app/wwwroot/interactive/explainers/index.html && grep -q "prediction-replay-v2" /app/wwwroot/js/dist/explainers.js'
+          docker exec mostlylucid-release-check sh -c 'test -s /app/wwwroot/js/dist/explainers.js && grep -q "24 users. Watch their journeys diverge." /app/wwwroot/interactive/explainers/index.html && grep -q "temporal-replay-v1" /app/wwwroot/js/dist/explainers.js'
 
       - name: Push the Docker image to Docker Hub
         run: |

@@ -10,17 +10,22 @@ public sealed record DestinationProbability(string Destination, double Probabili
 /// <param name="HorizonEvents">Maximum future event transitions considered, not elapsed time.</param>
 /// <param name="Outcomes">Estimated outcome masses; do not renormalize away unresolved probability.</param>
 /// <param name="RemainingProbability">Mass not assigned to destinations, including unsupported transitions.</param>
-/// <param name="SupportingTransitions">Outgoing observation count for the initial state; not calibrated confidence.</param>
-/// <param name="Status">Baseline values: no_state, insufficient_evidence, estimated or observed_destination.</param>
+/// <param name="SupportingTransitions">Outgoing transitions for Markov prediction, or matched episode landmarks for trajectory prediction; not calibrated confidence.</param>
+/// <param name="Status">Markov: no_state, insufficient_evidence or estimated. Temporal: no_trajectory, insufficient_motion,
+/// insufficient_trajectory_evidence, stale_trajectory or estimated_trajectory. Both report observed_destination for a known endpoint.</param>
 /// <param name="ObservedAt">When the entity's starting state was observed; allows callers to assess staleness.</param>
 /// <param name="IsCalibrated">False for the baseline; external strategies may declare independently validated calibration.</param>
+/// <param name="HorizonSeconds">Elapsed-time horizon when trajectory prediction is enabled; HorizonEvents is then zero.</param>
+/// <param name="Trajectory">Actual timestamped motion and normal-reference evidence when configured.</param>
 public sealed record DestinationPrediction(string Subject, string? CurrentState, int HorizonEvents,
     IReadOnlyList<DestinationProbability> Outcomes, double RemainingProbability, double SupportingTransitions, string Status,
-    DateTimeOffset? ObservedAt = null, bool IsCalibrated = false);
+    DateTimeOffset? ObservedAt = null, bool IsCalibrated = false, double? HorizonSeconds = null, TrajectoryFrame? Trajectory = null);
 
 /// <summary>Pooled empirical first-order counts, cumulative while the engine model record remains active.</summary>
 public sealed class TransitionModel
 {
+    /// <summary>Optional bounded populations for elapsed-time trajectory forecasts.</summary>
+    public TrajectoryModel? Trajectories { get; set; }
     /// <summary>Source-state to target-state observation counts; destinations have no learned outgoing transitions.</summary>
     public Dictionary<string, Dictionary<string, double>> Counts { get; set; } = [];
 }
@@ -30,7 +35,9 @@ public sealed class TransitionModel
 /// <param name="State">Retained state, or null for an unknown/expired entity.</param>
 /// <param name="Transitions">Transition counts pooled over this engine identity.</param>
 /// <param name="Definition">Configured states, absorbing destinations and prediction horizon.</param>
-public sealed record PredictionContext(string Subject, SubjectState? State, TransitionModel Transitions, DestinationDefinition Definition);
+/// <param name="RequestedAt">Query clock used to reject an elapsed-time forecast whose observation window has already expired.</param>
+public sealed record PredictionContext(string Subject, SubjectState? State, TransitionModel Transitions, DestinationDefinition Definition,
+    DateTimeOffset? RequestedAt = null);
 
 /// <summary>Replaceable outcome inference over a snapshot; caller/DI owns its lifetime.</summary>
 public interface IDestinationPredictor

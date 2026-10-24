@@ -172,3 +172,40 @@ dotnet run --project samples/RelevanceShop -- predict --output /tmp/relevance-pr
 It starts fresh, learns from observations, predicts new users, reopens SQLite and evaluates against a frozen later population. See [the sample](../samples/RelevancePredict/README.md) for actual output, optional frozen LLM copy and the prefix/label boundary. The sample's small predictor adapters inspect or freeze the existing transition baseline; the core consumer API is unchanged.
 
 [Part 3](../Mostlylucid/Markdown/show-me-what-you-got-part3-predict.md) establishes outcome forecasts. [Part 4](../docs/relevance/part4-intervention-learning.md) uses controlled interventions to learn what changes the result. Richer image/embedding ingestion follows in [Part 5](../docs/relevance/part5-richer-representations.md).
+
+## Timestamped trajectories and normal references
+
+Destination prediction also supports a physical-time estimator. Configure `destinations.trajectory` to make it the default strategy; omitting it keeps the event-count Markov baseline. The public calls stay `SaveAsync` and `PredictAsync`.
+
+```yaml
+destinations:
+  states: [healthy, degraded, outage, recovered]
+  outcomes: [outage, recovered]
+  trajectory:
+    points: [behaviour]
+    horizon_seconds: 60
+    half_life_seconds: 2
+    velocity_scale: 0.01
+    acceleration_scale: 0.002
+    elapsed_scale_seconds: 60
+    baseline_states: [healthy]
+    baseline_half_life_seconds: 86400
+```
+
+The selected points must be declared converters, with at most 64 total coordinates. Observation streams must use `point_source: input` for measured observations. An endpoint may omit all selected measurement fields: it closes the episode using the recorded outcome time and preserves the last measured motion, rather than inventing a new vector. If any selected measurement is supplied, provide the complete vector. `baseline_group` (or a mapped field) is required when learning normal references, so unrelated services do not share one norm. Empty `baseline_states` disables normal-reference learning for domains that do not need it.
+
+The fast centroid uses elapsed-time exponential smoothing. Finite differences produce velocity per second and acceleration per second squared; irregular intervals use the separation between velocity midpoints. Three observations are needed for complete motion evidence. Equal/out-of-order timestamps are rejected in temporal mode, duplicate IDs remain idempotent, and gaps above `max_gap_seconds` reset motion and pending landmarks. An observed endpoint closes an episode; use a new subject ID for the next episode.
+
+The temporal predictor learns bounded feature-cell centroids and within-window outcome counts. Each completed episode contributes its first motion-ready landmark per observed state, preventing repeated samples in the same state from multiplying its votes. Matching uses scaled centroid, velocity, acceleration and elapsed-time features, plus the same state and reference group. Nearest eligible cell populations supply empirical destination frequencies. Unsupported contexts abstain. `max_cohorts` bounds memory by evicting the least recently updated cell; counts within a retained cell are cumulative, not a rolling training window.
+
+A completed episode whose first endpoint was outside the configured window contributes within-window unresolved mass. An unfinished episode does not become a failed outcome. These are uncalibrated completed-episode estimates; selective loss of feedback can bias the learned population. A different estimator can address censoring through the existing predictor interface.
+
+`DestinationPrediction.HorizonSeconds` identifies a temporal forecast, and `HorizonEvents` is zero. The window is anchored at `ObservedAt`, not at the time a caller reads an old snapshot. A query after that window has expired returns `stale_trajectory` and unresolved mass. The `Trajectory` evidence contains raw position, fast centroid, derivatives, elapsed episode time and any learned normal reference.
+
+Normal references use a separate slow, time-decayed mean/variance, updated only by explicitly qualified baseline states. Incident observations never update that reference. Deviation is RMS standardised displacement with a variance floor and minimum effective support; it is a diagnostic distance, not an incident probability. Normal admission and the meaning/scaling of every coordinate belong to the application. Reference records and the outcome model persist through the pluggable store and expire under configured retention.
+
+Run the reproducible two-domain sample:
+
+```sh
+dotnet run --project samples/RelevanceShop -- predict-time --output /tmp/relevance-time-814
+```

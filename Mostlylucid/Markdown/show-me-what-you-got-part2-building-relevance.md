@@ -321,7 +321,7 @@ The engine also has a small destination-prediction boundary:
 var prediction = await relevance.PredictAsync(sessionId);
 ```
 
-[Part 3: Predict](/blog/show-me-what-you-got-part3-predict) gives that boundary a proper worked example. We start with an empty SQLite model, generate products and user journeys with Bogus, learn from observed endpoints, and forecast outcomes for fresh users. The article uses real output from the C# console tool and evaluates predictions against a later held-out population.
+[Part 3: Predict](/blog/show-me-what-you-got-part3-predict) gives that boundary a proper worked example. We start with an empty SQLite model, generate products and user journeys with Bogus, learn from observed endpoints, and forecast outcomes for fresh users. The article adds timestamped centroid motion, velocity, acceleration and an elapsed-time forecast horizon, alongside a simpler state-count baseline. It uses real C# output and evaluates predictions against later held-out populations.
 
 For now, keep the two returned quantities distinct: RRF scores explain candidate ranking; destination estimates describe what tends to follow an observed journey, with a stated horizon, support and unresolved mass.
 

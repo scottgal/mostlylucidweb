@@ -1,52 +1,74 @@
-import {describe, expect, it} from 'vitest';
-import {objectives, predictionReplay, predictionSnapshot, predictionMax, probabilities, behaviourPosition, utilityRange} from './prediction-model';
-import report from '../../../../samples/RelevancePredict/artifacts/seed-814/report.json';
+import {describe,expect,it} from 'vitest';
+import {predictionReplay,predictionSnapshot,predictionMax,timeOrigin,probabilities,trajectoryComparisonPair,comparisonSnapshot,
+    objectives,utilityRange,formatDuration} from './prediction-model';
+import operations from '../../../../samples/RelevancePredict/artifacts/seed-814/temporal-operations-replay.json';
 
-describe('multiple behavioural tracks', () => {
-    it('uses 24 distinct visits with different paths, not clones of three users', () => {
+describe('physical-time behavioural tracks',()=>{
+    it('uses 24 separate timestamped visits and preserves the actual forecast mass',()=>{
         expect(predictionReplay.participants).toHaveLength(24);
         expect(new Set(predictionReplay.participants.map(p=>p.id)).size).toBe(24);
-        expect(new Set(predictionReplay.participants.map(p=>p.frames.map(f=>f.event).join(','))).size).toBeGreaterThan(5);
-        expect(new Set(predictionSnapshot(2).map(p=>p.position.join(','))).size).toBe(24);
-    });
-    it('preserves real forecast mass and agrees with the article cart estimates', () => {
-        const frames=predictionReplay.participants.flatMap(p=>p.frames);
-        for(const f of frames)expect(Object.values(probabilities(f.prediction)).reduce((a,b)=>a+b,0)).toBeCloseTo(1,12);
-        for(const forecast of report.forecasts){
-            const f=frames.find(f=>f.prediction.currentState===forecast.currentState);
-            expect(f.prediction.outcomes).toEqual(forecast.outcomes);
+        for(const participant of predictionReplay.participants){
+            expect(participant.frames.every(f=>Number.isFinite(Date.parse(f.at)))).toBe(true);
+            for(const frame of participant.frames){
+                expect(Object.values(probabilities(frame.prediction)).reduce((a,b)=>a+b,0)).toBeCloseTo(1,12);
+                expect(frame.prediction.horizonSeconds).toBe(60);
+                expect(frame.prediction.horizonEvents).toBe(0);
+            }
         }
     });
-    it('moves continuously, keeps individual trails, and rewinds deterministically', () => {
-        const a=predictionSnapshot(2.1),b=predictionSnapshot(2.6);
-        expect(a.filter((p,i)=>p.position.join(',')!==b[i].position.join(',')).length).toBeGreaterThan(10);
-        expect(b.every(p=>p.trail.length>=2)).toBe(true);
-        const before=predictionSnapshot(2.6);predictionSnapshot(predictionMax);
-        expect(predictionSnapshot(2.6)).toEqual(before);
+    it('shows real differences at the same observed position and categorical state',()=>{
+        const [a,b]=trajectoryComparisonPair();
+        expect(a.frame.prediction.trajectory.position).toEqual(b.frame.prediction.trajectory.position);
+        expect(a.frame.prediction.currentState).toBe(b.frame.prediction.currentState);
+        expect(a.frame.prediction.trajectory.velocity[0]).toBeGreaterThan(0);
+        expect(b.frame.prediction.trajectory.velocity[0]).toBeLessThan(0);
+        expect(probabilities(a.frame.prediction).purchase).toBeCloseTo(.855,5);
+        expect(probabilities(b.frame.prediction).purchase).toBeCloseTo(.22,5);
+        const population=comparisonSnapshot(60);
+        expect(population).toHaveLength(24);
+        expect(population.slice(0,2)).toEqual([a,b]);
+        expect(population.slice(2)).toEqual(predictionSnapshot(60).slice(2));
+        expect(a.events).not.toContain('purchase');
+        expect(b.events).not.toContain('leave');
     });
-    it('shows backwards movement for basket removal without consulting an endpoint', () => {
-        const person=predictionReplay.participants[2];
-        const cart=person.frames.find(f=>f.prediction.currentState==='research_cart');
-        const removed=person.frames.find(f=>f.event==='remove');
-        expect(behaviourPosition(removed,2)[0]).toBeLessThan(behaviourPosition(cart,2)[0]);
-        const before=predictionSnapshot(3);
-        const last=person.frames.at(-1);
-        const original=last.prediction.currentState;last.prediction.currentState='purchase';
-        expect(predictionSnapshot(3)).toEqual(before);
-        last.prediction.currentState=original;
+    it('distinguishes the same route at different paces and retains out-of-window mass',()=>{
+        const [a,c]=trajectoryComparisonPair('pace');
+        expect(a.frame.prediction.trajectory.position).toEqual(c.frame.prediction.trajectory.position);
+        expect(a.frame.prediction.trajectory.elapsedSeconds).toBe(20);
+        expect(c.frame.prediction.trajectory.elapsedSeconds).toBe(120);
+        expect(a.frame.prediction.trajectory.velocity[0]).toBeGreaterThan(c.frame.prediction.trajectory.velocity[0]);
+        expect(c.frame.prediction.remainingProbability).toBe(1);
+        expect(c.frame.prediction.status).toBe('estimated_trajectory');
     });
-    it('keeps censored visits unresolved and does not assign an invented destination', () => {
-        const completed=predictionSnapshot(predictionMax);
-        const censored=completed.filter(p=>p.frame.prediction.status!=='observed_destination');
-        expect(censored.length).toBeGreaterThan(0);
-        expect(completed.every(p=>p.finished)).toBe(true);
-        expect(censored.every(p=>!['purchase','cancel','leave'].includes(p.frame.event))).toBe(true);
+    it('uses the shared UTC timeline and interpolates continuous movement without inventing events',()=>{
+        expect(predictionSnapshot(3)[0].events).toEqual(['view']);
+        // Waiting placeholders have no measured coordinates and must not become part of an observed trail.
+        expect(predictionSnapshot(3)[0].trail).toHaveLength(2);
+        expect(predictionSnapshot(3)[1].events).toEqual([]);
+        const before=predictionSnapshot(45),after=predictionSnapshot(50);
+        expect(before.filter((p,i)=>p.position.join(',')!==after[i].position.join(',')).length).toBeGreaterThan(10);
+        predictionSnapshot(predictionMax);
+        expect(predictionSnapshot(45)).toEqual(before);
+        expect(formatDuration(120)).toBe('02:00');
+        expect(predictionMax).toBeGreaterThan(300);
+        expect(Number.isFinite(timeOrigin)).toBe(true);
     });
-    it('changes utility without moving a behavioural track or changing its forecast', () => {
-        const snapshot=predictionSnapshot(3),before=JSON.stringify(snapshot);
-        const forecast=snapshot[0].frame.prediction;
-        expect(utilityRange(forecast,objectives.purchase)[0]).toBeGreaterThan(utilityRange(forecast,objectives.cancellation)[0]);
-        expect(JSON.stringify(snapshot)).toBe(before);
-        expect(utilityRange(predictionSnapshot(0)[0].frame.prediction,objectives.purchase)).toEqual([-.5,1]);
+    it('keeps unfinished visits unfinished and marks expired recorded forecast windows',()=>{
+        const finished=predictionSnapshot(predictionMax);
+        expect(finished.filter(p=>p.frame.prediction.status!=='observed_destination')).toHaveLength(2);
+        expect(predictionSnapshot(200)[2].forecastExpired).toBe(true);
+        expect(predictionSnapshot(200)[0].forecastExpired).toBe(false);
+    });
+    it('retains a stable, learned normal reference despite incident trajectories',()=>{
+        const normalFrames=operations.participants.flatMap(p=>p.frames).filter(f=>f.prediction.trajectory?.normal);
+        const centroid=normalFrames[0].prediction.trajectory.normal.centroid;
+        expect(normalFrames.every(f=>JSON.stringify(f.prediction.trajectory.normal.centroid)===JSON.stringify(centroid))).toBe(true);
+        expect(normalFrames.some(f=>f.prediction.trajectory.normal.deviation>50)).toBe(true);
+        expect(centroid[0]).toBeCloseTo(.1,3);
+    });
+    it('keeps desirability independent of geometry and forecast probabilities',()=>{
+        const person=trajectoryComparisonPair()[0],before=JSON.stringify(person);
+        expect(utilityRange(person.frame.prediction,objectives.purchase)[0]).toBeGreaterThan(utilityRange(person.frame.prediction,objectives.cancellation)[0]);
+        expect(JSON.stringify(person)).toBe(before);
     });
 });

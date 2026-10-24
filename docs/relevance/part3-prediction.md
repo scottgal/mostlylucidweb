@@ -1,31 +1,38 @@
 # Part 3: Predict
 
-Implemented sample: `samples/RelevancePredict`, exposed as `predict` in the existing RelevanceShop console tool. Article: [SHOW ME WHAT YOU GOT (Part 3): Predict](../../Mostlylucid/Markdown/show-me-what-you-got-part3-predict.md).
+The primary demonstration is now `predict-time` in `samples/RelevanceShop`, implemented by `samples/RelevancePredict/TemporalPredictionDemo.cs`. The original `predict` command remains the simpler event-count baseline. Article: [SHOW ME WHAT YOU GOT (Part 3): Predict](../../Mostlylucid/Markdown/show-me-what-you-got-part3-predict.md).
 
-The objective is to make outcome learning directly visible before introducing controlled interventions. A fresh SQLite engine learns transition counts from a substantial synthetic population, forecasts destinations for new prefixes, persists across a restart, and updates the next forecast after an actual endpoint arrives.
+## Physical time is part of the representation
 
-## Data and representation
+The optional `destinations.trajectory` configuration selects source points, a fast centroid half-life, coordinate/rate/acceleration scales and a forecast horizon in seconds. Three strictly ordered timestamped observations produce centroid velocity and acceleration. Irregular acceleration uses the separation between successive velocity midpoints. Long gaps reset derivatives and pending landmarks rather than asserting continuity. Existing configurations retain the Markov predictor and event-count horizon.
 
-Bogus 35.6.5 supplies fake product/user metadata. A separately seeded simulator supplies observed journeys, final endpoints and incomplete feedback. The default has 240 products, 1,000 training visits and 400 later visits. Prefix states preserve comparison depth, cart progress, removals and returns. Simulator intent is private to generation; future labels never become input features. Counts/encoder versions and the fixed clock are explicit.
+`PredictAsync` returns a real `TrajectoryFrame`: observed position, smoothed centroid, velocity, acceleration, elapsed time, and optional normal evidence. Temporal forecasts are anchored at `ObservedAt` and expire after `HorizonSeconds`. A clock reading alone does not invent a new observation. The single channel/worker and atomic store transactions remain the consumer boundary.
 
-Optional local LLM copy is generated once, structurally validated, reviewed and frozen. Its overlay cannot change price, category, swatch, stock or labels. Copy remains metadata until an explicitly registered feature converter uses it.
+## Outcome learning
 
-## Learning and inference
+Completed episodes contribute their first motion-ready landmark per categorical state to bounded feature-cell populations. Cells maintain context centroids and actual within-window outcome counts. Nearby eligible populations, rather than screen geometry, supply empirical probabilities. Context includes centroid, velocity, acceleration and elapsed time. Minimum support/distance bounds abstain; unfinished episodes never become failures. These completed-episode estimates are uncalibrated and can be biased by informative loss of feedback.
 
-Use the existing MarkovDestinationPredictor and SaveAsync/PredictAsync APIs. Outcomes increment empirical transition counts in the same transaction as deduplication. Sparse states abstain. Probabilities are for the next four transitions and preserve unresolved mass. A new cancellation changes the next checkout forecast from 306/348 to 306/349; its duplicate retry does not train twice.
+## Qualified normal references
 
-A sample-only IDestinationPredictor adapter captures detached training counts. A second adapter freezes those counts for the evaluation engine while allowing ordinary subject-prefix ingestion. No core API expansion is needed.
+Normality is separate from outcome prediction. Explicit healthy-state admission updates a slow decayed mean/variance per application-defined reference group. Incident observations update live motion but cannot update the normal reference. Minimum effective mass, variance floors and retention make missing/old references explicit. Drift is RMS standardised displacement, not an incident probability. The sample uses a two-second live half-life and a 24-hour reference half-life.
 
-## Evaluation
+## Reproducible evidence
 
-The article distinguishes destination probabilities from application-owned desirability. An illustrative utility mapping (purchase 1, cancel -0.5, leave 0) demonstrates expected utility without changing the predictor's configuration or counts. Unresolved mass is unknown value, not a zero-valued endpoint. This is interpretation of the forecast, not an implemented intervention policy or evidence of action uplift.
+Each domain trains on 600 earlier synthetic episodes with timing/feature noise, then evaluates 300 later visits at their first motion-ready landmark against a frozen outcome model. Qualified normal observations precede training/evaluation. Seed 814 gives:
 
-The held-out landmark is the first cart addition. Forecasts are captured before inspecting labels. Missing feedback is unscored, an observed horizon without an endpoint is unresolved, and sessions without a cart never enter the landmark population. Compare multiclass Brier score with a training-only landmark prior and report reliability bins separately.
+| Domain | Scored | Censored | Model Brier | Training-only prior |
+| --- | ---: | ---: | ---: | ---: |
+| Shopping | 270 | 30 | 0.3405 | 0.7197 |
+| Operations | 264 | 36 | 0.2180 | 0.6657 |
 
-The article's seed 814 yields 349 scored visits, 27 censored and 24 without a cart. Brier: model 0.4750, prior 0.6234. Three independent seeded test fixtures verify improvement over that baseline. This establishes the mechanism on the simulator, not production calibration or causal treatment effects.
+The replay captures 24 additional visits per domain. Its first three visits share the same observed vector but differ in direction or pace. Shopping A/B purchase estimates within 60 seconds are 85.5% and 22.0%; the slower C has 100% outside-window unresolved mass. Operational A/B have 76.0% and 22.6% outage estimates, with a stable normal centroid near 100 ms latency and 1% errors.
+
+These simulator experiments establish the mechanism, not production calibration or causal uplift. They are separate fixtures from the state-only Bogus/Brier example; their scores are not a head-to-head benchmark.
+
+## Visualisation
+
+The temporal replay uses actual captured UTC timestamps, smoothed feature-coordinate positions and a selectable playback speed. Direction/pace comparisons pin two visits at their own recorded landmarks while retaining the population. Small identity offsets and interpolation are presentation choices; the C# engine supplies motion and forecasts. Service mode shows the learned normal marker and standardised deviation. Expired recorded windows are labelled rather than presented as current forecasts.
 
 ## Progression
 
-Part 3 supplies the expected-outcome baseline. [Part 4](part4-intervention-learning.md) adds directed interventions and measured responses: product/price/offer assignment, marketing messages, descriptions, missing information and allowed operational actions. The connection to DiSE is deliberate: make a bounded change, observe its response and update what the system knows. A later treatment-aware ML model can learn from that ledger.
-
-[Part 5](part5-richer-representations.md) introduces richer image/text representations after those measurement and experimentation contracts exist.
+[Part 4](part4-intervention-learning.md) adds controlled actions and measured responses. Record temporal context and its version at assignment; distinguish the forecast's observation-based horizon from the intervention's exposure-based attribution window. Destination desirability and intervention costs remain application-owned. [Part 5](part5-richer-representations.md) introduces richer image/text representations after the measurement contracts exist.
