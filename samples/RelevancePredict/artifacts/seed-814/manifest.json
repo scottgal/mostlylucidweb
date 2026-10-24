@@ -1,0 +1,12 @@
+{
+  "version": "bogus-shop-v2",
+  "seed": 814,
+  "bogus": "35.6.5",
+  "journeysSha256": "69810e4a1983df78013e7c8ca968d1b2774bd942baed03861a265f253509f697",
+  "trainingVisits": 1000,
+  "holdoutVisits": 400,
+  "copyOverlay": "none",
+  "clock": "2026-10-24T12:00:00+00:00",
+  "populationCountsFrozenForEvaluation": true,
+  "stateEncoding": "prefix-v2"
+}

@@ -11,7 +11,7 @@ Choose **all-MiniLM-L6-v2 through ONNX Runtime for the smallest initial text dem
 | `sentence-transformers/all-MiniLM-L6-v2` | 22.7M parameters, 384 dimensions, English; the published AVX2 quantised ONNX file is about 23 MB. | First lightweight text adapter. Short product descriptions and log messages, with a modest download. |
 | `BAAI/bge-small-en-v1.5` | 33.4M parameters, 384 dimensions, 512-token context, English. | Retrieval-focused challenger in the same small-model evaluation. |
 | EmbeddingGemma 1 | 308M parameters, multilingual text, 768 dimensions with supported truncation. | Existing text-only alternative; less compelling as the long-term series choice now that version 2 exists. |
-| `google/embeddinggemma-2` | Modular: 270M text-only, 440M text plus vision, 740M with all encoders. Unified 768-dimensional output, supporting 512/256/128 truncation. | Preferred candidate for Part 4, where multilingual and cross-modal relevance justify the larger runtime. |
+| `google/embeddinggemma-2` | Modular: 270M text-only, 440M text plus vision, 740M with all encoders. Unified 768-dimensional output, supporting 512/256/128 truncation. | Preferred candidate for Part 5, where multilingual and cross-modal relevance justify the larger runtime. |
 
 Sources: [MiniLM model card](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2), [published quantised ONNX artifact](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2/blob/main/onnx/model_quint8_avx2.onnx), [Sentence Transformers runtime evaluation](https://www.sbert.net/docs/sentence_transformer/usage/efficiency.html), [BGE model card](https://huggingface.co/BAAI/bge-small-en-v1.5), [EmbeddingGemma versions](https://ai.google.dev/gemma/docs/embeddinggemma), [EmbeddingGemma 2 model card](https://ai.google.dev/gemma/docs/embeddinggemma/model_card_2).
 
@@ -54,4 +54,4 @@ Verify tokenizer and pooling parity against the reference implementation, finite
 
 The next model-specific implementation gate is a real local inference smoke test followed by this evaluation. The completed provider/engine tests do not qualify an embedding runtime.
 
-Images and shared-space matching continue in the [Part 4 plan](part4-richer-representations.md).
+Images and shared-space matching continue in the [Part 5 plan](part5-richer-representations.md).

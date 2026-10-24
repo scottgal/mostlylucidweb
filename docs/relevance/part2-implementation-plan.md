@@ -2,7 +2,7 @@
 
 Research date: 2026-10-23. Initial implementation: .NET 10, local preview packages, no remote dependency.
 
-Series progression: **Understand the data → Understand the behaviour → Change the outcome.** Part 1 establishes representation and relevance; Part 2 builds the statistical engine and two-domain demo; [Part 3](part3-intervention-learning.md) introduces the separate intervention-learning extension. [Part 4](part4-richer-representations.md) adds images and richer representations. The [optional embedding research](optional-embeddings.md) recommends a small ONNX text baseline and qualification of EmbeddingGemma 2/GGUF for the multimodal path.
+Series progression: **Understand the data → Understand the behaviour → Change the outcome.** Part 1 establishes representation and relevance; Part 2 builds the statistical engine and two-domain demo; [Part 3](../../Mostlylucid/Markdown/show-me-what-you-got-part3-predict.md) demonstrates online destination learning with a Bogus fixture and held-out forecasts. [Part 4](part4-intervention-learning.md) introduces controlled experimentation. [Part 5](part5-richer-representations.md) adds images and richer representations. The [optional embedding research](optional-embeddings.md) recommends a small ONNX text baseline and qualification of EmbeddingGemma 2/GGUF for the multimodal path.
 
 ## Demonstration and public surface
 

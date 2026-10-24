@@ -1,0 +1,11 @@
+Write useful, plain display copy for these fictional demo products. Return JSON only:
+{"products":[{"id":"existing-id","name":"short name","description":"short intended-use description"}]}
+Use exactly the supplied IDs. Preserve each product kind and category. Do not invent materials,
+size, dimensions, performance, certifications, health benefits, discounts or prices. No advertising
+superlatives. Drop silly generated adjectives such as Tasty, Awesome or Intelligent from names.
+Do not describe anything as electric, comfortable, high-quality, enhanced, compact or sustainable:
+these attributes are not supplied. Describe purpose only: a flask carries drinks, a kettle heats
+water, a speaker plays audio, boots are for walking. Invented short range names are fine. Do not mention a different kind of product. Names <= 80 characters, descriptions <= 200.
+These are synthetic fixtures, not evidence about real products.
+INPUT:
+[{"id": "p-0001", "name": "Small Camp flask", "category": "outdoors"}, {"id": "p-0002", "name": "Tasty Pocket speaker", "category": "electronics"}, {"id": "p-0003", "name": "Unbranded Kettle", "category": "home"}, {"id": "p-0004", "name": "Sleek Walking boots", "category": "outdoors"}, {"id": "p-0005", "name": "Awesome Pocket speaker", "category": "electronics"}, {"id": "p-0006", "name": "Tasty Kettle", "category": "home"}]

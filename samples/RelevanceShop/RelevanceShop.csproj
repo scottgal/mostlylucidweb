@@ -7,6 +7,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../RelevancePredict/RelevancePredict.csproj" />
     <ProjectReference Include="../../Mostlylucid.Relevance.Sqlite/Mostlylucid.Relevance.Sqlite.csproj" />
     <None Include="relevance.yaml" CopyToOutputDirectory="PreserveNewest" />
     <None Include="diagnostics.yaml" CopyToOutputDirectory="PreserveNewest" />

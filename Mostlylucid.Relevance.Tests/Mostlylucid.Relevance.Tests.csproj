@@ -12,6 +12,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.12" />
+    <ProjectReference Include="../samples/RelevancePredict/RelevancePredict.csproj" />
     <ProjectReference Include="../Mostlylucid.Relevance.Sqlite/Mostlylucid.Relevance.Sqlite.csproj" />
     <ProjectReference Include="../Mostlylucid.Relevance.Demo/Mostlylucid.Relevance.Demo.csproj" />
     <None Include="../samples/RelevanceShop/relevance.yaml" Link="relevance.yaml" CopyToOutputDirectory="PreserveNewest" />

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "p-0001",
+    "name": "Small Camp flask",
+    "category": "outdoors",
+    "price": 191,
+    "available": true,
+    "swatch": "#354456",
+    "description": "Camp flask for outdoors use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+  },
+  {
+    "id": "p-0002",
+    "name": "Tasty Pocket speaker",
+    "category": "electronics",
+    "price": 257,
+    "available": true,
+    "swatch": "#354456",
+    "description": "Pocket speaker for electronics use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+  },
+  {
+    "id": "p-0003",
+    "name": "Unbranded Kettle",
+    "category": "home",
+    "price": 132,
+    "available": true,
+    "swatch": "#c0a783",
+    "description": "Kettle for home use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+  },
+  {
+    "id": "p-0004",
+    "name": "Sleek Walking boots",
+    "category": "outdoors",
+    "price": 269,
+    "available": true,
+    "swatch": "#456859",
+    "description": null
+  },
+  {
+    "id": "p-0005",
+    "name": "Awesome Pocket speaker",
+    "category": "electronics",
+    "price": 205,
+    "available": true,
+    "swatch": "#c0a783",
+    "description": "Pocket speaker for electronics use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+  },
+  {
+    "id": "p-0006",
+    "name": "Tasty Kettle",
+    "category": "home",
+    "price": 123,
+    "available": true,
+    "swatch": "#9b563a",
+    "description": "Kettle for home use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+  }
+]

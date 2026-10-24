@@ -159,3 +159,16 @@ Implementation sequence and SQLite research: [Part 2 plan](../docs/relevance/par
 ## Sample API documentation
 
 Both library projects generate XML documentation for IntelliSense and package consumers. Missing documentation on a public member is a build error (`CS1591`). Entry-point comments explain ownership, completion/cancellation, score meaning and failure conditions; provider and converter contracts document the invariants an extension must preserve.
+
+
+## Part 3: learn and predict from generated journeys
+
+The console tool now has a reproducible `predict` command using Bogus products/users and explicit synthetic outcome rules:
+
+```sh
+dotnet run --project samples/RelevanceShop -- predict --output /tmp/relevance-predict-814
+```
+
+It starts fresh, learns from observations, predicts new users, reopens SQLite and evaluates against a frozen later population. See [the sample](../samples/RelevancePredict/README.md) for actual output, optional frozen LLM copy and the prefix/label boundary. The sample's small predictor adapters inspect or freeze the existing transition baseline; the core consumer API is unchanged.
+
+[Part 3](../Mostlylucid/Markdown/show-me-what-you-got-part3-predict.md) establishes outcome forecasts. [Part 4](../docs/relevance/part4-intervention-learning.md) uses controlled interventions to learn what changes the result. Richer image/embedding ingestion follows in [Part 5](../docs/relevance/part5-richer-representations.md).

@@ -311,57 +311,19 @@ This follows the [behavioural inference pattern](/blog/behavioural-inference-sys
 
 > **Diagnostic aside: a relevant action is still a candidate.** A prototype match does not prove a root cause or show that executing the action will improve the system. The application decides which handlers are allowed and whether to apply one.
 
-# Can We Predict Where This Behaviour Is Going?
+# From Matching to Prediction
 
-Matching asks what resembles the current situation. Prediction asks what tends to follow it.
+A matching score ranks eligible candidates. It does not tell us the probability of a purchase or a service outage.
 
-That requires additional evidence. The distance from a service profile to an action prototype does not establish an outage probability. We need observed relationships between state and subsequent outcomes.
-
-The baseline uses first-order Markov transitions, following the approach discussed in [Stylo.Bot's transition modelling](/blog/botdetection-part2-signature-pipeline-and-stylobot-architecture#novel-bit-2-markov-style-transition-modeling).
-
-A **first-order** model uses the current state to estimate the next one. For shopping, states include view, comparison, cart and the destinations purchase/cancel. For operations, they include healthy, degraded and the destinations outage/recovered.
-
-The console diagnostic sample constructs four independent synthetic journeys:
-
-| Observed transition | Count |
-|---------------------|------:|
-| Degraded → outage | 3 |
-| Degraded → recovered | 1 |
-
-With smoothing disabled for this teaching example, the outgoing proportions are 3/4 and 1/4. For a currently degraded entity, that produces 75% outage and 25% recovery in this tiny model. These are synthetic proportions, not measured production accuracy.
-
-Longer journeys need more than one update. `MarkovDestinationPredictor` maintains probability mass across states and propagates it for the configured horizon. The key operation is:
+The engine also has a small destination-prediction boundary:
 
 ```csharp
-var total = count + definition.Smoothing * definition.States.Count;
-foreach (var target in definition.States)
-    next[target] += mass *
-        (row.GetValueOrDefault(target) + definition.Smoothing) / total;
+var prediction = await relevance.PredictAsync(sessionId);
 ```
 
-For each currently possible state, distribute its mass among possible next states according to the outgoing transition estimates. Repeat for the chosen number of steps.
+[Part 3: Predict](/blog/show-me-what-you-got-part3-predict) gives that boundary a proper worked example. We start with an empty SQLite model, generate products and user journeys with Bogus, learn from observed endpoints, and forecast outcomes for fresh users. The article uses real output from the C# console tool and evaluates predictions against a later held-out population.
 
-**Smoothing** adds a small pseudo-count to possible transitions. It avoids treating an unobserved transition as impossible merely because the dataset is small. That is a modelling assumption, so the configuration makes it visible.
-
-Destination states are **absorbing** during the forecast: once probability reaches purchase, cancel, outage or recovery, it stays assigned to that destination for the remaining steps.
-
-Sparse rows take a different path:
-
-```csharp
-if (count < definition.MinTransitions)
-{
-    remaining += mass;
-    continue;
-}
-```
-
-That mass becomes unresolved. So does mass still in an intermediate state at the end of the horizon. We preserve it rather than redistributing it over the named outcomes.
-
-> **Probability aside: eight events is not eight minutes.** The baseline horizon counts transitions. A result must retain its horizon, observation time, support and unresolved mass to be interpretable. A count of supporting observations is not a confidence interval.
-
-Transition counts are pooled across entities within the configured engine identity and remain cumulative while the model record is active. The latest state begins a forecast, but the model does not retain the entire path or distinguish every kind of degraded service.
-
-This gives us a useful statistical baseline. Richer states, elapsed-time models, trajectories and calibrated predictors can be compared against it. There is no need to infer probability from geometry to make the first implementation work.
+For now, keep the two returned quantities distinct: RRF scores explain candidate ranking; destination estimates describe what tends to follow an observed journey, with a stated horizon, support and unresolved mass.
 
 # Let Outcomes Inform the Next Ranking
 
@@ -403,7 +365,7 @@ The operations equivalent is just as interesting. The demo lets an explicitly ch
 
 Recovery after that action does not demonstrate that the action caused recovery. We could have changed nothing and recovered anyway.
 
-Part 3 will address that comparison through a separate `.Learning` extension: record the context, actual exposure, available alternatives and selection probabilities, then evaluate interventions. The current feedback heuristic and before/after notebook are the starting point for that question.
+Part 4 will address that comparison through a separate `.Learning` extension: record the context, actual exposure, available alternatives and selection probabilities, then evaluate interventions. The current feedback heuristic and before/after notebook are the starting point for that question.
 
 # Make Streaming a Promise We Can Explain
 
@@ -467,7 +429,7 @@ Optional text embeddings fit the same boundary. Encode a product description whe
 
 The current demo runs without an embedding runtime. The researched small text baseline is [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2) through ONNX. [EmbeddingGemma 2](https://ai.google.dev/gemma/docs/embeddinggemma/model_card_2) is a candidate for the richer multilingual and image extension; a GGUF conversion exists, but the exact LLamaSharp backend still needs qualification.
 
-Part 4 will explore images and multimodal representations. Separate image and text rankings can be fused even when their spaces differ. Direct text-to-image comparison needs compatible encoders and preprocessing from a shared space.
+Part 5 will explore images and multimodal representations. Separate image and text rankings can be fused even when their spaces differ. Direct text-to-image comparison needs compatible encoders and preprocessing from a shared space.
 
 Revisit russet from Part 1. A word embedding, a measured swatch and a product photograph can preserve different valid relationships. Adding another vector is useful when those relationships help the decision, and we should measure whether they do.
 
@@ -517,6 +479,6 @@ dotnet run --project samples/RelevanceShop/RelevanceShop.csproj
 
 These are .NET 10 preview projects. The library packages can be built locally; they have not been published to NuGet. [The sample source](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid.Relevance) includes the commented public API, [the SQLite provider](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid.Relevance.Sqlite) and [the runnable demo](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid.Relevance.Demo).
 
-We can now use an entity's characterisation to match candidates, combine useful opinions and update the result as evidence arrives. The next question is whether choosing a particular candidate actually changes what happens.
+We can now use an entity's characterisation to match candidates, combine useful opinions and update the result as evidence arrives.
 
-That is Part 3: **Change the outcome.**
+Next, [Part 3: Predict](/blog/show-me-what-you-got-part3-predict) learns how observed journeys tend to end and returns outcome probabilities for fresh users. That gives us a baseline for Part 4: **experiment with an intervention and measure the response**.

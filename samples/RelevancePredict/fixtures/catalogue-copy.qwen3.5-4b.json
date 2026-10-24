@@ -1,0 +1,36 @@
+{
+  "model": "qwen3.5:4b",
+  "promptVersion": "catalogue-copy-v1",
+  "products": [
+    {
+      "id": "p-0001",
+      "name": "Camp flask",
+      "description": "Carries drinks for outdoor use"
+    },
+    {
+      "id": "p-0002",
+      "name": "Pocket speaker",
+      "description": "Plays audio in small spaces"
+    },
+    {
+      "id": "p-0003",
+      "name": "Kettle",
+      "description": "Heats water for home use"
+    },
+    {
+      "id": "p-0004",
+      "name": "Walking boots",
+      "description": "Used for walking on trails"
+    },
+    {
+      "id": "p-0005",
+      "name": "Pocket speaker",
+      "description": "Plays audio in small spaces"
+    },
+    {
+      "id": "p-0006",
+      "name": "Kettle",
+      "description": "Heats water for home use"
+    }
+  ]
+}

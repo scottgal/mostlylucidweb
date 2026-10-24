@@ -1,6 +1,13 @@
 using Mostlylucid.Relevance;
 using Mostlylucid.Relevance.Sqlite;
 
+// Part 3 uses a fresh Bogus population and reports actual destination forecasts.
+if (args.FirstOrDefault() == "predict")
+{
+    await Mostlylucid.Relevance.PredictDemo.PredictionDemo.RunAsync(args.Skip(1).ToArray());
+    return;
+}
+
 var config = Path.Combine(AppContext.BaseDirectory, "relevance.yaml");
 var database = args.FirstOrDefault() ?? Path.Combine(Path.GetTempPath(), $"relevance-demo-{Guid.NewGuid():N}.db");
 // Standalone lifetime: the factory starts a bounded worker; await using drains it and closes SQLite.

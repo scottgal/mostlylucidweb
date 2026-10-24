@@ -1,0 +1,671 @@
+{
+  "version": "bogus-shop-v2",
+  "seed": 814,
+  "origin": "synthetic",
+  "isCalibrated": false,
+  "checkpoints": [
+    {
+      "journeys": 0,
+      "prediction": {
+        "subject": "new-shopper",
+        "currentState": "browsing",
+        "horizonEvents": 4,
+        "outcomes": [
+          {
+            "destination": "purchase",
+            "probability": 0
+          },
+          {
+            "destination": "cancel",
+            "probability": 0
+          },
+          {
+            "destination": "leave",
+            "probability": 0
+          }
+        ],
+        "remainingProbability": 1,
+        "supportingTransitions": 0,
+        "status": "insufficient_evidence",
+        "observedAt": "2026-10-24T11:00:00+00:00",
+        "isCalibrated": false
+      }
+    },
+    {
+      "journeys": 3,
+      "prediction": {
+        "subject": "new-shopper",
+        "currentState": "browsing",
+        "horizonEvents": 4,
+        "outcomes": [
+          {
+            "destination": "purchase",
+            "probability": 0
+          },
+          {
+            "destination": "cancel",
+            "probability": 0
+          },
+          {
+            "destination": "leave",
+            "probability": 0
+          }
+        ],
+        "remainingProbability": 1,
+        "supportingTransitions": 3,
+        "status": "insufficient_evidence",
+        "observedAt": "2026-10-24T11:00:00+00:00",
+        "isCalibrated": false
+      }
+    },
+    {
+      "journeys": 100,
+      "prediction": {
+        "subject": "new-shopper",
+        "currentState": "browsing",
+        "horizonEvents": 4,
+        "outcomes": [
+          {
+            "destination": "purchase",
+            "probability": 0.392145733054824
+          },
+          {
+            "destination": "cancel",
+            "probability": 0.1007225098134189
+          },
+          {
+            "destination": "leave",
+            "probability": 0.19011544011544013
+          }
+        ],
+        "remainingProbability": 0.317016317016317,
+        "supportingTransitions": 99,
+        "status": "estimated",
+        "observedAt": "2026-10-24T11:00:00+00:00",
+        "isCalibrated": false
+      }
+    },
+    {
+      "journeys": 1000,
+      "prediction": {
+        "subject": "new-shopper",
+        "currentState": "browsing",
+        "horizonEvents": 4,
+        "outcomes": [
+          {
+            "destination": "purchase",
+            "probability": 0.4005163810571429
+          },
+          {
+            "destination": "cancel",
+            "probability": 0.12221811201345374
+          },
+          {
+            "destination": "leave",
+            "probability": 0.21146988709812714
+          }
+        ],
+        "remainingProbability": 0.26579561983127625,
+        "supportingTransitions": 975,
+        "status": "estimated",
+        "observedAt": "2026-10-24T11:00:00+00:00",
+        "isCalibrated": false
+      }
+    }
+  ],
+  "forecasts": [
+    {
+      "subject": "probe-considered",
+      "currentState": "considered_cart",
+      "horizonEvents": 4,
+      "outcomes": [
+        {
+          "destination": "purchase",
+          "probability": 0.8793103448275862
+        },
+        {
+          "destination": "cancel",
+          "probability": 0.06896551724137931
+        },
+        {
+          "destination": "leave",
+          "probability": 0.05172413793103448
+        }
+      ],
+      "remainingProbability": 0,
+      "supportingTransitions": 357,
+      "status": "estimated",
+      "observedAt": "2026-10-24T11:02:00+00:00",
+      "isCalibrated": false
+    },
+    {
+      "subject": "probe-impulsive",
+      "currentState": "impulsive_cart",
+      "horizonEvents": 4,
+      "outcomes": [
+        {
+          "destination": "purchase",
+          "probability": 0.1826625386996904
+        },
+        {
+          "destination": "cancel",
+          "probability": 0.2724458204334365
+        },
+        {
+          "destination": "leave",
+          "probability": 0.544891640866873
+        }
+      ],
+      "remainingProbability": 0,
+      "supportingTransitions": 336,
+      "status": "estimated",
+      "observedAt": "2026-10-24T11:01:00+00:00",
+      "isCalibrated": false
+    },
+    {
+      "subject": "probe-returning",
+      "currentState": "returning_cart",
+      "horizonEvents": 4,
+      "outcomes": [
+        {
+          "destination": "purchase",
+          "probability": 0.3318777292576419
+        },
+        {
+          "destination": "cancel",
+          "probability": 0.3056768558951965
+        },
+        {
+          "destination": "leave",
+          "probability": 0.3624454148471616
+        }
+      ],
+      "remainingProbability": 0,
+      "supportingTransitions": 229,
+      "status": "estimated",
+      "observedAt": "2026-10-24T11:05:00+00:00",
+      "isCalibrated": false
+    }
+  ],
+  "recommendations": [
+    {
+      "id": "ee7b9ea8c17f482ebd25f7d697e0643a",
+      "subject": "probe-considered",
+      "placement": "home",
+      "items": [
+        {
+          "id": "p-0001",
+          "score": 0.04098360655737705,
+          "data": {
+            "id": "p-0001",
+            "name": "Small Camp flask",
+            "category": "outdoors",
+            "price": 191,
+            "available": true,
+            "swatch": "#354456",
+            "description": "Camp flask for outdoors use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+          },
+          "reasons": [
+            {
+              "head": "category",
+              "rank": 1,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "price",
+              "rank": 1,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "colour",
+              "rank": 1,
+              "weight": 0.5,
+              "distance": 0
+            }
+          ]
+        },
+        {
+          "id": "p-0007",
+          "score": 0.03770706190061029,
+          "data": {
+            "id": "p-0007",
+            "name": "Sleek Walking boots",
+            "category": "outdoors",
+            "price": 119,
+            "available": true,
+            "swatch": "#354456",
+            "description": "Walking boots for outdoors use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+          },
+          "reasons": [
+            {
+              "head": "category",
+              "rank": 2,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "price",
+              "rank": 14,
+              "weight": 1,
+              "distance": 0.35999995470046997
+            },
+            {
+              "head": "colour",
+              "rank": 2,
+              "weight": 0.5,
+              "distance": 0
+            }
+          ]
+        },
+        {
+          "id": "p-0058",
+          "score": 0.03767622586748222,
+          "data": {
+            "id": "p-0058",
+            "name": "Ergonomic Camp flask",
+            "category": "outdoors",
+            "price": 183,
+            "available": true,
+            "swatch": "#354456",
+            "description": null
+          },
+          "reasons": [
+            {
+              "head": "category",
+              "rank": 11,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "price",
+              "rank": 2,
+              "weight": 1,
+              "distance": 0.039999961853027344
+            },
+            {
+              "head": "colour",
+              "rank": 7,
+              "weight": 0.5,
+              "distance": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "701b049d267d42c9a7b543a61a526e07",
+      "subject": "probe-impulsive",
+      "placement": "home",
+      "items": [
+        {
+          "id": "p-0001",
+          "score": 0.04098360655737705,
+          "data": {
+            "id": "p-0001",
+            "name": "Small Camp flask",
+            "category": "outdoors",
+            "price": 191,
+            "available": true,
+            "swatch": "#354456",
+            "description": "Camp flask for outdoors use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+          },
+          "reasons": [
+            {
+              "head": "category",
+              "rank": 1,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "price",
+              "rank": 1,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "colour",
+              "rank": 1,
+              "weight": 0.5,
+              "distance": 0
+            }
+          ]
+        },
+        {
+          "id": "p-0007",
+          "score": 0.03770706190061029,
+          "data": {
+            "id": "p-0007",
+            "name": "Sleek Walking boots",
+            "category": "outdoors",
+            "price": 119,
+            "available": true,
+            "swatch": "#354456",
+            "description": "Walking boots for outdoors use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+          },
+          "reasons": [
+            {
+              "head": "category",
+              "rank": 2,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "price",
+              "rank": 14,
+              "weight": 1,
+              "distance": 0.35999995470046997
+            },
+            {
+              "head": "colour",
+              "rank": 2,
+              "weight": 0.5,
+              "distance": 0
+            }
+          ]
+        },
+        {
+          "id": "p-0058",
+          "score": 0.03767622586748222,
+          "data": {
+            "id": "p-0058",
+            "name": "Ergonomic Camp flask",
+            "category": "outdoors",
+            "price": 183,
+            "available": true,
+            "swatch": "#354456",
+            "description": null
+          },
+          "reasons": [
+            {
+              "head": "category",
+              "rank": 11,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "price",
+              "rank": 2,
+              "weight": 1,
+              "distance": 0.039999961853027344
+            },
+            {
+              "head": "colour",
+              "rank": 7,
+              "weight": 0.5,
+              "distance": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "a2532a1d2a0044f29cfa3976c9fddfcf",
+      "subject": "probe-returning",
+      "placement": "home",
+      "items": [
+        {
+          "id": "p-0001",
+          "score": 0.04098360655737705,
+          "data": {
+            "id": "p-0001",
+            "name": "Small Camp flask",
+            "category": "outdoors",
+            "price": 191,
+            "available": true,
+            "swatch": "#354456",
+            "description": "Camp flask for outdoors use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+          },
+          "reasons": [
+            {
+              "head": "category",
+              "rank": 1,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "price",
+              "rank": 1,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "colour",
+              "rank": 1,
+              "weight": 0.5,
+              "distance": 0
+            }
+          ]
+        },
+        {
+          "id": "p-0007",
+          "score": 0.03770706190061029,
+          "data": {
+            "id": "p-0007",
+            "name": "Sleek Walking boots",
+            "category": "outdoors",
+            "price": 119,
+            "available": true,
+            "swatch": "#354456",
+            "description": "Walking boots for outdoors use. This synthetic listing supplies a price and colour swatch; material and size details have not been provided."
+          },
+          "reasons": [
+            {
+              "head": "category",
+              "rank": 2,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "price",
+              "rank": 14,
+              "weight": 1,
+              "distance": 0.35999995470046997
+            },
+            {
+              "head": "colour",
+              "rank": 2,
+              "weight": 0.5,
+              "distance": 0
+            }
+          ]
+        },
+        {
+          "id": "p-0058",
+          "score": 0.03767622586748222,
+          "data": {
+            "id": "p-0058",
+            "name": "Ergonomic Camp flask",
+            "category": "outdoors",
+            "price": 183,
+            "available": true,
+            "swatch": "#354456",
+            "description": null
+          },
+          "reasons": [
+            {
+              "head": "category",
+              "rank": 11,
+              "weight": 1,
+              "distance": 0
+            },
+            {
+              "head": "price",
+              "rank": 2,
+              "weight": 1,
+              "distance": 0.039999961853027344
+            },
+            {
+              "head": "colour",
+              "rank": 7,
+              "weight": 0.5,
+              "distance": 0
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "evaluation": {
+    "visits": 400,
+    "withoutCart": 24,
+    "censored": 27,
+    "scored": 349,
+    "horizonEvents": 4,
+    "modelBrier": 0.47504213480071233,
+    "priorBrier": 0.6233937033499614,
+    "purchaseBins": [
+      {
+        "range": "0\u201320%",
+        "count": 119,
+        "meanPredicted": 0.18266253869969057,
+        "observedFrequency": 0.16806722689075632
+      },
+      {
+        "range": "20\u201340%",
+        "count": 91,
+        "meanPredicted": 0.3318777292576416,
+        "observedFrequency": 0.37362637362637363
+      },
+      {
+        "range": "40\u201360%",
+        "count": 0,
+        "meanPredicted": 0,
+        "observedFrequency": 0
+      },
+      {
+        "range": "60\u201380%",
+        "count": 0,
+        "meanPredicted": 0,
+        "observedFrequency": 0
+      },
+      {
+        "range": "80\u2013100%",
+        "count": 139,
+        "meanPredicted": 0.879310344827587,
+        "observedFrequency": 0.8705035971223022
+      }
+    ]
+  },
+  "transitions": {
+    "counts": {
+      "browsing": {
+        "comparing": 632,
+        "impulsive_cart": 343
+      },
+      "comparing": {
+        "repeated_comparison": 253,
+        "considered_cart": 364
+      },
+      "repeated_comparison": {
+        "research_cart": 248
+      },
+      "research_cart": {
+        "cart_removed": 245
+      },
+      "cart_removed": {
+        "reconsidering": 238
+      },
+      "reconsidering": {
+        "returning_cart": 235
+      },
+      "returning_cart": {
+        "purchase": 76,
+        "leave": 83,
+        "cancel": 70
+      },
+      "impulsive_cart": {
+        "post_cart_browsing": 336
+      },
+      "post_cart_browsing": {
+        "leave": 176,
+        "cancel": 88,
+        "purchase": 59
+      },
+      "considered_cart": {
+        "checkout": 357
+      },
+      "checkout": {
+        "purchase": 306,
+        "cancel": 24,
+        "leave": 18
+      }
+    }
+  },
+  "adaptation": {
+    "before": {
+      "subject": "adapt-session",
+      "currentState": "checkout",
+      "horizonEvents": 4,
+      "outcomes": [
+        {
+          "destination": "purchase",
+          "probability": 0.8793103448275862
+        },
+        {
+          "destination": "cancel",
+          "probability": 0.06896551724137931
+        },
+        {
+          "destination": "leave",
+          "probability": 0.05172413793103448
+        }
+      ],
+      "remainingProbability": 0,
+      "supportingTransitions": 348,
+      "status": "estimated",
+      "observedAt": "2026-10-24T11:00:00+00:00",
+      "isCalibrated": false
+    },
+    "observed": {
+      "subject": "adapt-session",
+      "currentState": "cancel",
+      "horizonEvents": 4,
+      "outcomes": [
+        {
+          "destination": "purchase",
+          "probability": 0
+        },
+        {
+          "destination": "cancel",
+          "probability": 1
+        },
+        {
+          "destination": "leave",
+          "probability": 0
+        }
+      ],
+      "remainingProbability": 0,
+      "supportingTransitions": 0,
+      "status": "observed_destination",
+      "observedAt": "2026-10-24T11:01:00+00:00",
+      "isCalibrated": false
+    },
+    "after": {
+      "subject": "next-checkout",
+      "currentState": "checkout",
+      "horizonEvents": 4,
+      "outcomes": [
+        {
+          "destination": "purchase",
+          "probability": 0.8767908309455588
+        },
+        {
+          "destination": "cancel",
+          "probability": 0.07163323782234957
+        },
+        {
+          "destination": "leave",
+          "probability": 0.05157593123209169
+        }
+      ],
+      "remainingProbability": 0,
+      "supportingTransitions": 349,
+      "status": "estimated",
+      "observedAt": "2026-10-24T11:02:00+00:00",
+      "isCalibrated": false
+    },
+    "retryDuplicate": true
+  }
+}

@@ -1,0 +1,38 @@
+id: predict-shop-v2
+half_life_minutes: 90
+state_retention_hours: 24
+filters: [category, available, price]
+streams:
+  products: {kind: candidate}
+  events:
+    kind: observation
+    weights: {view: 1, compare: 2, cart: 3, remove: 0, checkout: 0, purchase: 0, cancel: 0, leave: 0}
+destinations:
+  states: [browsing, post_cart_browsing, comparing, repeated_comparison, considered_cart, research_cart, impulsive_cart, returning_cart, cart_removed, reconsidering, checkout, purchase, cancel, leave]
+  outcomes: [purchase, cancel, leave]
+  horizon_events: 4
+  min_transitions: 20
+  # No pseudo-counts in this teaching run: every displayed edge has an observation.
+  smoothing: 0
+points:
+  category:
+    path: category
+    converter: categorical
+    categories: [outdoors, electronics, home]
+    metric: cosine
+    displays: Category affinity from the products receiving attention.
+  price:
+    path: price
+    converter: formula
+    expression: "x / 200"
+    metric: l2
+    displays: Price affinity in units of £200.
+  colour:
+    path: swatch
+    converter: rgb-oklab
+    metric: l2
+    displays: Measured product swatch, not an embedding of its name.
+placements:
+  home:
+    heads: {category: 1, price: 1, colour: 0.5}
+    where: {available: true}

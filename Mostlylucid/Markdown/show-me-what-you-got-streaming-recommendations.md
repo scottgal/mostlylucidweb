@@ -576,7 +576,7 @@ This follows the signal-and-evidence approach in [Behavioural Inference](/blog/b
 
 A gift purchase does not establish an enduring preference. An accidental click is weak evidence. Many repeated observations can reinforce a mistaken interpretation rather than make it correct. Retain context, distinguish explicit constraints from inferred preferences, and let evidence expire.
 
-The system also influences what it observes. Products shown more often have more opportunities to receive clicks. Without exposure information, we cannot distinguish an ignored product from one the shopper never saw. This becomes central when we learn from interventions in Part 3.
+The system also influences what it observes. Products shown more often have more opportunities to receive clicks. Without exposure information, we cannot distinguish an ignored product from one the shopper never saw. This becomes central when we learn from interventions in Part 4.
 
 A useful representation preserves relationships relevant to the decision. To assess it, compare against a simpler baseline and remove individual signals to see what changes. That removal is an **ablation study**. Adding a vector or discovering a cluster does not by itself demonstrate improved recommendations.
 
@@ -598,4 +598,4 @@ The next question is how to use that characterisation. Given this session's inte
 
 [Part 2: From Behaviour to Recommendations in C#](/blog/show-me-what-you-got-part2-building-relevance) follows that path from an entity's representation to candidate matching, combined rankings and destination estimates. Short extracts from the working Relevance engine make each concept concrete: the calculation that updates a summary, the comparison that finds a neighbour, and the ranking rule that combines different signals.
 
-The companion shop and operations monitor give us examples we can run and inspect as we go. They use the same statistical machinery with different observations and candidates. Part 3 will ask whether choosing a particular candidate changes the outcome; Part 4 will add richer representations, including images.
+The companion shop and operations monitor give us examples we can run and inspect as we go. They use the same statistical machinery with different observations and candidates. [Part 3: Predict](/blog/show-me-what-you-got-part3-predict) learns how journeys tend to end. Part 4 will test directed interventions, including products, offers and marketing messages; Part 5 will add richer representations, including images.

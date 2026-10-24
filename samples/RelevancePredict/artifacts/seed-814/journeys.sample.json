@@ -1,0 +1,203 @@
+[
+  {
+    "user": {
+      "id": "train-00001",
+      "name": "Candice",
+      "category": "electronics",
+      "budget": 285
+    },
+    "events": [
+      {
+        "id": "train-00001-00",
+        "subject": "train-00001",
+        "candidate": "p-0128",
+        "type": "view",
+        "at": "2026-10-24T08:00:34+00:00"
+      },
+      {
+        "id": "train-00001-01",
+        "subject": "train-00001",
+        "candidate": "p-0155",
+        "type": "compare",
+        "at": "2026-10-24T08:01:25+00:00"
+      },
+      {
+        "id": "train-00001-02",
+        "subject": "train-00001",
+        "candidate": "p-0176",
+        "type": "compare",
+        "at": "2026-10-24T08:02:08+00:00"
+      },
+      {
+        "id": "train-00001-03",
+        "subject": "train-00001",
+        "candidate": "p-0071",
+        "type": "cart",
+        "at": "2026-10-24T08:02:40+00:00"
+      },
+      {
+        "id": "train-00001-04",
+        "subject": "train-00001",
+        "candidate": "p-0116",
+        "type": "remove",
+        "at": "2026-10-24T08:02:57+00:00"
+      },
+      {
+        "id": "train-00001-05",
+        "subject": "train-00001",
+        "candidate": "p-0047",
+        "type": "compare",
+        "at": "2026-10-24T08:03:16+00:00"
+      },
+      {
+        "id": "train-00001-06",
+        "subject": "train-00001",
+        "candidate": "p-0047",
+        "type": "cart",
+        "at": "2026-10-24T08:03:43+00:00"
+      },
+      {
+        "id": "train-00001-07",
+        "subject": "train-00001",
+        "candidate": "p-0134",
+        "type": "purchase",
+        "at": "2026-10-24T08:04:18+00:00"
+      }
+    ],
+    "outcome": "purchase"
+  },
+  {
+    "user": {
+      "id": "train-00002",
+      "name": "Davion",
+      "category": "home",
+      "budget": 173
+    },
+    "events": [
+      {
+        "id": "train-00002-00",
+        "subject": "train-00002",
+        "candidate": "p-0075",
+        "type": "view",
+        "at": "2026-10-24T08:01:01+00:00"
+      },
+      {
+        "id": "train-00002-01",
+        "subject": "train-00002",
+        "candidate": "p-0228",
+        "type": "compare",
+        "at": "2026-10-24T08:01:52+00:00"
+      },
+      {
+        "id": "train-00002-02",
+        "subject": "train-00002",
+        "candidate": "p-0153",
+        "type": "compare",
+        "at": "2026-10-24T08:02:24+00:00"
+      },
+      {
+        "id": "train-00002-03",
+        "subject": "train-00002",
+        "candidate": "p-0186",
+        "type": "cart",
+        "at": "2026-10-24T08:03:14+00:00"
+      },
+      {
+        "id": "train-00002-04",
+        "subject": "train-00002",
+        "candidate": "p-0105",
+        "type": "remove",
+        "at": "2026-10-24T08:03:41+00:00"
+      },
+      {
+        "id": "train-00002-05",
+        "subject": "train-00002",
+        "candidate": "p-0240",
+        "type": "compare",
+        "at": "2026-10-24T08:04:18+00:00"
+      },
+      {
+        "id": "train-00002-06",
+        "subject": "train-00002",
+        "candidate": "p-0192",
+        "type": "cart",
+        "at": "2026-10-24T08:04:32+00:00"
+      },
+      {
+        "id": "train-00002-07",
+        "subject": "train-00002",
+        "candidate": "p-0006",
+        "type": "leave",
+        "at": "2026-10-24T08:05:06+00:00"
+      }
+    ],
+    "outcome": "leave"
+  },
+  {
+    "user": {
+      "id": "train-00003",
+      "name": "Jerad",
+      "category": "home",
+      "budget": 95
+    },
+    "events": [
+      {
+        "id": "train-00003-00",
+        "subject": "train-00003",
+        "candidate": "p-0195",
+        "type": "view",
+        "at": "2026-10-24T08:00:14+00:00"
+      },
+      {
+        "id": "train-00003-01",
+        "subject": "train-00003",
+        "candidate": "p-0030",
+        "type": "compare",
+        "at": "2026-10-24T08:01:07+00:00"
+      },
+      {
+        "id": "train-00003-02",
+        "subject": "train-00003",
+        "candidate": "p-0093",
+        "type": "compare",
+        "at": "2026-10-24T08:02:02+00:00"
+      },
+      {
+        "id": "train-00003-03",
+        "subject": "train-00003",
+        "candidate": "p-0192",
+        "type": "cart",
+        "at": "2026-10-24T08:02:32+00:00"
+      },
+      {
+        "id": "train-00003-04",
+        "subject": "train-00003",
+        "candidate": "p-0105",
+        "type": "remove",
+        "at": "2026-10-24T08:03:31+00:00"
+      },
+      {
+        "id": "train-00003-05",
+        "subject": "train-00003",
+        "candidate": "p-0072",
+        "type": "compare",
+        "at": "2026-10-24T08:04:04+00:00"
+      },
+      {
+        "id": "train-00003-06",
+        "subject": "train-00003",
+        "candidate": "p-0105",
+        "type": "cart",
+        "at": "2026-10-24T08:04:35+00:00"
+      },
+      {
+        "id": "train-00003-07",
+        "subject": "train-00003",
+        "candidate": "p-0015",
+        "type": "purchase",
+        "at": "2026-10-24T08:04:53+00:00"
+      }
+    ],
+    "outcome": "purchase"
+  }
+]

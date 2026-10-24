@@ -294,6 +294,6 @@ A support system could characterise successive voice messages along defined comm
 
 Compute the representation when the observation or asset changes, then reuse it for comparisons. A model need not reread the recording every time we ask for a recommendation.
 
-[Part 2](/blog/show-me-what-you-got-part2-building-relevance) takes the next step: use the characterisation to retrieve eligible candidates, combine useful rankings and update the decision as new observations arrive. Part 4 will build out richer ingestion, including images.
+[Part 2](/blog/show-me-what-you-got-part2-building-relevance) takes the next step: use the characterisation to retrieve eligible candidates, combine useful rankings and update the decision as new observations arrive. [Part 3](/blog/show-me-what-you-got-part3-predict) learns outcome forecasts from observed journeys. Part 4 adds experiments, and Part 5 builds out richer ingestion, including images.
 
 The practical answer to “how do I vectorise X?” is to decide which relationships matter, define the dimensions that preserve them, and choose producers capable of supplying those readings. Decision models make semantic properties across more kinds of input accessible through that same small pattern: **question → reading → coordinate**.

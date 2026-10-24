@@ -1,0 +1,24 @@
+SYNTHETIC FIXTURE bogus-shop-v2; seed=814; Bogus=35.6.5
+products=240; training_visits=1000; later_holdout_visits=400
+missing_descriptions=48; unavailable=28; neural_inference=none
+Fresh SQLite model. No preloaded histories. Probabilities are uncalibrated simulator estimates.
+UNKNOWN purchase=0.0 % cancel=0.0 % leave=0.0 % unresolved=100.0 % support=0 status=no_state
+COLD purchase=0.0 % cancel=0.0 % leave=0.0 % unresolved=100.0 % support=0 status=insufficient_evidence
+AFTER 3 VISITS purchase=0.0 % cancel=0.0 % leave=0.0 % unresolved=100.0 % support=3 status=insufficient_evidence
+AFTER 100 VISITS purchase=39.2 % cancel=10.1 % leave=19.0 % unresolved=31.7 % support=99 status=estimated
+AFTER 1000 VISITS purchase=40.1 % cancel=12.2 % leave=21.1 % unresolved=26.6 % support=975 status=estimated
+SQLITE REOPEN probabilities_unchanged=true
+FRESH considered state=considered_cart purchase=87.9 % cancel=6.9 % leave=5.2 % unresolved=0.0 % support=357 status=estimated
+PICKS considered budget=£191 p-0001:0.04098, p-0007:0.03771, p-0058:0.03768
+FRESH impulsive state=impulsive_cart purchase=18.3 % cancel=27.2 % leave=54.5 % unresolved=0.0 % support=336 status=estimated
+PICKS impulsive budget=£191 p-0001:0.04098, p-0007:0.03771, p-0058:0.03768
+FRESH returning state=returning_cart purchase=33.2 % cancel=30.6 % leave=36.2 % unresolved=0.0 % support=229 status=estimated
+PICKS returning budget=£191 p-0001:0.04098, p-0007:0.03771, p-0058:0.03768
+HOLDOUT landmark=first_cart horizon=4_events scored=349 censored=27 without_cart=24
+BRIER lower_is_better model=0.4750 training_prior=0.6234
+PURCHASE BIN 0–20% n=119 predicted=18.3 % observed=16.8 %
+PURCHASE BIN 20–40% n=91 predicted=33.2 % observed=37.4 %
+PURCHASE BIN 80–100% n=139 predicted=87.9 % observed=87.1 %
+No held-out outcome trained the frozen evaluator. These numbers test the simulator, not a real shop or an intervention.
+OBSERVED status=observed_destination cancel=100.0 %
+OUTCOME UPDATE checkout_purchase=87.9 % -> 87.7 % support=348->349 retry_duplicate=true

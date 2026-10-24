@@ -1,0 +1,9 @@
+{
+  "model": "qwen3.5:4b",
+  "createdAt": "2026-10-24T10:42:06.871063Z",
+  "seed": 814,
+  "temperature": 0,
+  "promptVersion": "catalogue-copy-v1",
+  "source": "catalogue.json",
+  "note": "Actual local inference; preserve the generated JSON to replay exact copy."
+}

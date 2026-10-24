@@ -25,7 +25,7 @@ Replay a retry storm, slow database, queue backlog or recovery trace. Inspect ma
 
 Applying the eligible rate action changes the **actual local shop API** limit from 240 to 60 requests/minute. It is one shared demo bucket, not a production per-customer limiter. Operations controls remain available and reset restores the default. Other registered handlers return an inspection snapshot. Nothing alters external services or connection pools.
 
-The intervention notebook records the original recommendation/context and compares pre-action metrics with current observations. Replaying recovery after an action does not establish causality. The [Part 3 learning design](../docs/relevance/part3-intervention-learning.md) describes the separate controlled-intervention extension.
+The intervention notebook records the original recommendation/context and compares pre-action metrics with current observations. Replaying recovery after an action does not establish causality. The [Part 4 experimentation design](../docs/relevance/part4-intervention-learning.md) describes the separate controlled-intervention extension.
 
 The app binds to loopback by default and is a demonstration host, not a deployed authenticated sidecar. The library itself remains usable without HTTP.
 

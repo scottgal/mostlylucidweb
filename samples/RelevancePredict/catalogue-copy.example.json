@@ -1,0 +1,7 @@
+{
+  "model": "manual-example-not-an-inference-run",
+  "promptVersion": "catalogue-copy-v1",
+  "products": [
+    {"id":"p-0001","name":"Field Camp Flask","description":"Illustrative display copy for the existing product. This overlay does not supply measurements, invent a price or change the behavioural outcome labels."}
+  ]
+}
