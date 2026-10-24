@@ -130,4 +130,26 @@ public sealed class PredictionFixtureTests
         Assert.Equal(4,after.SupportingTransitions);
     }
 
+    [Fact]
+    public async Task BrowserReplayCapturesRealPrefixForecastsWithoutUpdatingItsTrainingPopulation()
+    {
+        var fixture = FixtureGenerator.Generate(814, 12, 3, 1);
+        var counts = new TransitionModel { Counts = new()
+        {
+            ["considered_cart"] = new() { ["checkout"] = 100 },
+            ["checkout"] = new() { ["purchase"] = 80, ["cancel"] = 20 }
+        } };
+        var before = JsonSerializer.Serialize(counts);
+        var replay = await PredictionReplay.CaptureAsync(PredictionDemo.Definition(), counts, fixture);
+        Assert.Equal(before, JsonSerializer.Serialize(counts));
+        var frames = replay.Participants[0].Frames;
+        Assert.Equal("no_state", frames[0].Prediction.Status);
+        Assert.Equal("considered_cart", frames[3].Prediction.CurrentState);
+        Assert.Equal(.8, frames[3].Prediction.Outcomes.Single(o => o.Destination == "purchase").Probability, 10);
+        Assert.Equal("observed_destination", frames[^1].Prediction.Status);
+        Assert.Equal(1, frames[^1].Prediction.Outcomes.Single(o => o.Destination == "purchase").Probability);
+        Assert.All(replay.Participants.SelectMany(p => p.Frames), f =>
+            Assert.Equal(1, f.Prediction.Outcomes.Sum(o => o.Probability) + f.Prediction.RemainingProbability, 10));
+    }
+
 }

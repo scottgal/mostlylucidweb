@@ -9,3 +9,18 @@
 
 /* Include child margins in the reported natural height; even a tiny inner scroll range can capture a touch gesture. */
 .embed body{display:flow-root}
+
+/* Destination replay shares the controls, but keeps its camera fixed so touch always scrolls the page. */
+#prediction-plot{position:relative;height:440px;background:radial-gradient(circle at 50% 45%,var(--soft),transparent 69%);isolation:isolate}
+#prediction-plot canvas{position:absolute!important;inset:0;touch-action:pan-y pinch-zoom!important}
+#prediction-fallback{position:absolute;inset:0}
+#prediction-fallback svg{width:100%;height:100%;font:12px ui-sans-serif,system-ui,sans-serif}
+.user-a{background:#4871c8}.user-b{background:#b165b0}.user-c{background:#be8f2d}
+.prediction-map-note{padding:0 23px 12px;margin:0}
+.destination-utilities{display:flex;gap:14px;flex-wrap:wrap;font-size:11px;color:var(--muted)}
+.destination-utilities strong{color:var(--ink);margin-left:3px}
+html[data-view=prediction] .playback{position:sticky;top:0;z-index:5;margin-bottom:17px}
+#prediction-prefix{overflow-wrap:anywhere}
+nav{flex-wrap:wrap}
+@media(max-width:720px){#prediction-plot{height:380px}.prediction-inspector{display:block}.prediction-map-note{padding:0 17px 12px}#prediction-users button{flex:1 1 100%;text-align:left}}
+@media print{#prediction-plot canvas{display:none!important}#prediction-fallback{display:block!important}}

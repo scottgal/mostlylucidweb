@@ -5,12 +5,15 @@ import {configure, enhanceMermaidDiagrams, cleanupMermaidEnhancements} from '../
 import {createPeleRenderer} from '../../../../mostlylucid-mermaid/src/renderers.ts';
 import '../../../../mostlylucid-mermaid/src/styles.css';
 import {groups, candidates, events, replay, rank, eligible, proxyScenarios, proxySteps} from './model';
+import {predictionMax} from './prediction-model';
+import {createPredictionView} from './prediction-view';
 
 const $ = id => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-let view = params.get('view') === 'proxy' ? 'proxy' : 'vectors';
+let view = ['proxy', 'prediction'].includes(params.get('view')) ? params.get('view') : 'vectors';
 let cursor = 0, idle = 0, timer = null, threeD = false, interactive = false, selected = null;
 let deck = null, webglFailed = false, proxyDirection = null;
+let predictionView = null;
 const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const positions = values => threeD ? values.map(v => v * 1000) : [values[0] * 1000, values[1] * 1000, 0];
 const format = values => '[' + values.map(v => v.toFixed(3)).join(', ') + ']';
@@ -172,13 +175,13 @@ function proxyUpdate() {
     });
     $('data-table').innerHTML = steps.slice(0,cursor+1).map(s=>`<tr><td>${s.node}</td><td>${s.title}</td><td>Origin ${s.origin?'reached':'not reached'}</td></tr>`).join('');
 }
-const max = () => view==='vectors'?events.length:proxySteps($('scenario').value).length-1;
+const max = () => view==='prediction'?predictionMax:view==='vectors'?events.length:proxySteps($('scenario').value).length-1;
 function update() {
     cursor=Math.max(0,Math.min(max(),cursor));
-    if(view==='vectors') vectorUpdate(); else proxyUpdate();
+    if(view==='vectors') vectorUpdate(); else if(view==='prediction') predictionView.update(cursor); else proxyUpdate();
     $('scrub').max=String(max()); $('scrub').value=String(cursor);
     $('step-count').textContent=`${cursor} / ${max()}`;
-    const label=view==='vectors'?(cursor?events[cursor-1].text:'Before the first observation'):proxySteps($('scenario').value)[cursor].title;
+    const label=view==='prediction'?predictionView.label(cursor):view==='vectors'?(cursor?events[cursor-1].text:'Before the first observation'):proxySteps($('scenario').value)[cursor].title;
     $('step-label').textContent=label; $('announcement').textContent=label;
     $('back').disabled=cursor===0; $('next').disabled=cursor===max();
     postSize();
@@ -187,11 +190,16 @@ function pause(){clearInterval(timer);timer=null;$('play').textContent='Play';}
 function advance(){if(cursor>=max()){pause();return;}cursor++;idle=0;update();if(cursor===max())pause();}
 async function switchView(next){
     pause(); view=next;cursor=0;idle=0;
-    $('vector-view').hidden=view!=='vectors'; $('proxy-view').hidden=view!=='proxy';
-    document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
-    $('heading').innerHTML=view==='vectors'?'Watch evidence become<br>a <em>recommendation.</em>':'Follow a request.<br>See the <em>decision.</em>';
-    $('intro').textContent=view==='vectors'?'A point is an observation. A centroid is a summary. Add evidence and follow what changes.':'A proxy sits in the request path. Observations inform policy before the origin receives anything.';
-    $('article-link').href=view==='vectors'?'/blog/show-me-what-you-got-streaming-recommendations':'/blog/botdetection-part3-as-simple-as-possible';
+    document.documentElement.dataset.view=view;
+    // Keep the prediction controls beside the map, ahead of the longer evidence inspector on phones.
+    if(view==='prediction')$('prediction-view').before(document.querySelector('.playback'));
+    else $('announcement').before(document.querySelector('.playback'));
+    $('vector-view').hidden=view!=='vectors'; $('proxy-view').hidden=view!=='proxy'; $('prediction-view').hidden=view!=='prediction';
+    if(view==='prediction'&&!predictionView)predictionView=createPredictionView(update);
+    document.querySelectorAll('nav [data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
+    $('heading').innerHTML=view==='prediction'?'Watch a journey.<br>Predict the <em>destination.</em>':view==='vectors'?'Watch evidence become<br>a <em>recommendation.</em>':'Follow a request.<br>See the <em>decision.</em>';
+    $('intro').textContent=view==='prediction'?'Three fresh users. One learned population. Follow actual engine forecasts as new events arrive.':view==='vectors'?'A point is an observation. A centroid is a summary. Add evidence and follow what changes.':'A proxy sits in the request path. Observations inform policy before the origin receives anything.';
+    $('article-link').href=view==='prediction'?'/blog/show-me-what-you-got-part3-predict':view==='vectors'?'/blog/show-me-what-you-got-streaming-recommendations':'/blog/botdetection-part3-as-simple-as-possible';
     if(view==='proxy')await mountProxy();
     update();
     if(view==='vectors'&&deck)deck.setProps({initialViewState:camera()});
@@ -199,14 +207,14 @@ async function switchView(next){
 function toggleTheme(){
     document.documentElement.classList.toggle('dark');
     $('theme').textContent=document.documentElement.classList.contains('dark')?'Light mode':'Dark mode';
-    syncDiagramTheme(); if(view==='vectors')drawSpace();
+    syncDiagramTheme(); if(view==='vectors')drawSpace(); else if(view==='prediction'&&predictionView)update();
 }
 function postSize(){
     if(window.parent!==window) requestAnimationFrame(()=>window.parent.postMessage({type:'mostlylucid-explainer-size',height:Math.ceil(document.body.getBoundingClientRect().height)+4},location.origin));
 }
 $('play').onclick=()=>{if(timer){pause();return;}if(cursor===max()){cursor=0;idle=0;update();}timer=setInterval(advance,prefersReducedMotion?2400:1500);$('play').textContent='Pause';};
 $('next').onclick=()=>{pause();advance();};$('back').onclick=()=>{pause();cursor--;idle=0;update();};
-$('reset').onclick=()=>{pause();cursor=0;idle=0;selected=null;$('point-details').open=false;$('point-detail').textContent='';update();};
+$('reset').onclick=()=>{pause();cursor=0;idle=0;selected=null;predictionView?.reset();$('point-details').open=false;$('point-detail').textContent='';update();};
 $('scrub').oninput=()=>{pause();cursor=Number($('scrub').value);idle=0;update();};
 for(const id of ['category','budget','available','half-life','cart-weight'])$(id).addEventListener('input',update);
 $('idle').onclick=()=>{pause();idle+=30;update();};
@@ -216,16 +224,16 @@ $('interact').onclick=()=>{interactive=!interactive;$('interact').setAttribute('
 $('reset-camera').onclick=()=>deck?.setProps({initialViewState:camera()});
 $('theme').onclick=toggleTheme;
 $('expand').onclick=async()=>{if(document.fullscreenElement)await document.exitFullscreen();else if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen();};
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
+document.querySelectorAll('nav [data-view]').forEach(b=>b.onclick=()=>switchView(b.dataset.view));
 if(params.get('embed')==='1')document.documentElement.classList.add('embed');
 if(matchMedia('(prefers-color-scheme: dark)').matches)toggleTheme();
 const sizeObserver=new ResizeObserver(()=>{postSize();}); sizeObserver.observe(document.body);
 let resizeTimeout;
-addEventListener('resize',()=>{clearTimeout(resizeTimeout);resizeTimeout=setTimeout(async()=>{if(view==='proxy')await mountProxy();else if(deck)deck.setProps({initialViewState:camera()});update();},150);});
-addEventListener('pagehide',()=>{pause();clearTimeout(resizeTimeout);sizeObserver.disconnect();deck?.finalize();deck=null;cleanupMermaidEnhancements();proxyDirection=null;});
+addEventListener('resize',()=>{clearTimeout(resizeTimeout);resizeTimeout=setTimeout(async()=>{if(view==='proxy')await mountProxy();else if(view==='vectors'&&deck)deck.setProps({initialViewState:camera()});update();},150);});
+addEventListener('pagehide',()=>{pause();clearTimeout(resizeTimeout);sizeObserver.disconnect();deck?.finalize();deck=null;predictionView?.dispose();cleanupMermaidEnhancements();proxyDirection=null;});
 // Safari/Chromium may restore this document from the back/forward cache without re-running the module.
 addEventListener('pageshow',async event=>{if(!event.persisted)return;sizeObserver.observe(document.body);if(view==='proxy')await mountProxy();update();});
 addEventListener('message',event=>{if(event.origin===location.origin&&event.source===window.parent&&event.data?.type==='mostlylucid-explainer-theme'){
-    document.documentElement.classList.toggle('dark',event.data.dark===true);$('theme').textContent=event.data.dark===true?'Light mode':'Dark mode';syncDiagramTheme();if(view==='vectors')drawSpace();
+    document.documentElement.classList.toggle('dark',event.data.dark===true);$('theme').textContent=event.data.dark===true?'Light mode':'Dark mode';syncDiagramTheme();if(view==='vectors')drawSpace();else if(view==='prediction'&&predictionView)update();
 }});
 await switchView(view);

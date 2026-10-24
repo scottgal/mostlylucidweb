@@ -148,6 +148,8 @@ public static class PredictionDemo
             }
             if (options.Output is not null)
             {
+                var replay = await PredictionReplay.CaptureAsync(definition, trained, fixture);
+                await File.WriteAllTextAsync(Path.Combine(options.Output, "replay.json"), JsonSerializer.Serialize(replay, Json));
                 var report = new {fixture.Version, fixture.Seed, origin = "synthetic", isCalibrated = false, checkpoints,
                     forecasts = forecastExamples, recommendations, evaluation = metrics, transitions = trained, adaptation};
                 await File.WriteAllTextAsync(Path.Combine(options.Output, "report.json"), JsonSerializer.Serialize(report, Json));

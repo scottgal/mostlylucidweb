@@ -1,6 +1,6 @@
 # Interactive article explainers
 
-Research date: 2026-10-23. The first implementation now lives in `Mostlylucid/src/js/explainers` and `Mostlylucid/wwwroot/interactive/explainers`. The storyboards below describe the intended direction; current scope is a deterministic three-feature centroid replay and synthetic allowed/challenged proxy traces. Ordinary Mermaid fences retain their existing renderer. Pele support in the enhancements package is an unreleased source change.
+Research date: 2026-10-23. The implementation lives in `Mostlylucid/src/js/explainers` and `Mostlylucid/wwwroot/interactive/explainers`. The storyboards below describe the intended direction; current scope is a deterministic three-feature centroid replay, synthetic allowed/challenged proxy traces, and a destination replay captured from the C# prediction engine. Ordinary Mermaid fences retain their existing renderer. Pele support in the enhancements package is an unreleased source change.
 
 ## Recommendation
 
@@ -91,3 +91,15 @@ Check keyboard controls, touch selection, narrow-screen layout, light/dark mode,
 - Desktop article screenshots are checked in under `Mostlylucid/wwwroot/articleimages/explainer-*.png`; additional mobile/3D inspection screenshots remain under ignored `output/playwright/`.
 
 These are local checks in Chromium, including touch emulation, rather than a physical-device matrix or a deployed-site verification. The Docker build context now copies the shared renderer source, but a complete container build was not run for this frontend change.
+
+## Part 3 destination replay (2026-10-24)
+
+The `prediction` view extends the same standalone page, deck.gl renderer family and shared play/pause/back/reset/scrub controls. `samples/RelevancePredict/PredictionReplay.cs` captures actual `PredictAsync` output after each prefix of three synthetic fresh visits, against frozen training counts. Its `replay.json` artifact is imported directly into the browser bundle, avoiding a second implementation of the estimator. The visits are teaching examples, separate from the scored holdout population.
+
+This is a **forecast map**, not a projection of behavioural embeddings. Purchase, cancellation, departure and unresolved mass have fixed display anchors. Each user's position is their probability-weighted blend. Trails show previous forecasts, and an observed endpoint lands on its anchor. Four masses cannot be recovered uniquely from two display coordinates: the inspector and accessible table remain authoritative. Identical forecasts overlap, with the user buttons providing unambiguous selection.
+
+Objective selection changes utility only. Resolved probability receives the selected destination values; unresolved value is reported as a range using the configured minimum and maximum utility. That range is not a statistical confidence interval. No intervention effect is invented. The prediction camera is fixed, with touch scrolling enabled, reduced-motion support, a printable SVG fallback and explicit WebGL cleanup on navigation.
+
+Layer references: [deck.gl TextLayer](https://deck.gl/docs/api-reference/layers/text-layer) for fixed labels and [OrthographicView](https://deck.gl/docs/api-reference/core/orthographic-view) for non-geographic display coordinates.
+
+Local validation: 52 frontend tests, 59 Relevance tests (native SQLite vector extension enabled), and a clean Relevance solution build. Production Webpack completed with the existing three bundle-size warnings. Chromium checks covered automatic playback to the final step, reset, keyboard scrubbing, objective changes without probability changes, existing vector/proxy navigation, initial dark/reduced-motion mode, SVG operation with WebGL blocked, and touch scrolling over the standalone and article-embedded plot. At a 390-pixel article viewport, the iframe expanded to 1,774 pixels without horizontal overflow or an inner scrolling viewport. A static workbench snapshot is checked in as `explainer-prediction.png`; browser inspection artifacts remain under ignored `output/playwright/`. These are local browser checks, not a physical-device matrix or deployed-site verification.

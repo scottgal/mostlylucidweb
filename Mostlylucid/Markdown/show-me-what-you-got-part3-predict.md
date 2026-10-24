@@ -27,6 +27,16 @@ We need both. Two people can be interested in the same products while being at d
 
 Their interest vectors can be very similar. Their likely next actions need not be.
 
+The interactive replay below follows three fresh users as their events arrive. Press **Play**, or step forward and select a user to inspect the evidence. The destination regions stay fixed; each user's node moves as the engine revises its forecast, leaving a trail of earlier estimates.
+
+<iframe class="article-explainer" src="/interactive/explainers/index.html?v=20261024-predict&amp;view=prediction&amp;embed=1" title="Interactive user journeys and predicted destinations" width="100%" height="1400" loading="lazy" style="border:0;border-radius:12px;"></iframe>
+
+[Open the destination replay](/interactive/explainers/index.html?view=prediction) or [view a static snapshot](/articleimages/explainer-prediction.png). The map uses captured forecasts from the C# tool, trained on the same 1,000 visits used below. Its positions are probability-weighted display coordinates, not behavioural embeddings or distances used to calculate the probabilities. Unresolved evidence has its own anchor. The inspector and data table show the values that the two-dimensional picture cannot fully express.
+
+Change the objective from completing purchases to avoiding cancellations: the preferences change, but the probabilities and positions do not. These visits play against a frozen population model; no intervention is applied. That gives us the baseline Part 4 will try to improve.
+
+The [C# replay capture](https://github.com/scottgal/mostlylucidweb/blob/main/samples/RelevancePredict/PredictionReplay.cs) saves each prefix's actual `PredictAsync` result to `replay.json`. The browser displays those results rather than implementing another predictor.
+
 The prediction gives us a baseline for choosing what to investigate. It can help identify a point where reassurance, a better comparison, a different product or a useful offer might change the result. Measuring whether that change actually helps is the next step.
 
 ```mermaid

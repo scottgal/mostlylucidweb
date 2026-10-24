@@ -4,12 +4,12 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Inside the machine / Mostlylucid explainers</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23295748'/%3E%3Ctext x='10' y='29' fill='white' font-size='28'%3E∴%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css?v=d9c67863d3a3">
-<script defer src="/js/dist/explainers.js?v=d9c67863d3a3"></script>
+<link rel="stylesheet" href="style.css?v=813941107545">
+<script defer src="/js/dist/explainers.js?v=813941107545"></script>
 </head>
 <body>
 <header><a class="brand" href="/" target="_top"><span class="brand-mark">∴</span> mostlylucid <span class="muted">/ explainers</span></a><div class="header-actions"><button id="theme" type="button">Dark mode</button><button id="expand" type="button">Expand ↗</button></div></header>
-<nav aria-label="Explainer"><button data-view="vectors" aria-pressed="true">01 / Vector space</button><button data-view="proxy" aria-pressed="false">02 / The proxy</button><span class="replay-label">Interactive teaching replay</span></nav>
+<nav aria-label="Explainer"><button data-view="vectors" aria-pressed="true">01 / Vector space</button><button data-view="proxy" aria-pressed="false">02 / The proxy</button><button data-view="prediction" aria-pressed="false">03 / Destinations</button><span class="replay-label">Interactive teaching replay</span></nav>
 <section class="hero"><p class="eyebrow">INSIDE THE MACHINE</p><h1 id="heading">Watch evidence become<br>a <em>recommendation.</em></h1><p id="intro">A point is an observation. A centroid is a summary. Add evidence and follow what changes.</p></section>
 <main>
 <section id="vector-view" aria-label="Vector space explainer">
@@ -28,6 +28,19 @@
 <div class="proxy-options"><label>Request scenario<select id="scenario"><option value="browser">Ordinary browser</option><option value="crawler">Known crawler</option><option value="unfamiliar">Unfamiliar client</option><option value="burst">Scripted burst</option></select></label><p class="small muted">Client → TLS edge → gateway → origin. No application SDK needed.</p></div>
 <div class="workbench"><div class="visual-card"><div class="card-heading"><div><span class="eyebrow">THE REQUEST PATH</span><h2>See where the request actually goes.</h2></div><span class="pill">Pele + enhancements</span></div><div id="proxy-stage" class="mermaid"></div><p class="small muted diagram-hint">Scroll normally. Use the toolbar to enable diagram interaction, zoom, export or open fullscreen.</p><div class="proxy-counters"><div><span>Origin reached</span><strong id="origin-reached">Not yet</strong></div><div><span>Policy path</span><strong id="policy-path">Not evaluated</strong></div><div><span>Source</span><strong>Synthetic trace</strong></div></div></div><aside class="inspector"><span class="eyebrow">FOLLOW THE EVIDENCE</span><h2 id="proxy-title"></h2><p id="proxy-caption" class="muted"></p><div id="proxy-evidence"></div><h3>Request ledger</h3><ol id="proxy-ledger"></ol><p class="small muted">A challenge is a response from the gateway. The origin stays untouched in this trace. Background telemetry has its own lane.</p></aside></div>
 <p class="note">An educational replay of a protective reverse-proxy topology, not live Stylo.Bot traffic or a complete detector implementation.</p>
+</section>
+<section id="prediction-view" aria-label="Destination prediction explainer" hidden>
+<div class="workbench">
+<div class="visual-card"><div class="card-heading"><div><span class="eyebrow">THE FORECAST MAP</span><h2>New evidence. Different destinations.</h2></div></div>
+<div class="legend"><span><i class="dot user-a"></i>User A</span><span><i class="dot user-b"></i>User B</span><span><i class="dot user-c"></i>User C</span><span>Trails retain previous forecasts</span></div>
+<div id="prediction-plot" role="group" aria-label="User forecasts moving between destination anchors"><div id="prediction-fallback"></div><span id="prediction-renderer" class="plot-status">deck.gl forecast map</span></div>
+<div id="prediction-users" class="plot-tools" aria-label="Select a user to inspect"></div>
+<p class="prediction-map-note small muted">Position is a weighted blend of the four labelled anchors, calculated from the probabilities. This is a forecast map, not an embedding or a source of probabilities. Users with the same forecast overlap.</p>
+<div class="filters"><label>What are we optimising for?<select id="prediction-objective"><option value="purchase">Complete purchases</option><option value="cancellation">Avoid cancellation</option></select></label><div id="prediction-destinations" class="destination-utilities"></div></div>
+</div>
+<aside class="inspector prediction-inspector"><span class="eyebrow">CAPTURED C# ENGINE OUTPUT</span><h2 id="prediction-title"></h2><p id="prediction-prefix" class="muted"></p><div class="evidence-item"><span>Current state</span><strong id="prediction-state"></strong></div><p id="prediction-status" class="small muted"></p><div id="prediction-values"></div><p id="prediction-support" class="small muted"></p><h3>Utility / possible range</h3><strong id="prediction-utility"></strong><p id="prediction-utility-note" class="small muted"></p></aside>
+</div>
+<p class="note">Synthetic fresh visits against a frozen model trained on 1,000 visits (seed 814). Forecast horizon: four future events. These visits do not update population counts. Endpoints appear only when observed; shorter visits hold their final position. Uncalibrated simulator estimates. Utility changes preferences, not forecasts. No intervention effect is simulated.</p>
 </section>
 <section class="playback" aria-label="Replay controls"><div class="play-buttons"><button id="play" class="primary">Play</button><button id="back" aria-label="Previous step">←</button><button id="next" aria-label="Next step">Next →</button><button id="reset">Reset</button></div><label class="scrubber"><span id="step-label">Before the first observation</span><input id="scrub" type="range" min="0" max="5" value="0" aria-label="Replay position"></label><span id="step-count" class="step-count">0 / 5</span></section>
 <p id="announcement" class="sr-only" aria-live="polite"></p>
