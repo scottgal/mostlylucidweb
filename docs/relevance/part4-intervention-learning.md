@@ -46,9 +46,13 @@ Start with one placement and a small eligible action set: show product X, show p
 
 Products, images, price, placement and position are separate treatment dimensions. Do not change all of them at once and attribute the result to one image. Slates and position bias need a deliberate experiment design. Prefer an appropriate session/account assignment unit to avoid inconsistent treatment within a visit, and account for carryover.
 
+Include prevention scenarios: a basket-abandonment trajectory can trigger an experiment with clearer delivery costs or product comparisons; a payment-cancellation trajectory can trigger clearer payment guidance or an alternative eligible payment method. Log the warning context before assignment. Define abandonment by an explicit window and payment cancellation by a suitable event; neither is inferred solely from a pause. The existing fixture's generic `cancel` is not yet a payment-specific outcome. Measure profitable completion and costs as well as the unwanted endpoint.
+
 ## Operational interventions
 
 Compare permitted actions such as reducing the local request limit, reducing a connection limit within configured bounds, adjusting consumer concurrency, or observing without a change. Define preconditions, scope, cooldown, limits and rollback in the action registry. The learning policy cannot make an ineligible action eligible.
+
+A concrete prevention scenario starts with increasing latency, error responses and queue growth. Predict a defined sustained service-level breach or outage, then compare an eligible concurrency/connection-limit change with the alternative. Record sustained recovery, throughput and rejected work over the same window; a reduction in the warning metric alone is not sufficient evidence of success.
 
 Use an incident/episode as the assignment unit when requests share one system state. Allow a settling window, measure a fixed follow-up period, and record concurrent deployments and other interventions. Keep throughput and rejected-request costs alongside latency/error improvement: rejecting everything is not a successful fix.
 

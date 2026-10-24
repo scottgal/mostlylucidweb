@@ -218,6 +218,18 @@ Expected utility describes the current forecast. It does not yet tell us which a
 
 That means defining the objective, measurement window and constraints before the experiment, and recording their version with each decision. The target is an improvement in observed results, rather than a higher forecast or a convenient proxy such as clicks.
 
+## Intervene Before an Undesirable Destination
+
+The useful prediction may be a warning about something we want to prevent:
+
+- **System degradation:** latency is increasing, errors are becoming more frequent, and the queue is growing. The forecast suggests a higher chance of a sustained service-level breach or outage. An allowed intervention might reduce consumer concurrency or change a connection limit. Success means sustained recovery with acceptable throughput, measured against the alternative.
+- **Basket abandonment:** someone repeatedly compares products, removes items and stops progressing through checkout. The forecast suggests the basket may be abandoned. We could test clearer delivery costs or a useful product comparison before offering a discount. Success means more completed, profitable purchases within the chosen window.
+- **Payment cancellation:** someone returns repeatedly from payment to checkout. If the application exposes suitable events, we can estimate the risk of an explicit cancellation and test clearer payment guidance or an alternative available payment method. Measure completion, cancellation and the cost of the change.
+
+These are possible integrations, rather than additional outcomes implemented in this fixture. Rising latency and repeated checkout visits are observations; a sustained breach or an explicit cancellation is a defined result. Basket abandonment needs its own closing window, rather than treating a quiet moment as a confirmed departure. The sample's `cancel` is a generic episode cancellation, not a separately modelled payment state.
+
+The aim is to spot a trajectory early enough to change it. A warning identifies where an intervention may be useful; the experiment establishes whether that intervention actually prevents the unwanted outcome.
+
 # This Is What Training Does
 
 Suppose a historical user moves from `checkout` to `purchase`. The engine increments that connection:
