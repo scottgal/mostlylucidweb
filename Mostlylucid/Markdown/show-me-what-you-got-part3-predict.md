@@ -174,6 +174,50 @@ The horizon asks about destinations **within the next four observed transitions*
 
 The minimum support requires twenty outgoing observations before a state can propagate probability. This run uses zero smoothing so each displayed transition has an observation behind it. The engine also supports explicit pseudo-count smoothing when that is appropriate for the application.
 
+# Which Destinations Do We Want?
+
+Defining an endpoint tells us what to predict. We also need to say **what result we are trying to improve**.
+
+Purchase, cancellation and departure are observations. Their desirability is an application decision. A shop might want completed, profitable purchases; an operations team might want sustained recovery while preserving throughput. More basket additions or lower latency are useful signals, but neither necessarily achieves those goals.
+
+We can express a simple preference using a **utility**: a numeric value assigned to an outcome. For illustration:
+
+| Destination | Example utility |
+|-------------|----------------:|
+| `purchase` | 1.0 |
+| `cancel` | -0.5 |
+| `leave` | 0.0 |
+
+These are chosen teaching values, not learned probabilities or a claim about the cost of a cancellation. Another application can value the same destinations differently.
+
+Combining a forecast with those values gives an expected utility:
+
+```text
+Expected utility = sum of P(destination | observed state) × utility(destination)
+```
+
+For a forecast whose destination probabilities account for all the mass, the application-side calculation is small:
+
+```csharp
+var utility = new Dictionary<string, double>
+{
+    ["purchase"] = 1.0,
+    ["cancel"] = -0.5,
+    ["leave"] = 0.0
+};
+
+var expectedUtility = prediction.Outcomes.Sum(
+    outcome => outcome.Probability * utility[outcome.Destination]);
+```
+
+This is a way to interpret `PredictAsync` output, not another field in the predictor's YAML. Changing the objective should not rewrite what the system believes will happen. Keep the probabilities available so we can explain the trade-off.
+
+> **Uncertainty aside:** unresolved probability is not a destination with a utility of zero. If the horizon ends or evidence is insufficient, some value remains unknown. Report that missing mass alongside the estimate; do not turn an incomplete forecast into an apparently complete business score.
+
+Expected utility describes the current forecast. It does not yet tell us which action will improve it. Part 4 will compare the expected value **under each intervention** with the control, including intervention costs. A discount might increase purchase probability while reducing profit. A connection limit might reduce errors while rejecting too much useful traffic.
+
+That means defining the objective, measurement window and constraints before the experiment, and recording their version with each decision. The target is an improvement in observed results, rather than a higher forecast or a convenient proxy such as clicks.
+
 # This Is What Training Does
 
 Suppose a historical user moves from `checkout` to `purchase`. The engine increments that connection:

@@ -28,6 +28,18 @@ Useful extension contracts:
 
 Keep the consumer API small: choose an action, then save exposure and outcome events. Use existing save/event conventions rather than a large imperative workflow API. Every operation needs stable IDs and restart-safe attribution. The decision ledger is owned by the learning extension, not reconstructed from today's mutable context.
 
+## Define what to optimise
+
+Destination probability and destination desirability are separate contracts. The application supplies a versioned objective: destination utilities, measurement window, costs, and constraints. Changing the objective must not change the predictor's empirical transition probabilities. Keep the raw outcome and objective version so recorded results can be explained and, where the necessary components were retained, rescored.
+
+For a simple objective, expected utility is the sum of destination probability multiplied by destination utility. The Part 3 illustration uses purchase 1, cancel -0.5 and leave 0. These are preference units, not probabilities. Unresolved probability remains unknown value; do not silently assign zero or renormalise away missing mass. Sparse or incomplete forecasts need explicit uncertainty handling before policy selection.
+
+Intervention selection needs action-conditional outcome estimates: expected utility under an eligible action, less its costs, compared with the control. The observational forecast is a baseline/context feature; it cannot supply the unmeasured treatment effect. Evaluate the policy on observed rewards under the stated objective, not on whether its own predictions increased.
+
+Start with an explicit fixed objective and a small action set. Retail might optimise net contribution after discounts, contact costs and returns, with cancellation/complaint constraints. Operations might optimise sustained recovery within a fixed window, with minimum throughput and rejected-request limits. Keep hard constraints in eligibility rather than allowing a large reward to purchase permission to violate them. State which costs are already included in utility so they are not subtracted twice.
+
+If an updater requires bounded rewards, define and version the mapping from raw utility to that range; signed utility must not be passed directly to the core's existing [0,1] feedback contract. Report raw component measures alongside the scalar reward. Objective changes create a new evaluation version; do not pool incompatible reward statistics.
+
 ## Ecommerce interventions
 
 Start with one placement and a small eligible action set: show product X, show product Y, or show one of two images for the same product. Hold the rest of the page stable. Capture actual display, position, context, selection probability, and whether the defined purchase outcome occurred within the attribution window.
@@ -65,6 +77,7 @@ Report reward estimates, uncertainty, exposure counts, action coverage and the o
 5. A confounded recovery trace where naive before/after analysis would claim a false improvement.
 6. Measurement of purchase rate/utility, policy regret on the known simulator, uncertainty, latency and cost.
 7. Demo comparisons showing what changes when intervention learning is enabled, with a visible reset and explicit model/history version.
+8. Two objectives applied to the same destination forecast leave probabilities unchanged but can prefer different actions; intervention costs, hard constraints, unresolved mass and reward-range conversion remain explicit.
 
 This keeps Part 4's central question testable: did choosing this action improve the outcome relative to an eligible alternative, for the context and measurement window we defined?
 

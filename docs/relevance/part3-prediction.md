@@ -18,6 +18,8 @@ A sample-only IDestinationPredictor adapter captures detached training counts. A
 
 ## Evaluation
 
+The article distinguishes destination probabilities from application-owned desirability. An illustrative utility mapping (purchase 1, cancel -0.5, leave 0) demonstrates expected utility without changing the predictor's configuration or counts. Unresolved mass is unknown value, not a zero-valued endpoint. This is interpretation of the forecast, not an implemented intervention policy or evidence of action uplift.
+
 The held-out landmark is the first cart addition. Forecasts are captured before inspecting labels. Missing feedback is unscored, an observed horizon without an endpoint is unresolved, and sessions without a cart never enter the landmark population. Compare multiclass Brier score with a training-only landmark prior and report reliability bins separately.
 
 The article's seed 814 yields 349 scored visits, 27 censored and 24 without a cart. Brier: model 0.4750, prior 0.6234. Three independent seeded test fixtures verify improvement over that baseline. This establishes the mechanism on the simulator, not production calibration or causal treatment effects.
