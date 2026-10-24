@@ -1,6 +1,5 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import typescript from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
 
 const banner = '/* @mostlylucid/mermaid-enhancements - Public Domain (Unlicense) */';
@@ -8,7 +7,8 @@ const banner = '/* @mostlylucid/mermaid-enhancements - Public Domain (Unlicense)
 export default [
   // Bundled ESM (all dependencies included)
   {
-    input: 'src/index.ts',
+    // Bundle the ESM checked and emitted by TypeScript 7 in the preceding build step.
+    input: 'dist/index.js',
     output: {
       file: 'dist/index.bundle.js',
       format: 'esm',
@@ -21,15 +21,12 @@ export default [
         browser: true,
       }),
       commonjs(),
-      typescript({
-        declaration: false,
-        declarationMap: false,
-      }),
     ],
   },
   // Bundled ESM minified
   {
-    input: 'src/index.ts',
+    // Bundle the ESM checked and emitted by TypeScript 7 in the preceding build step.
+    input: 'dist/index.js',
     output: {
       file: 'dist/index.bundle.min.js',
       format: 'esm',
@@ -42,10 +39,6 @@ export default [
         browser: true,
       }),
       commonjs(),
-      typescript({
-        declaration: false,
-        declarationMap: false,
-      }),
       terser({
         compress: {
           drop_console: false,
@@ -66,7 +59,8 @@ export default [
   },
   // UMD build for browser <script> tags
   {
-    input: 'src/index.ts',
+    // Bundle the ESM checked and emitted by TypeScript 7 in the preceding build step.
+    input: 'dist/index.js',
     output: {
       file: 'dist/index.umd.js',
       format: 'umd',
@@ -83,10 +77,6 @@ export default [
         browser: true,
       }),
       commonjs(),
-      typescript({
-        declaration: false,
-        declarationMap: false,
-      }),
       terser({
         compress: {
           drop_console: false,

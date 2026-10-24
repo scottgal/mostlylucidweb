@@ -55,6 +55,9 @@ RUN dotnet restore "./Mostlylucid/Mostlylucid.csproj"
 COPY ./Mostlylucid/ ./Mostlylucid/
 # Webpack consumes the shared renderer/touch fixes directly until the next npm release.
 COPY ./mostlylucid-mermaid/src/ ./mostlylucid-mermaid/src/
+COPY ./mostlylucid-mermaid/package.json ./mostlylucid-mermaid/package.json
+# The explainer imports captured C# replay data at bundle time. Blog Markdown stays external.
+COPY ./samples/RelevancePredict/artifacts/seed-814/ ./samples/RelevancePredict/artifacts/seed-814/
 COPY ./Mostlylucid.Test/ ./Mostlylucid.Test/
 COPY ./Mostlylucid.Shared/ ./Mostlylucid.Shared/
 COPY ./Mostlylucid.Services/ ./Mostlylucid.Services/

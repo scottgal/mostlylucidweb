@@ -5,6 +5,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
+    environmentOptions: {
+      happyDOM: {settings: {enableIframePageLoading: true}},
+    },
     setupFiles: ['./src/js/__tests__/setup.js'],
     coverage: {
       provider: 'v8',

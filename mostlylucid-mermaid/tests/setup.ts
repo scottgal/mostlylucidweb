@@ -61,7 +61,7 @@ const localStorageMock = {
   removeItem: vi.fn(),
   clear: vi.fn(),
 };
-global.localStorage = localStorageMock as any;
+Object.defineProperty(globalThis, 'localStorage', { configurable: true, writable: true, value: localStorageMock });
 
 // Ensure theme state does not leak across tests
 beforeEach(() => {

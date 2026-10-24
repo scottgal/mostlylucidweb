@@ -72,6 +72,7 @@ jobs:
             ${{ env.TAGS }} -c 'mkdir -p /app/site-content/translated; exec dotnet /app/Mostlylucid.dll'
           docker exec mostlylucid-release-check dotnet /app/resume-compiler/LucidResumeHost.dll --probe http://127.0.0.1:8080
           docker exec mostlylucid-release-check dotnet /app/resume-compiler/LucidResumeHost.dll --probe https://localhost:7240
+          docker exec mostlylucid-release-check sh -c 'test -s /app/wwwroot/js/dist/explainers.js && grep -q "24 users. Watch their journeys diverge." /app/wwwroot/interactive/explainers/index.html && grep -q "prediction-replay-v2" /app/wwwroot/js/dist/explainers.js'
 
       - name: Push the Docker image to Docker Hub
         run: |
