@@ -13,7 +13,9 @@ const params = new URLSearchParams(location.search);
 let view = ['proxy', 'prediction'].includes(params.get('view')) ? params.get('view') : 'vectors';
 let cursor = 0, idle = 0, timer = null, threeD = false, interactive = false, selected = null;
 let deck = null, webglFailed = false, proxyDirection = null;
-let predictionView = null;
+let predictionView = null, predictionVisible = false;
+const predictionVisibility = new IntersectionObserver(entries => { predictionVisible = entries[0].isIntersecting; });
+predictionVisibility.observe($('prediction-plot'));
 const prefersReducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const positions = values => threeD ? values.map(v => v * 1000) : [values[0] * 1000, values[1] * 1000, 0];
 const format = values => '[' + values.map(v => v.toFixed(3)).join(', ') + ']';
@@ -180,16 +182,16 @@ function update() {
     cursor=Math.max(0,Math.min(max(),cursor));
     if(view==='vectors') vectorUpdate(); else if(view==='prediction') predictionView.update(cursor); else proxyUpdate();
     $('scrub').max=String(max()); $('scrub').value=String(cursor);
-    $('step-count').textContent=`${cursor} / ${max()}`;
+    $('step-count').textContent=`${view==='prediction'?cursor.toFixed(1):cursor} / ${max()}`;
     const label=view==='prediction'?predictionView.label(cursor):view==='vectors'?(cursor?events[cursor-1].text:'Before the first observation'):proxySteps($('scenario').value)[cursor].title;
-    $('step-label').textContent=label; $('announcement').textContent=label;
+    $('step-label').textContent=label; if($('announcement').textContent!==label)$('announcement').textContent=label;
     $('back').disabled=cursor===0; $('next').disabled=cursor===max();
     postSize();
 }
 function pause(){clearInterval(timer);timer=null;$('play').textContent='Play';}
 function advance(){if(cursor>=max()){pause();return;}cursor++;idle=0;update();if(cursor===max())pause();}
 async function switchView(next){
-    pause(); view=next;cursor=0;idle=0;
+    pause(); view=next;cursor=view==='prediction'?2:0;idle=0;
     document.documentElement.dataset.view=view;
     // Keep the prediction controls beside the map, ahead of the longer evidence inspector on phones.
     if(view==='prediction')$('prediction-view').before(document.querySelector('.playback'));
@@ -198,11 +200,13 @@ async function switchView(next){
     if(view==='prediction'&&!predictionView)predictionView=createPredictionView(update);
     document.querySelectorAll('nav [data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===view)));
     $('heading').innerHTML=view==='prediction'?'Watch a journey.<br>Predict the <em>destination.</em>':view==='vectors'?'Watch evidence become<br>a <em>recommendation.</em>':'Follow a request.<br>See the <em>decision.</em>';
-    $('intro').textContent=view==='prediction'?'Three fresh users. One learned population. Follow actual engine forecasts as new events arrive.':view==='vectors'?'A point is an observation. A centroid is a summary. Add evidence and follow what changes.':'A proxy sits in the request path. Observations inform policy before the origin receives anything.';
+    $('intro').textContent=view==='prediction'?'24 individual journeys. Watch comparisons, basket removals and checkout attempts split their paths towards different outcomes.':view==='vectors'?'A point is an observation. A centroid is a summary. Add evidence and follow what changes.':'A proxy sits in the request path. Observations inform policy before the origin receives anything.';
     $('article-link').href=view==='prediction'?'/blog/show-me-what-you-got-part3-predict':view==='vectors'?'/blog/show-me-what-you-got-streaming-recommendations':'/blog/botdetection-part3-as-simple-as-possible';
     if(view==='proxy')await mountProxy();
     update();
     if(view==='vectors'&&deck)deck.setProps({initialViewState:camera()});
+    $('scrub').step=view==='prediction'?'0.01':'1';
+    if(view==='prediction'&&!prefersReducedMotion)startPlayback(true);
 }
 function toggleTheme(){
     document.documentElement.classList.toggle('dark');
@@ -212,7 +216,22 @@ function toggleTheme(){
 function postSize(){
     if(window.parent!==window) requestAnimationFrame(()=>window.parent.postMessage({type:'mostlylucid-explainer-size',height:Math.ceil(document.body.getBoundingClientRect().height)+4},location.origin));
 }
-$('play').onclick=()=>{if(timer){pause();return;}if(cursor===max()){cursor=0;idle=0;update();}timer=setInterval(advance,prefersReducedMotion?2400:1500);$('play').textContent='Pause';};
+function startPlayback(loop=false){
+    if(cursor>=max()){cursor=0;idle=0;update();}
+    let held=0;
+    timer=setInterval(()=>{
+        if(view!=='prediction'){advance();return;}
+        if(!predictionVisible||document.hidden)return;
+        if(cursor>=max()){
+            if(!loop){pause();return;}
+            if(++held<45)return;
+            cursor=0;held=0;
+        }else cursor=Math.min(max(),cursor+.022);
+        update();
+    },view==='prediction'?33:1500);
+    $('play').textContent='Pause';
+}
+$('play').onclick=()=>{if(timer){pause();return;}startPlayback();};
 $('next').onclick=()=>{pause();advance();};$('back').onclick=()=>{pause();cursor--;idle=0;update();};
 $('reset').onclick=()=>{pause();cursor=0;idle=0;selected=null;predictionView?.reset();$('point-details').open=false;$('point-detail').textContent='';update();};
 $('scrub').oninput=()=>{pause();cursor=Number($('scrub').value);idle=0;update();};
@@ -230,9 +249,9 @@ if(matchMedia('(prefers-color-scheme: dark)').matches)toggleTheme();
 const sizeObserver=new ResizeObserver(()=>{postSize();}); sizeObserver.observe(document.body);
 let resizeTimeout;
 addEventListener('resize',()=>{clearTimeout(resizeTimeout);resizeTimeout=setTimeout(async()=>{if(view==='proxy')await mountProxy();else if(view==='vectors'&&deck)deck.setProps({initialViewState:camera()});update();},150);});
-addEventListener('pagehide',()=>{pause();clearTimeout(resizeTimeout);sizeObserver.disconnect();deck?.finalize();deck=null;predictionView?.dispose();cleanupMermaidEnhancements();proxyDirection=null;});
+addEventListener('pagehide',()=>{pause();clearTimeout(resizeTimeout);sizeObserver.disconnect();predictionVisibility.disconnect();deck?.finalize();deck=null;predictionView?.dispose();cleanupMermaidEnhancements();proxyDirection=null;});
 // Safari/Chromium may restore this document from the back/forward cache without re-running the module.
-addEventListener('pageshow',async event=>{if(!event.persisted)return;sizeObserver.observe(document.body);if(view==='proxy')await mountProxy();update();});
+addEventListener('pageshow',async event=>{if(!event.persisted)return;sizeObserver.observe(document.body);predictionVisibility.observe($('prediction-plot'));if(view==='proxy')await mountProxy();update();});
 addEventListener('message',event=>{if(event.origin===location.origin&&event.source===window.parent&&event.data?.type==='mostlylucid-explainer-theme'){
     document.documentElement.classList.toggle('dark',event.data.dark===true);$('theme').textContent=event.data.dark===true?'Light mode':'Dark mode';syncDiagramTheme();if(view==='vectors')drawSpace();else if(view==='prediction'&&predictionView)update();
 }});

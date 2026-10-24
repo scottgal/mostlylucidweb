@@ -39,7 +39,19 @@ public static class PredictionReplay
             }
             participants.Add(new(id, name, frames));
         }
-        return new("prediction-replay-v1", fixture.Seed, fixture.Training.Count,
+        // Add real generated holdout paths, including incomplete visits, rather than cloning three paths in JavaScript.
+        foreach (var journey in fixture.Holdout.Take(21))
+        {
+            var encoder = new JourneyState();
+            var frames = new List<ReplayFrame> { new(null, await engine.PredictAsync(journey.User.Id, cancellationToken)) };
+            foreach (var observation in journey.Events)
+            {
+                await PredictionDemo.SaveAsync(engine, observation, encoder, cancellationToken);
+                frames.Add(new(observation.Type, await engine.PredictAsync(journey.User.Id, cancellationToken)));
+            }
+            participants.Add(new(journey.User.Id, $"{journey.User.Name} / {journey.User.Id}", frames));
+        }
+        return new("prediction-replay-v2", fixture.Seed, fixture.Training.Count,
             definition.Destinations!.HorizonEvents, participants);
     }
 }

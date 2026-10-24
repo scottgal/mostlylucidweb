@@ -4,8 +4,8 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Inside the machine / Mostlylucid explainers</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23295748'/%3E%3Ctext x='10' y='29' fill='white' font-size='28'%3E∴%3C/text%3E%3C/svg%3E">
-<link rel="stylesheet" href="style.css?v=813941107545">
-<script defer src="/js/dist/explainers.js?v=813941107545"></script>
+<link rel="stylesheet" href="style.css?v=c491b878ad9b">
+<script defer src="/js/dist/explainers.js?v=c491b878ad9b"></script>
 </head>
 <body>
 <header><a class="brand" href="/" target="_top"><span class="brand-mark">∴</span> mostlylucid <span class="muted">/ explainers</span></a><div class="header-actions"><button id="theme" type="button">Dark mode</button><button id="expand" type="button">Expand ↗</button></div></header>
@@ -31,16 +31,17 @@
 </section>
 <section id="prediction-view" aria-label="Destination prediction explainer" hidden>
 <div class="workbench">
-<div class="visual-card"><div class="card-heading"><div><span class="eyebrow">THE FORECAST MAP</span><h2>New evidence. Different destinations.</h2></div></div>
-<div class="legend"><span><i class="dot user-a"></i>User A</span><span><i class="dot user-b"></i>User B</span><span><i class="dot user-c"></i>User C</span><span>Trails retain previous forecasts</span></div>
-<div id="prediction-plot" role="group" aria-label="User forecasts moving between destination anchors"><div id="prediction-fallback"></div><span id="prediction-renderer" class="plot-status">deck.gl forecast map</span></div>
+<div class="visual-card"><div class="card-heading"><div><span class="eyebrow">THE BEHAVIOURAL TRACKS</span><h2>24 users. Watch their journeys diverge.</h2></div></div>
+<div class="legend"><span>Each coloured trail is one user</span><span>Dots mark observations</span><span>Moving heads show current behaviour</span></div>
+<div id="prediction-plot" role="group" aria-label="Multiple user behaviour tracks moving towards and away from destinations"><div id="prediction-fallback"></div><span id="prediction-renderer" class="plot-status">Observed behaviour / deck.gl</span></div>
+<div id="prediction-live" class="prediction-live" aria-live="off"></div>
 <div id="prediction-users" class="plot-tools" aria-label="Select a user to inspect"></div>
-<p class="prediction-map-note small muted">Position is a weighted blend of the four labelled anchors, calculated from the probabilities. This is a forecast map, not an embedding or a source of probabilities. Users with the same forecast overlap.</p>
+<p class="prediction-map-note small muted">Follow the heads, then read the trails: basket removal and resumed browsing pull users back; checkout advances them towards purchase. Positions are an authored state layout with separate display lanes, not learned embedding coordinates. Select a track for its real forecast.</p>
 <div class="filters"><label>What are we optimising for?<select id="prediction-objective"><option value="purchase">Complete purchases</option><option value="cancellation">Avoid cancellation</option></select></label><div id="prediction-destinations" class="destination-utilities"></div></div>
 </div>
 <aside class="inspector prediction-inspector"><span class="eyebrow">CAPTURED C# ENGINE OUTPUT</span><h2 id="prediction-title"></h2><p id="prediction-prefix" class="muted"></p><div class="evidence-item"><span>Current state</span><strong id="prediction-state"></strong></div><p id="prediction-status" class="small muted"></p><div id="prediction-values"></div><p id="prediction-support" class="small muted"></p><h3>Utility / possible range</h3><strong id="prediction-utility"></strong><p id="prediction-utility-note" class="small muted"></p></aside>
 </div>
-<p class="note">Synthetic fresh visits against a frozen model trained on 1,000 visits (seed 814). Forecast horizon: four future events. These visits do not update population counts. Endpoints appear only when observed; shorter visits hold their final position. Uncalibrated simulator estimates. Utility changes preferences, not forecasts. No intervention effect is simulated.</p>
+<p class="note">24 synthetic visits: three teaching paths and 21 generated holdout journeys. Starts are staggered for visibility; movement interpolates between captured observations. The paths use observed states, never future outcomes. Incomplete visits stop without inventing an endpoint. Forecasts come from the frozen C# model trained on 1,000 visits; no intervention effect is simulated.</p>
 </section>
 <section class="playback" aria-label="Replay controls"><div class="play-buttons"><button id="play" class="primary">Play</button><button id="back" aria-label="Previous step">←</button><button id="next" aria-label="Next step">Next →</button><button id="reset">Reset</button></div><label class="scrubber"><span id="step-label">Before the first observation</span><input id="scrub" type="range" min="0" max="5" value="0" aria-label="Replay position"></label><span id="step-count" class="step-count">0 / 5</span></section>
 <p id="announcement" class="sr-only" aria-live="polite"></p>

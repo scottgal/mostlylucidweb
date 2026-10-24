@@ -1,5 +1,5 @@
 {
-  "version": "prediction-replay-v1",
+  "version": "prediction-replay-v2",
   "seed": 814,
   "trainingVisits": 1000,
   "horizonEvents": 4,
@@ -557,6 +557,3669 @@
             "supportingTransitions": 0,
             "status": "observed_destination",
             "observedAt": "2026-10-24T11:07:00+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00001",
+      "name": "Maximillia / test-00001",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00001",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00001",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:47+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00001",
+            "currentState": "impulsive_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 336,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:09+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00001",
+            "currentState": "post_cart_browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 323,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:19+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cancel",
+          "prediction": {
+            "subject": "test-00001",
+            "currentState": "cancel",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 1
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:02:17+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00002",
+      "name": "Erika / test-00002",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00002",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00002",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:13+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00002",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:48+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00002",
+            "currentState": "repeated_comparison",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 248,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:01+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00002",
+            "currentState": "research_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 245,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:48+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "remove",
+          "prediction": {
+            "subject": "test-00002",
+            "currentState": "cart_removed",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 238,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:16+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00002",
+            "currentState": "reconsidering",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 235,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:03:01+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00002",
+            "currentState": "returning_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 229,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:03:23+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "purchase",
+          "prediction": {
+            "subject": "test-00002",
+            "currentState": "purchase",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 1
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:03:37+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00003",
+      "name": "Reinhold / test-00003",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00003",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00003",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:21+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00003",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:33+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00003",
+            "currentState": "repeated_comparison",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 248,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:06+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00003",
+            "currentState": "research_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 245,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:28+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "remove",
+          "prediction": {
+            "subject": "test-00003",
+            "currentState": "cart_removed",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 238,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:13+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00003",
+            "currentState": "reconsidering",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 235,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:53+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00003",
+            "currentState": "returning_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 229,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:03:39+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cancel",
+          "prediction": {
+            "subject": "test-00003",
+            "currentState": "cancel",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 1
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:03:54+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00004",
+      "name": "Maye / test-00004",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00004",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00004",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:31+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00004",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:08+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00004",
+            "currentState": "considered_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 357,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:57+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "checkout",
+          "prediction": {
+            "subject": "test-00004",
+            "currentState": "checkout",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 348,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:50+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "purchase",
+          "prediction": {
+            "subject": "test-00004",
+            "currentState": "purchase",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 1
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:03:08+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00005",
+      "name": "Daren / test-00005",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00005",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00005",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:37+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00005",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:18+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00005",
+            "currentState": "considered_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 357,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:52+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "checkout",
+          "prediction": {
+            "subject": "test-00005",
+            "currentState": "checkout",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 348,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:35+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cancel",
+          "prediction": {
+            "subject": "test-00005",
+            "currentState": "cancel",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 1
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:02:50+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00006",
+      "name": "Sibyl / test-00006",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00006",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00006",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:53+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00006",
+            "currentState": "impulsive_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 336,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:38+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00006",
+            "currentState": "post_cart_browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 323,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:29+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cancel",
+          "prediction": {
+            "subject": "test-00006",
+            "currentState": "cancel",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 1
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:03:05+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00007",
+      "name": "Stephany / test-00007",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00007",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00007",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:32+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00007",
+            "currentState": "impulsive_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 336,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:24+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00007",
+            "currentState": "post_cart_browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 323,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:59+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "leave",
+          "prediction": {
+            "subject": "test-00007",
+            "currentState": "leave",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 1
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:02:58+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00008",
+      "name": "Lilly / test-00008",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00008",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00008",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:28+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00008",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:49+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00008",
+            "currentState": "considered_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 357,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:29+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "checkout",
+          "prediction": {
+            "subject": "test-00008",
+            "currentState": "checkout",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 348,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:16+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "purchase",
+          "prediction": {
+            "subject": "test-00008",
+            "currentState": "purchase",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 1
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:02:40+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00009",
+      "name": "Kaley / test-00009",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00009",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00009",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:55+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00009",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:10+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00009",
+            "currentState": "repeated_comparison",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 248,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:05+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00009",
+            "currentState": "research_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 245,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:03:03+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "remove",
+          "prediction": {
+            "subject": "test-00009",
+            "currentState": "cart_removed",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 238,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:03:46+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00009",
+            "currentState": "reconsidering",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 235,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:04:46+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00009",
+            "currentState": "returning_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 229,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:05:11+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cancel",
+          "prediction": {
+            "subject": "test-00009",
+            "currentState": "cancel",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 1
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:05:52+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00010",
+      "name": "Jaquan / test-00010",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00010",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00010",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:41+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00011",
+      "name": "Elmer / test-00011",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00011",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00011",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:07+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00011",
+            "currentState": "impulsive_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 336,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:38+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00011",
+            "currentState": "post_cart_browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 323,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:49+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "purchase",
+          "prediction": {
+            "subject": "test-00011",
+            "currentState": "purchase",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 1
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:02:09+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00012",
+      "name": "Guy / test-00012",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00012",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00012",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:49+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00012",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:30+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00012",
+            "currentState": "considered_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 357,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:01+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "checkout",
+          "prediction": {
+            "subject": "test-00012",
+            "currentState": "checkout",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 348,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:44+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "purchase",
+          "prediction": {
+            "subject": "test-00012",
+            "currentState": "purchase",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 1
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:03:16+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00013",
+      "name": "Vinnie / test-00013",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00013",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00013",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:05+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00013",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:56+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00013",
+            "currentState": "repeated_comparison",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 248,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:52+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00013",
+            "currentState": "research_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 245,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:03:39+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "remove",
+          "prediction": {
+            "subject": "test-00013",
+            "currentState": "cart_removed",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 238,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:04:17+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00013",
+            "currentState": "reconsidering",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 235,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:04:41+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00013",
+            "currentState": "returning_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 229,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:05:11+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cancel",
+          "prediction": {
+            "subject": "test-00013",
+            "currentState": "cancel",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 1
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:05:38+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00014",
+      "name": "Elliot / test-00014",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00014",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00014",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:55+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00014",
+            "currentState": "impulsive_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 336,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:37+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00014",
+            "currentState": "post_cart_browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 323,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:06+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "leave",
+          "prediction": {
+            "subject": "test-00014",
+            "currentState": "leave",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 1
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:02:40+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00015",
+      "name": "Elizabeth / test-00015",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00015",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00015",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:29+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00015",
+            "currentState": "impulsive_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 336,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:02+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00015",
+            "currentState": "post_cart_browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.1826625386996904
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.2724458204334365
+              },
+              {
+                "destination": "leave",
+                "probability": 0.544891640866873
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 323,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:30+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "leave",
+          "prediction": {
+            "subject": "test-00015",
+            "currentState": "leave",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 1
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:02:22+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00016",
+      "name": "Gayle / test-00016",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00016",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00016",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:10+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00016",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:53+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00016",
+            "currentState": "considered_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 357,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:07+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "checkout",
+          "prediction": {
+            "subject": "test-00016",
+            "currentState": "checkout",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 348,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:53+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "purchase",
+          "prediction": {
+            "subject": "test-00016",
+            "currentState": "purchase",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 1
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:03:14+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00017",
+      "name": "Dorcas / test-00017",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00017",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00017",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:09+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00017",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:28+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00017",
+            "currentState": "considered_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 357,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:18+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "checkout",
+          "prediction": {
+            "subject": "test-00017",
+            "currentState": "checkout",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 348,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:03:17+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cancel",
+          "prediction": {
+            "subject": "test-00017",
+            "currentState": "cancel",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 1
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:04:03+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00018",
+      "name": "Alfredo / test-00018",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00018",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00018",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:40+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00018",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:37+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00018",
+            "currentState": "considered_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 357,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:13+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "checkout",
+          "prediction": {
+            "subject": "test-00018",
+            "currentState": "checkout",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 348,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:03:07+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "leave",
+          "prediction": {
+            "subject": "test-00018",
+            "currentState": "leave",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 1
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:03:28+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00019",
+      "name": "Shakira / test-00019",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00019",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00019",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:53+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00019",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:35+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00019",
+            "currentState": "considered_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 357,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:55+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "checkout",
+          "prediction": {
+            "subject": "test-00019",
+            "currentState": "checkout",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 348,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:40+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "purchase",
+          "prediction": {
+            "subject": "test-00019",
+            "currentState": "purchase",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 1
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:03:14+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00020",
+      "name": "Theresia / test-00020",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00020",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00020",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:07+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00020",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:45+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00020",
+            "currentState": "repeated_comparison",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 248,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:01+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00020",
+            "currentState": "research_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 245,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:03:01+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "remove",
+          "prediction": {
+            "subject": "test-00020",
+            "currentState": "cart_removed",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 238,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:03:28+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00020",
+            "currentState": "reconsidering",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 235,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:04:28+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00020",
+            "currentState": "returning_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.3318777292576419
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.3056768558951965
+              },
+              {
+                "destination": "leave",
+                "probability": 0.3624454148471616
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 229,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:05:27+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "purchase",
+          "prediction": {
+            "subject": "test-00020",
+            "currentState": "purchase",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 1
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:06:15+00:00",
+            "isCalibrated": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "test-00021",
+      "name": "Anderson / test-00021",
+      "frames": [
+        {
+          "event": null,
+          "prediction": {
+            "subject": "test-00021",
+            "currentState": null,
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 1,
+            "supportingTransitions": 0,
+            "status": "no_state",
+            "observedAt": null,
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "view",
+          "prediction": {
+            "subject": "test-00021",
+            "currentState": "browsing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.4005163810571429
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.12221811201345374
+              },
+              {
+                "destination": "leave",
+                "probability": 0.21146988709812714
+              }
+            ],
+            "remainingProbability": 0.26579561983127625,
+            "supportingTransitions": 975,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:00:39+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "compare",
+          "prediction": {
+            "subject": "test-00021",
+            "currentState": "comparing",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.5187503492986084
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.04068630190577321
+              },
+              {
+                "destination": "leave",
+                "probability": 0.030514726429329907
+              }
+            ],
+            "remainingProbability": 0.4100486223662885,
+            "supportingTransitions": 617,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:01:26+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "cart",
+          "prediction": {
+            "subject": "test-00021",
+            "currentState": "considered_cart",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 357,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:05+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "checkout",
+          "prediction": {
+            "subject": "test-00021",
+            "currentState": "checkout",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 0.8793103448275862
+              },
+              {
+                "destination": "cancel",
+                "probability": 0.06896551724137931
+              },
+              {
+                "destination": "leave",
+                "probability": 0.05172413793103448
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 348,
+            "status": "estimated",
+            "observedAt": "2026-10-24T10:02:38+00:00",
+            "isCalibrated": false
+          }
+        },
+        {
+          "event": "purchase",
+          "prediction": {
+            "subject": "test-00021",
+            "currentState": "purchase",
+            "horizonEvents": 4,
+            "outcomes": [
+              {
+                "destination": "purchase",
+                "probability": 1
+              },
+              {
+                "destination": "cancel",
+                "probability": 0
+              },
+              {
+                "destination": "leave",
+                "probability": 0
+              }
+            ],
+            "remainingProbability": 0,
+            "supportingTransitions": 0,
+            "status": "observed_destination",
+            "observedAt": "2026-10-24T10:03:17+00:00",
             "isCalibrated": false
           }
         }
