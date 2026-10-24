@@ -37,46 +37,46 @@ export const formatClock = at => new Date(at).toISOString().slice(11,19)+' UTC';
 export function probabilities(prediction) {
     return {...Object.fromEntries(prediction.outcomes.map(o=>[o.destination,o.probability])),unresolved:prediction.remainingProbability};
 }
-export function behaviourPosition(frame,index,count=predictionReplay.participants.length) {
+export function behaviourPosition(frame,index,spread=true,count=predictionReplay.participants.length) {
     const motion=frame.prediction.trajectory;
     if(!motion)return [45,95+index/Math.max(1,count-1)*700];
     const point=projectCoordinates(motion.centroid);
-    // Small identity offsets keep coincident tracks selectable. They are presentation only.
-    return [point[0]+Math.cos(index*2.39996)*5,point[1]+Math.sin(index*2.39996)*5];
+    // Optional fixed display lanes separate coincident trajectories. Never use these offsets for inference.
+    return [point[0],point[1]+(spread?((index*7)%count-(count-1)/2)*6:0)];
 }
 export function utilityRange(prediction,objective) {
     const values=objective.utilities;
     const known=prediction.outcomes.reduce((sum,o)=>sum+o.probability*values[o.destination],0);
     return [known+prediction.remainingProbability*Math.min(...Object.values(values)),known+prediction.remainingProbability*Math.max(...Object.values(values))];
 }
-function participantSnapshot(p,index,at,fraction,now) {
+function participantSnapshot(p,index,at,fraction,now,spread=true) {
     const prefix=p.frames.slice(0,at+1),frame=prefix.at(-1);
-    const start=behaviourPosition(frame,index),end=behaviourPosition(p.frames[Math.min(at+1,p.frames.length-1)],index);
+    const start=behaviourPosition(frame,index,spread),end=behaviourPosition(p.frames[Math.min(at+1,p.frames.length-1)],index,spread);
     const position=start.map((v,axis)=>v+(end[axis]-v)*fraction);
     return {...p,index,color:colors[index%colors.length],frame,position,
-        trail:[...prefix.filter(f=>f.prediction.trajectory).map(f=>behaviourPosition(f,index)),position],events:prefix.map(f=>f.event).filter(Boolean),
+        trail:[...prefix.filter(f=>f.prediction.trajectory).map(f=>behaviourPosition(f,index,spread)),position],events:prefix.map(f=>f.event).filter(Boolean),
         waiting:at===0&&fraction===0,finished:at===p.frames.length-1,
         forecastExpired:frame.prediction.status!=='observed_destination'&&frame.prediction.observedAt!=null&&now>Date.parse(frame.prediction.observedAt)+predictionReplay.horizonSeconds*1000};
 }
 /** All visits share their actual UTC event timeline. Playback seconds are independent of event count. */
-export function predictionSnapshot(cursor) {
+export function predictionSnapshot(cursor,spread=true) {
     const now=timeOrigin+Math.max(0,Math.min(predictionMax,cursor))*1000;
     return predictionReplay.participants.map((p,index)=>{
         let at=0;
         while(at+1<p.frames.length&&Date.parse(p.frames[at+1].at)<=now)at++;
         const start=Date.parse(p.frames[at].at),next=Date.parse(p.frames[Math.min(at+1,p.frames.length-1)].at);
         const fraction=next>start?Math.max(0,Math.min(1,(now-start)/(next-start))):0;
-        return participantSnapshot(p,index,at,fraction,now);
+        return participantSnapshot(p,index,at,fraction,now,spread);
     });
 }
 /** Pin visits at the same measured position, retaining their true directions and elapsed durations. */
-export function trajectoryComparisonPair(mode='direction') {
+export function trajectoryComparisonPair(mode='direction',spread=true) {
     return [0,mode==='pace'?2:1].map(index=>{
         const p=predictionReplay.participants[index],at=p.comparisonFrame;
-        return participantSnapshot(p,index,at,0,Date.parse(p.frames[at].at));
+        return participantSnapshot(p,index,at,0,Date.parse(p.frames[at].at),spread);
     });
 }
-export function comparisonSnapshot(cursor,mode='direction') {
-    const pair=new Map(trajectoryComparisonPair(mode).map(p=>[p.id,p]));
-    return predictionSnapshot(cursor).map(p=>pair.get(p.id)??p);
+export function comparisonSnapshot(cursor,mode='direction',spread=true) {
+    const pair=new Map(trajectoryComparisonPair(mode,spread).map(p=>[p.id,p]));
+    return predictionSnapshot(cursor,spread).map(p=>pair.get(p.id)??p);
 }

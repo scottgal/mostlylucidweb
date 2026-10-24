@@ -109,3 +109,7 @@ The prediction view now imports `temporal-shop-replay.json` and `temporal-operat
 Compare direction pins A/B at identical raw input vectors with opposite rates; compare pace pins A/C at their own landmarks, reached after 20 and 120 seconds. Both cards show real forecasts for the same 60-second target. The service view displays a separate learned normal reference and deviation; only qualified healthy samples update it. Playback interpolation is not an additional sensor measurement. Recorded forecast windows that have elapsed are labelled explicitly.
 
 Comparison cards and motion evidence exceed the original 2,400px mobile iframe bound. The source/origin-checked resizing handler now admits up to 8,000px, allowing comparison and accessible-table expansion without a nested scrolling viewport.
+
+The prediction player provides a Separate tracks control. Fixed vertical display lanes distinguish coincident trajectories; turning it off restores the exact feature projection. Lane spacing never enters forecasting. Compare labels use opposing offsets so two highlighted heads remain readable.
+
+Article math uses `$$...$$` for display equations and `$...$` for inline expressions. The Markdown parser preserves these before KaTeX produces HTML and MathML. Backslash bracket/parenthesis delimiters are consumed as Markdown escapes and must not be used in article source. Check the rendered article, including subscripts, in a local browser.

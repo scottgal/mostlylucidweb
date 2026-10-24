@@ -10,7 +10,7 @@ const milestones = isOperations ? [{name:'LATENCY INCREASES →',position:[500,8
 
 /** Observed-state tracks and real C# forecasts share a playhead, but display coordinates do not produce probabilities. */
 export function createPredictionView(onChange) {
-    let deck = null, failed = false, selected = 'a', current = [], inspectorKey = '', tableKey = '', comparing = null;
+    let deck = null, failed = false, selected = 'a', current = [], inspectorKey = '', tableKey = '', comparing = null, spread = true;
     const plot = $('prediction-plot'), fallback = $('prediction-fallback');
     plot.dataset.replayVersion = predictionReplay.version;
     const choose = id => { selected = id; $('prediction-subject').value = id; onChange(); };
@@ -19,6 +19,7 @@ export function createPredictionView(onChange) {
     $('prediction-subject').onchange = e => choose(e.target.value);
     $('prediction-objective').innerHTML = Object.entries(objectives).map(([key,value])=>`<option value="${key}">${value.name}</option>`).join('');
     $('prediction-objective').onchange = onChange;
+    $('prediction-spread').onclick = () => { spread=!spread; $('prediction-spread').setAttribute('aria-pressed',String(spread)); onChange(); };
     $('prediction-domain').value = isOperations ? 'operations' : 'shop';
     $('prediction-domain').onchange = event => {
         const url = new URL(location.href); url.searchParams.set('domain',event.target.value); location.assign(url.href);
@@ -115,13 +116,14 @@ export function createPredictionView(onChange) {
                     onClick:({object})=>object&&choose(object.id)}),
                 new TextLayer({...common,characterSet:'auto',id:'selected-user',data:current.filter(highlighted),getPosition:p=>p.position,
                     getText:p=>`${String(p.index+1).padStart(2,'0')} / ${(p.frame.event??'arriving').toUpperCase()}`,
-                    getColor:ink,getSize:12,getPixelOffset:[12,-16],getTextAnchor:'start'})
+                    getColor:p=>p.color,getSize:12,getPixelOffset:p=>comparing?(p.id==='a'?[12,25]:[12,-25]):[12,-16],getTextAnchor:'start',
+                    updateTriggers:{getPixelOffset:comparing}})
             ]});
         } catch {showFallback();}
     }
     return {
         update(cursor) {
-            current=comparing?comparisonSnapshot(cursor,comparing):predictionSnapshot(cursor);
+            current=comparing?comparisonSnapshot(cursor,comparing,spread):predictionSnapshot(cursor,spread);
             $('prediction-clock').textContent = comparing ? 'Separate visit landmarks / 60-second forecasts' : `${formatClock(timeOrigin+cursor*1000)} / elapsed ${formatDuration(cursor)}`;
             const counts=destinations.map(d=>`${current.filter(p=>p.frame.prediction.currentState===d.id).length} ${d.name.toLowerCase()}`);
             $('prediction-live').textContent=`${current.filter(p=>!p.waiting&&!p.finished).length} moving · ${counts.join(' · ')} · ${current.filter(p=>p.finished&&p.frame.prediction.status!=='observed_destination').length} incomplete`;

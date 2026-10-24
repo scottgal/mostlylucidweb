@@ -1,6 +1,6 @@
 import {describe,expect,it} from 'vitest';
 import {predictionReplay,predictionSnapshot,predictionMax,timeOrigin,probabilities,trajectoryComparisonPair,comparisonSnapshot,
-    objectives,utilityRange,formatDuration} from './prediction-model';
+    objectives,utilityRange,formatDuration,behaviourPosition,projectCoordinates} from './prediction-model';
 import operations from '../../../../samples/RelevancePredict/artifacts/seed-814/temporal-operations-replay.json';
 
 describe('physical-time behavioural tracks',()=>{
@@ -52,6 +52,14 @@ describe('physical-time behavioural tracks',()=>{
         expect(formatDuration(120)).toBe('02:00');
         expect(predictionMax).toBeGreaterThan(300);
         expect(Number.isFinite(timeOrigin)).toBe(true);
+    });
+    it('separates coincident tracks only for display and can restore the exact feature projection',()=>{
+        const frame=trajectoryComparisonPair()[0].frame;
+        expect(new Set(Array.from({length:24},(_,i)=>behaviourPosition(frame,i).join(','))).size).toBe(24);
+        expect(behaviourPosition(frame,0,false)).toEqual(projectCoordinates(frame.prediction.trajectory.centroid));
+        const spaced=predictionSnapshot(60),exact=predictionSnapshot(60,false);
+        expect(exact.map(p=>p.frame.prediction)).toEqual(spaced.map(p=>p.frame.prediction));
+        expect(exact[0].position).not.toEqual(spaced[0].position);
     });
     it('keeps unfinished visits unfinished and marks expired recorded forecast windows',()=>{
         const finished=predictionSnapshot(predictionMax);

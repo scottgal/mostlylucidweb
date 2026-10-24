@@ -27,7 +27,7 @@ We need both. Two people can be interested in the same products while being at d
 
 Their interest vectors can be very similar. Their likely next actions need not be.
 
-The interactive replay follows **24 timestamped behavioural trajectories** together. The heads track smoothed behavioural centroids; the trails preserve their routes. The right-hand panel shows the actual C# forecast, velocity, acceleration, observation time and deadline.
+The interactive replay follows **24 timestamped behavioural trajectories** together. The heads track smoothed behavioural centroids; the trails preserve their routes. **Separate tracks** adds fixed display lanes to distinguish overlapping paths. Turn it off to inspect the exact two-coordinate projection; the forecasts always use the original vectors. The right-hand panel shows the actual C# forecast, velocity, acceleration, observation time and deadline.
 
 <iframe class="article-explainer" src="/interactive/explainers/index.html?v=20261024-temporal&amp;view=prediction&amp;embed=1" title="24 timestamped behavioural trajectories, predictions and learned normal references" width="100%" height="1500" loading="lazy" style="border:0;border-radius:12px;"></iframe>
 
@@ -79,23 +79,23 @@ Use **Compare direction** to highlight A and B together, or **Compare pace** for
 
 ## Measure Movement in Actual Time
 
-The engine maintains a fast behavioural centroid. For an observation \(x_t\), elapsed time \(\Delta t\), and a half-life \(h\) in seconds:
+The engine maintains a fast behavioural centroid. For an observation $x_t$, elapsed time $\Delta t$, and a half-life $h$ in seconds:
 
-\[
+$$
 \alpha(\Delta t)=1-2^{-\Delta t/h}
-\]
+$$
 
-\[
+$$
 \mu_t=\mu_{t-1}+\alpha(\Delta t)(x_t-\mu_{t-1})
-\]
+$$
 
 A ten-second interval and a one-minute interval produce different adaptation weights. The centroid is a smoothed characterisation, so it can lag the latest observation slightly; equal raw input vectors need not give exactly equal smoothed centroids.
 
 Velocity measures how that centroid changes per second:
 
-\[
+$$
 v_t=\frac{\mu_t-\mu_{t-1}}{\Delta t}
-\]
+$$
 
 Acceleration compares successive velocity estimates. With irregular sampling, those velocities describe different interval midpoints:
 

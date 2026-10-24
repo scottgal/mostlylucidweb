@@ -189,14 +189,16 @@ For each point, the engine retains a weighted vector sum and its total supportin
 
 Before adding new evidence, we reduce the influence of the old evidence according to elapsed time:
 
-\[
- d = 2^{-\Delta t/h}, \qquad
- S' = dS + wx, \qquad
- M' = dM + w, \qquad
- \mu' = S'/M'
-\]
+$$
+\begin{aligned}
+ d &= 2^{-\Delta t/h} \\
+ S' &= dS + wx \\
+ M' &= dM + w \\
+ \mu' &= S'/M'
+\end{aligned}
+$$
 
-Here, \(h\) is the half-life, \(\Delta t\) is elapsed time in the same units, \(w\) is the event weight, and \(x\) is the observation's vector.
+Here, $h$ is the half-life, $\Delta t$ is elapsed time in the same units, $w$ is the event weight, and $x$ is the observation's vector.
 
 The arithmetic in `Observe` is similarly small. First, decay the existing summary:
 
