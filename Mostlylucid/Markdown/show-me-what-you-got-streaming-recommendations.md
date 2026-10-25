@@ -37,7 +37,7 @@ The timing matters. A recommendation made from yesterday's profile can miss what
 
 The approach has two useful capabilities: **streaming updates** keep the current state responsive, while new signal contributors let us extend what the system observes and learn which evidence matters.
 
-Together, these support an **emergent streaming recommender**. Patterns are discovered from observations, given readable names, and used to inform recommendations. Reusable embedding models and small LLMs help us represent and interpret those patterns without naming every audience segment in advance.
+Together, these give us the foundations for an **emergent streaming recommender**. We will start with explicit features and small statistical updates. Later extensions can discover shared patterns, give them readable names and test their contribution to recommendations. The [behavioural inference articles](/blog/behavioural-inference-systems-blog) develop that wider architecture; this series makes the individual operations visible in code.
 
 We'll use a shop to make the mechanics concrete. Keep the diagnostic example in mind: the important question is which parts of this machinery depend on selling products, and which parts apply wherever new evidence changes what is worth considering next.
 
@@ -257,7 +257,20 @@ Choose a fixed order and calculate a number for each position:
 | 4 | Any basket addition | Yes = 1, no = 0 | `1.00` |
 | 5 | Mean observed dwell time | Divide seconds by 120 and cap at 1 | `0.25` |
 
-That gives us:
+The table's arithmetic can be written directly in C#. With the measured values above assigned to these variables:
+
+```csharp
+var sessionVector = new[]
+{
+    Math.Min((views / windowMinutes) / 20.0, 1.0),
+    comparisons / (double)views,
+    Math.Min(priceFilterChanges / 5.0, 1.0),
+    anyBasketAddition ? 1.0 : 0.0,
+    meanDwellSeconds / 120.0
+};
+```
+
+Here, `windowMinutes` is a double holding `5.0`, so dividing ten views by that window produces two views per minute. The example has measured views; a real empty window needs an explicit missing-data policy. The result is:
 
 ```text
 session behaviour = [0.10, 0.40, 0.60, 1.00, 0.25]
@@ -279,6 +292,15 @@ Choose a small set of event states, such as view, compare, change filter, and ad
 P(add to basket | compare)
     = count(compare → add to basket) / count(all transitions out of compare)
 ```
+
+For a source state with observed exits, the equation becomes:
+
+```csharp
+var basketShare = addToBasketAfterCompare
+    / (double)allTransitionsOutOfCompare;
+```
+
+The vertical bar means “given”: among transitions that started at comparison, what fraction ended with a basket addition? [Part 3's state-count example](/blog/show-me-what-you-got-part3-predict#a-smaller-worked-example-learning-from-state-counts) builds an outcome predictor from this same count-and-divide operation.
 
 Those transition frequencies can become vector features alongside activity rates and interest summaries. Updating the counts only requires the previous state and the new event. Keep support counts too: one observed transition is much weaker evidence than hundreds, and an unseen source state needs a fallback rather than division by zero.
 
@@ -308,13 +330,9 @@ Measured behavioural features and semantic embeddings describe different things.
 
 ## Questions as Semantic Features
 
-We can also choose the semantic dimensions ourselves. Does a voice message use aggressive delivery? Does a photograph show package damage? Does a support request ask for a person? A capable decision model can supply readings along these named dimensions, using the appropriate text, image or audio evidence.
+Some useful coordinates require interpretation: hostile vocal delivery, visible package damage, or a request to speak with a person. A suitable decision model can answer a defined question over the supplied evidence, and that reading becomes a coordinate.
 
-Each yes/no question is a binary classification task. Several questions act as a bank of classifiers whose scores form an explicit semantic vector. The interpretation still comes from a model, and an unanswered question must remain distinct from a negative answer.
-
-This is one way to produce features. Encoding a measured price and generating a general text embedding are also vectorisation operations; they do not necessarily classify the input into named categories.
-
-[Part 1.5: Vectorise Anything With Decision Models](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) develops this question-defined representation, with voice and image examples and a small existing code example from StyloMail. It is an optional bridge between choosing a representation and using it to recommend candidates.
+[Part 1.5: Vectorise Anything With Decision Models](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) develops this optional route, including what the scores mean and how to retain missing readings. Here, the important point is that these interpreted features can sit alongside measured features as separate contributors.
 
 ## Colour or Root Vegetable
 
@@ -349,7 +367,22 @@ Trusting any one representation as a complete account of the situation can hide 
 
 ## How Do We Measure Similarity?
 
-Cosine similarity measures how closely two vectors point in the same direction:
+Cosine similarity measures how closely two vectors point in the same direction. It asks whether their proportions line up, while setting aside overall length. For example, `[1, 2]` and `[2, 4]` point in the same direction even though the second is twice as long.
+
+For two non-zero vectors with matching dimensions, the code is:
+
+```csharp
+double dot = 0, lengthASquared = 0, lengthBSquared = 0;
+for (var i = 0; i < a.Length; i++)
+{
+    dot += (double)a[i] * b[i];
+    lengthASquared += (double)a[i] * a[i];
+    lengthBSquared += (double)b[i] * b[i];
+}
+var similarity = dot / Math.Sqrt(lengthASquared * lengthBSquared);
+```
+
+The loop multiplies matching coordinates and adds them to `dot`. The denominator removes the effect of vector length, so doubling all the numbers in one vector does not change the score. Written as a formula, those same operations are:
 
 ```text
 cosine(a, b) = dot(a, b) / (length(a) * length(b))
@@ -360,6 +393,8 @@ If both vectors have been normalised to length one, this reduces to their dot pr
 > **ML aside: normalising a vector.** Here, it means rescaling the whole vector to length one while preserving its direction. That differs from scaling individual features. A dot product multiplies corresponding coordinates and adds the results; with unit-length vectors, it gives us the cosine score directly.
 
 A higher cosine score means closer alignment in that representation. A score of `0.9` does **not** mean a 90% chance of buying something. Nor does it guarantee that items are interchangeable or compatible. The interpretation depends on the representation and its purpose.
+
+The engine uses `cosineDistance = 1 - similarity` when retrieving neighbours, so a smaller distance means a closer match. [Part 2](/blog/show-me-what-you-got-part2-building-relevance#several-useful-opinions-one-list) combines the resulting rankings.
 
 Cosine is one choice, not a rule for every vector. The colour example needs a colour-distance measure; a behavioural space needs a metric that respects its feature scales and meaning. Normalising everything indiscriminately can discard magnitude that matters, such as overall activity or colour lightness.
 
@@ -393,6 +428,18 @@ total weight = 5
 centroid     = [4.4, 1.8] / 5
              = [0.88, 0.36]
 ```
+
+In C#, the same average can be calculated one coordinate at a time. Here, `observations` contains the three vector/weight pairs above:
+
+```csharp
+var totalWeight = observations.Sum(item => item.Weight);
+var centroid = Enumerable.Range(0, 2)
+    .Select(axis => observations.Sum(item => item.Weight * item.Vector[axis])
+        / totalWeight)
+    .ToArray();
+```
+
+Each coordinate gets a weighted average of its own. A basket addition with weight `3` pulls the summary three times as much as a view with weight `1`. Dividing by the total weight keeps the result an average, rather than a total that grows with every interaction.
 
 That centroid summarises the observed interest. With an appropriate comparison metric, it can become the starting point for matching candidates in Part 2. The choice of weights is our starting policy, not a universal truth about how much a basket addition means.
 
@@ -477,7 +524,7 @@ To predict an outcome, we need evidence relating state to what happened next. On
 
 Movement through a vector space can supply features for those models. Extrapolating that movement alone does not establish that someone will purchase a particular product. Any claimed probability needs evaluation and, where appropriate, calibration.
 
-This distinction keeps the architecture useful: matching can deliver value before we build a reliable next-action predictor.
+This distinction sets the order of the implementation: [Part 2](/blog/show-me-what-you-got-part2-building-relevance) builds candidate matching; [Part 3](/blog/show-me-what-you-got-part3-predict) learns destination probabilities from observed journeys. We can use the first before we have enough outcome evidence for the second.
 
 # Emergent Recommendation: Discover the Patterns
 
@@ -596,6 +643,6 @@ If the dimensions we need require interpretation, [Part 1.5: Vectorise Anything 
 
 The next question is how to use that characterisation. Given this session's interests, which available products should we recommend? Given this service's current state, which diagnostic action is worth considering?
 
-[Part 2: From Behaviour to Recommendations in C#](/blog/show-me-what-you-got-part2-building-relevance) follows that path from an entity's representation to candidate matching, combined rankings and destination estimates. Short extracts from the working Relevance engine make each concept concrete: the calculation that updates a summary, the comparison that finds a neighbour, and the ranking rule that combines different signals.
+[Part 2: From Behaviour to Recommendations in C#](/blog/show-me-what-you-got-part2-building-relevance) follows that path from an entity's representation to eligible candidates, combined rankings and updates that become visible on the next read. Short extracts from the working Relevance engine make each concept concrete: the calculation that updates a summary, the comparison that finds a neighbour, and the ranking rule that combines different signals.
 
 The companion shop and operations monitor give us examples we can run and inspect as we go. They use the same statistical machinery with different observations and candidates. [Part 3: Predict](/blog/show-me-what-you-got-part3-predict) uses timestamped trajectories, velocity and acceleration to forecast outcomes within a time window, with learned normal references for incident analysis. Part 4 will test directed interventions, including products, offers and marketing messages; Part 5 will add richer representations, including images.

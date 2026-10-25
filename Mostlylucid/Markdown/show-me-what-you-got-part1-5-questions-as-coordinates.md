@@ -2,7 +2,7 @@
 
 “How do I vectorise this?”
 
-It is a reasonable question after [Part 1](/blog/show-me-what-you-got-streaming-recommendations). We know how useful vectors can be. We can compare entities, maintain centroids, discover groups and track change. But where do the coordinates come from when the thing we care about is difficult to measure?
+This is an optional bridge between [Part 1](/blog/show-me-what-you-got-streaming-recommendations) and [Part 2](/blog/show-me-what-you-got-part2-building-relevance). It focuses on producing coordinates for properties we cannot read directly from a database field or event counter.
 
 Take a voice message. **Is this message aggressive?**
 
@@ -220,14 +220,7 @@ We need the ordered question definitions, the producer and model version, the un
 
 It is a representation of an input in a numerical space. Calling it an embedding is reasonable in that broad sense. The useful distinction is that this is a **question-defined semantic vector**: its axes have explicit meanings selected for our task.
 
-A conventional embedding model learns a broad latent representation. We generally compare its vectors without assigning a human-readable property to each coordinate. Both approaches can be valuable.
-
-| Representation | Good starting point when |
-|----------------|--------------------------|
-| Measured features | We already have the quantities we need |
-| General learned embedding | We want broad similarity, retrieval or semantic neighbourhoods |
-| Question-defined vector | We want comparisons along particular interpretable properties |
-| Combination of contributors | Different aspects of the decision need different evidence |
+[Part 1's representation examples](/blog/show-me-what-you-got-streaming-recommendations#colour-or-root-vegetable) explain why measured features, text embeddings and interpreted properties preserve different relationships. The addition here is a producer for explicitly named semantic dimensions: we choose a question, then ask a suitable model to supply its reading.
 
 We are not reversing an embedding model and uncovering its hidden aggression axis. We are defining an axis, then using a model to estimate the corresponding property from evidence.
 
@@ -253,7 +246,7 @@ We can exclude masked dimensions, require a minimum amount of compatible evidenc
 
 > **Geometry aside: do not normalise away the property.** Two vectors may point in the same direction while assigning very different yes probabilities. Unit-length normalisation can erase that distinction. A distance over original values, with explicit weights and missing-value rules, can be a better starting hypothesis for these coordinates.
 
-The question schema is also versioned evidence. If “aggressive delivery” changes from a hostility rubric to a volume threshold, the old and new coordinate no longer mean the same thing. Reusing the same ID does not preserve compatibility.
+The question schema is also versioned evidence. If “aggressive delivery” changes from a hostility rubric to a volume threshold, the old and new coordinate no longer mean the same thing. Reusing the same ID does not preserve compatibility. [Part 2's storage boundary](/blog/show-me-what-you-got-part2-building-relevance#a-small-storage-boundary) makes that contract concrete: incompatible representations cannot silently reuse the same stored engine state.
 
 # A Small Existing Example: StyloMail
 
@@ -292,7 +285,7 @@ Once we have a compatible representation, the rest of the vector machinery becom
 
 A support system could characterise successive voice messages along defined communication dimensions. A catalogue could describe photographs through visible properties. A diagnostic assistant could characterise reports by the conditions they describe. The input modalities differ; the downstream contracts can remain similar.
 
-Compute the representation when the observation or asset changes, then reuse it for comparisons. A model need not reread the recording every time we ask for a recommendation.
+Compute the representation when the observation or asset changes, then reuse it for comparisons. A model need not reread the recording every time we ask for a recommendation. That keeps this optional interpretation step at the converter boundary rather than inside every ranking request.
 
 [Part 2](/blog/show-me-what-you-got-part2-building-relevance) takes the next step: use the characterisation to retrieve eligible candidates, combine useful rankings and update the decision as new observations arrive. [Part 3](/blog/show-me-what-you-got-part3-predict) learns outcome forecasts from observed journeys. Part 4 adds experiments, and Part 5 builds out richer ingestion, including images.
 

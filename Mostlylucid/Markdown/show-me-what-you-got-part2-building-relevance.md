@@ -17,7 +17,7 @@ The shop gives us familiar examples. Its operations monitor uses the same engine
 
 [TOC]
 
-# We Have a Representation. What Can We Do With It?
+# Put the Representation to Work
 
 The console sample has six products, including these:
 
@@ -54,7 +54,7 @@ With only the boots comparison in our summary, the entity's price point is also 
 | Headphones | 0.525 | 0.025 |
 | Waterproof jacket | 0.550 | 0.050 |
 
-This is L2, or Euclidean, distance. In one dimension it is the absolute difference. The general calculation in `VectorMath.Distance` accumulates squared coordinate differences and takes their square root:
+This is L2, or Euclidean, distance. In one dimension it is the absolute difference. The general calculation in `VectorMath.Distance` accumulates squared coordinate differences and takes their square root. In plain English: find the gap on each coordinate, square the gaps so positive and negative differences cannot cancel, add them, then take the square root to return to distance units:
 
 ```csharp
 for (var i = 0; i < a.Length; i++)
@@ -155,6 +155,8 @@ The baseline uses **weighted reciprocal rank fusion**, or RRF. The entire scorin
 entry.Reasons.Sum(r => r.Weight / (definition.RrfConstant + r.Rank))
 ```
 
+Read `r.Rank` as this head's position for the product: first place is `1`, second is `2`, and so on. Dividing by a larger rank gives a smaller contribution. `r.Weight` controls how much that head matters, and `Sum` adds its contribution to those from the other heads. A product that appears near the top of several lists accumulates more credit.
+
 Each head contributes its weight divided by a constant plus the candidate's rank. With equal weights of 1 and a constant of 60:
 
 ```text
@@ -187,7 +189,26 @@ A basket addition contributes more positive affinity than a view. These are our 
 
 For each point, the engine retains a weighted vector sum and its total supporting weight, called **mass**. The centroid is sum divided by mass.
 
-Before adding new evidence, we reduce the influence of the old evidence according to elapsed time:
+Before adding new evidence, fade the old evidence according to its age. Keep half after one half-life, a quarter after two. Then add the new observation with its configured weight and divide the weighted total by the total weight.
+
+The code follows those steps directly. This uses minutes consistently for both elapsed time and the configured half-life:
+
+```csharp
+var decay = Math.Pow(0.5, elapsed.TotalMinutes / halfLifeMinutes);
+
+// Fade what we already know, then add the new weighted observation.
+for (var i = 0; i < summary.Sum.Length; i++)
+{
+    summary.Sum[i] *= decay;
+    summary.Sum[i] += weight * vector.Values[i];
+}
+summary.Mass = summary.Mass * decay + weight;
+
+// The weighted mean for one coordinate.
+var mean = summary.Sum[0] / summary.Mass;
+```
+
+The equations describe the same operations. `d` is `decay`, `S` is a coordinate of `summary.Sum`, and `M` is `summary.Mass`. A prime means the updated value. The first line calculates how much old evidence survives; the next two update the totals; the last obtains the average:
 
 $$
 \begin{aligned}
@@ -198,25 +219,7 @@ $$
 \end{aligned}
 $$
 
-Here, $h$ is the half-life, $\Delta t$ is elapsed time in the same units, $w$ is the event weight, and $x$ is the observation's vector.
-
-The arithmetic in `Observe` is similarly small. First, decay the existing summary:
-
-```csharp
-for (var i = 0; i < summary.Sum.Length; i++)
-    summary.Sum[i] *= decay;
-
-summary.Mass *= decay;
-```
-
-Then add the new positive evidence:
-
-```csharp
-for (var i = 0; i < vector.Values.Length; i++)
-    summary.Sum[i] += weight * vector.Values[i];
-
-summary.Mass += weight;
-```
+Here, `h` is `halfLifeMinutes`, delta t is `elapsed.TotalMinutes`, `w` is `weight`, and `x` is the corresponding coordinate of `vector.Values`. Mu is the resulting mean. The real update in [RelevanceEngine.cs](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid.Relevance/RelevanceEngine.cs) also checks ordering, usable weights and finite values; this excerpt isolates the arithmetic.
 
 Take the boots comparison at £100, with weight 2. Its price coordinate is 0.5, so the initial sum is 1 and mass is 2.
 
@@ -262,112 +265,7 @@ Eligible candidates return in ordinal ID order with zero scores and no personal 
 
 The interactive demo's fresh-visit control makes this easy to see. Start a session, inspect the initial list, then compare a few products and inspect the contributing heads.
 
-The baseline also keeps one summary per point. A shopper browsing boots and a birthday present can produce an average between interests. Part 1 explained why several centroids may help; this implementation has not yet added interest discovery and routing. Keeping that limitation visible gives us a baseline against which to measure the extension.
-
-# The Same Reasoning Applies to a Service
-
-Now open the operations side of the demo. The entity is a service rather than a shopper, and observations describe measurement windows:
-
-| Role | Shopper | Service |
-|------|---------|---------|
-| Entity | Current session | Monitored service |
-| Observation | Product interaction | Measurement window |
-| Representation | Category, price and colour interest | Latency, errors, retries and queue depth |
-| Candidates | Products | Diagnostic actions |
-| Recommendation | Product worth showing | Action worth considering |
-
-The important difference is where observation vectors come from.
-
-A product event references a candidate whose vectors are already stored:
-
-```csharp
-await relevance.SaveAsync("events", new
-{
-    id = eventId,
-    subject = sessionId,
-    candidate = productId,
-    type = "compare"
-});
-```
-
-The telemetry stream instead uses `point_source: input`. Its converters read measurements from the incoming observation itself:
-
-```yaml
-telemetry:
-  kind: observation
-  point_source: input
-  weights: {sample: 1}
-```
-
-For example, the console diagnostic configuration converts latency from milliseconds to seconds and queue size to hundreds of items. These are documented coordinates for comparisons, not semantic embeddings of log prose.
-
-The candidates also need a meaningful representation. The console sample supplies an `inspect-queue` candidate with a reference condition: elevated latency, errors, retries and queue depth. The interactive demo supplies three prototypes associated with different diagnostic actions.
-
-We are matching the current service profile against those conditions. The association between a condition and an action is domain knowledge supplied by the sample. A vector containing the words “inspect database” would not create that association for us.
-
-In the interactive demo, ordinary shop HTTP requests provide latency/status measurements. Labelled synthetic traces supply retry storms, database slowness, queue pressure and recovery. The state labels come from transparent thresholds, rather than automatically discovered communities. Ordinary HTTP logs enter a separate bounded monitor queue; replay controls wait for their sample observations to finish processing.
-
-Replay a retry storm and inspect the candidate contributions. Then replay recovery. The same summary, distance and rank-fusion machinery is being used with different inputs.
-
-This follows the [behavioural inference pattern](/blog/behavioural-inference-systems-blog): accumulate partial evidence, maintain an interpretation, and use it for a bounded decision.
-
-> **Diagnostic aside: a relevant action is still a candidate.** A prototype match does not prove a root cause or show that executing the action will improve the system. The application decides which handlers are allowed and whether to apply one.
-
-# From Matching to Prediction
-
-A matching score ranks eligible candidates. It does not tell us the probability of a purchase or a service outage.
-
-The engine also has a small destination-prediction boundary:
-
-```csharp
-var prediction = await relevance.PredictAsync(sessionId);
-```
-
-[Part 3: Predict](/blog/show-me-what-you-got-part3-predict) gives that boundary a proper worked example. We start with an empty SQLite model, generate products and user journeys with Bogus, learn from observed endpoints, and forecast outcomes for fresh users. The article adds timestamped centroid motion, velocity, acceleration and an elapsed-time forecast horizon, alongside a simpler state-count baseline. It uses real C# output and evaluates predictions against later held-out populations.
-
-For now, keep the two returned quantities distinct: RRF scores explain candidate ranking; destination estimates describe what tends to follow an observed journey, with a stated horizon, support and unresolved mass.
-
-# Let Outcomes Inform the Next Ranking
-
-We can also use observed outcomes to adjust how strongly ranking heads contribute.
-
-Keep two kinds of weights separate. **Event weights** determine how an observation updates an entity's profile. **Head weights** determine how rankings combine for a placement.
-
-The current implementation stores positive and negative outcome credit for each placement/head. At recommendation time it adjusts the configured base weight:
-
-```csharp
-var weight = baseWeight *
-    (0.5 + (1 + evidence.Positive) /
-        (2 + evidence.Positive + evidence.Negative));
-```
-
-With no outcome evidence, the multiplier is 1. Positive credit increases it; negative credit reduces it. The smoothing terms prevent an empty history from producing an extreme weight.
-
-Feedback allocates credit among heads that supported the selected candidate, with more credit for better ranks. Old credit is reduced by a factor of 0.99 on subsequent credited updates, keeping its magnitude bounded. This is event-based reduction, separate from the elapsed-time decay of entity summaries.
-
-This rule is an inspectable **reliability heuristic**. It does not establish the causal value of an individual head.
-
-The application submits a final attributed outcome through the same ingestion method:
-
-```csharp
-await relevance.SaveAsync("outcomes", new
-{
-    id = feedbackId,
-    recommendation = result.Id,
-    candidate = selectedProductId,
-    reward = 1.0
-});
-```
-
-The engine checks that the retained decision returned that candidate, and accepts one final outcome per decision/candidate. A caller must still record whether the candidate was actually displayed and define its attribution window. Returning an item is not evidence that someone saw it.
-
-Here is the next question: **did showing this product improve the outcome compared with showing another eligible product?**
-
-The operations equivalent is just as interesting. The demo lets an explicitly chosen, allowed handler reduce the actual local shop API rate limit from 240 to 60 requests per minute. Its notebook records the preceding metrics and later observations. A reset restores the original limit.
-
-Recovery after that action does not demonstrate that the action caused recovery. We could have changed nothing and recovered anyway.
-
-Part 4 will address that comparison through a separate `.Learning` extension: record the context, actual exposure, available alternatives and selection probabilities, then evaluate interventions. The current feedback heuristic and before/after notebook are the starting point for that question.
+The baseline also keeps one summary per point. A shopper browsing boots and a birthday present can produce an average between interests. [Part 1 explains why one average can mislead](/blog/show-me-what-you-got-streaming-recommendations#why-one-average-can-mislead); this implementation has not yet added interest discovery and routing. Keeping that limitation visible gives us a baseline against which to measure the extension.
 
 # Make Streaming a Promise We Can Explain
 
@@ -419,6 +317,55 @@ SQLite database I/O remains synchronous underneath the worker, as [Microsoft's d
 
 Configuration, representation and storage semantics are fingerprinted. The preview rejects incompatible reuse of an engine identity. Re-encode and replay under a new identity, or provide an explicit migration. Silently mixing coordinate systems would preserve the appearance of valid numbers while changing what their distances mean.
 
+# The Same Reasoning Applies to a Service
+
+Now open the operations side of the demo. The entity is a service rather than a shopper, and observations describe measurement windows:
+
+| Role | Shopper | Service |
+|------|---------|---------|
+| Entity | Current session | Monitored service |
+| Observation | Product interaction | Measurement window |
+| Representation | Category, price and colour interest | Latency, errors, retries and queue depth |
+| Candidates | Products | Diagnostic actions |
+| Recommendation | Product worth showing | Action worth considering |
+
+The important difference is where observation vectors come from.
+
+A product event references a candidate whose vectors are already stored:
+
+```csharp
+await relevance.SaveAsync("events", new
+{
+    id = eventId,
+    subject = sessionId,
+    candidate = productId,
+    type = "compare"
+});
+```
+
+The telemetry stream instead uses `point_source: input`. Its converters read measurements from the incoming observation itself:
+
+```yaml
+telemetry:
+  kind: observation
+  point_source: input
+  weights: {sample: 1}
+```
+
+For example, the console diagnostic configuration converts latency from milliseconds to seconds and queue size to hundreds of items. These are documented coordinates for comparisons, not semantic embeddings of log prose.
+
+The candidates also need a meaningful representation. The console sample supplies an `inspect-queue` candidate with a reference condition: elevated latency, errors, retries and queue depth. The interactive demo supplies three prototypes associated with different diagnostic actions.
+
+We are matching the current service profile against those conditions. The association between a condition and an action is domain knowledge supplied by the sample. A vector containing the words “inspect database” would not create that association for us.
+
+In the interactive demo, ordinary shop HTTP requests provide latency/status measurements. Labelled synthetic traces supply retry storms, database slowness, queue pressure and recovery. The state labels come from transparent thresholds, rather than automatically discovered communities. Ordinary HTTP logs enter a separate bounded monitor queue; replay controls wait for their sample observations to finish processing.
+
+Replay a retry storm and inspect the candidate contributions. Then replay recovery. The same summary, distance and rank-fusion machinery is being used with different inputs.
+
+This follows the [behavioural inference pattern](/blog/behavioural-inference-systems-blog): accumulate partial evidence, maintain an interpretation, and use it for a bounded decision.
+
+> **Diagnostic aside: a relevant action is still a candidate.** A prototype match does not prove a root cause or show that executing the action will improve the system. The application decides which handlers are allowed and whether to apply one.
+
 # Add Another Representation When It Earns Its Place
 
 The interactive shop adds measured colour through the Oklab converter alongside category and price. The same rank-fusion operation can then combine three independent opinions.
@@ -433,9 +380,51 @@ The current demo runs without an embedding runtime. The researched small text ba
 
 Part 5 will explore images and multimodal representations. Separate image and text rankings can be fused even when their spaces differ. Direct text-to-image comparison needs compatible encoders and preprocessing from a shared space.
 
-Revisit russet from Part 1. A word embedding, a measured swatch and a product photograph can preserve different valid relationships. Adding another vector is useful when those relationships help the decision, and we should measure whether they do.
+Revisit [russet from Part 1](/blog/show-me-what-you-got-streaming-recommendations#colour-or-root-vegetable). A word embedding, a measured swatch and a product photograph can preserve different valid relationships. Adding another vector is useful when those relationships help the decision, and we should measure whether they do.
 
 Discovered communities and evidence-backed cluster descriptions can become further contributors. The baseline does not yet implement Leiden, multiple interest centroids or language-model cluster naming. Starting with the simpler statistics gives those additions something concrete to improve upon.
+
+# Feedback Can Adjust the Ranking
+
+We can also use observed outcomes to adjust how strongly ranking heads contribute.
+
+Keep two kinds of weights separate. **Event weights** determine how an observation updates an entity's profile. **Head weights** determine how rankings combine for a placement.
+
+The current implementation stores positive and negative outcome credit for each placement/head. At recommendation time it adjusts the configured base weight:
+
+```csharp
+var weight = baseWeight *
+    (0.5 + (1 + evidence.Positive) /
+        (2 + evidence.Positive + evidence.Negative));
+```
+
+Read the fraction as a smoothed share of positive credit: the extra `1` and `2` give an empty history a middle value of `0.5`. Adding the outer `0.5` produces a multiplier of `1`, preserving the configured weight. For example, positive credit of `8` and no negative credit gives a multiplier of `1.4`; the reverse gives `0.6`. These multipliers adjust a ranking contribution, rather than expressing an outcome probability.
+
+Feedback allocates credit among heads that supported the selected candidate, with more credit for better ranks. Old credit is reduced by a factor of 0.99 on subsequent credited updates, keeping its magnitude bounded. This is event-based reduction, separate from the elapsed-time decay of entity summaries.
+
+This rule is an inspectable **reliability heuristic**. It does not establish the causal value of an individual head.
+
+The application submits a final attributed outcome through the same ingestion method:
+
+```csharp
+await relevance.SaveAsync("outcomes", new
+{
+    id = feedbackId,
+    recommendation = result.Id,
+    candidate = selectedProductId,
+    reward = 1.0
+});
+```
+
+The engine checks that the retained decision returned that candidate, and accepts one final outcome per decision/candidate. A caller must still record whether the candidate was actually displayed and define its attribution window. Returning an item is not evidence that someone saw it.
+
+Here is the next question: **did showing this product improve the outcome compared with showing another eligible product?**
+
+The operations equivalent is just as interesting. The demo lets an explicitly chosen, allowed handler reduce the actual local shop API rate limit from 240 to 60 requests per minute. Its notebook records the preceding metrics and later observations. A reset restores the original limit.
+
+Recovery after that action does not demonstrate that the action caused recovery. We could have changed nothing and recovered anyway.
+
+Part 4 will address that comparison through a separate `.Learning` extension: record the context, actual exposure, available alternatives and selection probabilities, then evaluate interventions. The current feedback heuristic and before/after notebook are the starting point for that question.
 
 # What Has the Code Demonstrated?
 
@@ -479,8 +468,16 @@ The smaller console example runs both domains without the web UI:
 dotnet run --project samples/RelevanceShop/RelevanceShop.csproj
 ```
 
-These are .NET 10 preview projects. The library packages can be built locally; they have not been published to NuGet. [The sample source](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid.Relevance) includes the commented public API, [the SQLite provider](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid.Relevance.Sqlite) and [the runnable demo](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid.Relevance.Demo).
+These are .NET 10 sample projects. The library packages can be built locally; they have not been published to NuGet. [The sample source](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid.Relevance) includes the commented public API, [the SQLite provider](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid.Relevance.Sqlite) and [the runnable demo](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid.Relevance.Demo).
 
-We can now use an entity's characterisation to match candidates, combine useful opinions and update the result as evidence arrives.
+# Next: Learn Where the Journey Is Heading
 
-Next, [Part 3: Predict](/blog/show-me-what-you-got-part3-predict) learns how observed journeys tend to end and returns outcome probabilities for fresh users. That gives us a baseline for Part 4: **experiment with an intervention and measure the response**.
+We can now turn an entity's characterisation into eligible candidates, combine their rankings, and update the result as observations arrive. [Part 1.5](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) supplies an optional way to produce interpreted coordinates; the matching machinery does not depend on how those compatible coordinates were obtained.
+
+The next boundary is outcome prediction:
+
+```csharp
+var prediction = await relevance.PredictAsync(sessionId);
+```
+
+[Part 3: Predict](/blog/show-me-what-you-got-part3-predict) explains how the engine learns from actual endpoints, uses timestamped movement, and forecasts fresh users' destinations. RRF has told us which candidates rank well; the predictor will tell us what tends to happen along the journey. Part 4 will test whether an intervention changes that result.

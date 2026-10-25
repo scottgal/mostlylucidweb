@@ -4,13 +4,11 @@ In [Part 2](/blog/show-me-what-you-got-part2-building-relevance), we turned an e
 
 Now we want to use that history to answer a more useful business question: **where is this journey heading, and where might a change help?**
 
-That is the point of prediction here. A retailer wants to help someone find a suitable product and complete a purchase. Marketing wants to know where a useful message or offer might improve the journey. A systems administrator wants to recognise a service heading towards failure early enough to do something about it.
-
-Those disciplines already combine experience, observation and judgement. We are making part of that process explicit: record the journey, observe its endpoint, learn the relationships, and estimate what is likely to happen next. Then we can test a directed change and measure the response.
+A retailer might want to recognise a faltering purchase journey; a systems administrator might want to spot a service approaching failure. We make part of that judgement explicit: record the journey, observe its endpoint, learn the relationship, then estimate what is likely to happen for the next journey.
 
 This article builds the prediction step. Part 4 adds **experimentation**: showing different products, testing a price or offer, changing a message, or applying an allowed operational action. Together, they make the learning loop visible.
 
-The companion C# tool starts with an empty SQLite database, generates a substantial synthetic population, learns from its completed and partially observed journeys, then predicts outcomes for fresh users. The output below comes from running that code.
+The companion C# tool starts with an empty SQLite database, generates a substantial synthetic population, learns from completed journeys, retains unfinished journeys without inventing outcomes, then predicts outcomes for fresh users. The output below comes from running that code.
 
 <datetime class="hidden">2026-10-24T10:00</datetime>
 <!-- category -- AI,Architecture,Machine Learning,Recommendations,Behavioural Inference,C#,SQLite,DiSE -->
@@ -34,8 +32,6 @@ The interactive replay follows **24 timestamped behavioural trajectories** toget
 [Open the temporal replay](/interactive/explainers/index.html?view=prediction). Use **Compare direction** or **Compare pace**, and switch **Traffic** between shoppers and service incidents. The replay uses recorded UTC times. Its playback speed is separate from the forecast horizon.
 
 The display is a fixed view of two explicit feature coordinates, with small presentation offsets to keep users selectable. It is not a learned embedding projection, and screen distance does not supply the outcome probabilities. Those come from the frozen temporal model trained on 600 earlier episodes per domain. An incomplete visit stops at its last observation without an invented endpoint.
-
-The prediction gives us a baseline for choosing what to investigate. It can help identify a point where reassurance, a better comparison, a different product or a useful offer might change the result. Measuring whether that change actually helps is the next step.
 
 ```mermaid
 flowchart TD
@@ -75,36 +71,91 @@ A's purchase/cancel/leave distribution is **85.5% / 7.5% / 7.0%**. B's is **22.0
 
 Use **Compare direction** to highlight A and B together, or **Compare pace** for A and C. The other 22 tracks stay visible. Each comparison pins the visits at their own recorded landmarks, rather than pretending they reached that position at the same clock time.
 
-> **Representation aside:** these are normalised observations supplied by the simulator, not an LLM's purchase-intent score. Their meaning and scale are modelling choices, as in [Part 1.5](/blog/show-me-what-you-got-part1-5-questions-as-coordinates). The operational example uses latency in seconds and error fraction. Converters let another application supply its own dimensions.
+> **Representation aside:** these are normalised observations supplied by the simulator, not an LLM's purchase-intent score. Their meaning and scale are modelling choices, as in [Part 1's measured features](/blog/show-me-what-you-got-streaming-recommendations#turning-features-into-a-vector). [Part 1.5](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) adds interpreted coordinates when ordinary measurements are insufficient. The operational example uses latency in seconds and error fraction. Converters let another application supply its own dimensions.
 
-## Measure Movement in Actual Time
+# Define the Destinations
 
-The engine maintains a fast behavioural centroid. For an observation $x_t$, elapsed time $\Delta t$, and a half-life $h$ in seconds:
+An outcome needs a concrete meaning. In this example:
+
+| Destination | Meaning in the fixture |
+|-------------|------------------------|
+| `purchase` | A purchase event was recorded for this episode. |
+| `cancel` | An explicit cancellation ended the episode. |
+| `leave` | The simulator recorded the episode closing without purchase. |
+
+A missing event is none of these. In a real shop, “the episode has closed” needs an application definition, such as a measured session window. A person might return later, so a session outcome and a customer's eventual outcome are different targets.
+
+The temporal example asks whether one of these endpoints arrives **within 60 seconds of the latest observation**. We need that definition before we can label examples or judge a forecast. The smaller state-only example later uses a different window: four observed transitions.
+
+# Measure Movement in Actual Time
+
+We keep a moving average of the observations so one noisy event does not replace everything we know. When a new observation arrives, move the current summary partway towards it. The half-life controls how quickly the summary follows new evidence.
+
+For one coordinate, the update is ordinary C#:
+
+```csharp
+var elapsedSeconds = (observedAt - previousObservedAt).TotalSeconds;
+var fractionToMove = 1 - Math.Pow(0.5, elapsedSeconds / halfLifeSeconds);
+
+var newCentroid = previousCentroid
+    + fractionToMove * (observation - previousCentroid);
+```
+
+`observation - previousCentroid` is the gap between the new reading and our current summary. Multiply that gap by `fractionToMove`, then add the result to the old summary. If the summary is `0.2`, the new observation is `0.6`, and the fraction is `0.5`, the updated summary is `0.4`: halfway between them.
+
+With a two-second half-life, a two-second gap gives a fraction of `0.5`. A four-second gap gives `0.75`. The longer the gap, the less of the previous summary we retain when the next measurement arrives.
+
+The equations express those same two lines. Alpha is `fractionToMove`; delta t is `elapsedSeconds`; h is `halfLifeSeconds`:
 
 $$
 \alpha(\Delta t)=1-2^{-\Delta t/h}
 $$
 
+Mu is the centroid, x is the observation, and the subscripts distinguish the new value from the previous one:
+
 $$
 \mu_t=\mu_{t-1}+\alpha(\Delta t)(x_t-\mu_{t-1})
 $$
 
-A ten-second interval and a one-minute interval produce different adaptation weights. The centroid is a smoothed characterisation, so it can lag the latest observation slightly; equal raw input vectors need not give exactly equal smoothed centroids.
+> **Reading the notation:** a subscript `t` means “at this observation”; `t−1` means “at the previous observation”. They play the same role as `newCentroid` and `previousCentroid` in the code. There is no additional operation hidden in the Greek letters.
 
-Velocity measures how that centroid changes per second:
+The centroid is a smoothed characterisation, so it can lag the latest observation slightly; equal raw input vectors need not give exactly equal smoothed centroids.
+
+## Velocity: How Fast Is the Summary Moving?
+
+Subtract the previous position from the new one and divide by the time between them:
+
+```csharp
+var velocityPerSecond = (newCentroid - previousCentroid) / elapsedSeconds;
+```
+
+A coordinate moving from `0.3` to `0.5` in ten seconds has a velocity of `0.02` coordinate units per second. Covering the same distance in one second gives `0.2`. The direction is the same, but the pace is very different. A negative value means movement towards smaller values on that coordinate.
+
+The equation says exactly that. The numerator is the change in centroid; the denominator is elapsed seconds:
 
 $$
 v_t=\frac{\mu_t-\mu_{t-1}}{\Delta t}
 $$
 
-Acceleration compares successive velocity estimates. With irregular sampling, those velocities describe different interval midpoints:
+## Acceleration: Is That Movement Speeding Up or Slowing Down?
+
+Now apply the same idea to velocity. Compare the new rate with the previous rate and divide by the time separating those estimates:
 
 ```csharp
-var acceleration = (velocity - previousVelocity)
-    / ((intervalSeconds + previousIntervalSeconds) / 2);
+var midpointGapSeconds = (elapsedSeconds + previousIntervalSeconds) / 2;
+var accelerationPerSecondSquared =
+    (velocityPerSecond - previousVelocityPerSecond) / midpointGapSeconds;
 ```
 
-The implementation applies this coordinate by coordinate. Velocity has coordinate units per second; acceleration has coordinate units per second squared. Three observations are needed before both are available. The tests include an irregularly sampled quadratic trajectory, so changing the sampling intervals cannot quietly change the units.
+Each velocity describes movement across an interval, so we treat it as an estimate at that interval's midpoint. If both intervals last ten seconds, their midpoints are ten seconds apart. If they last two and eight seconds, their midpoints are five seconds apart. That is what the first line calculates.
+
+For a latency coordinate, positive velocity means latency is rising. Positive acceleration means that rise is becoming faster; negative acceleration means the velocity is decreasing. We need both signs to distinguish worsening behaviour, a slowdown in that worsening, and recovery.
+
+The implementation applies these operations to every coordinate in the vector. Velocity has coordinate units per second; acceleration has coordinate units per second squared. Three observations are needed before both are available.
+
+Part 2's [decayed sum and mass](/blog/show-me-what-you-got-part2-building-relevance#the-shopper-does-something-new) retain the weight of the interaction evidence. This temporal update instead uses elapsed time to choose how far the live position moves. They share the idea of fading history, but are different summaries for different jobs.
+
+These scalar snippets unpack the vector operations in [TrajectoryPrediction.cs](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid.Relevance/TrajectoryPrediction.cs). The tests include an irregularly sampled quadratic trajectory, so changing the sampling intervals cannot quietly change the units.
 
 The engine rejects equal or out-of-order timestamps in temporal mode. A sufficiently long gap resets derivative history and pending landmarks. We do not draw a line across an unobserved interval and call it measured velocity.
 
@@ -140,7 +191,7 @@ A clock reading alone is not a new behavioural observation. If idle time matters
 
 A forecast is anchored at its returned `ObservedAt`, with a `HorizonSeconds` value. In temporal mode `HorizonEvents` is zero. If the window has already expired when `PredictAsync` is called, the engine abstains with `stale_trajectory`. The visualiser labels a recorded forecast whose window has elapsed, rather than presenting it as a fresh prediction.
 
-## How Those Features Become a Forecast
+# How Those Features Become a Forecast
 
 The predictor matches an explicitly scaled context containing:
 
@@ -157,7 +208,9 @@ When an actual endpoint arrives, the first motion-ready landmark for each observ
 
 At prediction time, eligible nearby contexts supply a reference population. The **observed destination frequencies** in that population supply the probabilities. Geometric closeness selects relevant experience; it is not itself renamed a probability. Minimum support and distance bounds allow the engine to abstain. Context capacity is bounded, and updates happen through the existing asynchronous channel and save transaction.
 
-> **Training aside:** this is what the system learns. It accumulates context centroids and actual within-window results, then uses them for later forecasts. A neural model could replace this estimator through `IDestinationPredictor`, but the statistical baseline already uses measured direction, rate, acceleration and time.
+> **In plain English:** find completed journeys that looked like this one, including how quickly they were changing. Count where those journeys ended within the forecast window. If 80 out of 100 comparable journeys reached purchase in time, the purchase estimate is 80%. The engine checks that there are enough comparable examples before returning an estimate.
+
+The `IDestinationPredictor` hook keeps this estimator replaceable. The state-only example below shows the counting mechanism without the motion features; another estimator could use a trained model over the same recorded evidence.
 
 # Normal Behaviour Gives Drift a Reference
 
@@ -182,7 +235,59 @@ That deviation is a distance, not an outage probability. The destination forecas
 
 > **Normality aside:** `healthy` is an admission rule, not a label the predictor awards itself. It might come from verified operating periods or an application policy. The reference needs sufficient effective mass; old or missing normal evidence cannot justify a confident drift score. A legitimate new operating regime needs deliberate admission, rather than silently accepting an incident into the reference.
 
-## Check the Temporal Forecasts on Later Episodes
+# Which Destinations Do We Want?
+
+Defining an endpoint tells us what to predict. We also need to say **what result we are trying to improve**.
+
+Purchase, cancellation and departure are observations. Their desirability is an application decision. A shop might want completed, profitable purchases; an operations team might want sustained recovery while preserving throughput. More basket additions or lower latency are useful signals, but neither necessarily achieves those goals.
+
+We can express a simple preference using a **utility**: a numeric value assigned to an outcome. For illustration:
+
+| Destination | Example utility |
+|-------------|----------------:|
+| `purchase` | 1.0 |
+| `cancel` | -0.5 |
+| `leave` | 0.0 |
+
+These are chosen teaching values, not learned probabilities or a claim about the cost of a cancellation. Another application can value the same destinations differently.
+
+Combining a forecast with those values gives an expected utility. In plain English, multiply each possible result's value by its chance of happening, then add the contributions. This is an average value across possible futures, rather than a promise about this particular visit:
+
+```text
+Expected utility = sum of P(destination | observed state) × utility(destination)
+```
+
+For a forecast whose destination probabilities account for all the mass, the application-side calculation is small:
+
+```csharp
+var utility = new Dictionary<string, double>
+{
+    ["purchase"] = 1.0,
+    ["cancel"] = -0.5,
+    ["leave"] = 0.0
+};
+
+var expectedUtility = prediction.Outcomes.Sum(
+    outcome => outcome.Probability * utility[outcome.Destination]);
+```
+
+For example, a complete forecast of 80% purchase, 10% cancellation and 10% departure gives `0.8 × 1 + 0.1 × -0.5 + 0.1 × 0 = 0.75`. The code multiplies `Probability` by the corresponding dictionary value, then `Sum` adds those contributions.
+
+This is a way to interpret `PredictAsync` output, not another field in the predictor's YAML. Changing the objective should not rewrite what the system believes will happen. Keep the probabilities available so we can explain the trade-off.
+
+> **Uncertainty aside:** unresolved probability is not a destination with a utility of zero. If the horizon ends or evidence is insufficient, some value remains unknown. Report that missing mass alongside the estimate; do not turn an incomplete forecast into an apparently complete business score.
+
+Expected utility describes the current forecast. It does not yet tell us which action will improve it. Part 4 will compare the expected value **under each intervention** with the control, including intervention costs. A discount might increase purchase probability while reducing profit. A connection limit might reduce errors while rejecting too much useful traffic.
+
+That means defining the objective, measurement window and constraints before the experiment, and recording their version with each decision. The target is an improvement in observed results, rather than a higher forecast or a convenient proxy such as clicks.
+
+## Choose a Target We Can Actually Observe
+
+A retail integration could define basket abandonment or payment cancellation as undesirable destinations. An operations integration could define sustained degradation or an outage. Each needs an observable result and a closing window: a quiet basket is not yet abandonment, and rising latency is not itself a confirmed outage.
+
+These are possible extensions, rather than extra labels implemented in the fixture. The shop's `cancel` remains a generic episode cancellation. [Part 2's service example](/blog/show-me-what-you-got-part2-building-relevance#the-same-reasoning-applies-to-a-service) supplies measurements and allowed diagnostic candidates; the prediction adds an estimate of where that measured behaviour leads. Part 4 tests which allowed change helps.
+
+# Check the Temporal Forecasts on Later Episodes
 
 Each domain has 600 training episodes and a separate later population of 300 visits. A frozen outcome model predicts at the first motion-ready landmark, before future labels are revealed. Missing feedback is excluded from scoring, not counted as a bad outcome. Normal references use earlier qualified observations.
 
@@ -197,11 +302,15 @@ Lower Brier scores are better. Both compare with a prior for the **same time-def
 
 This estimator learns from completed episodes. If feedback disappears selectively, the resulting reference population can be biased. A production application may need a censoring-aware estimator. Keeping the estimator replaceable does not remove that modelling responsibility.
 
-# Give the State Baseline Enough Experience
+# A Smaller Worked Example: Learning From State Counts
 
-To isolate the state-transition mathematics, the repository also includes a simpler `predict` command. This example has an event-count horizon and a separate Bogus catalogue/visit fixture. It is a foundation for understanding the update rule, rather than a head-to-head benchmark against the temporal dataset above.
+The temporal example is the main implementation in this article. The repository also includes a smaller state-only predictor that makes the learning mechanism especially easy to inspect: count observed transitions, turn those counts into probabilities, then update them when a real outcome arrives.
 
-The new `predict` command uses [Bogus](https://github.com/bchavez/Bogus) for fake catalogue and user data, with a small C# simulator supplying behaviour and eventual outcomes:
+This second example uses a separate Bogus fixture and a **four-event horizon**, rather than the temporal example's 60-second horizon. Its results are not a head-to-head benchmark against the temporal model. Read it to follow training one count at a time, or continue to [the experimentation handoff](#next-experiment-with-the-journey).
+
+## Generate a Reproducible Population
+
+The `predict` command uses [Bogus](https://github.com/bchavez/Bogus) for fake catalogue and user data, with a small C# simulator supplying behaviour and eventual outcomes:
 
 ```csharp
 var fixture = FixtureGenerator.Generate(
@@ -239,7 +348,7 @@ Bogus uses local seeded randomness, and the simulation has its own random stream
 
 > **Data aside: this is synthetic experience.** We are testing the learning mechanism against a controlled population, with labels supplied by the simulator. These are genuine program outputs, but the resulting percentages are not claims about a real retailer. Production events can enter through the same API when the application has defined its observations and outcomes.
 
-# What Is a Journey Made Of?
+## Characterise the Journey Prefix
 
 The underlying event shape is small:
 
@@ -298,19 +407,9 @@ This follows [Part 1.5](/blog/show-me-what-you-got-part1-5-questions-as-coordina
 
 The simulator's hidden intent settings are not passed to this encoder. Neither are the user's future actions or final outcome. New users are characterised through the same observations as historical users.
 
-# Define the Destinations
+## Configure an Event-Count Horizon
 
-An outcome needs a concrete meaning. In this example:
-
-| Destination | Meaning in the fixture |
-|-------------|------------------------|
-| `purchase` | A purchase event was recorded for this episode. |
-| `cancel` | An explicit cancellation ended the episode. |
-| `leave` | The simulator recorded the episode closing without purchase. |
-
-A missing event is none of these. In a real shop, “the episode has closed” needs an application definition, such as a measured session window. A person might return later, so a session outcome and a customer's eventual outcome are different targets.
-
-The predictor's configuration includes:
+The state-only configuration includes:
 
 ```yaml
 destinations:
@@ -329,63 +428,7 @@ The horizon asks about destinations **within the next four observed transitions*
 
 The minimum support requires twenty outgoing observations before a state can propagate probability. This run uses zero smoothing so each displayed transition has an observation behind it. The engine also supports explicit pseudo-count smoothing when that is appropriate for the application.
 
-# Which Destinations Do We Want?
-
-Defining an endpoint tells us what to predict. We also need to say **what result we are trying to improve**.
-
-Purchase, cancellation and departure are observations. Their desirability is an application decision. A shop might want completed, profitable purchases; an operations team might want sustained recovery while preserving throughput. More basket additions or lower latency are useful signals, but neither necessarily achieves those goals.
-
-We can express a simple preference using a **utility**: a numeric value assigned to an outcome. For illustration:
-
-| Destination | Example utility |
-|-------------|----------------:|
-| `purchase` | 1.0 |
-| `cancel` | -0.5 |
-| `leave` | 0.0 |
-
-These are chosen teaching values, not learned probabilities or a claim about the cost of a cancellation. Another application can value the same destinations differently.
-
-Combining a forecast with those values gives an expected utility:
-
-```text
-Expected utility = sum of P(destination | observed state) × utility(destination)
-```
-
-For a forecast whose destination probabilities account for all the mass, the application-side calculation is small:
-
-```csharp
-var utility = new Dictionary<string, double>
-{
-    ["purchase"] = 1.0,
-    ["cancel"] = -0.5,
-    ["leave"] = 0.0
-};
-
-var expectedUtility = prediction.Outcomes.Sum(
-    outcome => outcome.Probability * utility[outcome.Destination]);
-```
-
-This is a way to interpret `PredictAsync` output, not another field in the predictor's YAML. Changing the objective should not rewrite what the system believes will happen. Keep the probabilities available so we can explain the trade-off.
-
-> **Uncertainty aside:** unresolved probability is not a destination with a utility of zero. If the horizon ends or evidence is insufficient, some value remains unknown. Report that missing mass alongside the estimate; do not turn an incomplete forecast into an apparently complete business score.
-
-Expected utility describes the current forecast. It does not yet tell us which action will improve it. Part 4 will compare the expected value **under each intervention** with the control, including intervention costs. A discount might increase purchase probability while reducing profit. A connection limit might reduce errors while rejecting too much useful traffic.
-
-That means defining the objective, measurement window and constraints before the experiment, and recording their version with each decision. The target is an improvement in observed results, rather than a higher forecast or a convenient proxy such as clicks.
-
-## Intervene Before an Undesirable Destination
-
-The useful prediction may be a warning about something we want to prevent:
-
-- **System degradation:** latency is increasing, errors are becoming more frequent, and the queue is growing. The forecast suggests a higher chance of a sustained service-level breach or outage. An allowed intervention might reduce consumer concurrency or change a connection limit. Success means sustained recovery with acceptable throughput, measured against the alternative.
-- **Basket abandonment:** someone repeatedly compares products, removes items and stops progressing through checkout. The forecast suggests the basket may be abandoned. We could test clearer delivery costs or a useful product comparison before offering a discount. Success means more completed, profitable purchases within the chosen window.
-- **Payment cancellation:** someone returns repeatedly from payment to checkout. If the application exposes suitable events, we can estimate the risk of an explicit cancellation and test clearer payment guidance or an alternative available payment method. Measure completion, cancellation and the cost of the change.
-
-These are possible integrations, rather than additional outcomes implemented in this fixture. Rising latency and repeated checkout visits are observations; a sustained breach or an explicit cancellation is a defined result. Basket abandonment needs its own closing window, rather than treating a quiet moment as a confirmed departure. The sample's `cancel` is a generic episode cancellation, not a separately modelled payment state.
-
-The aim is to spot a trajectory early enough to change it. A warning identifies where an intervention may be useful; the experiment establishes whether that intervention actually prevents the unwanted outcome.
-
-# The State Baseline Learns Transition Counts
+## The State Baseline Learns Transition Counts
 
 Suppose a historical user moves from `checkout` to `purchase`. The engine increments that connection:
 
@@ -401,6 +444,15 @@ After enough observations, divide each outgoing count by the row total:
 ```text
 P(next state | current state) = transition count / total outgoing count
 ```
+
+Read the vertical bar as “given”: the chance of the next state, given the state we are in now. In C#, the count-to-probability step is:
+
+```csharp
+var totalOutgoing = row.Values.Sum();
+var nextStateProbability = row[nextState] / totalOutgoing;
+```
+
+For a supported row, this asks “of all the recorded exits from here, what fraction went there?” The counts are doubles in this model, so the division retains the fractional result.
 
 The run's learned checkout row contains:
 
@@ -423,7 +475,7 @@ There is no gradient calculation in this estimator. A later model might learn fe
 
 **Machine learning does not require a neural network.** This is a small online statistical model whose update happens as observations arrive.
 
-# Watch a Fresh System Learn
+## Watch a Fresh System Learn
 
 Before any observations, the tool cannot characterise the new shopper:
 
@@ -450,13 +502,20 @@ The last line closes the training engine, opens the same SQLite database in a ne
 
 Notice the unresolved probability. At the start of a visit, four transitions do not always carry the shopper to a destination. Some routes need more steps. Unsupported branches can also retain unresolved mass.
 
-The predictor follows the possible routes, multiplying probabilities along each path and adding mass arriving at the same destination. A destination is **absorbing**: once mass reaches a recorded endpoint, it stays there for the rest of the forecast.
+The predictor follows the possible routes, multiplying probabilities along each path and adding mass arriving at the same destination. For one branch, the bookkeeping is:
+
+```csharp
+var branchMass = currentMass * transitionProbability;
+nextMass[nextState] = nextMass.GetValueOrDefault(nextState) + branchMass;
+```
+
+If 50% of the forecast reaches a state and 80% of those routes go to purchase, that branch contributes `0.5 × 0.8 = 0.4`, or 40 percentage points, to purchase. Other branches can add their own contributions. A destination is **absorbing**: once mass reaches a recorded endpoint, it stays there for the rest of the forecast.
 
 We retain unresolved mass rather than rescaling the named outcomes to add up to 100%. Otherwise we would make an incompletely resolved forecast appear more certain.
 
-The engine performs these updates through the same bounded channel and hosted worker as Part 2. Awaiting `SaveAsync` means the update has completed before the subsequent `PredictAsync` read. There is no scheduled rebuild between a new outcome and a new estimate.
+The [streaming completion contract from Part 2](/blog/show-me-what-you-got-part2-building-relevance#make-streaming-a-promise-we-can-explain) still applies: an awaited save completes before the next queued prediction read. No scheduled rebuild sits between the new outcome and that estimate.
 
-## One More Outcome, One More Update
+### One More Outcome, One More Update
 
 The demo also takes a new shopper at checkout, records an actual cancellation, and forecasts the next shopper arriving at checkout. This runs against the persistent live model, separately from the frozen evaluation model.
 
@@ -471,7 +530,7 @@ A transport retry of the cancellation is recognised as a duplicate, so it does n
 
 That is the training loop directly: an observation changes a learned parameter, and a later prediction changes as a result. With enough experience, the relationships can become useful inputs to deciding which journey to investigate or improve.
 
-# State-Only Forecasts for Fresh Users
+## State-Only Forecasts for Fresh Users
 
 Now introduce three fresh shoppers. For this controlled comparison they interact with the **same product**, giving the matcher the same location to work from. Their paths differ.
 
@@ -501,7 +560,7 @@ PICKS impulsive budget=£191 p-0001:0.04098, p-0007:0.03771, p-0058:0.03768
 PICKS returning budget=£191 p-0001:0.04098, p-0007:0.03771, p-0058:0.03768
 ```
 
-That is useful. We know which products fit the observed interest, and we have a separate estimate of how the journey tends to end. The application can return both alongside an explanation of the evidence.
+The [candidate-ranking calculation from Part 2](/blog/show-me-what-you-got-part2-building-relevance#several-useful-opinions-one-list) is unchanged. The added result is the forecast for each journey, which the application can return alongside those candidates.
 
 An 87.9% purchase forecast does not tell us that this person needs an offer. They may be likely to buy already. An 18.3% forecast does not tell us that an offer would work either. The person could be browsing for a future purchase, comparing elsewhere or simply uninterested.
 
@@ -509,7 +568,7 @@ What it gives us is a set of contexts in which to test useful changes. We can st
 
 > **Support aside:** 357 is an outgoing transition count, not a confidence interval or a claim about 357 independent customers. A model can learn several transitions from one episode. Keep episode identities for evaluation and experimental assignment.
 
-# Test the Predictions on Later Users
+## Test the Predictions on Later Users
 
 We need to check forecasts before treating them as useful inputs to a decision.
 
@@ -540,7 +599,20 @@ Twenty-four visits never reached the landmark. Twenty-seven reached it but did n
 
 The baseline predicts the same outcome distribution for every first-cart visit, using the training population's frequencies. Our learned state model improves the Brier score from **0.6234 to 0.4750** on this held-out fixture.
 
-The multiclass Brier score sums squared errors across the possible outcomes, including unresolved, and averages them across the scored episodes. We use the version ranging from zero to two. Lower is better. The [scikit-learn model evaluation documentation](https://scikit-learn.org/stable/modules/model_evaluation.html#brier-score-loss) explains this convention.
+The multiclass Brier score measures how far the forecast was from the result we observed. Give the outcome that happened a target of `1`, and every other outcome a target of `0`. Subtract each target from its forecast probability, square the difference, and add the results:
+
+```csharp
+var episodeError = probabilities.Sum(entry =>
+{
+    var target = entry.Key == actualOutcome ? 1.0 : 0.0;
+    var error = entry.Value - target;
+    return error * error;
+});
+totalEpisodeError += episodeError;
+var brierScore = totalEpisodeError / scoredEpisodes;
+```
+
+Here, `probabilities` includes the unresolved category, and `totalEpisodeError` accumulates `episodeError` across the scored visits. An 80% purchase / 20% leave forecast followed by a purchase scores `(0.8 - 1)² + (0.2 - 0)² = 0.08`; if the visitor leaves, it scores `1.28`. Squaring makes a confidently wrong forecast more costly. Average those episode errors to assess the whole set of forecasts. We use the version ranging from zero to two. Lower is better. The [scikit-learn model evaluation documentation](https://scikit-learn.org/stable/modules/model_evaluation.html#brier-score-loss) explains this convention.
 
 We also check whether groups of similar purchase forecasts match their observed frequencies:
 
@@ -554,7 +626,7 @@ This is a **reliability check**. If we repeatedly predict about 80%, roughly eig
 
 The returned `IsCalibrated` flag remains false. We have evaluated this version against synthetic holdout data; we have not fitted a separate calibrator or established reliability on a real shop. The tests also check improvement over the population prior across three independently seeded fixtures, rather than depending entirely on the article's one run.
 
-# Where an LLM Helps Generate the Demo
+# Optional: Give the Generated Catalogue Readable Copy
 
 Bogus and explicit simulation rules give us enough data to exercise the learning system. A local LLM can make the catalogue more readable without becoming part of the prediction hot path.
 
@@ -577,21 +649,7 @@ Preserve the supplied IDs and product kinds.
 Do not invent materials, dimensions, performance, certifications or prices.
 ```
 
-The import envelope is:
-
-```json
-{
-  "model": "the-model-that-produced-the-copy",
-  "promptVersion": "catalogue-copy-v1",
-  "products": [
-    {
-      "id": "p-0001",
-      "name": "A short product name",
-      "description": "A short description of its intended use."
-    }
-  ]
-}
-```
+The [sample README](https://github.com/scottgal/mostlylucidweb/tree/main/samples/RelevancePredict#optional-local-llm-display-copy) documents the response envelope and provenance fields. Freeze the generated response before importing it.
 
 Import a reviewed, frozen response with:
 
@@ -603,41 +661,23 @@ dotnet run --project samples/RelevanceShop -- predict \
 
 The importer rejects unknown IDs, duplicate entries and extra fields. The LLM cannot change prices, availability, categories, observations or outcome labels through this interface. The host supplies provenance; the model does not certify itself.
 
-Names and descriptions are metadata in this configuration. Changing them does not change the learned transition counts or product vectors. A later text converter could make description content a retrieval feature, with its own version and evaluation.
+Here the LLM changes display copy, not the prediction inputs or labels. [Part 1.5](/blog/show-me-what-you-got-part1-5-questions-as-coordinates) covers models that actually produce feature coordinates; this helper has a deliberately smaller role.
 
 The [sample source](https://github.com/scottgal/mostlylucidweb/tree/main/samples/RelevancePredict) includes a frozen local-model response and the actual output used here. Keeping the generated response gives us an exact replay artifact even if an LLM runtime changes later.
 
 > **Part 4 aside: feedback can improve the catalogue too.** A pattern of questions, missing descriptions or poorly performing journeys can suggest a content experiment: clarify the product copy, supply a missing specification, test a different image, or investigate a pricing hypothesis. We can feed those observations back to retail and marketing, then compare the change with a control. Missing data is a reason to investigate; it does not by itself prove that filling a field, lowering a price or rewriting a paragraph will improve conversion.
 
-# From Incident Prediction to an Intervention
-
-The operational example above gives us the current trajectory, a learned normal reference and an expected route towards outage or recovery. The next practical question is whether an allowed change improves that route.
-
-Would reducing a connection limit help this kind of incident? Would a different retry policy improve recovery? We can record the context, make a bounded change, and measure the response against an alternative.
-
-That is the same directed learning loop as showing a different product, a special offer or a timed email. The outcomes and costs differ; the need for observed trajectories, baselines and measured responses remains. Predicting an unwanted result identifies a context worth investigating; it does not prove that any particular intervention will prevent it.
-
-# A Small, Direct Version of DiSE
-
-This is a more accessible entry into the ideas I explored in [Directed Synthetic Evolution](/blog/dise-architecture-overview): **perceive, evaluate, mutate, select**.
-
-Here we can see the learned state rather than asking a large model to explain what it might have learned. A new observation updates a small table. A fresh forecast uses that table. A held-out journey lets us compare the forecast with an observed endpoint.
-
-When we introduce a directed change, the system gains another relationship to learn: what happened when this allowed action was applied in this context?
-
-A more elaborate model can eventually learn that relationship from the same recorded experience. Training still needs examples, outcomes, an update rule and evaluation. The simple estimator makes those responsibilities visible before we put them inside a model whose parameters are harder to inspect.
-
 # Next: Experiment With the Journey
 
-We now have a working loop from observations to destination forecasts, with support, persistence and measured performance on fresh synthetic users.
+We now have observed trajectories, destination forecasts, normal references and a way to evaluate later journeys. A forecast identifies where a change may be worth investigating. It cannot establish that a discount, different message or connection limit will improve the result.
 
-Part 4 will add the experiment around the intervention: assignment to a product, offer, message, price or allowed operational action; actual exposure; the response window; and a comparison with the control or another eligible treatment.
+This follows the **perceive, evaluate, mutate, select** loop from [Directed Synthetic Evolution](/blog/dise-architecture-overview). This article makes the prediction and evaluation steps visible. Part 4 adds the directed change and tests its effect: assignment to an allowed intervention, actual exposure, a response window and comparison with a control or another eligible treatment. Costs and constraints remain part of the objective.
 
-We will be able to ask both questions:
+The same questions apply to a product, special offer, timed email or operational action:
 
 ```text
 What is likely to happen along this journey?
 What changes when we apply this intervention?
 ```
 
-The first gives us a useful baseline. The second is how we learn to change the result.
+The series progresses from understanding the data, through understanding the behaviour, to testing how we can change the outcome. The predictions give us the baseline for that experiment.
