@@ -29,7 +29,7 @@ The interactive replay follows **24 timestamped behavioural trajectories** toget
 
 <iframe class="article-explainer" src="/interactive/explainers/index.html?v=20261024-temporal&amp;view=prediction&amp;embed=1" title="24 timestamped behavioural trajectories, predictions and learned normal references" width="100%" height="1500" loading="lazy" style="border:0;border-radius:12px;"></iframe>
 
-[Open the temporal replay](/interactive/explainers/index.html?view=prediction). Use **Compare direction** or **Compare pace**, and switch **Traffic** between shoppers and service incidents. The replay uses recorded UTC times. Its playback speed is separate from the forecast horizon.
+<a href="/interactive/explainers/index.html?view=prediction" hx-boost="false">Open the temporal replay</a>. Use **Compare direction** or **Compare pace**, and switch **Traffic** between shoppers and service incidents. The replay uses recorded UTC times. Its playback speed is separate from the forecast horizon.
 
 The display is a fixed view of two explicit feature coordinates, with small presentation offsets to keep users selectable. It is not a learned embedding projection, and screen distance does not supply the outcome probabilities. Those come from the frozen temporal model trained on 600 earlier episodes per domain. An incomplete visit stops at its last observation without an invented endpoint.
 
