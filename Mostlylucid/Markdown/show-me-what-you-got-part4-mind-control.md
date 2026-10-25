@@ -33,6 +33,10 @@ For a journey visualisation, that means keeping the neighbouring control tracks 
 
 This chapter follows that relationship through a working email example: characterise the proposed change, apply it under a recorded experiment, observe the response, then learn which changes tend to help which detected patterns.
 
+The series is building up ML concepts from ordinary observations and small pieces of code. Part 1 established representations and similarity. Part 1.5 showed how classifiers can produce useful coordinates. Part 2 used those representations to rank candidates. Part 3 added time, trajectories and outcome prediction. Here we close the loop: choose an action, observe its result and use the evidence to improve later choices.
+
+That brings us to **online learning, regression, contextual bandits and causal inference**. Those names describe different jobs in the system. We will introduce each where we need it, using the email experiment to explain what it buys us. The goal is to learn which permitted change helps in a particular situation, rather than merely predict who was likely to purchase anyway.
+
 # Detect the Context Before Choosing the Push
 
 Audience experimentation gives us a familiar starting point. Find people with relevant behaviour, compare variants with a control, then measure the result. Our difference is how the audience emerges.
@@ -44,6 +48,8 @@ In the example, the context has two deliberately small coordinates: comparison a
 One detected pattern eventually has a mean near `[0.753, 0.697]`; another near `[0.149, 0.102]`. We can describe the first as more comparison-heavy and price-narrowing after looking at that evidence. The description does not create the group.
 
 The current detector is bounded online nearest-centroid grouping. An observation close enough to an existing reference updates it; a sufficiently different observation starts another reference, within the configured limit. Feature scales, radius and observation order matter. This is a simple inspectable baseline, rather than an undisclosed Leiden implementation. [Part 1](/blog/show-me-what-you-got-streaming-recommendations#emergent-recommendation-discover-the-patterns) explains the richer community-discovery route.
+
+> **ML aside: unsupervised versus supervised learning.** Grouping asks which observed behaviours resemble one another without requiring a correct audience label for each visit. That is the unsupervised part. Later, an observed reward supplies a target for predicting response: that is supervised learning. We can discover a group before we know which intervention helps it. Finding structure and learning what to do with that structure are separate tasks.
 
 A segment is also not compulsory. A later policy could use the continuous position and trajectory directly. Explicit audience definitions remain available when useful. Permission to contact someone, minimum margins and allowed interventions are separate eligibility rules, not discoveries about their behaviour.
 
@@ -140,6 +146,8 @@ A relative change is useful for transfer. Five percent can describe offers on di
 
 Likewise, a text-position fraction lets us compare layouts of different lengths. It does not make two CTAs at `0.2` psychologically equivalent. The coordinate is a testable input, not a certificate of shared effect.
 
+> **ML aside: feature engineering is choosing what the learner can notice.** Normalisation gives each coordinate a declared scale. It matters for both distance comparisons and the coefficient penalty we will use later. Action descriptors also let the learner share evidence: an unseen email can share price and placement characteristics with observed ones. This is **generalisation**. It works only as far as those characteristics preserve the distinctions that affect response. A document ID alone offers no such relationship between new and old versions.
+
 The descriptor must be versioned. Changing the question rubric, canonicalisation rule, feature scale or meaning of a coordinate changes the space. Reusing an array length or a field name does not preserve compatibility. [Part 2's storage boundary](/blog/show-me-what-you-got-part2-building-relevance#a-small-storage-boundary) makes that contract concrete.
 
 This is also why the exact intervention includes settings outside the copy. An otherwise identical email sent at a different time is a different treatment. Preserve intended settings and evidence of what was actually applied, rather than assuming a generator's request became a delivered message unchanged.
@@ -166,6 +174,8 @@ The producer also keeps availability. A failed or missing reading does not becom
 Structural and interpreted features complement each other. The structural producer can identify the button occurrence and its position. The decision model can interpret the wording around it. Neither needs to pretend to do the other's job, and neither can establish what the recipient actually did.
 
 The readings are computed when a variant is created or changed. They can be reused across recipients while the response stream continues to update. That keeps the expensive interpretation step separate from the immediate experiment decision.
+
+> **ML aside: there are two different prediction tasks here.** The content classifier estimates whether a property is expressed in the email. The response model estimates the reward after an intervention in a particular context. A very confident answer to “does this explain delivery?” is not evidence that explaining delivery will help. We borrow a trained model to produce a feature, then learn whether that feature is useful from outcomes.
 
 # A Rewrite Is a Proposal, Not an Improvement
 
@@ -226,6 +236,10 @@ var observedDeviation = movementWithChange - movementWithoutChange;
 ```
 
 This code expresses the comparison, not a complete causal estimator. Both groups need compatible representations, comparable starting contexts and the same observation interval. Randomised assignment supplies the clean starting example. Historical matching alone can leave important differences unobserved.
+
+> **ML aside: prediction is not uplift.** A purchase predictor asks who is likely to buy under the circumstances represented in its data. An **uplift** or treatment-effect model asks how an intervention changes the outcome compared with a specified alternative. Someone already likely to buy may benefit very little from a discount. Someone less likely to buy may respond strongly. We want to learn the difference the push makes, which is why a good forecast alone cannot choose the best intervention.
+
+We cannot observe the same person's simultaneous future both with and without that email. The missing alternative is the **counterfactual**. Randomised groups let us estimate average differences; conditioning on relevant starting behaviour lets us investigate where those differences vary. This is the territory of heterogeneous treatment effects, described in [EconML's motivation](https://www.pywhy.org/EconML/spec/motivation.html). Our small reward regression is a starting response model, not an implementation of those more advanced causal estimators.
 
 For richer trajectories, the same comparison can include direction, speed, acceleration, time to a state and destination rates. A message may accelerate a purchase that would have happened anyway, reduce cancellation, or move someone into more comparisons without increasing eventual purchases. Those are different responses, and the objective determines which are useful.
 
@@ -298,13 +312,48 @@ Read this as “given this context, how do these intervention characteristics re
 
 The implementation maintains the sufficient statistics for a small ridge regression. That lets it update incrementally without replaying every earlier message or invoking a neural training pipeline. The penalty stabilises the estimate; it does not make every coefficient an isolated causal effect.
 
+> **ML aside: this is already a trained model.** Regression learns weights from examples with observed targets. Here the inputs are intervention characteristics within a detected context, and the target is realised margin reward. “Linear” means the prediction adds weighted feature contributions. “Ridge” adds a penalty for large weights, reducing the temptation to explain limited or correlated evidence with extreme coefficients. The [scikit-learn linear-model guide](https://scikit-learn.org/stable/modules/linear_model.html#ridge-regression-and-classification) explains the same technique. No neural network is required.
+
+The interesting training code accumulates the evidence needed to fit those weights:
+
+```csharp
+var x = new[] { 1.0 }.Concat(descriptor).ToArray();
+for (var i = 0; i < x.Length; i++)
+{
+    Target[i] += x[i] * reward;
+    for (var j = 0; j < x.Length; j++)
+        Gram[i][j] += x[i] * x[j];
+}
+```
+
+The leading `1.0` supplies the baseline term. `Target` accumulates how each input varies with reward; `Gram` accumulates how inputs vary together. These running totals are **sufficient statistics** for this least-squares fit: with the penalty, they let us solve for the coefficients without retaining every training row in the fitting algorithm. We still retain experimental evidence separately for audit and evaluation.
+
+That is training directly from a stream of completed observations. It does not mean the model is automatically responsive to drift: this baseline accumulates old and new evidence together. Forgetting factors or rolling windows would be additional modelling choices when yesterday's response stops describing today's population.
+
+The additive model also makes an assumption we can inspect. A discount and early CTA contribute separately within each group. If their combination matters in a way neither feature captures alone, we could add an interaction feature such as `discount * earlyCta`, or try a more flexible learner. More flexibility needs more evidence. We would compare later performance rather than assume the more complex model wins.
+
 The model can give a new version a provisional score using characteristics it shares with observed versions. It only does so after sufficient outcomes and near supported descriptors. Similarity does not manufacture completed trials. The returned explanation still says how many actual outcomes exist for the exact candidate and whether the score came from descriptor regression, an observed mean or only relevance evidence.
 
 This is the route towards learning useful content, timing and targeting by emergent behaviour. An unseen version is not necessarily an unrelated arm, but nor is it automatically a proven improvement. Sharing evidence through parameters is a hypothesis about the representation's usefulness.
 
 The policy starts with uniform assignment, then uses an exploration fraction alongside its preferred choice. Every eligible action, including the control, retains a positive chance. Otherwise the system could reinforce an early preference and stop collecting evidence about alternatives.
 
+> **ML aside: this is a contextual-bandit problem.** The context is the observed journey, the action is one eligible email version, and the reward is its later measured result. We observe feedback for the chosen action; the other versions do not acquire imaginary outcomes. A **policy** is the rule that turns the current evidence into a choice. This framing and its exploration strategies are introduced in [Vowpal Wabbit's contextual-bandit tutorial](https://vowpalwabbit.org/docs/vowpal_wabbit/python/latest/tutorials/python_Contextual_bandits_and_Vowpal_Wabbit.html).
+
+Our baseline uses **epsilon-greedy** exploration: mostly prefer the currently best-scoring action, but sometimes choose uniformly to keep learning. After warm-up, the probability of selecting a particular action is:
+
+```csharp
+var probability = exploration / eligibleCount
+    + (isPreferredAction ? 1.0 - exploration : 0.0);
+```
+
+With exploration `0.25` and 48 eligible versions, each receives about `0.52%` probability through exploration. The preferred version also receives the `75%` exploitation share. Those are assignment chances, not predicted purchase probabilities. Warm-up instead assigns each version `1 / 48`.
+
+A contextual bandit learns which single choice tends to help in a context. A fuller **reinforcement-learning** problem would model a sequence of decisions: this email changes the state in which tomorrow's offer is selected, and the policy must consider longer-term consequences. A delayed reward alone does not make our example that fuller sequential learner.
+
 The realised selection probability is recorded when the decision is made. It is neither the candidate's RRF score nor its estimated reward. Keeping those numbers separate lets a later evaluator understand how the observations were selected.
+
+> **ML aside: the policy changes its own training data.** Once a preferred version gets more traffic, its raw outcome count cannot be compared fairly with a rarely selected alternative. Logged assignment probabilities are useful for methods such as inverse-propensity evaluation, which reweight observations to account for their selection chances. Logging is the prerequisite, not the estimator itself. This sample reports a separate randomised policy comparison; it does not claim to implement that off-policy evaluation.
 
 For the five relevant quantities, the meanings are:
 
@@ -360,6 +409,8 @@ The fixture's missing-endpoint mechanism is random. Real missing feedback may be
 No-observed-view cases are retained as well. Across the run, 1,635 scored episodes had no observed view. In the later population, the uniform and adaptive arms included 283 and 284 no-observed-view assignments respectively, including any with censored endpoints.
 
 These are genuine program outputs from a synthetic response environment. The policy comparison uses the reproducible lexical producer; the separately captured Nimble readings do not become an invented claim that adding an LLM improved conversion. The exact documents, readings, rewrite and measured output are retained in the [sample artifacts](https://github.com/scottgal/mostlylucidweb/tree/main/samples/RelevanceLearning/artifacts/seed-814).
+
+> **ML aside: what would count as learning something useful?** New recipients test decisions made before their outcomes arrive. New email variants test generalisation across content. A later season or changed product range tests whether the relationship survives a changed environment. These are different questions. The synthetic run verifies that the machinery can recover useful structure in its specified environment; it does not establish real marketing effectiveness. The next evidence must come from measured interventions in the intended setting.
 
 # Keep the Experimental History Intact
 
