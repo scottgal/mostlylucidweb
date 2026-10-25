@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="../Mostlylucid.Relevance.Sqlite/Mostlylucid.Relevance.Sqlite.csproj" />
+    <ProjectReference Include="../samples/RelevanceLearning/RelevanceLearning.csproj" />
     <Compile Include="../Mostlylucid.AudienceSegmentation.Demo/Models/Product.cs" Link="Models/Product.cs" />
     <Content Include="Configuration/*.yaml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>

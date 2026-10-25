@@ -1,6 +1,6 @@
 # SHOW ME WHAT YOU GOT (Part 4) : Mind Contol - The Subtle Art of Manipulation.
 
-Planned extension: `Mostlylucid.Relevance.Learning`. This document is a design for the next project, not a claim that causal intervention learning is implemented in the core preview.
+Implemented baseline: `Mostlylucid.Relevance.Learning`, the `samples/RelevanceLearning` runner and `/experiments.html` in the demo. The article now follows the actual parser, email candidates, detected grouping, assignment ledger, outcome updates and descriptor reward model. The measured fixture output is checked in. This plan retains further extensions; the current detector is nearest-centroid grouping, not Leiden, and the operational notebook is not a controlled recovery experiment.
 
 ## The series
 
@@ -19,19 +19,27 @@ The core's current rank-head reliability rule is deliberately a heuristic. It is
 
 The [working article draft](../../Mostlylucid/Markdown/show-me-what-you-got-part4-mind-control.md) opens with the title's joke and acknowledges that segmentation, ranking and learning are used to influence behaviour across commerce, advertising, entertainment and other systems. Keep the objective and the beneficiary explicit. The intro references [Meta's ranking explanation](https://ai.meta.com/tools/system-cards/instagram-feed-ranking/) and the FTC's [dark-patterns report](https://www.ftc.gov/reports/bringing-dark-patterns-light) without equating every experiment with a deceptive interface.
 
-Begin the technical explanation with an audience, a control and a few variants. Familiar targeting identifies eligible sessions; random assignment supplies the initial comparison. Freeze the segment/context at assignment, rather than grouping participants by an outcome produced by the intervention. [Firebase's messaging experiments](https://firebase.google.com/docs/ab-testing/abtest-with-console) and [parameterised configuration experiments](https://firebase.google.com/docs/ab-testing/abtest-config) provide concrete examples of this familiar starting point.
+Begin with the familiar audience/control/variant experiment, then make the distinction explicit: this system detects recurring behavioural groups from observations instead of requiring manually defined audiences. A live context may match a discovered group, or the policy may use the continuous context without a segment label. Explicit audience rules remain optional. Hard eligibility rules, such as contact permission or minimum margin, remain separate from detection. Random assignment within the eligible population supplies the initial comparison. Snapshot the pre-assignment context and any detector/group version and membership evidence; retain the original assignment if membership changes after treatment. [Firebase's messaging experiments](https://firebase.google.com/docs/ab-testing/abtest-with-console) and [parameterised configuration experiments](https://firebase.google.com/docs/ab-testing/abtest-config) provide concrete examples of this familiar starting point.
 
 Then introduce the generalisation: characterise the intervention as well as the entity. The useful input is an entity context plus the exact change and its descriptor. Shared parameters give a future learner something to compare across variants and contexts. Parametric experimentation and contextual policies already exist; the series demonstrates their integration with the streaming behavioural representation, replaceable feature producers and measured trajectories.
 
 Proposed article progression:
 
-1. Returning shoppers, fixed eligibility, a control and two price variants.
+1. Detect a recurring behavioural group, apply independent eligibility rules, then assign a control and two price variants.
 2. Exact variant identity plus a small, typed intervention description.
 3. Allowed variant generation, with ordinary measurements and optional decision-model properties.
 4. Assignment, delivery/application, observed engagement and downstream outcomes.
 5. Pre/post trajectory change, forecast residuals and controlled outcome comparisons.
 6. The same pattern for a rate-limit/concurrency change across incidents.
 7. Update future choices from observed results, then evaluate generalisation across intervention parameters.
+
+## Detect behavioural segments; assign experimental groups
+
+A behavioural segment is a detected pattern in observed representations or trajectories. A readable name is an annotation applied to that pattern. A control/treatment arm is an experimental assignment. Keep these identities distinct: detecting a session as similar to a group does not choose its treatment.
+
+Reuse the community-discovery approach described in Part 1 and the Stylo.Bot work where suitable. Detection can match live context against previously discovered reference groups; it need not rerun community discovery on every observation. Version the representation, detector/reference population and membership evidence. The core preview's existing context cells are not automatically Leiden communities; discovery integration is part of the planned work, not a claim about the current baseline.
+
+Do not make segments a required consumer API object. Support detected grouping, optional explicit audiences and direct contextual selection through the same intervention boundary. Keep the original assignment context for evaluation while measuring subsequent movement as response evidence. Avoid reclassifying experiment participants using behaviour caused by the intervention and then treating those groups as pre-existing audiences.
 
 ## Describe interventions in a transferable schema
 

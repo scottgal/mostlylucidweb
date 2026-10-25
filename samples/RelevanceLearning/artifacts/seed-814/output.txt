@@ -1,0 +1,11 @@
+EMAIL CANDIDATES 48; producer=literal-phrases:v1; hidden_audience_labels=none
+STRUCTURE control=mail-5fafb3a920602765 words=115 links=3 primary=link-02 position=0.852
+LINK link-01 region=header position=0.000 button=False unsubscribe=False text=Fieldwork
+LINK link-02 region=body position=0.852 button=True unsubscribe=False text=View the walking boots for £100.00
+LINK link-03 region=footer position=0.983 button=False unsubscribe=True text=Unsubscribe
+DETECTED detected-001 support=1800 centroid=[0.753,0.697] coefficients=[0.012,0.086,0.087,0.114,0.064,0.265]
+DETECTED detected-002 support=1800 centroid=[0.149,0.102] coefficients=[0.514,-0.035,-0.233,-0.051,-0.118,-0.166]
+EVALUATION policy=uniform assigned=565 scored=526 censored=39 purchase=25.5% reward=0.2385 no_observed_view=283
+EVALUATION policy=adaptive assigned=635 scored=609 censored=26 purchase=41.9% reward=0.3881 no_observed_view=284
+NO OBSERVED VIEW scored=1635; retained_in_assignment_analysis=true
+SQLITE REOPEN groups=2 outcomes=3420 variants=48

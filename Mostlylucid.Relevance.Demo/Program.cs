@@ -13,6 +13,8 @@ builder.Services.AddHostedService<DemoSeeder>();
 builder.Services.AddSingleton<OperationsMonitor>();
 builder.Services.AddHostedService(p => p.GetRequiredService<OperationsMonitor>());
 builder.Services.AddSingleton<DemoPolicy>();
+builder.Services.AddSingleton<EmailLearningDemo>();
+builder.Services.AddHostedService(p => p.GetRequiredService<EmailLearningDemo>());
 
 var app = builder.Build();
 app.UseDefaultFiles();
@@ -46,26 +48,61 @@ api.AddEndpointFilter(async (context, next) =>
 api.MapGet("/health", () => new { status = "ready" });
 api.MapGet("/shop/products", (string? category, decimal? budget, DemoCatalog catalog) => catalog.Products
     .Where(p => (category is null or "all" || p.Category == category) && (!budget.HasValue || p.Price <= budget)));
-api.MapPost("/shop/events", async (ShopEvent request, DemoCatalog catalog, DemoEngines engines, CancellationToken ct) =>
+api.MapPost("/shop/events", async (ShopEvent request, DemoCatalog catalog, DemoEngines engines, EmailLearningDemo emails, CancellationToken ct) =>
 {
     if (string.IsNullOrWhiteSpace(request.Session) || request.Session.Length > 100) return Results.BadRequest(new { error = "Session is required." });
     var product = catalog.Get(request.Product);
     if (request.Type is not ("view" or "compare" or "cart" or "remove" or "purchase" or "cancel")) return Results.BadRequest(new { error = "Unknown interaction." });
     if (!product.Available && request.Type is "cart" or "purchase") return Results.BadRequest(new { error = "Product is unavailable." });
     var receipt = await engines.Shop.SaveAsync("events", new { id = request.Id ?? Guid.NewGuid().ToString(), subject = request.Session, candidate = product.Id, type = request.Type }, ct);
+    if (!receipt.Duplicate) emails.Observe(request.Session, request.Type);
     if (request.Type == "purchase" && request.Recommendation is { } recommendation)
         await engines.Shop.SaveAsync("outcomes", new { id = "purchase:" + receipt.Id, recommendation, candidate = product.Id, reward = 1.0 }, ct);
     return Results.Ok(new { receipt, prediction = await engines.Shop.PredictAsync(request.Session, ct) });
 });
-api.MapGet("/shop/recommendations", async (string session, string? category, double? budget, DemoEngines engines, CancellationToken ct) =>
+api.MapGet("/shop/recommendations", async (string session, string? category, double? budget, DemoEngines engines, EmailLearningDemo emails, CancellationToken ct) =>
 {
     var placement = category switch { "outdoors" => "outdoors", "electronics" => "electronics", "home" => "homewares", null or "all" => "home", _ => throw new ArgumentException("Unknown category.") };
-    return await engines.Shop.RecommendAsync(session, placement, budget.HasValue ? Filter.Lte("price", budget.Value) : null, 4, ct);
+    var result = await engines.Shop.RecommendAsync(session, placement, budget.HasValue ? Filter.Lte("price", budget.Value) : null, 4, ct);
+    emails.ObserveBudget(session, budget);
+    return result;
 });
 api.MapGet("/operations", (OperationsMonitor monitor, DemoPolicy policy) => new { telemetry = monitor.Snapshot, policy = policy.View });
 api.MapPost("/operations/scenarios/{name}", async (string name, OperationsMonitor monitor, CancellationToken ct) => { await monitor.InjectAsync(name, ct); return Results.Ok(new { state = monitor.Snapshot.State }); });
 api.MapPost("/operations/actions/{name}", async (string name, DemoPolicy policy, CancellationToken ct) => Results.Ok(await policy.ApplyAsync(name, ct)));
 api.MapPost("/operations/reset", (DemoPolicy policy) => { policy.Reset(); return Results.Ok(policy.View); });
+api.MapGet("/learning", async (EmailLearningDemo emails, CancellationToken ct) => Results.Ok(await emails.SnapshotAsync(ct)));
+api.MapGet("/learning/progress", (EmailLearningDemo emails) => emails.Progress);
+api.MapGet("/learning/visit", (string session, EmailLearningDemo emails) => emails.Visit(session));
+api.MapPost("/learning/choose", async (EmailAssignmentRequest request, EmailLearningDemo emails, CancellationToken ct) => Results.Ok(await emails.ChooseAsync(request, ct)));
+api.MapPost("/learning/analyse", (EmailEditRequest request, EmailLearningDemo emails) => emails.Analyse(request));
+api.MapPost("/learning/register", async (EmailEditRequest request, EmailLearningDemo emails, CancellationToken ct) => Results.Ok(await emails.RegisterAsync(request, ct)));
+api.MapPost("/learning/rewrite", async (EmailEditRequest request, EmailLearningDemo emails, CancellationToken ct) =>
+{
+    try { return Results.Ok(await emails.RewriteAsync(request, ct)); }
+    catch (HttpRequestException) { return Results.Problem("The local rewrite model is unavailable. Start Ollama and configure Demo:RewriteModel, or use the human editor.", statusCode: 503); }
+});
+api.MapPost("/learning/model-readings", async (EmailEditRequest request, EmailLearningDemo emails, CancellationToken ct) =>
+{
+    try { return Results.Ok(await emails.ModelReadingsAsync(request, ct)); }
+    catch (HttpRequestException) { return Results.Problem("The local decision model is unavailable. Start Ollama with the configured model.", statusCode: 503); }
+});
+api.MapPost("/learning/events", async (EmailStageRequest request, EmailLearningDemo emails, CancellationToken ct) => Results.Ok(await emails.RecordAsync(request, ct)));
+api.MapPost("/learning/run", async (EmailLearningDemo emails, CancellationToken ct) => Results.Ok(await emails.RunAsync(ct)));
+api.MapPost("/learning/reset", async (EmailLearningDemo emails, CancellationToken ct) => { await emails.ResetAsync(ct); return Results.Ok(new { reset = true }); });
+api.MapPost("/learning/visits/{kind}", async (string kind, DemoCatalog catalog, DemoEngines engines, EmailLearningDemo emails, CancellationToken ct) =>
+{
+    if (kind is not ("comparison" or "direct")) throw new ArgumentException("Unknown sample visit.");
+    var session = "email-visit-" + Guid.NewGuid().ToString("N");
+    var product = catalog.Products.First(p => p.Available && p.Shape == "boot");
+    foreach (var type in Enumerable.Repeat("view", 10).Concat(Enumerable.Repeat("compare", kind == "comparison" ? 8 : 1)))
+    {
+        await engines.Shop.SaveAsync("events", new { id = Guid.NewGuid().ToString(), subject = session, candidate = product.Id, type }, ct);
+        emails.Observe(session, type);
+    }
+    foreach (var budget in kind == "comparison" ? new[] { 250d, 220, 180, 140, 110 } : new[] { 250d }) emails.ObserveBudget(session, budget);
+    return Results.Ok(emails.Visit(session));
+});
 app.Run();
 
 /// <summary>A shopping interaction; provide a stable Id for retries and a returned Recommendation ID for attribution.</summary>

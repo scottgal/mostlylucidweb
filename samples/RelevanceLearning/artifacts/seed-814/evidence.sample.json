@@ -1,0 +1,2290 @@
+{
+  "groups": [
+    {
+      "id": "detected-001",
+      "support": 1800,
+      "centroid": [
+        0.7527222222222224,
+        0.6969999999999993
+      ],
+      "rewardCoefficients": [
+        0.012088642554096099,
+        0.08582316304913498,
+        0.08709284005911046,
+        0.11413257039626004,
+        0.06392107214964571,
+        0.26481244833014694
+      ]
+    },
+    {
+      "id": "detected-002",
+      "support": 1800,
+      "centroid": [
+        0.14927777777777732,
+        0.10211111111111112
+      ],
+      "rewardCoefficients": [
+        0.5138133713126245,
+        -0.03503553756947998,
+        -0.2326041619058607,
+        -0.05104146050747836,
+        -0.11816401939317958,
+        -0.16557398626658973
+      ]
+    }
+  ],
+  "recent": [
+    {
+      "decision": {
+        "id": "evaluation-01199",
+        "unit": "evaluation-01199",
+        "group": "detected-002",
+        "groupSupport": 1800,
+        "context": [
+          0.2,
+          0.2
+        ],
+        "variant": {
+          "id": "mail-606f5a9a53fa9a99",
+          "features": [
+            0.5,
+            0.2005813953488372,
+            0,
+            0.16666666666666666,
+            0.25
+          ],
+          "candidate": {
+            "id": "mail-606f5a9a53fa9a99",
+            "Subject": "Your walking shortlist",
+            "Html": "<!doctype html><html><body><div class=\"preheader\" style=\"display:none\">Your walking shortlist, together.</div><header><a href=\"https://fieldwork.example/\">Fieldwork</a></header><main><h1>Your walking shortlist</h1><p>You compared walking boots during your visit. Here is the pair you looked at, with the details together.</p><p><a class=\"cta\" href=\"https://fieldwork.example/products/walking-boots?utm_source=email\">View the walking boots for £95.00</a></p><p>Take another look at the fit, the materials and the available sizes before deciding whether these are right for your walks.</p><p>Compare the product details with your shortlist. You can return to the same selection without starting the search again.</p><p>Your basket is a place to keep possibilities together. There is no need to complete a purchase to review the information.</p><p>The full product page has the current sizes and materials for this pair of boots.</p><p>Need help choosing? Reply to ask about your shortlist.</p></main><footer><a href=\"https://fieldwork.example/unsubscribe\">Unsubscribe</a></footer></body></html>",
+            "OriginalPrice": 100,
+            "OfferPrice": 95.0,
+            "DelayMinutes": 10,
+            "Author": "template-generator-v1",
+            "content_hash": "606F5A9A53FA9A99BE59FFD5105CC5E4767EAEA3F8D2F7A4FC2F07C9417C18D6",
+            "Producer": "literal-phrases",
+            "Version": "v1",
+            "structure": [
+              0.2005813953488372,
+              0.3,
+              0.23,
+              0,
+              0.25
+            ],
+            "meaning": [
+              0,
+              1
+            ],
+            "timing": [
+              0.16666666666666666
+            ],
+            "offer": [
+              0.5
+            ]
+          },
+          "control": false
+        },
+        "assignedAt": "2026-10-01T16:58:47+00:00",
+        "deadline": "2026-10-01T17:58:47+00:00",
+        "probability": 0.020833333333333332,
+        "policy": "uniform-v1",
+        "alternatives": [
+          {
+            "id": "mail-a99042cc1479465c",
+            "score": 0.2548878014049656,
+            "outcomes": 29,
+            "meanReward": 0.20689655172413793,
+            "relevanceRank": 10,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-0e8c148986b609fe",
+            "score": 0.21932111216500327,
+            "outcomes": 36,
+            "meanReward": 0.2777777777777778,
+            "relevanceRank": 2,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-5fafb3a920602765",
+            "score": 0.19548704212971924,
+            "outcomes": 32,
+            "meanReward": 0.15625,
+            "relevanceRank": 14,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-ff6dfe626e85c5a8",
+            "score": 0.15992035288975692,
+            "outcomes": 35,
+            "meanReward": 0.08571428571428572,
+            "relevanceRank": 41,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-a097e67578c31e46",
+            "score": 0.2035573235527532,
+            "outcomes": 30,
+            "meanReward": 0.26666666666666666,
+            "relevanceRank": 18,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e21b053a0844a600",
+            "score": 0.1679977345535234,
+            "outcomes": 31,
+            "meanReward": 0.0967741935483871,
+            "relevanceRank": 34,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-b177afe6cc93686a",
+            "score": 0.14415656427750684,
+            "outcomes": 31,
+            "meanReward": 0.03225806451612903,
+            "relevanceRank": 36,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-7fd3778558d5785c",
+            "score": 0.10859697527827705,
+            "outcomes": 28,
+            "meanReward": 0.14285714285714285,
+            "relevanceRank": 35,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-5c7542a2ecc9f2ec",
+            "score": 0.4067840744310168,
+            "outcomes": 264,
+            "meanReward": 0.4393939393939394,
+            "relevanceRank": 1,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e44628f0a6983cad",
+            "score": 0.36651735986535383,
+            "outcomes": 26,
+            "meanReward": 0.34615384615384615,
+            "relevanceRank": 16,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-664d7d544968b7dd",
+            "score": 0.3473833151557705,
+            "outcomes": 23,
+            "meanReward": 0.34782608695652173,
+            "relevanceRank": 8,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e8e6482c73118849",
+            "score": 0.3071166005901075,
+            "outcomes": 25,
+            "meanReward": 0.24,
+            "relevanceRank": 28,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-232f4534bdace885",
+            "score": 0.35533558528262216,
+            "outcomes": 39,
+            "meanReward": 0.28205128205128205,
+            "relevanceRank": 3,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-b5ca57bec3b8145b",
+            "score": 0.31507300789176257,
+            "outcomes": 37,
+            "meanReward": 0.32432432432432434,
+            "relevanceRank": 20,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-4f0b13d853297a31",
+            "score": 0.29593482600737586,
+            "outcomes": 36,
+            "meanReward": 0.3611111111111111,
+            "relevanceRank": 15,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-0df2777004b7ebd3",
+            "score": 0.2556722486165162,
+            "outcomes": 31,
+            "meanReward": 0.3225806451612903,
+            "relevanceRank": 11,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-fd0f4466b6b0408c",
+            "score": 0.237242979595216,
+            "outcomes": 29,
+            "meanReward": 0.29118773946360155,
+            "relevanceRank": 37,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-2c9b9387f6edf23a",
+            "score": 0.20169388833793178,
+            "outcomes": 29,
+            "meanReward": 0.16091954022988503,
+            "relevanceRank": 12,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-bb1205b007a6c3ff",
+            "score": 0.17784222031996966,
+            "outcomes": 29,
+            "meanReward": 0.16091954022988503,
+            "relevanceRank": 38,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-11bf1d3c0f39c7d8",
+            "score": 0.14229312906268549,
+            "outcomes": 26,
+            "meanReward": 0.1752136752136752,
+            "relevanceRank": 17,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e14f81bbc9764ac3",
+            "score": 0.18591215460885369,
+            "outcomes": 35,
+            "meanReward": 0.15873015873015872,
+            "relevanceRank": 40,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-2378b57889f6cda9",
+            "score": 0.15037020919903638,
+            "outcomes": 29,
+            "meanReward": 0.22222222222222224,
+            "relevanceRank": 21,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-1e51ab457a29d37d",
+            "score": 0.12651139533360733,
+            "outcomes": 30,
+            "meanReward": 0.12962962962962962,
+            "relevanceRank": 29,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-3763dcac01587537",
+            "score": 0.09096944992379002,
+            "outcomes": 30,
+            "meanReward": 0.08888888888888888,
+            "relevanceRank": 42,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-606f5a9a53fa9a99",
+            "score": 0.38936003208787484,
+            "outcomes": 36,
+            "meanReward": 0.2314814814814815,
+            "relevanceRank": 4,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-c4845b3083cc1a05",
+            "score": 0.34909745469701525,
+            "outcomes": 30,
+            "meanReward": 0.24444444444444446,
+            "relevanceRank": 19,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-2ba0d8d8285281ae",
+            "score": 0.3299592728126285,
+            "outcomes": 28,
+            "meanReward": 0.3373015873015873,
+            "relevanceRank": 5,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-b8745c8df5db17c2",
+            "score": 0.28969669542176896,
+            "outcomes": 31,
+            "meanReward": 0.3082437275985663,
+            "relevanceRank": 27,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-3d80b2f8d133ac0a",
+            "score": 0.337911345395098,
+            "outcomes": 32,
+            "meanReward": 0.2916666666666667,
+            "relevanceRank": 7,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e42aed9d9a48e672",
+            "score": 0.2976529229792195,
+            "outcomes": 29,
+            "meanReward": 0.29118773946360155,
+            "relevanceRank": 32,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-6d629712906c3db0",
+            "score": 0.2785105861198517,
+            "outcomes": 38,
+            "meanReward": 0.3216374269005849,
+            "relevanceRank": 24,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-57394197b19dbef9",
+            "score": 0.23825216370397317,
+            "outcomes": 34,
+            "meanReward": 0.28431372549019607,
+            "relevanceRank": 31,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e71714b93315ca95",
+            "score": 0.2198867937473789,
+            "outcomes": 28,
+            "meanReward": 0.2738095238095238,
+            "relevanceRank": 39,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-efc0daecbe8812fb",
+            "score": 0.18433770249009468,
+            "outcomes": 22,
+            "meanReward": 0.21717171717171715,
+            "relevanceRank": 44,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-2e7025589ac1cc7c",
+            "score": 0.16048603447213255,
+            "outcomes": 23,
+            "meanReward": 0.2222222222222222,
+            "relevanceRank": 23,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-ff22d78932197c36",
+            "score": 0.12493694321484833,
+            "outcomes": 34,
+            "meanReward": 0.09803921568627452,
+            "relevanceRank": 47,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-440d0f110beef434",
+            "score": 0.16855596876101653,
+            "outcomes": 22,
+            "meanReward": 0.18686868686868688,
+            "relevanceRank": 30,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-9a09d133594058df",
+            "score": 0.13301402335119927,
+            "outcomes": 37,
+            "meanReward": 0.0900900900900901,
+            "relevanceRank": 43,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-cde0317c695c39f7",
+            "score": 0.10915520948577018,
+            "outcomes": 36,
+            "meanReward": 0.11419753086419754,
+            "relevanceRank": 46,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-a5c39f2ef96bc76a",
+            "score": 0.07361326407595292,
+            "outcomes": 31,
+            "meanReward": 0.14695340501792115,
+            "relevanceRank": 48,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-5f47dce24ca478b1",
+            "score": 0.37200384624003774,
+            "outcomes": 35,
+            "meanReward": 0.4000000000000001,
+            "relevanceRank": 6,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-cfbe35b771c8bdd0",
+            "score": 0.33174126884917815,
+            "outcomes": 27,
+            "meanReward": 0.3004115226337448,
+            "relevanceRank": 25,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-93e291e5f8d53318",
+            "score": 0.31260308696479144,
+            "outcomes": 33,
+            "meanReward": 0.3097643097643098,
+            "relevanceRank": 22,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-acdc5a4f2f95e605",
+            "score": 0.2723405095739318,
+            "outcomes": 25,
+            "meanReward": 0.3244444444444444,
+            "relevanceRank": 33,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-378c4dba258723b5",
+            "score": 0.3205551595472609,
+            "outcomes": 27,
+            "meanReward": 0.2551440329218107,
+            "relevanceRank": 9,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-1980f3a3def7f2f2",
+            "score": 0.2802967371313824,
+            "outcomes": 34,
+            "meanReward": 0.38888888888888895,
+            "relevanceRank": 13,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-5130ffefe9ce7ed9",
+            "score": 0.2611544002720145,
+            "outcomes": 32,
+            "meanReward": 0.2222222222222222,
+            "relevanceRank": 26,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-f91e50abbf5d5b6e",
+            "score": 0.22089597785613607,
+            "outcomes": 31,
+            "meanReward": 0.10035842293906812,
+            "relevanceRank": 45,
+            "source": "descriptor-regression"
+          }
+        ]
+      },
+      "events": [
+        {
+          "id": "evaluation-01199:attempted",
+          "decision": "evaluation-01199",
+          "stage": "attempted",
+          "at": "2026-10-01T16:58:48+00:00",
+          "source": "seeded-email-environment-v1",
+          "reward": null,
+          "outcome": null,
+          "after": null,
+          "measures": null,
+          "link": null
+        },
+        {
+          "id": "evaluation-01199:delivered",
+          "decision": "evaluation-01199",
+          "stage": "delivered",
+          "at": "2026-10-01T16:58:49+00:00",
+          "source": "seeded-email-environment-v1",
+          "reward": null,
+          "outcome": null,
+          "after": null,
+          "measures": null,
+          "link": null
+        },
+        {
+          "id": "evaluation-01199:outcome",
+          "decision": "evaluation-01199",
+          "stage": "outcome",
+          "at": "2026-10-01T16:58:50+00:00",
+          "source": "seeded-email-environment-v1",
+          "reward": 0,
+          "outcome": "closed-without-purchase",
+          "after": [
+            0.28,
+            0.28
+          ],
+          "measures": {
+            "margin_gbp": 0,
+            "paid_gbp": 0,
+            "contact_cost_gbp": 0.05,
+            "policy_assignment_probability": 0.5
+          },
+          "link": null
+        }
+      ],
+      "closed": true
+    },
+    {
+      "decision": {
+        "id": "evaluation-01198",
+        "unit": "evaluation-01198",
+        "group": "detected-001",
+        "groupSupport": 1800,
+        "context": [
+          0.7,
+          0.6
+        ],
+        "variant": {
+          "id": "mail-ff22d78932197c36",
+          "features": [
+            1,
+            0.8267605633802817,
+            0,
+            0.6666666666666666,
+            0.5
+          ],
+          "candidate": {
+            "id": "mail-ff22d78932197c36",
+            "Subject": "Your walking shortlist",
+            "Html": "<!doctype html><html><body><div class=\"preheader\" style=\"display:none\">Your walking shortlist, together.</div><header><a href=\"https://fieldwork.example/\">Fieldwork</a></header><main><h1>Your walking shortlist</h1><p>You compared walking boots during your visit. Here is the pair you looked at, with the details together.</p><p>Take another look at the fit, the materials and the available sizes before deciding whether these are right for your walks.</p><p>Compare the product details with your shortlist. You can return to the same selection without starting the search again.</p><p>Your basket is a place to keep possibilities together. There is no need to complete a purchase to review the information.</p><p>The full product page has the current sizes and materials for this pair of boots.</p><p><a class=\"cta\" href=\"https://fieldwork.example/products/walking-boots?utm_source=email\">View the walking boots for £90.00</a></p><p><a href=\"https://fieldwork.example/products/walking-boots?utm_medium=reminder\">See these boots again</a></p><p>Need help choosing? Reply to ask about your shortlist.</p></main><footer><a href=\"https://fieldwork.example/unsubscribe\">Unsubscribe</a></footer></body></html>",
+            "OriginalPrice": 100,
+            "OfferPrice": 90.0,
+            "DelayMinutes": 40,
+            "Author": "template-generator-v1",
+            "content_hash": "FF22D78932197C369DE42564287A5CE44FA15663AAAEF76AFBFE74071B52FD1C",
+            "Producer": "literal-phrases",
+            "Version": "v1",
+            "structure": [
+              0.8267605633802817,
+              0.4,
+              0.238,
+              0,
+              0.5
+            ],
+            "meaning": [
+              0,
+              1
+            ],
+            "timing": [
+              0.6666666666666666
+            ],
+            "offer": [
+              1
+            ]
+          },
+          "control": false
+        },
+        "assignedAt": "2026-10-01T16:58:41+00:00",
+        "deadline": "2026-10-01T17:58:41+00:00",
+        "probability": 0.005208333333333333,
+        "policy": "epsilon-descriptor-v1",
+        "alternatives": [
+          {
+            "id": "mail-a99042cc1479465c",
+            "score": 0.16303243006539395,
+            "outcomes": 32,
+            "meanReward": 0.25,
+            "relevanceRank": 41,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-0e8c148986b609fe",
+            "score": 0.22655393198512466,
+            "outcomes": 37,
+            "meanReward": 0.21621621621621623,
+            "relevanceRank": 16,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-5fafb3a920602765",
+            "score": 0.1946456395783647,
+            "outcomes": 26,
+            "meanReward": 0.23076923076923078,
+            "relevanceRank": 24,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-ff6dfe626e85c5a8",
+            "score": 0.2581671414980954,
+            "outcomes": 27,
+            "meanReward": 0.2222222222222222,
+            "relevanceRank": 34,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-a097e67578c31e46",
+            "score": 0.2778941744539719,
+            "outcomes": 35,
+            "meanReward": 0.3142857142857143,
+            "relevanceRank": 30,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e21b053a0844a600",
+            "score": 0.3414130400563038,
+            "outcomes": 21,
+            "meanReward": 0.2857142857142857,
+            "relevanceRank": 28,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-b177afe6cc93686a",
+            "score": 0.30950738396694266,
+            "outcomes": 39,
+            "meanReward": 0.28205128205128205,
+            "relevanceRank": 21,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-7fd3778558d5785c",
+            "score": 0.37302624956927455,
+            "outcomes": 26,
+            "meanReward": 0.38461538461538464,
+            "relevanceRank": 11,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-5c7542a2ecc9f2ec",
+            "score": 0.10663338635747488,
+            "outcomes": 29,
+            "meanReward": 0.06896551724137931,
+            "relevanceRank": 46,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e44628f0a6983cad",
+            "score": 0.1719000063666208,
+            "outcomes": 33,
+            "meanReward": 0.15151515151515152,
+            "relevanceRank": 48,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-664d7d544968b7dd",
+            "score": 0.13824659587044563,
+            "outcomes": 25,
+            "meanReward": 0.08,
+            "relevanceRank": 40,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e8e6482c73118849",
+            "score": 0.20351321587959156,
+            "outcomes": 23,
+            "meanReward": 0.17391304347826086,
+            "relevanceRank": 45,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-232f4534bdace885",
+            "score": 0.22153894830733215,
+            "outcomes": 42,
+            "meanReward": 0.21428571428571427,
+            "relevanceRank": 29,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-b5ca57bec3b8145b",
+            "score": 0.28680403218463024,
+            "outcomes": 36,
+            "meanReward": 0.4166666666666667,
+            "relevanceRank": 42,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-4f0b13d853297a31",
+            "score": 0.25315215782030287,
+            "outcomes": 30,
+            "meanReward": 0.23333333333333334,
+            "relevanceRank": 20,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-0df2777004b7ebd3",
+            "score": 0.318417241697601,
+            "outcomes": 27,
+            "meanReward": 0.2222222222222222,
+            "relevanceRank": 8,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-fd0f4466b6b0408c",
+            "score": 0.20577166841963354,
+            "outcomes": 28,
+            "meanReward": 0.1626984126984127,
+            "relevanceRank": 47,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-2c9b9387f6edf23a",
+            "score": 0.26928663621331583,
+            "outcomes": 21,
+            "meanReward": 0.13227513227513227,
+            "relevanceRank": 18,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-bb1205b007a6c3ff",
+            "score": 0.2373848779326043,
+            "outcomes": 46,
+            "meanReward": 0.21497584541062806,
+            "relevanceRank": 33,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-11bf1d3c0f39c7d8",
+            "score": 0.3008998457262866,
+            "outcomes": 36,
+            "meanReward": 0.3395061728395062,
+            "relevanceRank": 5,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e14f81bbc9764ac3",
+            "score": 0.32063354169902436,
+            "outcomes": 39,
+            "meanReward": 0.27920227920227925,
+            "relevanceRank": 35,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-2378b57889f6cda9",
+            "score": 0.38414585624153996,
+            "outcomes": 28,
+            "meanReward": 0.41269841269841273,
+            "relevanceRank": 7,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-1e51ab457a29d37d",
+            "score": 0.3522467512119951,
+            "outcomes": 31,
+            "meanReward": 0.40860215053763443,
+            "relevanceRank": 2,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-3763dcac01587537",
+            "score": 0.4157590657545108,
+            "outcomes": 29,
+            "meanReward": 0.49042145593869735,
+            "relevanceRank": 1,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-606f5a9a53fa9a99",
+            "score": 0.14929064935748784,
+            "outcomes": 35,
+            "meanReward": 0.15873015873015872,
+            "relevanceRank": 43,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-c4845b3083cc1a05",
+            "score": 0.2145557332347859,
+            "outcomes": 29,
+            "meanReward": 0.12260536398467432,
+            "relevanceRank": 44,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-2ba0d8d8285281ae",
+            "score": 0.1809038588704586,
+            "outcomes": 36,
+            "meanReward": 0.18518518518518517,
+            "relevanceRank": 17,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-b8745c8df5db17c2",
+            "score": 0.24616894274775666,
+            "outcomes": 36,
+            "meanReward": 0.3024691358024692,
+            "relevanceRank": 36,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-3d80b2f8d133ac0a",
+            "score": 0.26419628465551903,
+            "outcomes": 32,
+            "meanReward": 0.34375000000000006,
+            "relevanceRank": 27,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e42aed9d9a48e672",
+            "score": 0.32945982579176825,
+            "outcomes": 25,
+            "meanReward": 0.29333333333333333,
+            "relevanceRank": 39,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-6d629712906c3db0",
+            "score": 0.2958094941684898,
+            "outcomes": 34,
+            "meanReward": 0.30392156862745107,
+            "relevanceRank": 19,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-57394197b19dbef9",
+            "score": 0.361073035304739,
+            "outcomes": 36,
+            "meanReward": 0.3858024691358025,
+            "relevanceRank": 14,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-e71714b93315ca95",
+            "score": 0.24840373632191085,
+            "outcomes": 36,
+            "meanReward": 0.2469135802469136,
+            "relevanceRank": 37,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-efc0daecbe8812fb",
+            "score": 0.3119187041155932,
+            "outcomes": 34,
+            "meanReward": 0.4738562091503269,
+            "relevanceRank": 32,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-2e7025589ac1cc7c",
+            "score": 0.28001694583488157,
+            "outcomes": 32,
+            "meanReward": 0.21527777777777776,
+            "relevanceRank": 6,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-ff22d78932197c36",
+            "score": 0.34353191362856395,
+            "outcomes": 30,
+            "meanReward": 0.37407407407407417,
+            "relevanceRank": 26,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-440d0f110beef434",
+            "score": 0.3632656096013017,
+            "outcomes": 44,
+            "meanReward": 0.3156565656565657,
+            "relevanceRank": 10,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-9a09d133594058df",
+            "score": 0.42677792414381743,
+            "outcomes": 24,
+            "meanReward": 0.42592592592592604,
+            "relevanceRank": 12,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-cde0317c695c39f7",
+            "score": 0.3948788191142725,
+            "outcomes": 28,
+            "meanReward": 0.42857142857142866,
+            "relevanceRank": 15,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-a5c39f2ef96bc76a",
+            "score": 0.4583911336567882,
+            "outcomes": 249,
+            "meanReward": 0.4417670682730917,
+            "relevanceRank": 4,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-5f47dce24ca478b1",
+            "score": 0.1919227172597652,
+            "outcomes": 27,
+            "meanReward": 0.2345679012345679,
+            "relevanceRank": 31,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-cfbe35b771c8bdd0",
+            "score": 0.2571878011370633,
+            "outcomes": 20,
+            "meanReward": 0.17777777777777776,
+            "relevanceRank": 38,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-93e291e5f8d53318",
+            "score": 0.22353592677273595,
+            "outcomes": 29,
+            "meanReward": 0.33333333333333337,
+            "relevanceRank": 25,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-acdc5a4f2f95e605",
+            "score": 0.28880101065003405,
+            "outcomes": 28,
+            "meanReward": 0.23015873015873017,
+            "relevanceRank": 23,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-378c4dba258723b5",
+            "score": 0.3068283525577964,
+            "outcomes": 29,
+            "meanReward": 0.24904214559386972,
+            "relevanceRank": 13,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-1980f3a3def7f2f2",
+            "score": 0.3720918936940456,
+            "outcomes": 28,
+            "meanReward": 0.34523809523809523,
+            "relevanceRank": 3,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-5130ffefe9ce7ed9",
+            "score": 0.33844156207076714,
+            "outcomes": 32,
+            "meanReward": 0.30208333333333337,
+            "relevanceRank": 9,
+            "source": "descriptor-regression"
+          },
+          {
+            "id": "mail-f91e50abbf5d5b6e",
+            "score": 0.40370510320701636,
+            "outcomes": 34,
+            "meanReward": 0.47712418300653603,
+            "relevanceRank": 22,
+            "source": "descriptor-regression"
+          }
+        ]
+      },
+      "events": [
+        {
+          "id": "evaluation-01198:attempted",
+          "decision": "evaluation-01198",
+          "stage": "attempted",
+          "at": "2026-10-01T16:58:42+00:00",
+          "source": "seeded-email-environment-v1",
+          "reward": null,
+          "outcome": null,
+          "after": null,
+          "measures": null,
+          "link": null
+        },
+        {
+          "id": "evaluation-01198:delivered",
+          "decision": "evaluation-01198",
+          "stage": "delivered",
+          "at": "2026-10-01T16:58:43+00:00",
+          "source": "seeded-email-environment-v1",
+          "reward": null,
+          "outcome": null,
+          "after": null,
+          "measures": null,
+          "link": null
+        },
+        {
+          "id": "evaluation-01198:viewed",
+          "decision": "evaluation-01198",
+          "stage": "viewed",
+          "at": "2026-10-01T16:58:44+00:00",
+          "source": "seeded-email-environment-v1",
+          "reward": null,
+          "outcome": null,
+          "after": null,
+          "measures": null,
+          "link": null
+        },
+        {
+          "id": "evaluation-01198:clicked",
+          "decision": "evaluation-01198",
+          "stage": "clicked",
+          "at": "2026-10-01T16:58:45+00:00",
+          "source": "seeded-email-environment-v1",
+          "reward": null,
+          "outcome": null,
+          "after": null,
+          "measures": null,
+          "link": "link-02"
+        },
+        {
+          "id": "evaluation-01198:outcome",
+          "decision": "evaluation-01198",
+          "stage": "outcome",
+          "at": "2026-10-01T16:58:46+00:00",
+          "source": "seeded-email-environment-v1",
+          "reward": 0.7777777777777779,
+          "outcome": "purchase",
+          "after": [
+            0.5499999999999999,
+            0.44999999999999996
+          ],
+          "measures": {
+            "margin_gbp": 35,
+            "paid_gbp": 90,
+            "contact_cost_gbp": 0.05,
+            "policy_assignment_probability": 0.5
+          },
+          "link": null
+        }
+      ],
+      "closed": true
+    }
+  ],
+  "evidence": [
+    {
+      "group": "detected-001",
+      "variant": "mail-a99042cc1479465c",
+      "assigned": 36,
+      "completed": 32,
+      "censored": 4,
+      "applied": 35,
+      "viewed": 16,
+      "clicked": 13,
+      "failed": 1,
+      "meanReward": 0.25,
+      "standardError": 0.0777713771047819
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-0e8c148986b609fe",
+      "assigned": 37,
+      "completed": 37,
+      "censored": 0,
+      "applied": 34,
+      "viewed": 20,
+      "clicked": 15,
+      "failed": 3,
+      "meanReward": 0.21621621621621623,
+      "standardError": 0.06861056852129646
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-5fafb3a920602765",
+      "assigned": 30,
+      "completed": 26,
+      "censored": 4,
+      "applied": 30,
+      "viewed": 13,
+      "clicked": 14,
+      "failed": 0,
+      "meanReward": 0.23076923076923078,
+      "standardError": 0.08426500884694862
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-ff6dfe626e85c5a8",
+      "assigned": 29,
+      "completed": 27,
+      "censored": 2,
+      "applied": 29,
+      "viewed": 23,
+      "clicked": 18,
+      "failed": 0,
+      "meanReward": 0.2222222222222222,
+      "standardError": 0.08153326507837143
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-a097e67578c31e46",
+      "assigned": 35,
+      "completed": 35,
+      "censored": 0,
+      "applied": 34,
+      "viewed": 16,
+      "clicked": 12,
+      "failed": 1,
+      "meanReward": 0.3142857142857143,
+      "standardError": 0.07961491954505553
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-e21b053a0844a600",
+      "assigned": 23,
+      "completed": 21,
+      "censored": 2,
+      "applied": 19,
+      "viewed": 8,
+      "clicked": 8,
+      "failed": 4,
+      "meanReward": 0.2857142857142857,
+      "standardError": 0.10101525445522107
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-b177afe6cc93686a",
+      "assigned": 39,
+      "completed": 39,
+      "censored": 0,
+      "applied": 38,
+      "viewed": 22,
+      "clicked": 18,
+      "failed": 1,
+      "meanReward": 0.28205128205128205,
+      "standardError": 0.07299934324587595
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-7fd3778558d5785c",
+      "assigned": 27,
+      "completed": 26,
+      "censored": 1,
+      "applied": 25,
+      "viewed": 16,
+      "clicked": 15,
+      "failed": 2,
+      "meanReward": 0.38461538461538464,
+      "standardError": 0.09730085108210398
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-5c7542a2ecc9f2ec",
+      "assigned": 30,
+      "completed": 29,
+      "censored": 1,
+      "applied": 30,
+      "viewed": 17,
+      "clicked": 14,
+      "failed": 0,
+      "meanReward": 0.06896551724137931,
+      "standardError": 0.04788724653995956
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-e44628f0a6983cad",
+      "assigned": 34,
+      "completed": 33,
+      "censored": 1,
+      "applied": 31,
+      "viewed": 17,
+      "clicked": 17,
+      "failed": 3,
+      "meanReward": 0.15151515151515152,
+      "standardError": 0.06338333534349057
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-664d7d544968b7dd",
+      "assigned": 25,
+      "completed": 25,
+      "censored": 0,
+      "applied": 21,
+      "viewed": 12,
+      "clicked": 8,
+      "failed": 4,
+      "meanReward": 0.08,
+      "standardError": 0.05537749241945384
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-e8e6482c73118849",
+      "assigned": 26,
+      "completed": 23,
+      "censored": 3,
+      "applied": 24,
+      "viewed": 10,
+      "clicked": 12,
+      "failed": 2,
+      "meanReward": 0.17391304347826086,
+      "standardError": 0.08081046758996392
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-232f4534bdace885",
+      "assigned": 43,
+      "completed": 42,
+      "censored": 1,
+      "applied": 41,
+      "viewed": 26,
+      "clicked": 19,
+      "failed": 2,
+      "meanReward": 0.21428571428571427,
+      "standardError": 0.06408213992247219
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-b5ca57bec3b8145b",
+      "assigned": 37,
+      "completed": 36,
+      "censored": 1,
+      "applied": 37,
+      "viewed": 25,
+      "clicked": 19,
+      "failed": 0,
+      "meanReward": 0.4166666666666667,
+      "standardError": 0.08333333333333333
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-4f0b13d853297a31",
+      "assigned": 31,
+      "completed": 30,
+      "censored": 1,
+      "applied": 29,
+      "viewed": 14,
+      "clicked": 15,
+      "failed": 2,
+      "meanReward": 0.23333333333333334,
+      "standardError": 0.07854032324531729
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-0df2777004b7ebd3",
+      "assigned": 28,
+      "completed": 27,
+      "censored": 1,
+      "applied": 28,
+      "viewed": 14,
+      "clicked": 16,
+      "failed": 0,
+      "meanReward": 0.2222222222222222,
+      "standardError": 0.08153326507837143
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-fd0f4466b6b0408c",
+      "assigned": 28,
+      "completed": 28,
+      "censored": 0,
+      "applied": 28,
+      "viewed": 17,
+      "clicked": 14,
+      "failed": 0,
+      "meanReward": 0.1626984126984127,
+      "standardError": 0.06725250697823366
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-2c9b9387f6edf23a",
+      "assigned": 22,
+      "completed": 21,
+      "censored": 1,
+      "applied": 22,
+      "viewed": 11,
+      "clicked": 10,
+      "failed": 0,
+      "meanReward": 0.13227513227513227,
+      "standardError": 0.07258518789266674
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-bb1205b007a6c3ff",
+      "assigned": 49,
+      "completed": 46,
+      "censored": 3,
+      "applied": 47,
+      "viewed": 23,
+      "clicked": 26,
+      "failed": 2,
+      "meanReward": 0.21497584541062806,
+      "standardError": 0.05721120426244933
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-11bf1d3c0f39c7d8",
+      "assigned": 37,
+      "completed": 36,
+      "censored": 1,
+      "applied": 35,
+      "viewed": 18,
+      "clicked": 14,
+      "failed": 2,
+      "meanReward": 0.3395061728395062,
+      "standardError": 0.07653894281785442
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-e14f81bbc9764ac3",
+      "assigned": 39,
+      "completed": 39,
+      "censored": 0,
+      "applied": 38,
+      "viewed": 19,
+      "clicked": 20,
+      "failed": 1,
+      "meanReward": 0.27920227920227925,
+      "standardError": 0.06804098933375564
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-2378b57889f6cda9",
+      "assigned": 30,
+      "completed": 28,
+      "censored": 2,
+      "applied": 28,
+      "viewed": 15,
+      "clicked": 7,
+      "failed": 2,
+      "meanReward": 0.41269841269841273,
+      "standardError": 0.09194786876710458
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-1e51ab457a29d37d",
+      "assigned": 33,
+      "completed": 31,
+      "censored": 2,
+      "applied": 32,
+      "viewed": 16,
+      "clicked": 12,
+      "failed": 1,
+      "meanReward": 0.40860215053763443,
+      "standardError": 0.08795614211485152
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-3763dcac01587537",
+      "assigned": 30,
+      "completed": 29,
+      "censored": 1,
+      "applied": 29,
+      "viewed": 15,
+      "clicked": 14,
+      "failed": 1,
+      "meanReward": 0.49042145593869735,
+      "standardError": 0.08985470804259443
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-606f5a9a53fa9a99",
+      "assigned": 37,
+      "completed": 35,
+      "censored": 2,
+      "applied": 36,
+      "viewed": 19,
+      "clicked": 18,
+      "failed": 1,
+      "meanReward": 0.15873015873015872,
+      "standardError": 0.05996259066272628
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-c4845b3083cc1a05",
+      "assigned": 30,
+      "completed": 29,
+      "censored": 1,
+      "applied": 28,
+      "viewed": 14,
+      "clicked": 15,
+      "failed": 2,
+      "meanReward": 0.12260536398467432,
+      "standardError": 0.0579255897332149
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-2ba0d8d8285281ae",
+      "assigned": 36,
+      "completed": 36,
+      "censored": 0,
+      "applied": 36,
+      "viewed": 20,
+      "clicked": 17,
+      "failed": 0,
+      "meanReward": 0.18518518518518517,
+      "standardError": 0.06384382276824702
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-b8745c8df5db17c2",
+      "assigned": 37,
+      "completed": 36,
+      "censored": 1,
+      "applied": 36,
+      "viewed": 19,
+      "clicked": 21,
+      "failed": 1,
+      "meanReward": 0.3024691358024692,
+      "standardError": 0.0724167927328066
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-3d80b2f8d133ac0a",
+      "assigned": 33,
+      "completed": 32,
+      "censored": 1,
+      "applied": 31,
+      "viewed": 18,
+      "clicked": 15,
+      "failed": 2,
+      "meanReward": 0.34375000000000006,
+      "standardError": 0.07988058824355389
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-e42aed9d9a48e672",
+      "assigned": 29,
+      "completed": 25,
+      "censored": 4,
+      "applied": 28,
+      "viewed": 13,
+      "clicked": 15,
+      "failed": 1,
+      "meanReward": 0.29333333333333333,
+      "standardError": 0.08746074957401967
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-6d629712906c3db0",
+      "assigned": 35,
+      "completed": 34,
+      "censored": 1,
+      "applied": 33,
+      "viewed": 15,
+      "clicked": 13,
+      "failed": 2,
+      "meanReward": 0.30392156862745107,
+      "standardError": 0.07669776474375137
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-57394197b19dbef9",
+      "assigned": 37,
+      "completed": 36,
+      "censored": 1,
+      "applied": 36,
+      "viewed": 19,
+      "clicked": 19,
+      "failed": 1,
+      "meanReward": 0.3858024691358025,
+      "standardError": 0.07737184458276122
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-e71714b93315ca95",
+      "assigned": 39,
+      "completed": 36,
+      "censored": 3,
+      "applied": 37,
+      "viewed": 23,
+      "clicked": 18,
+      "failed": 2,
+      "meanReward": 0.2469135802469136,
+      "standardError": 0.06802137839744934
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-efc0daecbe8812fb",
+      "assigned": 36,
+      "completed": 34,
+      "censored": 2,
+      "applied": 36,
+      "viewed": 24,
+      "clicked": 24,
+      "failed": 0,
+      "meanReward": 0.4738562091503269,
+      "standardError": 0.07451475523259654
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-2e7025589ac1cc7c",
+      "assigned": 33,
+      "completed": 32,
+      "censored": 1,
+      "applied": 31,
+      "viewed": 18,
+      "clicked": 14,
+      "failed": 2,
+      "meanReward": 0.21527777777777776,
+      "standardError": 0.06766308454949928
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-ff22d78932197c36",
+      "assigned": 34,
+      "completed": 31,
+      "censored": 3,
+      "applied": 33,
+      "viewed": 18,
+      "clicked": 14,
+      "failed": 1,
+      "meanReward": 0.3870967741935485,
+      "standardError": 0.07896700790688123
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-440d0f110beef434",
+      "assigned": 47,
+      "completed": 44,
+      "censored": 3,
+      "applied": 46,
+      "viewed": 20,
+      "clicked": 14,
+      "failed": 1,
+      "meanReward": 0.3156565656565657,
+      "standardError": 0.06757883342081437
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-9a09d133594058df",
+      "assigned": 27,
+      "completed": 24,
+      "censored": 3,
+      "applied": 25,
+      "viewed": 15,
+      "clicked": 12,
+      "failed": 2,
+      "meanReward": 0.42592592592592604,
+      "standardError": 0.09014477795427529
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-cde0317c695c39f7",
+      "assigned": 29,
+      "completed": 28,
+      "censored": 1,
+      "applied": 29,
+      "viewed": 14,
+      "clicked": 12,
+      "failed": 0,
+      "meanReward": 0.42857142857142866,
+      "standardError": 0.0837417555097588
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-a5c39f2ef96bc76a",
+      "assigned": 260,
+      "completed": 249,
+      "censored": 11,
+      "applied": 250,
+      "viewed": 149,
+      "clicked": 126,
+      "failed": 10,
+      "meanReward": 0.4417670682730917,
+      "standardError": 0.0277069941432123
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-5f47dce24ca478b1",
+      "assigned": 29,
+      "completed": 27,
+      "censored": 2,
+      "applied": 28,
+      "viewed": 16,
+      "clicked": 15,
+      "failed": 1,
+      "meanReward": 0.2345679012345679,
+      "standardError": 0.07853010480314539
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-cfbe35b771c8bdd0",
+      "assigned": 23,
+      "completed": 20,
+      "censored": 3,
+      "applied": 23,
+      "viewed": 6,
+      "clicked": 9,
+      "failed": 0,
+      "meanReward": 0.17777777777777776,
+      "standardError": 0.08236276908284564
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-93e291e5f8d53318",
+      "assigned": 30,
+      "completed": 29,
+      "censored": 1,
+      "applied": 27,
+      "viewed": 10,
+      "clicked": 13,
+      "failed": 3,
+      "meanReward": 0.33333333333333337,
+      "standardError": 0.08160495529276543
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-acdc5a4f2f95e605",
+      "assigned": 30,
+      "completed": 28,
+      "censored": 2,
+      "applied": 29,
+      "viewed": 16,
+      "clicked": 18,
+      "failed": 1,
+      "meanReward": 0.23015873015873017,
+      "standardError": 0.07044194156452037
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-378c4dba258723b5",
+      "assigned": 32,
+      "completed": 29,
+      "censored": 3,
+      "applied": 31,
+      "viewed": 13,
+      "clicked": 20,
+      "failed": 1,
+      "meanReward": 0.24904214559386972,
+      "standardError": 0.07054387984491177
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-1980f3a3def7f2f2",
+      "assigned": 28,
+      "completed": 28,
+      "censored": 0,
+      "applied": 28,
+      "viewed": 16,
+      "clicked": 11,
+      "failed": 0,
+      "meanReward": 0.34523809523809523,
+      "standardError": 0.08366859577179085
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-5130ffefe9ce7ed9",
+      "assigned": 36,
+      "completed": 32,
+      "censored": 4,
+      "applied": 34,
+      "viewed": 18,
+      "clicked": 12,
+      "failed": 2,
+      "meanReward": 0.30208333333333337,
+      "standardError": 0.07586524250872731
+    },
+    {
+      "group": "detected-001",
+      "variant": "mail-f91e50abbf5d5b6e",
+      "assigned": 35,
+      "completed": 34,
+      "censored": 1,
+      "applied": 35,
+      "viewed": 21,
+      "clicked": 14,
+      "failed": 0,
+      "meanReward": 0.47712418300653603,
+      "standardError": 0.07954578972866677
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-a99042cc1479465c",
+      "assigned": 31,
+      "completed": 29,
+      "censored": 2,
+      "applied": 30,
+      "viewed": 17,
+      "clicked": 11,
+      "failed": 1,
+      "meanReward": 0.20689655172413793,
+      "standardError": 0.07655305550699534
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-0e8c148986b609fe",
+      "assigned": 38,
+      "completed": 36,
+      "censored": 2,
+      "applied": 38,
+      "viewed": 23,
+      "clicked": 19,
+      "failed": 0,
+      "meanReward": 0.2777777777777778,
+      "standardError": 0.07570946042991633
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-5fafb3a920602765",
+      "assigned": 33,
+      "completed": 32,
+      "censored": 1,
+      "applied": 33,
+      "viewed": 20,
+      "clicked": 14,
+      "failed": 0,
+      "meanReward": 0.15625,
+      "standardError": 0.06521328221627366
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-ff6dfe626e85c5a8",
+      "assigned": 39,
+      "completed": 35,
+      "censored": 4,
+      "applied": 39,
+      "viewed": 21,
+      "clicked": 15,
+      "failed": 0,
+      "meanReward": 0.08571428571428572,
+      "standardError": 0.04800960288096034
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-a097e67578c31e46",
+      "assigned": 30,
+      "completed": 30,
+      "censored": 0,
+      "applied": 29,
+      "viewed": 18,
+      "clicked": 15,
+      "failed": 1,
+      "meanReward": 0.26666666666666666,
+      "standardError": 0.0821175682735253
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-e21b053a0844a600",
+      "assigned": 33,
+      "completed": 31,
+      "censored": 2,
+      "applied": 32,
+      "viewed": 16,
+      "clicked": 14,
+      "failed": 1,
+      "meanReward": 0.0967741935483871,
+      "standardError": 0.05397806622800488
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-b177afe6cc93686a",
+      "assigned": 35,
+      "completed": 31,
+      "censored": 4,
+      "applied": 34,
+      "viewed": 20,
+      "clicked": 14,
+      "failed": 1,
+      "meanReward": 0.03225806451612903,
+      "standardError": 0.03225806451612903
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-7fd3778558d5785c",
+      "assigned": 30,
+      "completed": 28,
+      "censored": 2,
+      "applied": 29,
+      "viewed": 19,
+      "clicked": 15,
+      "failed": 1,
+      "meanReward": 0.14285714285714285,
+      "standardError": 0.06734350297014739
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-5c7542a2ecc9f2ec",
+      "assigned": 278,
+      "completed": 264,
+      "censored": 14,
+      "applied": 272,
+      "viewed": 155,
+      "clicked": 151,
+      "failed": 6,
+      "meanReward": 0.4393939393939394,
+      "standardError": 0.030603989986757625
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-e44628f0a6983cad",
+      "assigned": 27,
+      "completed": 26,
+      "censored": 1,
+      "applied": 27,
+      "viewed": 15,
+      "clicked": 12,
+      "failed": 0,
+      "meanReward": 0.34615384615384615,
+      "standardError": 0.09514859136040756
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-664d7d544968b7dd",
+      "assigned": 24,
+      "completed": 23,
+      "censored": 1,
+      "applied": 23,
+      "viewed": 12,
+      "clicked": 11,
+      "failed": 1,
+      "meanReward": 0.34782608695652173,
+      "standardError": 0.10154334054280735
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-e8e6482c73118849",
+      "assigned": 26,
+      "completed": 25,
+      "censored": 1,
+      "applied": 24,
+      "viewed": 13,
+      "clicked": 10,
+      "failed": 2,
+      "meanReward": 0.24,
+      "standardError": 0.08717797887081348
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-232f4534bdace885",
+      "assigned": 39,
+      "completed": 39,
+      "censored": 0,
+      "applied": 35,
+      "viewed": 16,
+      "clicked": 13,
+      "failed": 4,
+      "meanReward": 0.28205128205128205,
+      "standardError": 0.07299934324587595
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-b5ca57bec3b8145b",
+      "assigned": 37,
+      "completed": 37,
+      "censored": 0,
+      "applied": 36,
+      "viewed": 21,
+      "clicked": 13,
+      "failed": 1,
+      "meanReward": 0.32432432432432434,
+      "standardError": 0.07802030664724673
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-4f0b13d853297a31",
+      "assigned": 36,
+      "completed": 36,
+      "censored": 0,
+      "applied": 35,
+      "viewed": 14,
+      "clicked": 11,
+      "failed": 1,
+      "meanReward": 0.3611111111111111,
+      "standardError": 0.08118935126220325
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-0df2777004b7ebd3",
+      "assigned": 35,
+      "completed": 31,
+      "censored": 4,
+      "applied": 35,
+      "viewed": 24,
+      "clicked": 14,
+      "failed": 0,
+      "meanReward": 0.3225806451612903,
+      "standardError": 0.08534681648595453
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-fd0f4466b6b0408c",
+      "assigned": 32,
+      "completed": 29,
+      "censored": 3,
+      "applied": 32,
+      "viewed": 17,
+      "clicked": 13,
+      "failed": 0,
+      "meanReward": 0.29118773946360155,
+      "standardError": 0.08223852874283918
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-2c9b9387f6edf23a",
+      "assigned": 30,
+      "completed": 29,
+      "censored": 1,
+      "applied": 29,
+      "viewed": 14,
+      "clicked": 14,
+      "failed": 1,
+      "meanReward": 0.16091954022988503,
+      "standardError": 0.06676379689854856
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-bb1205b007a6c3ff",
+      "assigned": 30,
+      "completed": 29,
+      "censored": 1,
+      "applied": 30,
+      "viewed": 14,
+      "clicked": 14,
+      "failed": 0,
+      "meanReward": 0.16091954022988503,
+      "standardError": 0.06676379689854856
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-11bf1d3c0f39c7d8",
+      "assigned": 28,
+      "completed": 26,
+      "censored": 2,
+      "applied": 27,
+      "viewed": 18,
+      "clicked": 16,
+      "failed": 1,
+      "meanReward": 0.1752136752136752,
+      "standardError": 0.07192194696209034
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-e14f81bbc9764ac3",
+      "assigned": 37,
+      "completed": 35,
+      "censored": 2,
+      "applied": 32,
+      "viewed": 13,
+      "clicked": 16,
+      "failed": 5,
+      "meanReward": 0.15873015873015872,
+      "standardError": 0.05996259066272628
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-2378b57889f6cda9",
+      "assigned": 33,
+      "completed": 29,
+      "censored": 4,
+      "applied": 32,
+      "viewed": 17,
+      "clicked": 15,
+      "failed": 1,
+      "meanReward": 0.22222222222222224,
+      "standardError": 0.07459676922274236
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-1e51ab457a29d37d",
+      "assigned": 32,
+      "completed": 30,
+      "censored": 2,
+      "applied": 31,
+      "viewed": 14,
+      "clicked": 8,
+      "failed": 1,
+      "meanReward": 0.12962962962962962,
+      "standardError": 0.06145747273150194
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-3763dcac01587537",
+      "assigned": 31,
+      "completed": 30,
+      "censored": 1,
+      "applied": 30,
+      "viewed": 18,
+      "clicked": 18,
+      "failed": 1,
+      "meanReward": 0.08888888888888888,
+      "standardError": 0.04951875684721383
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-606f5a9a53fa9a99",
+      "assigned": 40,
+      "completed": 37,
+      "censored": 3,
+      "applied": 38,
+      "viewed": 18,
+      "clicked": 17,
+      "failed": 2,
+      "meanReward": 0.22522522522522523,
+      "standardError": 0.06634983193720986
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-c4845b3083cc1a05",
+      "assigned": 31,
+      "completed": 30,
+      "censored": 1,
+      "applied": 30,
+      "viewed": 18,
+      "clicked": 16,
+      "failed": 1,
+      "meanReward": 0.24444444444444446,
+      "standardError": 0.07541569204792088
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-2ba0d8d8285281ae",
+      "assigned": 30,
+      "completed": 28,
+      "censored": 2,
+      "applied": 27,
+      "viewed": 13,
+      "clicked": 10,
+      "failed": 3,
+      "meanReward": 0.3373015873015873,
+      "standardError": 0.08732496613905802
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-b8745c8df5db17c2",
+      "assigned": 34,
+      "completed": 31,
+      "censored": 3,
+      "applied": 34,
+      "viewed": 22,
+      "clicked": 18,
+      "failed": 0,
+      "meanReward": 0.3082437275985663,
+      "standardError": 0.08174872175805682
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-3d80b2f8d133ac0a",
+      "assigned": 34,
+      "completed": 32,
+      "censored": 2,
+      "applied": 33,
+      "viewed": 10,
+      "clicked": 9,
+      "failed": 1,
+      "meanReward": 0.2916666666666667,
+      "standardError": 0.07789130219853813
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-e42aed9d9a48e672",
+      "assigned": 31,
+      "completed": 29,
+      "censored": 2,
+      "applied": 31,
+      "viewed": 14,
+      "clicked": 10,
+      "failed": 0,
+      "meanReward": 0.29118773946360155,
+      "standardError": 0.08223852874283918
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-6d629712906c3db0",
+      "assigned": 40,
+      "completed": 38,
+      "censored": 2,
+      "applied": 36,
+      "viewed": 18,
+      "clicked": 19,
+      "failed": 4,
+      "meanReward": 0.3216374269005849,
+      "standardError": 0.07352020503468082
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-57394197b19dbef9",
+      "assigned": 34,
+      "completed": 34,
+      "censored": 0,
+      "applied": 33,
+      "viewed": 17,
+      "clicked": 15,
+      "failed": 1,
+      "meanReward": 0.28431372549019607,
+      "standardError": 0.07682424531242694
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-e71714b93315ca95",
+      "assigned": 29,
+      "completed": 28,
+      "censored": 1,
+      "applied": 28,
+      "viewed": 18,
+      "clicked": 19,
+      "failed": 1,
+      "meanReward": 0.2738095238095238,
+      "standardError": 0.07741203644655836
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-efc0daecbe8812fb",
+      "assigned": 23,
+      "completed": 22,
+      "censored": 1,
+      "applied": 23,
+      "viewed": 17,
+      "clicked": 11,
+      "failed": 0,
+      "meanReward": 0.21717171717171715,
+      "standardError": 0.08787215313893744
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-2e7025589ac1cc7c",
+      "assigned": 25,
+      "completed": 23,
+      "censored": 2,
+      "applied": 24,
+      "viewed": 13,
+      "clicked": 14,
+      "failed": 1,
+      "meanReward": 0.2222222222222222,
+      "standardError": 0.0805606664742454
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-ff22d78932197c36",
+      "assigned": 35,
+      "completed": 34,
+      "censored": 1,
+      "applied": 35,
+      "viewed": 15,
+      "clicked": 17,
+      "failed": 0,
+      "meanReward": 0.09803921568627452,
+      "standardError": 0.04709017243273812
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-440d0f110beef434",
+      "assigned": 23,
+      "completed": 22,
+      "censored": 1,
+      "applied": 21,
+      "viewed": 9,
+      "clicked": 11,
+      "failed": 2,
+      "meanReward": 0.18686868686868688,
+      "standardError": 0.07575757575757576
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-9a09d133594058df",
+      "assigned": 38,
+      "completed": 37,
+      "censored": 1,
+      "applied": 36,
+      "viewed": 21,
+      "clicked": 16,
+      "failed": 2,
+      "meanReward": 0.0900900900900901,
+      "standardError": 0.043448517345767185
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-cde0317c695c39f7",
+      "assigned": 38,
+      "completed": 36,
+      "censored": 2,
+      "applied": 36,
+      "viewed": 24,
+      "clicked": 21,
+      "failed": 2,
+      "meanReward": 0.11419753086419754,
+      "standardError": 0.048388919993249416
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-a5c39f2ef96bc76a",
+      "assigned": 31,
+      "completed": 31,
+      "censored": 0,
+      "applied": 31,
+      "viewed": 17,
+      "clicked": 11,
+      "failed": 0,
+      "meanReward": 0.14695340501792115,
+      "standardError": 0.0617001258479109
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-5f47dce24ca478b1",
+      "assigned": 36,
+      "completed": 35,
+      "censored": 1,
+      "applied": 35,
+      "viewed": 21,
+      "clicked": 20,
+      "failed": 1,
+      "meanReward": 0.4000000000000001,
+      "standardError": 0.07583952786593613
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-cfbe35b771c8bdd0",
+      "assigned": 29,
+      "completed": 27,
+      "censored": 2,
+      "applied": 29,
+      "viewed": 13,
+      "clicked": 13,
+      "failed": 0,
+      "meanReward": 0.3004115226337448,
+      "standardError": 0.08425204561229753
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-93e291e5f8d53318",
+      "assigned": 35,
+      "completed": 33,
+      "censored": 2,
+      "applied": 33,
+      "viewed": 20,
+      "clicked": 18,
+      "failed": 2,
+      "meanReward": 0.3097643097643098,
+      "standardError": 0.07329518568254068
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-acdc5a4f2f95e605",
+      "assigned": 28,
+      "completed": 25,
+      "censored": 3,
+      "applied": 27,
+      "viewed": 12,
+      "clicked": 10,
+      "failed": 1,
+      "meanReward": 0.3244444444444444,
+      "standardError": 0.08933222774329681
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-378c4dba258723b5",
+      "assigned": 29,
+      "completed": 27,
+      "censored": 2,
+      "applied": 27,
+      "viewed": 17,
+      "clicked": 11,
+      "failed": 2,
+      "meanReward": 0.2551440329218107,
+      "standardError": 0.07796405469294351
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-1980f3a3def7f2f2",
+      "assigned": 35,
+      "completed": 34,
+      "censored": 1,
+      "applied": 34,
+      "viewed": 18,
+      "clicked": 15,
+      "failed": 1,
+      "meanReward": 0.38888888888888895,
+      "standardError": 0.07726110823108764
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-5130ffefe9ce7ed9",
+      "assigned": 34,
+      "completed": 32,
+      "censored": 2,
+      "applied": 33,
+      "viewed": 19,
+      "clicked": 15,
+      "failed": 1,
+      "meanReward": 0.2222222222222222,
+      "standardError": 0.0698465063437458
+    },
+    {
+      "group": "detected-002",
+      "variant": "mail-f91e50abbf5d5b6e",
+      "assigned": 34,
+      "completed": 31,
+      "censored": 3,
+      "applied": 32,
+      "viewed": 16,
+      "clicked": 13,
+      "failed": 2,
+      "meanReward": 0.10035842293906812,
+      "standardError": 0.04760417983049174
+    }
+  ]
+}

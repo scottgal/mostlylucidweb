@@ -34,3 +34,7 @@ The app binds to loopback by default and is a demonstration host, not a deployed
 One bounded Relevance worker serves the two engines; one log-monitor hosted service processes structured observations. Shutdown drains logs before stopping the engine worker. SQLite persists product representations, state, transitions, decision attribution and deduplication records. No neural network, external model service or runtime download is needed.
 
 Core API: [Mostlylucid.Relevance](../Mostlylucid.Relevance/README.md). Research and remaining work: [Part 2 plan](../docs/relevance/part2-implementation-plan.md).
+
+## Email intervention lab (Part 4)
+
+Open `/experiments.html` in the running demo. Replay observed shop visits, select an email, inspect parsed link occurrences and vectors, edit/rewrite/review a new version, then record actual demo stages and outcomes. Run the seeded population to see detected groups and uniform/adaptive policy results. No real mail is sent. See [RelevanceLearning](../samples/RelevanceLearning) for reproducible commands, captured output and optional maxo/Ollama configuration.

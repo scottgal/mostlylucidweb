@@ -1,0 +1,224 @@
+[
+  {
+    "draft": {
+      "subject": "Your walking shortlist",
+      "html": "<!doctype html><html><body><div class=\"preheader\" style=\"display:none\">Your walking shortlist, together.</div><header><a href=\"https://fieldwork.example/\">Fieldwork</a></header><main><h1>Your walking shortlist</h1><p>You compared walking boots during your visit. Here is the pair you looked at, with the details together.</p><p>Take another look at the fit, the materials and the available sizes before deciding whether these are right for your walks.</p><p>Compare the product details with your shortlist. You can return to the same selection without starting the search again.</p><p>Your basket is a place to keep possibilities together. There is no need to complete a purchase to review the information.</p><p>The full product page has the current sizes and materials for this pair of boots.</p><p><a class=\"cta\" href=\"https://fieldwork.example/products/walking-boots?utm_source=email\">View the walking boots for £100.00</a></p><p>Need help choosing? Reply to ask about your shortlist.</p></main><footer><a href=\"https://fieldwork.example/unsubscribe\">Unsubscribe</a></footer></body></html>",
+      "originalPrice": 100,
+      "offerPrice": 100,
+      "delayMinutes": 40,
+      "author": "template-generator-v1",
+      "control": true
+    },
+    "structure": {
+      "subject": "Your walking shortlist",
+      "preheader": "Your walking shortlist, together.",
+      "visibleText": "Fieldwork Your walking shortlist You compared walking boots during your visit. Here is the pair you looked at, with the details together. Take another look at the fit, the materials and the available sizes before deciding whether these are right for your walks. Compare the product details with your shortlist. You can return to the same selection without starting the search again. Your basket is a place to keep possibilities together. There is no need to complete a purchase to review the information. The full product page has the current sizes and materials for this pair of boots. View the walking boots for £100.00 Need help choosing? Reply to ask about your shortlist. Unsubscribe",
+      "words": 115,
+      "images": 0,
+      "altCoverage": null,
+      "headings": [
+        "Your walking shortlist"
+      ],
+      "links": [
+        {
+          "id": "link-01",
+          "text": "Fieldwork",
+          "originalHref": "https://fieldwork.example/",
+          "destination": "https://fieldwork.example/",
+          "region": "header",
+          "buttonLike": false,
+          "unsubscribe": false,
+          "textPosition": 0
+        },
+        {
+          "id": "link-02",
+          "text": "View the walking boots for £100.00",
+          "originalHref": "https://fieldwork.example/products/walking-boots?utm_source=email",
+          "destination": "https://fieldwork.example/products/walking-boots",
+          "region": "body",
+          "buttonLike": true,
+          "unsubscribe": false,
+          "textPosition": 0.8519593613933236
+        },
+        {
+          "id": "link-03",
+          "text": "Unsubscribe",
+          "originalHref": "https://fieldwork.example/unsubscribe",
+          "destination": "https://fieldwork.example/unsubscribe",
+          "region": "footer",
+          "buttonLike": false,
+          "unsubscribe": true,
+          "textPosition": 0.9825834542815675
+        }
+      ],
+      "primaryCta": {
+        "id": "link-02",
+        "text": "View the walking boots for £100.00",
+        "originalHref": "https://fieldwork.example/products/walking-boots?utm_source=email",
+        "destination": "https://fieldwork.example/products/walking-boots",
+        "region": "body",
+        "buttonLike": true,
+        "unsubscribe": false,
+        "textPosition": 0.8519593613933236
+      },
+      "primaryDestinationOccurrences": 1
+    },
+    "semantics": {
+      "producer": "literal-phrases",
+      "version": "v1",
+      "deliveryExplanation": 0,
+      "offersHelp": 1
+    },
+    "variant": {
+      "id": "mail-5fafb3a920602765",
+      "features": [
+        0,
+        0.8519593613933236,
+        0,
+        0.6666666666666666,
+        0.25
+      ],
+      "candidate": {
+        "id": "mail-5fafb3a920602765",
+        "Subject": "Your walking shortlist",
+        "Html": "<!doctype html><html><body><div class=\"preheader\" style=\"display:none\">Your walking shortlist, together.</div><header><a href=\"https://fieldwork.example/\">Fieldwork</a></header><main><h1>Your walking shortlist</h1><p>You compared walking boots during your visit. Here is the pair you looked at, with the details together.</p><p>Take another look at the fit, the materials and the available sizes before deciding whether these are right for your walks.</p><p>Compare the product details with your shortlist. You can return to the same selection without starting the search again.</p><p>Your basket is a place to keep possibilities together. There is no need to complete a purchase to review the information.</p><p>The full product page has the current sizes and materials for this pair of boots.</p><p><a class=\"cta\" href=\"https://fieldwork.example/products/walking-boots?utm_source=email\">View the walking boots for £100.00</a></p><p>Need help choosing? Reply to ask about your shortlist.</p></main><footer><a href=\"https://fieldwork.example/unsubscribe\">Unsubscribe</a></footer></body></html>",
+        "OriginalPrice": 100,
+        "OfferPrice": 100,
+        "DelayMinutes": 40,
+        "Author": "template-generator-v1",
+        "content_hash": "5FAFB3A9206027659B40FC96FF681B02C6E2537FCB6CCBC87BFFCB8DAFA6EDAC",
+        "Producer": "literal-phrases",
+        "Version": "v1",
+        "structure": [
+          0.8519593613933236,
+          0.3,
+          0.23,
+          0,
+          0.25
+        ],
+        "meaning": [
+          0,
+          1
+        ],
+        "timing": [
+          0.6666666666666666
+        ],
+        "offer": [
+          0
+        ]
+      },
+      "control": true
+    }
+  },
+  {
+    "draft": {
+      "subject": "Your walking shortlist",
+      "html": "<!doctype html><html><body><div class=\"preheader\" style=\"display:none\">Your walking shortlist, together.</div><header><a href=\"https://fieldwork.example/\">Fieldwork</a></header><main><h1>Your walking shortlist</h1><p>You compared walking boots during your visit. Here is the pair you looked at, with the details together.</p><p><a class=\"cta\" href=\"https://fieldwork.example/products/walking-boots?utm_source=email\">View the walking boots for £95.00</a></p><p>Take another look at the fit, the materials and the available sizes before deciding whether these are right for your walks.</p><p>Compare the product details with your shortlist. You can return to the same selection without starting the search again.</p><p>Your basket is a place to keep possibilities together. There is no need to complete a purchase to review the information.</p><p>The full product page has the current sizes and materials for this pair of boots.</p><p>Need help choosing? Reply to ask about your shortlist.</p></main><footer><a href=\"https://fieldwork.example/unsubscribe\">Unsubscribe</a></footer></body></html>",
+      "originalPrice": 100,
+      "offerPrice": 95.0,
+      "delayMinutes": 10,
+      "author": "template-generator-v1",
+      "control": false
+    },
+    "structure": {
+      "subject": "Your walking shortlist",
+      "preheader": "Your walking shortlist, together.",
+      "visibleText": "Fieldwork Your walking shortlist You compared walking boots during your visit. Here is the pair you looked at, with the details together. View the walking boots for £95.00 Take another look at the fit, the materials and the available sizes before deciding whether these are right for your walks. Compare the product details with your shortlist. You can return to the same selection without starting the search again. Your basket is a place to keep possibilities together. There is no need to complete a purchase to review the information. The full product page has the current sizes and materials for this pair of boots. Need help choosing? Reply to ask about your shortlist. Unsubscribe",
+      "words": 115,
+      "images": 0,
+      "altCoverage": null,
+      "headings": [
+        "Your walking shortlist"
+      ],
+      "links": [
+        {
+          "id": "link-01",
+          "text": "Fieldwork",
+          "originalHref": "https://fieldwork.example/",
+          "destination": "https://fieldwork.example/",
+          "region": "header",
+          "buttonLike": false,
+          "unsubscribe": false,
+          "textPosition": 0
+        },
+        {
+          "id": "link-02",
+          "text": "View the walking boots for £95.00",
+          "originalHref": "https://fieldwork.example/products/walking-boots?utm_source=email",
+          "destination": "https://fieldwork.example/products/walking-boots",
+          "region": "body",
+          "buttonLike": true,
+          "unsubscribe": false,
+          "textPosition": 0.2005813953488372
+        },
+        {
+          "id": "link-03",
+          "text": "Unsubscribe",
+          "originalHref": "https://fieldwork.example/unsubscribe",
+          "destination": "https://fieldwork.example/unsubscribe",
+          "region": "footer",
+          "buttonLike": false,
+          "unsubscribe": true,
+          "textPosition": 0.9825581395348837
+        }
+      ],
+      "primaryCta": {
+        "id": "link-02",
+        "text": "View the walking boots for £95.00",
+        "originalHref": "https://fieldwork.example/products/walking-boots?utm_source=email",
+        "destination": "https://fieldwork.example/products/walking-boots",
+        "region": "body",
+        "buttonLike": true,
+        "unsubscribe": false,
+        "textPosition": 0.2005813953488372
+      },
+      "primaryDestinationOccurrences": 1
+    },
+    "semantics": {
+      "producer": "literal-phrases",
+      "version": "v1",
+      "deliveryExplanation": 0,
+      "offersHelp": 1
+    },
+    "variant": {
+      "id": "mail-606f5a9a53fa9a99",
+      "features": [
+        0.5,
+        0.2005813953488372,
+        0,
+        0.16666666666666666,
+        0.25
+      ],
+      "candidate": {
+        "id": "mail-606f5a9a53fa9a99",
+        "Subject": "Your walking shortlist",
+        "Html": "<!doctype html><html><body><div class=\"preheader\" style=\"display:none\">Your walking shortlist, together.</div><header><a href=\"https://fieldwork.example/\">Fieldwork</a></header><main><h1>Your walking shortlist</h1><p>You compared walking boots during your visit. Here is the pair you looked at, with the details together.</p><p><a class=\"cta\" href=\"https://fieldwork.example/products/walking-boots?utm_source=email\">View the walking boots for £95.00</a></p><p>Take another look at the fit, the materials and the available sizes before deciding whether these are right for your walks.</p><p>Compare the product details with your shortlist. You can return to the same selection without starting the search again.</p><p>Your basket is a place to keep possibilities together. There is no need to complete a purchase to review the information.</p><p>The full product page has the current sizes and materials for this pair of boots.</p><p>Need help choosing? Reply to ask about your shortlist.</p></main><footer><a href=\"https://fieldwork.example/unsubscribe\">Unsubscribe</a></footer></body></html>",
+        "OriginalPrice": 100,
+        "OfferPrice": 95.0,
+        "DelayMinutes": 10,
+        "Author": "template-generator-v1",
+        "content_hash": "606F5A9A53FA9A99BE59FFD5105CC5E4767EAEA3F8D2F7A4FC2F07C9417C18D6",
+        "Producer": "literal-phrases",
+        "Version": "v1",
+        "structure": [
+          0.2005813953488372,
+          0.3,
+          0.23,
+          0,
+          0.25
+        ],
+        "meaning": [
+          0,
+          1
+        ],
+        "timing": [
+          0.16666666666666666
+        ],
+        "offer": [
+          0.5
+        ]
+      },
+      "control": false
+    }
+  }
+]

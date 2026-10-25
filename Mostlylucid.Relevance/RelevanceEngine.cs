@@ -147,8 +147,25 @@ public sealed class RelevanceEngine : IAsyncDisposable
         return worker.EnqueueAsync(ct => RecommendCoreAsync(subject, placement, snapshot, count, ct), cancellationToken);
     }
 
+    /// <summary>Ranks eligible candidates without retaining a recommendation/feedback record.</summary>
+    /// <param name="subject">Entity or detected-group identity whose observed summaries form the query.</param>
+    /// <param name="placement">Configured eligibility rules and ranking heads.</param>
+    /// <param name="filter">Additional portable eligibility constraints.</param>
+    /// <param name="count">Maximum returned candidates within the configured window.</param>
+    /// <param name="cancellationToken">Cancellation before the read completes.</param>
+    /// <remarks>Useful when an experiment owns its own durable assignment ledger. This neither records exposure nor accepts
+    /// feedback through a recommendation ID. Use RecommendAsync when the core should retain that attribution record.</remarks>
+    public ValueTask<IReadOnlyList<Recommendation>> RankAsync(string subject, string placement,
+        Filter? filter = null, int count = 10, CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(disposed != 0, this);
+        var snapshot = Filter.Snapshot(filter);
+        return worker.EnqueueAsync<IReadOnlyList<Recommendation>>(async ct =>
+            (await RecommendCoreAsync(subject, placement, snapshot, count, ct, retain: false)).Items, cancellationToken);
+    }
+
     private ValueTask<RecommendationResult> RecommendCoreAsync(string subject, string placement,
-        Filter? filter, int count, CancellationToken cancellationToken)
+        Filter? filter, int count, CancellationToken cancellationToken, bool retain = true)
     {
         if (string.IsNullOrWhiteSpace(subject)) throw new ArgumentException("Subject is required.");
         if (!definition.Placements.TryGetValue(placement, out var area)) throw new ArgumentException($"Unknown placement '{placement}'.");
@@ -192,8 +209,11 @@ public sealed class RelevanceEngine : IAsyncDisposable
                 items = tx.Eligible(definition.Id, eligibility, count)
                     .Select(c => new Recommendation(c.Id, 0, c.Data, Array.Empty<Contribution>())).ToArray();
             var result = new RecommendationResult(Guid.NewGuid().ToString("N"), subject, placement, items);
-            tx.Put(definition.Id, "decision", result.Id, result, now.AddHours(definition.DecisionRetentionHours));
-            if (tx.Count(definition.Id, "decision") > definition.MaxDecisions) throw new InvalidOperationException("Decision capacity reached.");
+            if (retain)
+            {
+                tx.Put(definition.Id, "decision", result.Id, result, now.AddHours(definition.DecisionRetentionHours));
+                if (tx.Count(definition.Id, "decision") > definition.MaxDecisions) throw new InvalidOperationException("Decision capacity reached.");
+            }
             return result;
         }, cancellationToken);
     }
