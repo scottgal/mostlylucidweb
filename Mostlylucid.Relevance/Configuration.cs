@@ -45,6 +45,37 @@ public sealed class RelevanceDefinition
     /// <summary>Named recommendation surfaces, each with mandatory rules and ranking heads.</summary>
     public Dictionary<string, PlacementDefinition> Placements { get; set; } = [];
 
+    /// <summary>Creates a usable single-vector recommender with the built-in converter, streams and ranking head.</summary>
+    /// <param name="dimensions">Length of each candidate's vector array, from 1 through 65536.</param>
+    /// <param name="metric">l2 for measured coordinates, or cosine for compatible nonzero vectors.</param>
+    /// <param name="filters">Optional scalar metadata paths made available for eligibility constraints.</param>
+    /// <returns>A mutable starting definition; engines freeze it when opened.</returns>
+    /// <remarks>
+    /// Save candidates to items with id/vector fields. Save interactions to events with id/subject/candidate/type;
+    /// type observe or helpful adds positive evidence. Use placement next and point traits. The outcomes stream
+    /// accepts attributed feedback. Destinations require application-defined states before PredictAsync is used.
+    /// This baseline needs no custom converter, provider or predictor implementation.
+    /// </remarks>
+    public static RelevanceDefinition ForVectors(int dimensions, string metric = "l2", IEnumerable<string>? filters = null)
+    {
+        if (dimensions is < 1 or > 65536) throw new ArgumentOutOfRangeException(nameof(dimensions));
+        var definition = new RelevanceDefinition
+        {
+            Id = "vectors-v1",
+            Filters = filters?.ToList() ?? [],
+            Streams = new()
+            {
+                ["items"] = new() { Kind = "candidate" },
+                ["events"] = new() { Kind = "observation", Weights = new() { ["observe"] = 1, ["helpful"] = 1 } },
+                ["outcomes"] = new() { Kind = "feedback" }
+            },
+            Points = new() { ["traits"] = new() { Path = "vector", Converter = "vector", Dimensions = dimensions, Metric = metric } },
+            Placements = new() { ["next"] = new() { Heads = new() { ["traits"] = 1 } } }
+        };
+        definition.Validate();
+        return definition;
+    }
+
     /// <summary>Parses strict YAML, rejecting duplicate and unknown keys; call Validate before using the result.</summary>
     [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("YAML uses reflection. Use FromJson or a typed definition for Native AOT.")]
     [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("YAML uses runtime type discovery. Use FromJson for Native AOT.")]

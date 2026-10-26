@@ -6,6 +6,7 @@ Durable storage and vector retrieval for [Mostlylucid.Relevance](../Mostlylucid.
 using Mostlylucid.Relevance;
 using Mostlylucid.Relevance.Sqlite;
 
+var definition = RelevanceDefinition.ForVectors(2, filters: ["available"]);
 await using var hub = new RelevanceHub(new SqliteRelevanceFactory("./relevance-data"));
 var products = await hub.OpenAsync(new RelevanceSpace(authorisedTenant, "products"), definition);
 ```

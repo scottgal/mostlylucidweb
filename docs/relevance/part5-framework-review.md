@@ -4,7 +4,7 @@ Reviewed the embedded package API, not an HTTP authentication layer. Host config
 
 ## Implemented boundaries
 
-- Existing Save/Recommend/Predict operations are retained. RelatedAsync adds one named-space neighbour query; RelevanceHub and RelevanceSpace add multi-domain ownership rather than a second recommendation API.
+- ForVectors supplies a usable vector baseline without custom components. Existing Save/Recommend/Predict operations are retained. RelatedAsync adds one named-space neighbour query; RelevanceHub and RelevanceSpace add multi-domain ownership rather than a second recommendation API.
 - Constructor snapshots and generated JSON metadata preserve representation contracts. Internal serializers have no reflection fallback or warning suppression. YAML and reflection-based generic input have explicit AOT annotations; JSON/typed metadata paths are verified natively.
 - Tenant/space keys are structured, hashed compound identities. Same candidate/subject IDs in separate spaces stay isolated. Shard paths use validated identifiers. Topology changes fail instead of silently remapping data.
 - Payloads, IDs, filter depth/node count, queue admission, open-space count and retained records have bounds. A rejected operation does not terminate the worker.
@@ -21,4 +21,4 @@ Reviewed the embedded package API, not an HTTP authentication layer. Host config
 
 ## Local evidence
 
-96 tests passed with both RELEVANCE_SQLITE_VEC and RELEVANCE_SQLITE_HNSW set. Added cases cover multi-space persistence/isolation, topology, related filtering, HNSW replacement/rollback/new-table rollback, ownership conflicts, recall against exact distances, excessive input/filters, mandatory-rule conjunction and SQL-shaped values. The macOS ARM64 Native AOT consumer runs both from project references and actual local NuGet packages, including native asset discovery, learning and reopen. The workflow verifies three host RIDs before assembling a full native package; those other-platform results are not claimed as already run locally.
+97 tests passed with both RELEVANCE_SQLITE_VEC and RELEVANCE_SQLITE_HNSW set. Added cases cover multi-space persistence/isolation, topology, related filtering, HNSW replacement/rollback/new-table rollback, ownership conflicts, recall against exact distances, excessive input/filters, mandatory-rule conjunction and SQL-shaped values. The macOS ARM64 Native AOT consumer runs both from project references and actual local NuGet packages, including native asset discovery, learning and reopen. The workflow verifies three host RIDs before assembling a full native package; those other-platform results are not claimed as already run locally.

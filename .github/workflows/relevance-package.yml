@@ -85,9 +85,24 @@ jobs:
           pattern: sqlite-vector-*
           path: Mostlylucid.Sqlite.Vector/runtimes
           merge-multiple: true
-      - name: Pack complete, verified runtime set
-        run: dotnet pack Mostlylucid.Sqlite.Vector -c Release -o artifacts/packages
+      - name: Pack ready-to-use framework feed and verified runtime set
+        shell: bash
+        run: |
+          for project in Mostlylucid.Relevance Mostlylucid.Relevance.Sqlite Mostlylucid.Relevance.Learning Mostlylucid.Sqlite.Vector; do
+            dotnet pack "$project" -c Release -o artifacts/packages
+          done
+          cat > artifacts/packages/NuGet.Config <<'CONFIG'
+          <?xml version="1.0" encoding="utf-8"?>
+          <configuration>
+            <packageSources>
+              <clear />
+              <add key="relevance-preview" value="." />
+              <add key="nuget.org" value="https://api.nuget.org/v3/index.json" />
+            </packageSources>
+          </configuration>
+          CONFIG
+          cp Mostlylucid.Relevance/AGENTS.md artifacts/packages/AGENTS.md
       - uses: actions/upload-artifact@v4
         with:
-          name: sqlite-vector-nuget
-          path: artifacts/packages/*.nupkg
+          name: relevance-nuget-packages
+          path: artifacts/packages/

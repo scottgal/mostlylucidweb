@@ -1,6 +1,6 @@
 # Mostlylucid.Relevance: please change this
 
-This framework is intended to be adapted. Explain the application's decision first, then choose a representation, outcome and provider. Keep integration small. This file ships in the NuGet packages; ask the coding assistant to read it explicitly. NuGet does not inject it into an application's agent context.
+This framework works with its supplied converters, SQLite provider, ranker, destination predictors and intervention learner. Start with RelevanceDefinition.ForVectors(dimensions) for a vector recommender; customise only when the application needs different behaviour. Explain the application's decision first, then choose a representation, outcome and provider. Keep integration small. This file ships in the NuGet packages; ask the coding assistant to read it explicitly. NuGet does not inject it into an application's agent context.
 
 ## Read before editing
 

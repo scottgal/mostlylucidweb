@@ -6,12 +6,13 @@ This is an initial .NET 10 preview. Packages are buildable locally; they have no
 
 ## Quick start
 
-Reference `Mostlylucid.Relevance.Sqlite` and supply a typed definition or `RelevanceDefinition.FromJson(...)`. The [package sample](../samples/RelevancePackage/Program.cs) includes a complete definition and generated input metadata for .NET 10 and Native AOT.
+Reference `Mostlylucid.Relevance.Sqlite` and start with `RelevanceDefinition.ForVectors(dimensions)`, a typed definition, or `RelevanceDefinition.FromJson(...)`. The [package sample](../samples/RelevancePackage/Program.cs) includes a complete definition and generated input metadata for .NET 10 and Native AOT.
 
 ```csharp
 using Mostlylucid.Relevance;
 using Mostlylucid.Relevance.Sqlite;
 
+var definition = RelevanceDefinition.ForVectors(2, filters: ["available"]);
 await using var hub = new RelevanceHub(new SqliteRelevanceFactory("./relevance-data"));
 var relevance = await hub.OpenAsync(new RelevanceSpace(authorisedTenant, "products"), definition);
 
@@ -22,7 +23,7 @@ var result = await relevance.RecommendAsync("entity-1", "next",
     Filter.Eq("available", true), count: 2);
 ```
 
-`items`, `events` and `next` are configuration names from the sample. `item` and `observation` are application inputs; `AppJson` is the application's generated JSON context. The first save upserts a candidate, the second updates the entity's evidence. Awaiting a save means its commit completed before the next operation.
+`ForVectors` supplies `items`/`events`/`outcomes` streams, the `traits` point and the `next` placement. Observation type `observe` adds affinity, and `helpful` supports the learner's positive-response bridge. No custom converter, provider or ranking implementation is required. `item` and `observation` are application inputs; `AppJson` is the application's generated JSON context. The first save upserts a candidate, the second updates the entity's evidence. Awaiting a save means its commit completed before the next operation.
 
 Start with one space and default exact search. Add another `RelevanceSpace` for a different tenant/domain; add `Mostlylucid.Sqlite.Vector` only when SQLite-owned HNSW is useful. The hub owns returned engines and drains them on disposal. The application authorises the tenant before opening a space.
 

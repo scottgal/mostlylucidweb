@@ -14,6 +14,22 @@ public sealed class PackageTests
     };
 
     [Fact]
+    public async Task ShippedVectorDefaultsWorkWithoutCustomComponents()
+    {
+        var definition = RelevanceDefinition.ForVectors(2, filters: ["available"]);
+        await using var engine = new RelevanceEngine(definition, new MemoryRelevanceStore());
+        await engine.SaveAsync("items", new { id = "a", vector = new[] { .1, .2 }, available = true });
+        await engine.SaveAsync("items", new { id = "b", vector = new[] { .2, .3 }, available = false });
+        await engine.SaveAsync("events", new { id = "event-1", subject = "customer", candidate = "a", type = "observe" });
+        var result = await engine.RecommendAsync("customer", "next", Filter.Eq("available", true), 1);
+        Assert.Equal("a", Assert.Single(result.Items).Id);
+        await engine.SaveAsync("outcomes", new { id = "reward-1", recommendation = result.Id, candidate = "a", reward = 1.0 });
+        Assert.Equal("b", Assert.Single(await engine.RelatedAsync("a", "traits", count: 1)).Candidate.Id);
+        Assert.Throws<ArgumentOutOfRangeException>(() => RelevanceDefinition.ForVectors(0));
+        Assert.Throws<ArgumentException>(() => RelevanceDefinition.ForVectors(2, "unsupported"));
+    }
+
+    [Fact]
     public async Task SpacesIsolateTheSameCandidateAndSubjectIdentitiesAndSurviveReopen()
     {
         var directory = Path.Combine(Path.GetTempPath(), "relevance-hub-" + Guid.NewGuid().ToString("N"));

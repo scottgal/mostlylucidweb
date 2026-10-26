@@ -1,6 +1,6 @@
 # A small framework consumer
 
-This sample exercises one API across product, email and operational-action domains. Domains reuse the machinery, not each other's incompatible feature spaces. A two-file shard factory routes each whole tenant/space with rendezvous hashing and checks a persisted topology manifest. It also exercises outcome learning and database reopen.
+The sample starts with the shipped `RelevanceDefinition.ForVectors` baseline; it needs no custom converter, store or learner implementation. It exercises one API across product, email and operational-action domains. Domains reuse the machinery, not each other's incompatible feature spaces. A two-file shard factory routes each whole tenant/space with rendezvous hashing and checks a persisted topology manifest. It also exercises outcome learning and database reopen.
 
 The sample disables reflection-based JSON serialization and treats compiler warnings as errors. Its inputs use a source-generated JSON context. The core, SQLite and optional learning packages are marked AOT-compatible; the native executable is the verification, not the annotation alone.
 
@@ -28,3 +28,9 @@ Generate sources with `python scripts/relevance/write-nuget-config.py <local-fee
 Tenant identities are resolved and authorised by the calling application. Definitions, converters, provider factories, paths and native libraries are trusted startup configuration. Each opened engine is owned by the hub. Reuse the hub and avoid competing processes opening the same native vector tables. Database backup must include committed WAL state through SQLite's backup API.
 
 See the shipped [agent guide](../../Mostlylucid.Relevance/AGENTS.md) for modification recipes and invariants. Package status is local preview; no public NuGet release is claimed.
+
+## Get and use a preview
+
+Download `relevance-nuget-packages` from a successful **Relevance packages and Native AOT** workflow run. Extract the artifact into a local feed directory. It includes all four packages, a `NuGet.Config` pointing at that directory and NuGet.org, and the agent guide. Restore a consuming application with `--configfile <feed-directory>/NuGet.Config`. Public NuGet.org publication is still pending; the preview feed is usable as supplied.
+
+Customisation is optional. The vector baseline works directly; application-specific destination states and intervention objectives are configuration, not missing inference implementations.

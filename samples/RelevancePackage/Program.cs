@@ -8,18 +8,7 @@ using Mostlylucid.Sqlite.Vector;
 var root = args.Length > 0 ? args[0] : Path.Combine(Path.GetTempPath(), "relevance-package-" + Guid.NewGuid().ToString("N"));
 var vectors = args.Length > 1 ? new SqliteVectorOptions { ExtensionPath = args[1] == "bundled" ? SqliteVectorExtension.Path : args[1] } : null;
 var factory = new SqliteRelevanceFactory(root, ["east", "west"], vectors);
-var definition = new RelevanceDefinition
-{
-    Id = "reusable-definition",
-    Filters = ["available"],
-    Streams = new()
-    {
-        ["items"] = new() { Kind = "candidate" },
-        ["events"] = new() { Kind = "observation", Weights = new() { ["helpful"] = 1 } }
-    },
-    Points = new() { ["traits"] = new() { Path = "vector", Converter = "vector", Dimensions = 2 } },
-    Placements = new() { ["next"] = new() { Heads = new() { ["traits"] = 1 } } }
-};
+var definition = RelevanceDefinition.ForVectors(2, filters: ["available"]);
 definition = RelevanceDefinition.FromJson(RelevanceJson.Serialize(definition));
 // Different domains reuse the machinery, not each other's incompatible vectors or learned state.
 var domains = new[] { new RelevanceSpace("shop", "products"), new RelevanceSpace("shop", "emails"), new RelevanceSpace("ops", "actions") };

@@ -1,6 +1,6 @@
-> COMING SOON
-
 # SHOW ME WHAT YOU GOT (Part 5): Please Change This
+
+> COMING SOON - Working on the nuget package, stay tuned!
 
 In [Part 4](/blog/show-me-what-you-got-part4-mind-control), the recommendation became an intervention. We characterised a proposed change, applied it under an experiment and learned from the observed response. An email could be a candidate in the same way that a product was a candidate in Part 2. A service incident could supply a behavioural trajectory in the same way that a shopping session did in Part 3.
 
@@ -8,9 +8,11 @@ The domain kept changing. The mathematical jobs were remarkably consistent: repr
 
 This part turns that shared machinery into a small framework: **Mostlylucid.Relevance**. It runs in the application's process, keeps its state in SQLite and can handle several recommendation domains at once. An optional native package gives SQLite an HNSW vector index. Its store boundary remains replaceable, so a PostgreSQL implementation can preserve the same application-facing operations.
 
+It is ready to use with the supplied implementations: built-in vector converters, SQLite persistence, ranking, destination predictors and intervention learning. Configuration supplies the meaning of your data and objectives. Custom implementations are an option when those supplied components no longer fit.
+
 It is also my first deliberately **“please change this” package**. Alongside the code, the packages ship an `AGENTS.md` describing the decisions, extension points and invariants. The intention is to give a developer and their coding assistant a useful starting point for adapting the framework to their own problem.
 
-That does not mean asking a model to rewrite the whole engine. It means making the places where change belongs easy to identify, while explaining what must remain true when they change.
+Use it as supplied first. The agent guide helps a developer or coding assistant customise an already working system, with clear extension points and invariants.
 
 <datetime class="hidden">2026-10-26T12:00</datetime>
 <!-- category -- AI,Architecture,Machine Learning,Recommendations,C#,SQLite,Native AOT -->
@@ -43,9 +45,11 @@ The [working package sample](https://github.com/scottgal/mostlylucidweb/tree/mai
 
 A **space** is a tenant-local recommendation domain. It owns a candidate catalogue, entity summaries, representations, outcome evidence and schema binding.
 
-Begin with one SQLite-backed space. Its definition supplies the points, streams and placements introduced in [Part 2](/blog/show-me-what-you-got-part2-building-relevance). In the companion sample, those routes are called `items`, `events` and `next`:
+Begin with the shipped vector baseline and one SQLite-backed space. `ForVectors` supplies the converter, streams and ranking head introduced in [Part 2](/blog/show-me-what-you-got-part2-building-relevance). You supply the vector length and any filter fields:
 
 ```csharp
+var definition = RelevanceDefinition.ForVectors(2, filters: ["available"]);
+
 await using var hub = new RelevanceHub(
     new SqliteRelevanceFactory("./relevance-data"));
 
@@ -58,6 +62,8 @@ await products.SaveAsync("events", observation, AppJson.Default.Observation);
 var result = await products.RecommendAsync(
     "entity-1", "next", Filter.Eq("available", true), count: 2);
 ```
+
+The preset names its candidate stream `items`, observation stream `events`, vector point `traits` and recommendation placement `next`. An observation of type `observe` contributes positive affinity; the `helpful` type also supports the learning layer's observed-response bridge. These defaults work without implementing an interface.
 
 The first save adds or updates a candidate. The second records what the entity did. The recommendation then uses the committed evidence and returns eligible candidates with their ranking reasons. `item` and `observation` are application data; the `AppJson` arguments supply generated serialization metadata, which we will return to in the AOT section.
 
@@ -236,7 +242,7 @@ This is also a practical extension point. A different prediction strategy can co
 
 # Learning: The Intervention Loop From Part 4
 
-[Mostlylucid.Relevance.Learning](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid.Relevance.Learning/InterventionLearning.cs) is the optional layer for choosing a change and observing what follows. The exact email or operational configuration becomes a candidate. The entity's observed context, the intervention descriptor and the eventual reward remain separate records.
+[Mostlylucid.Relevance.Learning](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid.Relevance.Learning/InterventionLearning.cs) is the separately packaged layer for choosing a change and observing what follows. The exact email or operational configuration becomes a candidate. The entity's observed context, the intervention descriptor and the eventual reward remain separate records.
 
 Its three operations follow the loop from [Part 4](/blog/show-me-what-you-got-part4-mind-control):
 
@@ -340,18 +346,20 @@ This is the purpose of “please change this”: offer a small implementation wh
 
 The native executable exercises recommendations in three independent domains, relationship search, observed intervention reward and persistence after reopening. It also runs as a consumer of the packed NuGet packages, so the test checks native asset delivery rather than succeeding because a developer copied a library into the output directory.
 
-The local test run has 96 passing tests, including both the existing sqlite-vec path and the new SQLite-owned HNSW path. They check isolation and persistence, compare approximate retrieval with exact distances, and exercise the input and eligibility boundaries. The [review notes](https://github.com/scottgal/mostlylucidweb/blob/main/docs/relevance/part5-framework-review.md) retain the detailed coverage.
+The local test run has 97 passing tests, including both the existing sqlite-vec path and the new SQLite-owned HNSW path. They check isolation and persistence, compare approximate retrieval with exact distances, and exercise the input and eligibility boundaries. The [review notes](https://github.com/scottgal/mostlylucidweb/blob/main/docs/relevance/part5-framework-review.md) retain the detailed coverage.
 
-These are unpublished preview packages. The repository includes the cross-platform native build and package-consumer workflow; local success on one host is not a claim that all platform jobs have already passed.
+These are unpublished preview packages. The completed cross-platform checks cover Windows x64, Linux x64 and macOS ARM64, including native extension builds, tests and AOT consumers of the actual packages. The workflow assembles all four packages into a downloadable feed; publication to NuGet.org is a separate release step.
 
 The native extension's connection model is also explicit. It assumes one live writer/connection per vector table, with graph reconciliation on reconnect. The provider holds a per-space ownership lease and rejects competing .NET provider instances; independent SQLite clients must respect the same single-owner contract. Reuse the hub. Use SQLite's backup API when backing up a live database, so committed WAL state is included.
 
 The [package sample](https://github.com/scottgal/mostlylucidweb/tree/main/samples/RelevancePackage) contains the verification commands and the [agent guide](https://github.com/scottgal/mostlylucidweb/blob/main/Mostlylucid.Relevance/AGENTS.md) contains the adaptation recipes. The article concentrates on why those boundaries exist.
 
-# Where Sequential Decisions Fit
+# Use It First, Then Customise It
 
-The package gives us representations, online summaries, trajectory predictions and candidate retrieval. The optional learner connects an intervention with its observed reward, using the contextual-bandit approach from [Part 4](/blog/show-me-what-you-got-part4-mind-control).
+The implementation covers the progression from Parts 1–4: characterise observations, update evidence as it arrives, retrieve relevant candidates, predict configured destinations and learn which permitted interventions produce useful observed outcomes.
 
-A sequence of interventions introduces another question. A rate-limit change may improve latency while building a backlog that changes the next decision. Learning that policy requires evidence about transitions, longer-term objectives and credit across the sequence. A longer reward window alone does not supply those relationships.
+For a vector recommender, start with `ForVectors`, save candidates and interactions, then request recommendations. For destination prediction, configure the application's states, outcomes and timescale and use the shipped predictor. For interventions, include the learning package, register the allowed variants and control, then report their observed results. Those components are implemented and usable without writing a new learner.
 
-That future learner can use the recorded states, actions and outcomes. Its transition model and evaluation belong at the prediction/learning boundary, leaving the application-facing representation and storage contracts available to reuse.
+Customisation begins with configuration: different axes, event weights, placements, eligibility rules and objectives. New converters, predictors or stores are extension points when the application needs them. The supplied SQLite provider, built-in representations and statistical learners remain a working starting point.
+
+“Please change this” is an invitation to adapt a useful package to your domain. It is not a request to finish the package before you can use it.
