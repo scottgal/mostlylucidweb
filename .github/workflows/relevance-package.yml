@@ -102,6 +102,13 @@ jobs:
           </configuration>
           CONFIG
           cp Mostlylucid.Relevance/AGENTS.md artifacts/packages/AGENTS.md
+      - name: Verify the assembled feed as a consumer would use it
+        shell: bash
+        run: |
+          dotnet restore samples/RelevancePackage -r linux-x64 -p:UsePackedRelevance=true \
+            --configfile artifacts/packages/NuGet.Config
+          dotnet publish samples/RelevancePackage -c Release -r linux-x64 -p:UsePackedRelevance=true --no-restore -o "$RUNNER_TEMP/feed-consumer"
+          "$RUNNER_TEMP/feed-consumer/RelevancePackage" "$RUNNER_TEMP/feed-consumer-data" bundled
       - uses: actions/upload-artifact@v4
         with:
           name: relevance-nuget-packages
