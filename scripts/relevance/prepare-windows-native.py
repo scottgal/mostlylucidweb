@@ -49,7 +49,7 @@ manifest = source / 'Cargo.toml'
 text = manifest.read_text()
 assert 'usearch = "2"' in text and '[patch.crates-io]' not in text
 # The framework uses F32 vectors. Avoid unsupported MSVC half-precision SIMD intrinsics.
-text = text.replace('usearch = "2"', 'usearch = { version = "2", default-features = false }')
+text = text.replace('usearch = "2"', 'usearch = { version = "2", default-features = false, features = ["fp16lib"] }')
 text += '\n[patch.crates-io]\nusearch = { path = "compat/usearch" }\nsqlite3_ext = { path = "compat/sqlite3_ext" }\n'
 manifest.write_text(text)
 
@@ -65,7 +65,7 @@ assert re.findall(r'name = "([^"\n]+)"\nversion = "([^"\n]+)"', text) == before
 lock.write_text(text)
 (source / 'windows-compatibility.json').write_text(json.dumps({
     'sqlite3_ext': '0.2.0: Windows UTF-8 path helper; invalid Unicode and NUL rejected',
-    'usearch': '2.24.0: Windows allocator null check; optional SIMD/FP16 features disabled',
+    'usearch': '2.24.0: Windows allocator null check; optional SIMD kernels disabled; portable FP16 conversion retained',
     'upstream_checksums': {f'{name}/{relative}': expected for name, _, relative, expected in patches},
 }, indent=2) + '\n')
 print('Prepared private Windows compatibility dependencies; all locked versions preserved.')

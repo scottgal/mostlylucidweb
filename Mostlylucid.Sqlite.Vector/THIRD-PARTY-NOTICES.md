@@ -7,4 +7,4 @@ The upstream Cargo.lock pins its dependencies, including USearch and Arrow.
 The build retains dependency SPDX declarations and available license/notice texts under licenses/ in the package. See licenses/dependencies.json for exact versions and source repositories.
 No upstream affiliation or endorsement is implied.
 
-Windows assets include documented dependency compatibility modifications: sqlite3_ext 0.2.0 gains a Windows UTF-8 path helper; USearch 2.24.0 uses the Windows allocator failure condition and disables optional SIMD/FP16 features. The original source checksums and modifications are retained in licenses/windows-compatibility.json. Dependency versions are unchanged.
+Windows assets include documented dependency compatibility modifications: sqlite3_ext 0.2.0 gains a Windows UTF-8 path helper; USearch 2.24.0 uses the Windows allocator failure condition and disables optional SIMD kernels while retaining portable FP16 conversion. The original source checksums and modifications are retained in licenses/windows-compatibility.json. Dependency versions are unchanged.
