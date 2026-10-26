@@ -31,6 +31,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Website articles include filenames that Windows cannot materialise.
+          # Include the demo's linked Product.cs as well as all package/test dependencies.
+          sparse-checkout: |
+            Mostlylucid.Relevance
+            Mostlylucid.Relevance.Sqlite
+            Mostlylucid.Relevance.Learning
+            Mostlylucid.Relevance.Tests
+            Mostlylucid.Relevance.Demo
+            Mostlylucid.AudienceSegmentation.Demo/Models
+            Mostlylucid.Sqlite.Vector
+            samples
+            scripts/relevance
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
