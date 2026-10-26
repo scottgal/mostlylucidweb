@@ -1,61 +1,65 @@
 # Mostlylucid.Relevance.Sqlite
 
-Durable SQLite provider for [Mostlylucid.Relevance](../Mostlylucid.Relevance/README.md), with one setup call:
+Durable storage and vector retrieval for [Mostlylucid.Relevance](../Mostlylucid.Relevance/README.md). Start with one SQLite file and the same engine used throughout the series:
 
 ```csharp
-await using var engine = await SqliteRelevance.OpenAsync("relevance.yaml");
-```
+using Mostlylucid.Relevance;
+using Mostlylucid.Relevance.Sqlite;
 
-The database defaults to the YAML file's path with a `.db` extension. Supply a second path to choose another location. For an existing .NET host, call `services.AddRelevanceSqlite("relevance.yaml")` and inject `RelevanceEngine`.
-
-The provider stores candidates, separate versioned vector points, aggregate state, transition counts, decision attribution and deduplication records. Save/update operations are atomic. WAL, FULL synchronous mode, foreign keys and a busy timeout are configured. All operations within an engine flow through the bounded hosted-service channel. SQLite calls themselves use the synchronous API because Microsoft.Data.Sqlite does not implement asynchronous SQLite I/O.
-
-## Vector search modes
-
-The default has no additional native-extension setup: vectors are float32 BLOBs in normal tables and an engine-registered exact distance function evaluates them. This is a correctness-first, no-extension baseline, not a large-scale ANN index.
-
-To use an installed, pinned sqlite-vec extension:
-
-```csharp
-await using var engine = await SqliteRelevance.OpenAsync(
-    "relevance.yaml", vectorExtensionPath: "/installed/extensions/vec0.dylib");
-```
-
-The extension is loaded with its explicit entry point and checked with `vec_version()`. Failure is surfaced rather than silently changing modes. Both modes enforce eligibility in the same SQL query **before ORDER BY/LIMIT**. Native search currently uses scalar distance functions over ordinary BLOB columns, retaining full supported filter semantics; `vec0` virtual-table acceleration is not implemented in this preview.
-
-`SqliteRelevanceStore.SearchMode` identifies the implementation. The native v0.1.9 release was smoke-tested on macOS ARM64; Windows and Linux remain subject to their native package CI checks; the later section describes the now-verified local AOT path. Native binaries are not bundled or downloaded at runtime. A managed-only installation still uses the SQLite native runtime supplied by Microsoft.Data.Sqlite.
-
-## Portable query intent
-
-`Filter` is a small storage-independent tree. `SqliteFilterCompiler` converts the current subset to parameterised SQLite SQL over declared JSON properties. It does not accept arbitrary SQL or compile the entire inference engine into SQL. PostgreSQL/SQL Server providers will need their own dialect/compiler and equivalent filter semantics.
-
-A future sidecar can host the same engine and reuse those query contracts. HTTP hosting and other SQL providers are planned; there is no remote service in this preview.
-
-## Verification
-
-Run all tests including native distance parity:
-
-```sh
-dotnet test Mostlylucid.Relevance.Tests/Mostlylucid.Relevance.Tests.csproj \
-  --environment RELEVANCE_SQLITE_VEC=/installed/extensions/vec0.dylib
-```
-
-Without that variable, the explicit native test is skipped; managed SQLite and memory-provider tests still run. Performance crossover points have not been benchmarked. See the [research and release gates](../docs/relevance/part2-implementation-plan.md).
-
-## SQLite-owned HNSW and named shards
-
-The optional [Mostlylucid.Sqlite.Vector](../Mostlylucid.Sqlite.Vector/README.md) package carries the pinned sqlite-vector-rs extension and AOT-compatible asset discovery:
-
-```csharp
-var vectors = new SqliteVectorOptions { ExtensionPath = SqliteVectorExtension.Path };
-await using var hub = new RelevanceHub(new SqliteRelevanceFactory("./data", ["east", "west"], vectors));
+await using var hub = new RelevanceHub(new SqliteRelevanceFactory("./relevance-data"));
 var products = await hub.OpenAsync(new RelevanceSpace(authorisedTenant, "products"), definition);
 ```
 
-Each named point/signature/space gets a SQLite virtual table. The extension owns its HNSW graph and persists it in shadow tables inside SQLite. Upserts and rollback are checked against the ordinary authoritative rows. No managed HNSW library or separate index file/service is used. A held per-space file lease rejects competing .NET provider owners of the same native space. Independent SQLite clients do not participate in that lease. Connections must not compete over the same vector table: use one live hub per set of spaces. Existing native graphs are refreshed on reopen, not live between independent connections.
+`definition` supplies the configured points, streams, placements and optional destinations. Use a typed definition or `RelevanceDefinition.FromJson` for Native AOT; the [package sample](../samples/RelevancePackage/Program.cs) includes a complete working example. The application authorises the tenant before opening a space. The hub owns returned engines and drains accepted work on disposal.
 
-Unfiltered retrieval can use HNSW. Queries with eligibility constraints use the existing exact SQL path, including mandatory placement restrictions. This preserves correctness while keeping the first adapter small. `SearchMode` reports the configured policy; it does not claim every query used ANN. Distances are returned in core units, including the square root of squared-L2 backend distances. Approximate candidate discovery may miss true neighbours; validate recall against exact search.
+## Start with exact search
 
-`SqliteRelevanceFactory` persists a topology manifest and refuses changes to shard names that would silently reroute data. Shards partition complete tenant/spaces. One large catalogue is not distributed across files, and no cross-shard transaction or distributed top-K is claimed. The provider factory remains replaceable by a PostgreSQL implementation.
+The default needs no vector-extension setup. It stores float32 vectors in ordinary tables and registers an exact distance function with SQLite. Eligibility is evaluated before ordering and limiting results. This supports small catalogues and supplies the reference for testing approximate retrieval.
 
-Native AOT has now been published and executed locally on macOS ARM64 with both exact and SQLite-owned HNSW search, plus learning and reopen checks. The dedicated package workflow verifies host packages on Linux x64, Windows x64 and macOS ARM64 before assembling release assets. Native binaries are supplied through NuGet; no runtime download or consumer-side Rust toolchain is required. These packages remain unpublished previews.
+Candidates, their named representations, subject/model state, attribution and deduplication are stored transactionally. WAL, FULL synchronous mode, foreign keys and a busy timeout are configured. The bounded engine worker orders operations; Microsoft.Data.Sqlite's actual database calls are synchronous.
+
+## Enable SQLite-owned HNSW when useful
+
+Add the separate [Mostlylucid.Sqlite.Vector](../Mostlylucid.Sqlite.Vector/README.md) native-assets package and supply its pinned extension:
+
+```csharp
+using Mostlylucid.Sqlite.Vector;
+
+var vectors = new SqliteVectorOptions { ExtensionPath = SqliteVectorExtension.Path };
+var stores = new SqliteRelevanceFactory("./relevance-data", vectors: vectors);
+await using var hub = new RelevanceHub(stores);
+```
+
+Use this factory in place of the exact-only factory above. Save, recommend, predict and related-candidate calls stay the same. The package carries the platform library; no runtime download or consumer-side Rust build is required. Packages remain unpublished previews.
+
+Each point/signature/space gets a native virtual table. The extension owns its HNSW graph and persists it in SQLite shadow tables. No separate managed graph or external index file/service is used. Unfiltered retrieval can use HNSW; queries with eligibility constraints use exact SQL, including mandatory placement restrictions. `SearchMode` describes that policy, not a promise that every query uses ANN. Distances retain core units, and recall must be checked against the exact baseline.
+
+The extension refreshes graphs on reconnect, not between independent live connections. A per-space lease rejects competing .NET provider owners of the same native space; independent SQLite clients must respect the same single-owner contract. Reuse one live hub per set of spaces. Back up an active database through SQLite's backup API to include committed WAL state.
+
+## Add independent domains and shards
+
+Open another `RelevanceSpace` to isolate another tenant/domain. One file remains sufficient until separate shard files are useful:
+
+```csharp
+var stores = new SqliteRelevanceFactory("./sharded-relevance-data", ["east", "west"], vectors);
+```
+
+Choose this topology when creating a new data directory. Each complete tenant/space routes to one shard so state, candidates and attribution remain atomic. The persisted manifest rejects topology changes that would silently reroute existing data; migrate explicitly into a new directory. This is whole-space partitioning, not distributed top-K within one large catalogue.
+
+## Provider and filter contracts
+
+`Filter` expresses typed comparisons and conjunctions. `SqliteFilterCompiler` generates parameterised SQL over declared JSON properties; it accepts no arbitrary query SQL. Other providers implement their own equivalent semantics through `IRelevanceStore` and `IRelevanceStoreFactory`. See the shipped [agent guide](../Mostlylucid.Relevance/AGENTS.md) for invariants and adaptation recipes.
+
+For existing JIT integrations, `SqliteRelevance.OpenAsync("relevance.yaml")` still opens one owned engine, and `services.AddRelevanceSqlite(...)` registers one hosted engine. The optional `vectorExtensionPath` argument on that convenience API selects **sqlite-vec scalar exact distances**, not HNSW. It requires an operator-installed binary, loads its explicit entry point and verifies `vec_version()`; failures propagate. Use `SqliteVectorOptions` for the SQLite-owned HNSW path above.
+
+## Verification
+
+Run the suite with both native paths enabled when the corresponding binaries are installed:
+
+```sh
+RELEVANCE_SQLITE_VEC=/installed/vec0.dylib \
+RELEVANCE_SQLITE_HNSW=/installed/libsqlite_vector_rs.dylib \
+dotnet test Mostlylucid.Relevance.Tests -c Release
+```
+
+Unset variables explicitly skip their native tests. Local macOS ARM64 verification includes published Native AOT consumers of the actual NuGet packages, exercising exact/HNSW search, learning and reopening. The dedicated workflow builds and verifies Linux x64, Windows x64 and macOS ARM64 packages before assembling the complete native asset set. Performance crossover points have not been benchmarked.

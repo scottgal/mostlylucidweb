@@ -6,29 +6,27 @@ This is an initial .NET 10 preview. Packages are buildable locally; they have no
 
 ## Quick start
 
-Reference `Mostlylucid.Relevance.Sqlite`, then provide a YAML definition like [the shop example](../samples/RelevanceShop/relevance.yaml).
+Reference `Mostlylucid.Relevance.Sqlite` and supply a typed definition or `RelevanceDefinition.FromJson(...)`. The [package sample](../samples/RelevancePackage/Program.cs) includes a complete definition and generated input metadata for .NET 10 and Native AOT.
 
 ```csharp
 using Mostlylucid.Relevance;
 using Mostlylucid.Relevance.Sqlite;
 
-await using var relevance = await SqliteRelevance.OpenAsync("relevance.yaml");
+await using var hub = new RelevanceHub(new SqliteRelevanceFactory("./relevance-data"));
+var relevance = await hub.OpenAsync(new RelevanceSpace(authorisedTenant, "products"), definition);
 
-await relevance.SaveAsync("products", product);
-await relevance.SaveAsync("events", new
-{
-    id = eventId, subject = sessionId, candidate = productId, type = "view"
-});
+await relevance.SaveAsync("items", item, AppJson.Default.Item);
+await relevance.SaveAsync("events", observation, AppJson.Default.Observation);
 
-var result = await relevance.RecommendAsync(sessionId, "home",
-    Filter.All(Filter.Eq("category", "outdoors"), Filter.Lte("price", 120)));
-
-var prediction = await relevance.PredictAsync(sessionId); // Requires configured destinations.
+var result = await relevance.RecommendAsync("entity-1", "next",
+    Filter.Eq("available", true), count: 2);
 ```
 
-`SaveAsync` accepts existing objects. Its first argument chooses a configured input stream. Candidates are upserted; observations update live state; feedback updates retrieval-head reliability.
+`items`, `events` and `next` are configuration names from the sample. `item` and `observation` are application inputs; `AppJson` is the application's generated JSON context. The first save upserts a candidate, the second updates the entity's evidence. Awaiting a save means its commit completed before the next operation.
 
-In an existing Generic Host or ASP.NET Core app, use `services.AddRelevanceSqlite("relevance.yaml")` and inject `RelevanceEngine`. The same `RelevanceWorker` is registered as the hosted service. The standalone factory starts and owns that worker for you.
+Start with one space and default exact search. Add another `RelevanceSpace` for a different tenant/domain; add `Mostlylucid.Sqlite.Vector` only when SQLite-owned HNSW is useful. The hub owns returned engines and drains them on disposal. The application authorises the tenant before opening a space.
+
+For JIT applications, the existing YAML convenience remains available: `await SqliteRelevance.OpenAsync("relevance.yaml")` opens one owned engine using [the shop definition](../samples/RelevanceShop/relevance.yaml), and the generic `SaveAsync` overload accepts ordinary objects. An existing Generic Host can use `services.AddRelevanceSqlite("relevance.yaml")` and inject that single `RelevanceEngine`. Use the hub when several domains are required; use JSON or generated input metadata for Native AOT.
 
 ## What happens in the background?
 

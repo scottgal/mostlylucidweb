@@ -17,7 +17,6 @@ Reviewed the embedded package API, not an HTTP authentication layer. Host config
 - Native ownership leases do not coordinate arbitrary external SQLite clients. Use a trusted data directory and one owner of each native space.
 - The SQLite factory partitions whole tenant/spaces; no hot-catalog fan-out, automatic migration or cross-shard atomic transaction is implemented.
 - sqlite-vector-rs is a pinned, young opt-in backend. Default exact SQL remains independent. Native RAM/latency is not benchmarked here; binary sizes are not RAM measurements.
-- SeekStorm.Bindings 0.2.4 is a viable embedded/AOT alternative for hybrid search. Its pinned-engine filtered-vector compatibility path and a separate authoritative-state/retrieval consistency contract need provider-specific qualification. No unsupported SeekStorm adapter is claimed.
 - JSON/typed configuration is the supported AOT route. Generated custom provider metadata is required explicitly.
 
 ## Local evidence
