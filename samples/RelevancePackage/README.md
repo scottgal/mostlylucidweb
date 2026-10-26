@@ -21,7 +21,7 @@ A second argument may instead be an operator-selected absolute path to sqlite-ve
 
 Build a native runtime with `scripts/relevance/build-sqlite-vector.sh <rid>`. Pack core, SQLite, Learning and Mostlylucid.Sqlite.Vector into a local feed. A host-only test pack explicitly uses `-p:AllowPartialNativePackage=true`; a complete package requires every declared RID.
 
-Publish this consumer with `-p:UsePackedRelevance=true --source <local-feed> --source https://api.nuget.org/v3/index.json`, then run both modes from the published directory. Do not manually copy the extension: the point is to test the NuGet runtime asset selection. The workflow does this independently on linux-x64, osx-arm64 and win-x64 before assembling a complete native-assets package. Those jobs do not publish to NuGet.org.
+Generate sources with `python scripts/relevance/write-nuget-config.py <local-feed> <config-path>`, restore with `dotnet restore samples/RelevancePackage -r <rid> -p:UsePackedRelevance=true --configfile <config-path>`, then publish with the same RID/property and `--no-restore`. The configuration file avoids URL/path rewriting in Windows shells. Run both modes from the published directory. Do not manually copy the extension: the point is to test the NuGet runtime asset selection. The workflow does this independently on linux-x64, osx-arm64 and win-x64 before assembling a complete native-assets package. Those jobs do not publish to NuGet.org.
 
 ## Trust boundary
 

@@ -57,8 +57,10 @@ jobs:
       - name: Publish actual NuGet consumer with Native AOT
         shell: bash
         run: |
-          dotnet publish samples/RelevancePackage -c Release -r '${{ matrix.rid }}' -o "$RUNNER_TEMP/aot" -p:UsePackedRelevance=true \
-            --source "$RUNNER_TEMP/feed" --source https://api.nuget.org/v3/index.json
+          python scripts/relevance/write-nuget-config.py "$RUNNER_TEMP/feed" "$RUNNER_TEMP/relevance-nuget.config"
+          dotnet restore samples/RelevancePackage -r '${{ matrix.rid }}' -p:UsePackedRelevance=true \
+            --configfile "$RUNNER_TEMP/relevance-nuget.config"
+          dotnet publish samples/RelevancePackage -c Release -r '${{ matrix.rid }}' -o "$RUNNER_TEMP/aot" -p:UsePackedRelevance=true --no-restore
       - name: Run published consumer without copying native libraries
         shell: bash
         run: |
