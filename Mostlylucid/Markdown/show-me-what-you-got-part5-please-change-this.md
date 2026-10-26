@@ -1,3 +1,5 @@
+> COMING SOON
+
 # SHOW ME WHAT YOU GOT (Part 5): Please Change This
 
 In [Part 4](/blog/show-me-what-you-got-part4-mind-control), the recommendation became an intervention. We characterised a proposed change, applied it under an experiment and learned from the observed response. An email could be a candidate in the same way that a product was a candidate in Part 2. A service incident could supply a behavioural trajectory in the same way that a shopping session did in Part 3.
