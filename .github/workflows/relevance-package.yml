@@ -31,48 +31,14 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-        if: runner.os != 'Windows'
-        with:
-          # Website articles include filenames that Windows cannot materialise.
-          # Include the demo's linked Product.cs as well as all package/test dependencies.
-          sparse-checkout: |
-            Mostlylucid.Relevance
-            Mostlylucid.Relevance.Sqlite
-            Mostlylucid.Relevance.Learning
-            Mostlylucid.Relevance.Tests
-            Mostlylucid.Relevance.Demo
-            Mostlylucid.AudienceSegmentation.Demo/Models
-            Mostlylucid.Sqlite.Vector
-            samples
-            scripts/relevance
-      - name: Export package sources on Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $PSNativeCommandUseErrorActionPreference = $true
-          # Git for Windows rejects invalid paths even outside a sparse working tree.
-          # Archive selected paths from a bare repository, without creating that index.
-          $sourceRepo = Join-Path $env:RUNNER_TEMP 'relevance-source.git'
-          $archive = Join-Path $env:RUNNER_TEMP 'relevance-source.tar'
-          git init --bare $sourceRepo
-          git -C $sourceRepo remote add origin "https://github.com/$env:GITHUB_REPOSITORY.git"
-          git -C $sourceRepo fetch --depth=1 --filter=blob:none origin $env:GITHUB_SHA
-          $paths = @(
-            'Mostlylucid.Relevance', 'Mostlylucid.Relevance.Sqlite',
-            'Mostlylucid.Relevance.Learning', 'Mostlylucid.Relevance.Tests',
-            'Mostlylucid.Relevance.Demo', 'Mostlylucid.AudienceSegmentation.Demo/Models',
-            'Mostlylucid.Sqlite.Vector', 'Mostlylucid.Relevance.slnx',
-            'samples', 'scripts/relevance'
-          )
-          git -C $sourceRepo archive --format=tar "--output=$archive" FETCH_HEAD -- @paths
-          tar -xf $archive -C $env:GITHUB_WORKSPACE
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Check portable repository paths
+        run: python scripts/relevance/check-portable-paths.py
       - uses: dtolnay/rust-toolchain@stable
       - name: Build pinned SQLite extension
         shell: bash
