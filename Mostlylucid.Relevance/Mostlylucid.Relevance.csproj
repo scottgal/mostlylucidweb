@@ -6,6 +6,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
     <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
     <Version>0.1.0-preview.1</Version>
     <Description>In-process streaming relevance with configured vectorisation, filtered retrieval and adaptive rank fusion.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -15,5 +16,6 @@
     <PackageReference Include="YamlDotNet" Version="16.3.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
     <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="AGENTS.md" Pack="true" PackagePath="/AGENTS.md" />
   </ItemGroup>
 </Project>

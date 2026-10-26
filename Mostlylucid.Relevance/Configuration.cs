@@ -46,11 +46,26 @@ public sealed class RelevanceDefinition
     public Dictionary<string, PlacementDefinition> Placements { get; set; } = [];
 
     /// <summary>Parses strict YAML, rejecting duplicate and unknown keys; call Validate before using the result.</summary>
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("YAML uses reflection. Use FromJson or a typed definition for Native AOT.")]
+    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("YAML uses runtime type discovery. Use FromJson for Native AOT.")]
     public static RelevanceDefinition FromYaml(string yaml) => new DeserializerBuilder()
         .WithNamingConvention(UnderscoredNamingConvention.Instance)
         .WithDuplicateKeyChecking()
         .WithAttemptingUnquotedStringTypeDeserialization()
         .Build().Deserialize<RelevanceDefinition>(yaml) ?? throw new ArgumentException("Empty configuration.");
+
+    /// <summary>Loads configuration using generated JSON metadata; supported in Native AOT.</summary>
+    public static RelevanceDefinition FromJson(string json)
+    {
+        if (Encoding.UTF8.GetByteCount(json) > 1_048_576) throw new ArgumentException("Configuration exceeds 1 MiB.");
+        var options = new JsonSerializerOptions(CoreJsonContext.Default.Options)
+        {
+            PropertyNameCaseInsensitive = true,
+            UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow
+        };
+        return JsonSerializer.Deserialize(json, new CoreJsonContext(options).RelevanceDefinition)
+            ?? throw new ArgumentException("Empty configuration.");
+    }
 
     /// <summary>Checks identity, ranges, paths, routes, heads and destinations; converter validation occurs at engine construction.</summary>
     /// <exception cref="ArgumentException">A configuration value is inconsistent or unsupported.</exception>
@@ -92,27 +107,32 @@ public sealed class RelevanceDefinition
     /// <summary>Rejects undeclared fields, unsupported operators and non-scalar or non-finite values.</summary>
     public void ValidateFilter(Filter? filter)
     {
-        switch (filter)
+        filter = Filter.Snapshot(filter);
+        ValidateNode(filter);
+        void ValidateNode(Filter? node)
         {
-            case null: return;
-            case Conjunction and:
-                foreach (var child in and.Filters) ValidateFilter(child);
-                return;
-            case Comparison c:
-                if (!Filters.Contains(c.Field, StringComparer.Ordinal)) throw new ArgumentException($"Filter field '{c.Field}' is not declared.");
-                if (!Enum.IsDefined(c.Operator) || c.Value.ValueKind is not (JsonValueKind.String or JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False))
-                    throw new ArgumentException("Unsupported filter operation or value.");
-                if (c.Value.ValueKind == JsonValueKind.Number && !double.IsFinite(c.Value.GetDouble())) throw new ArgumentException("Filter value must be finite.");
-                if (c.Operator != ComparisonOperator.Equal && c.Value.ValueKind != JsonValueKind.Number) throw new ArgumentException("Numeric range required.");
-                return;
-            default: throw new ArgumentException("Unsupported filter.");
+            switch (node)
+            {
+                case null: return;
+                case Conjunction and:
+                    foreach (var child in and.Filters) ValidateNode(child);
+                    return;
+                case Comparison c:
+                    if (!Filters.Contains(c.Field, StringComparer.Ordinal)) throw new ArgumentException($"Filter field '{c.Field}' is not declared.");
+                    if (!Enum.IsDefined(c.Operator) || c.Value.ValueKind is not (JsonValueKind.String or JsonValueKind.Number or JsonValueKind.True or JsonValueKind.False))
+                        throw new ArgumentException("Unsupported filter operation or value.");
+                    if (c.Value.ValueKind == JsonValueKind.Number && !double.IsFinite(c.Value.GetDouble())) throw new ArgumentException("Filter value must be finite.");
+                    if (c.Operator != ComparisonOperator.Equal && c.Value.ValueKind != JsonValueKind.Number) throw new ArgumentException("Numeric range required.");
+                    return;
+                default: throw new ArgumentException("Unsupported filter.");
+            }
         }
     }
 
-    internal static string Hash(object value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value))));
+    internal static string Hash<T>(T value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(RelevanceJson.Serialize(value))));
     private static void ValidatePath(string path)
     {
-        if (!Regex.IsMatch(path, @"\A[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*\z"))
+        if (string.IsNullOrWhiteSpace(path) || path.Length > 128 || !Regex.IsMatch(path, @"\A[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-z0-9_]*)*\z"))
             throw new ArgumentException($"Invalid property path '{path}'.");
     }
 }
@@ -188,5 +208,5 @@ public sealed class PlacementDefinition
     /// <summary>Mandatory scalar equalities, combined with caller filters using AND.</summary>
     public Dictionary<string, object> Where { get; set; } = [];
     /// <summary>Builds the mandatory equality conjunction, or null if there are no placement restrictions.</summary>
-    public Filter? BuildFilter() => Where.Count == 0 ? null : new Conjunction(Where.Select(p => (Filter)new Comparison(p.Key, ComparisonOperator.Equal, JsonSerializer.SerializeToElement(p.Value))).ToArray());
+    public Filter? BuildFilter() => Where.Count == 0 ? null : new Conjunction(Where.Select(p => (Filter)new Comparison(p.Key, ComparisonOperator.Equal, RelevanceJson.Scalar(p.Value))).ToArray());
 }

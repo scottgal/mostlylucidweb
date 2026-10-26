@@ -6,6 +6,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
     <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
     <Version>0.1.0-preview.1</Version>
     <Description>SQLite persistence and optional sqlite-vec acceleration for Mostlylucid.Relevance.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -15,5 +16,6 @@
     <ProjectReference Include="../Mostlylucid.Relevance/Mostlylucid.Relevance.csproj" />
     <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
     <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="../Mostlylucid.Relevance/AGENTS.md" Pack="true" PackagePath="/AGENTS.md" />
   </ItemGroup>
 </Project>

@@ -13,6 +13,8 @@ public static class SqliteRelevance
     /// <param name="cancellationToken">Cancellation while reading configuration.</param>
     /// <returns>An engine to dispose with await using.</returns>
     /// <remarks>With no native extension, exact managed distance functions are registered in SQLite.</remarks>
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("YAML uses reflection; construct a typed definition for Native AOT.")]
+    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("YAML uses reflection; construct a typed definition for Native AOT.")]
     public static async ValueTask<RelevanceEngine> OpenAsync(string configurationPath, string? databasePath = null,
         IEnumerable<IPointConverter>? converters = null, string? vectorExtensionPath = null, CancellationToken cancellationToken = default)
     {
@@ -34,6 +36,8 @@ public static class SqliteRelevance
     /// Start the host before submitting work; let the host stop the worker and dispose the engine.
     /// These are singleton registrations for one engine, not a named multi-engine factory.
     /// </remarks>
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("YAML uses reflection; construct a typed definition for Native AOT.")]
+    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("YAML uses reflection; construct a typed definition for Native AOT.")]
     public static IServiceCollection AddRelevanceSqlite(this IServiceCollection services, string configurationPath, string? databasePath = null, string? vectorExtensionPath = null)
     {
         services.AddSingleton<RelevanceWorker>();

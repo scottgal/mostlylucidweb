@@ -21,13 +21,18 @@ public static class SqliteFilterCompiler
             parameters[key] = value;
             return key;
         }
-        string Visit(Filter? node) => node switch
+        var remaining = 64;
+        string Visit(Filter? node, int depth = 0)
+        {
+            if (depth > 16 || --remaining < 0) throw new ArgumentException("Filter complexity exceeds supported bounds.");
+            return node switch
         {
             null => "1=1",
-            Conjunction and => and.Filters.Count == 0 ? "1=1" : "(" + string.Join(" AND ", and.Filters.Select(Visit)) + ")",
+            Conjunction and => and.Filters.Count == 0 ? "1=1" : "(" + string.Join(" AND ", and.Filters.Select(child => Visit(child, depth + 1))) + ")",
             Comparison c => Compare(c),
             _ => throw new ArgumentException("Unsupported SQL filter node.")
         };
+        }
         string Compare(Comparison c)
         {
             var path = Bind("$." + c.Field);

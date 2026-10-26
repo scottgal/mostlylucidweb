@@ -445,3 +445,6 @@ A human and an LLM can both supply the next candidate. Neither gets to declare t
 The asteroid picture keeps the purpose clear: we observe a course, try a nudge and compare what follows with similar courses without it. The email vector describes the intervention we attempted. The observed journey and endpoint tell us whether it helped.
 
 The [working email lab](https://github.com/scottgal/mostlylucidweb/tree/main/Mostlylucid.Relevance.Demo) lets us inspect those stages. Its [sample README](https://github.com/scottgal/mostlylucidweb/tree/main/samples/RelevanceLearning) contains the run commands, model-host configuration and source map. The article's examples come from that code; the code is there to make the model and its evidence inspectable.
+
+
+[Part 5: Please Change This](/blog/show-me-what-you-got-part5-please-change-this) turns the shared machinery into a compact, adaptable framework, with SQLite-owned vector search, independent entity domains, sharding and a Native AOT path.

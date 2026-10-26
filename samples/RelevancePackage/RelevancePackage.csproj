@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <PublishAot>true</PublishAot>
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(UsePackedRelevance)' != 'true'">
+    <ProjectReference Include="../../Mostlylucid.Sqlite.Vector/Mostlylucid.Sqlite.Vector.csproj" />
+    <ProjectReference Include="../../Mostlylucid.Relevance.Sqlite/Mostlylucid.Relevance.Sqlite.csproj" />
+    <ProjectReference Include="../../Mostlylucid.Relevance.Learning/Mostlylucid.Relevance.Learning.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UsePackedRelevance)' == 'true'">
+    <PackageReference Include="Mostlylucid.Relevance.Sqlite" Version="0.1.0-preview.1" />
+    <PackageReference Include="Mostlylucid.Relevance.Learning" Version="0.1.0-preview.1" />
+    <PackageReference Include="Mostlylucid.Sqlite.Vector" Version="0.3.1-preview.1" />
+  </ItemGroup>
+</Project>

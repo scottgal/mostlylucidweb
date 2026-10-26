@@ -30,22 +30,33 @@ public sealed record RecommendationResult(string Id, string Subject, string Plac
 public abstract record Filter
 {
     /// <summary>Requires scalar equality without coercing numbers, strings or booleans across types.</summary>
-    public static Filter Eq(string field, object value) => new Comparison(field, ComparisonOperator.Equal, JsonSerializer.SerializeToElement(value));
+    public static Filter Eq(string field, object value) => new Comparison(field, ComparisonOperator.Equal, RelevanceJson.Scalar(value));
     /// <summary>Requires a numeric property less than or equal to the inclusive bound.</summary>
-    public static Filter Lte(string field, double value) => new Comparison(field, ComparisonOperator.LessOrEqual, JsonSerializer.SerializeToElement(value));
+    public static Filter Lte(string field, double value) => new Comparison(field, ComparisonOperator.LessOrEqual, RelevanceJson.Scalar(value));
     /// <summary>Requires a numeric property greater than or equal to the inclusive bound.</summary>
-    public static Filter Gte(string field, double value) => new Comparison(field, ComparisonOperator.GreaterOrEqual, JsonSerializer.SerializeToElement(value));
+    public static Filter Gte(string field, double value) => new Comparison(field, ComparisonOperator.GreaterOrEqual, RelevanceJson.Scalar(value));
     /// <summary>Combines constraints with AND; an empty conjunction imposes no additional restriction.</summary>
     public static Filter All(params Filter[] filters) => new Conjunction(filters);
 
     // Records do not make a caller-owned list immutable. Freeze nested predicates before queue admission.
-    internal static Filter? Snapshot(Filter? filter) => filter switch
+    internal static Filter? Snapshot(Filter? filter)
     {
-        null => null,
-        Comparison comparison => comparison with { Value = comparison.Value.Clone() },
-        Conjunction and => new Conjunction(and.Filters.Select(child => Snapshot(child)!).ToArray()),
-        _ => throw new ArgumentException("Unsupported filter node.")
-    };
+        var remaining = 64;
+        return Copy(filter, 0);
+        Filter? Copy(Filter? node, int depth)
+        {
+            if (node is null) return null;
+            if (depth > 16 || --remaining < 0) throw new ArgumentException("Filters are limited to 64 nodes and 16 nested levels.");
+            return node switch
+            {
+                Comparison comparison => comparison with { Value = comparison.Value.Clone() },
+                Conjunction and => new Conjunction(and.Filters.Select(child => Copy(child, depth + 1)
+                    ?? throw new ArgumentException("Null filter child.")).ToArray()),
+                _ => throw new ArgumentException("Unsupported filter node.")
+            };
+        }
+    }
+
 }
 /// <summary>The supported scalar comparisons; range operators are numeric only.</summary>
 public enum ComparisonOperator
@@ -118,8 +129,8 @@ public interface IRelevanceTransaction
     int Count(string scope, string kind);
     /// <summary>Atomically replaces a candidate and all of its named vectors; candidates do not expire.</summary>
     void Upsert(string scope, Candidate candidate);
-    /// <summary>Returns compatible vectors by ascending distance, filtering eligibility before applying limit.</summary>
-    /// <remarks>Use ordinal candidate-ID order to break ties. Match the query's point signature and metric.</remarks>
+    /// <summary>Returns eligible compatible neighbours, ordered by distance. Approximate providers may trade recall for latency.</summary>
+    /// <remarks>Use ordinal candidate-ID order to break returned ties. Match the query's point signature and metric; never drop eligibility constraints.</remarks>
     IReadOnlyList<Neighbor> Nearest(string scope, VectorQuery query, Filter? filter, int limit);
     /// <summary>Returns matching candidates in ordinal ID order before taking the limit; used for cold starts.</summary>
     IReadOnlyList<Candidate> Eligible(string scope, Filter? filter, int limit);

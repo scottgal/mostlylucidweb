@@ -183,8 +183,8 @@ internal static class TrajectoryTracking
         foreach (var frame in state.Landmarks.Values)
         {
             var features = Features(frame, definition);
-            var cell = RelevanceDefinition.Hash(new {frame.State, frame.Group,
-                Bins = features.Select(v => Math.Floor(v / definition.BinWidth).ToString("R", CultureInfo.InvariantCulture)).ToArray()});
+            var cell = RelevanceDefinition.Hash(new TrajectoryCell(frame.State, frame.Group,
+                features.Select(v => Math.Floor(v / definition.BinWidth).ToString("R", CultureInfo.InvariantCulture)).ToArray()));
             if (!model.Cohorts.TryGetValue(cell, out var cohort))
             {
                 if (model.Cohorts.Count >= definition.MaxCohorts)

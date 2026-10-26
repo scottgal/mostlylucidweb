@@ -5,4 +5,7 @@
   <Project Path="samples/RelevancePredict/RelevancePredict.csproj" />
   <Project Path="samples/RelevanceShop/RelevanceShop.csproj" />
   <Project Path="Mostlylucid.Relevance.Demo/Mostlylucid.Relevance.Demo.csproj" />
+  <Project Path="Mostlylucid.Relevance.Learning/Mostlylucid.Relevance.Learning.csproj" />
+  <Project Path="Mostlylucid.Sqlite.Vector/Mostlylucid.Sqlite.Vector.csproj" />
+  <Project Path="samples/RelevancePackage/RelevancePackage.csproj" />
 </Solution>

@@ -43,7 +43,7 @@ public sealed class InterventionLearning : IAsyncDisposable
         this.store = store; this.relevance = relevance;
         this.clock = clock ?? TimeProvider.System; this.random = random ?? Random.Shared;
         scope = "learning:" + d.Id;
-        schema = Hash(new { Contract = 1, Definition = d });
+        schema = Hash(new LearningFingerprint(1, d));
         worker.StartAsync(CancellationToken.None).GetAwaiter().GetResult();
     }
 
@@ -61,12 +61,12 @@ public sealed class InterventionLearning : IAsyncDisposable
             var exists = await Transaction(tx =>
             {
                 var model = Model(tx);
-                var previous = tx.Get<InterventionVariant>(scope, "variant", frozen.Id);
+                var previous = Read<InterventionVariant>(tx, "variant", frozen.Id);
                 if (previous is not null && Hash(previous) != Hash(frozen))
                     throw new ArgumentException("Variant identity reused for different content or descriptors.");
                 if (model.Variants.TryGetValue(frozen.Id, out var old))
                 {
-                    if (Hash(tx.Get<InterventionVariant>(scope, "variant", old.Id)) != Hash(frozen)) throw new ArgumentException("Variant identity reused for different content or descriptors.");
+                    if (Hash(Read<InterventionVariant>(tx, "variant", old.Id)) != Hash(frozen)) throw new ArgumentException("Variant identity reused for different content or descriptors.");
                     return true;
                 }
                 if (model.Variants.Count >= definition.MaxVariants || frozen.Control && model.Variants.Values.Any(v => v.Control))
@@ -79,8 +79,8 @@ public sealed class InterventionLearning : IAsyncDisposable
             {
                 var model = Model(tx);
                 // Keep large HTML out of the frequently updated sufficient-statistic aggregate.
-                model.Variants.Add(frozen.Id, frozen with { Candidate = JsonSerializer.SerializeToElement(new { id = frozen.Id }) });
-                tx.Put(scope, "variant", frozen.Id, frozen, DateTimeOffset.MaxValue);
+                model.Variants.Add(frozen.Id, frozen with { Candidate = JsonSerializer.SerializeToElement(new CandidateIdentity(frozen.Id), LearningJsonContext.Default.CandidateIdentity) });
+                Write(tx, "variant", frozen.Id, frozen, DateTimeOffset.MaxValue);
                 PutModel(tx, model); return true;
             }, ct);
             return new SaveReceipt(frozen.Id);
@@ -99,7 +99,7 @@ public sealed class InterventionLearning : IAsyncDisposable
             CheckTime(frozen.ObservedAt);
             await FlushResponsesAsync(ct);
             var hash = Hash(frozen);
-            var existing = await Transaction(tx => tx.Get<DecisionState>(scope, "decision", frozen.Id), ct);
+            var existing = await Transaction(tx => Read<DecisionState>(tx, "decision", frozen.Id), ct);
             if (existing is not null)
             {
                 if (existing.RequestHash != hash) throw new ArgumentException("Decision ID reused with different context.");
@@ -107,7 +107,7 @@ public sealed class InterventionLearning : IAsyncDisposable
             }
             var prepared = await Transaction(tx =>
             {
-                if (tx.Get<string>(scope, "unit", frozen.Unit) is not null)
+                if (Read<string>(tx, "unit", frozen.Unit) is not null)
                     throw new ArgumentException("Assignment unit already has a decision; retry its ID or start a new episode.");
                 var model = Model(tx);
                 var group = Detect(model, frozen);
@@ -135,12 +135,12 @@ public sealed class InterventionLearning : IAsyncDisposable
                 var probability = uniform ? 1.0 / variants.Length
                     : definition.Exploration / variants.Length + (selected.Id == best ? 1 - definition.Exploration : 0);
                 var now = clock.GetUtcNow();
-                var exact = tx.Get<InterventionVariant>(scope, "variant", selected.Id) ?? throw new InvalidOperationException("Missing registered variant.");
+                var exact = Read<InterventionVariant>(tx, "variant", selected.Id) ?? throw new InvalidOperationException("Missing registered variant.");
                 var decision = new InterventionDecision(frozen.Id, frozen.Unit, group.Id, group.Count, frozen.Coordinates,
                     exact, now, now.AddSeconds(definition.HorizonSeconds), probability,
                     uniform ? "uniform-v1" : "epsilon-descriptor-v1", scores);
-                tx.Put(scope, "decision", frozen.Id, new DecisionState { RequestHash = hash, Decision = decision }, Expiry());
-                tx.Put(scope, "unit", frozen.Unit, frozen.Id, Expiry());
+                Write(tx, "decision", frozen.Id, new DecisionState { RequestHash = hash, Decision = decision }, Expiry());
+                Write(tx, "unit", frozen.Unit, frozen.Id, Expiry());
                 var arm = Arm(model, group.Id, selected.Id); arm.Assigned++;
                 model.Recent.Add(frozen.Id); if (model.Recent.Count > 24) model.Recent.RemoveAt(0);
                 PutModel(tx, model);
@@ -170,7 +170,7 @@ public sealed class InterventionLearning : IAsyncDisposable
             var receipt = await Transaction(tx =>
             {
                 if (!tx.Accept(scope, "event:" + frozen.Id, Hash(frozen), Expiry())) return new SaveReceipt(frozen.Id, true);
-                var row = tx.Get<DecisionState>(scope, "decision", frozen.Decision) ?? throw new ArgumentException("Unknown or expired decision.");
+                var row = Read<DecisionState>(tx, "decision", frozen.Decision) ?? throw new ArgumentException("Unknown or expired decision.");
                 if (frozen.At < row.Decision.AssignedAt || frozen.Stage == "outcome" && frozen.At > row.Decision.Deadline)
                     throw new ArgumentException("Evidence precedes assignment or its outcome is outside the defined window.");
                 if (row.Events.Count >= 64 || row.Closed && frozen.Stage is "outcome" or "censored")
@@ -195,7 +195,7 @@ public sealed class InterventionLearning : IAsyncDisposable
                     if (frozen.Reward > 0) model.PendingResponses.Add(row.Decision.Id);
                 }
                 if (frozen.Stage == "censored") { arm.Censored++; row.Closed = true; }
-                tx.Put(scope, "decision", frozen.Decision, row, Expiry()); PutModel(tx, model);
+                Write(tx, "decision", frozen.Decision, row, Expiry()); PutModel(tx, model);
                 if (tx.Count(scope, "dedup") > definition.MaxRecords * 16L) throw new InvalidOperationException("Event capacity reached.");
                 return new SaveReceipt(frozen.Id);
             }, ct);
@@ -220,9 +220,9 @@ public sealed class InterventionLearning : IAsyncDisposable
                 return new InterventionEvidence(g.Id, id, arm.Assigned, arm.Completed, arm.Censored, arm.Applied, arm.Viewed, arm.Clicked, arm.Failed, mean, se);
             })).ToArray();
             return new LearningSnapshot(model.Groups.Select(g => new DetectedGroup(g.Id, g.Count, g.Mean, g.Coefficients(definition.RidgePenalty))).ToArray(),
-                evidence, model.Recent.AsEnumerable().Reverse().Select(id => tx.Get<DecisionState>(scope, "decision", id)).OfType<DecisionState>()
+                evidence, model.Recent.AsEnumerable().Reverse().Select(id => Read<DecisionState>(tx, "decision", id)).OfType<DecisionState>()
                     .Select(d => new InterventionJourney(d.Decision, d.Events.OrderBy(e => e.At).ToArray(), d.Closed)).ToArray(),
-                model.Variants.Keys.Select(id => tx.Get<InterventionVariant>(scope, "variant", id)!).ToArray());
+                model.Variants.Keys.Select(id => Read<InterventionVariant>(tx, "variant", id)!).ToArray());
         }, ct);
     }, cancellationToken);
 
@@ -230,7 +230,7 @@ public sealed class InterventionLearning : IAsyncDisposable
     public ValueTask<InterventionJourney?> GetAsync(string decisionId, CancellationToken cancellationToken = default) => Queue(ct =>
         Transaction<InterventionJourney?>(tx =>
         {
-            var row = tx.Get<DecisionState>(scope, "decision", decisionId);
+            var row = Read<DecisionState>(tx, "decision", decisionId);
             return row is null ? null : new(row.Decision, row.Events.OrderBy(e => e.At).ToArray(), row.Closed);
         }, ct), cancellationToken);
 
@@ -259,17 +259,27 @@ public sealed class InterventionLearning : IAsyncDisposable
         {
             var next = await Transaction(tx => { var m = Model(tx); return m.PendingResponses.Count == 0 ? null : m.PendingResponses[0]; }, ct);
             if (next is null) return;
-            var row = await Transaction(tx => tx.Get<DecisionState>(scope, "decision", next), ct);
+            var row = await Transaction(tx => Read<DecisionState>(tx, "decision", next), ct);
             if (row is not null)
-                await relevance.SaveAsync(definition.ResponseStream, new { id = "observed:" + next, subject = row.Decision.Group,
-                    candidate = row.Decision.Variant.Id, type = definition.ResponseType }, ct);
+                await relevance.SaveAsync(definition.ResponseStream, JsonSerializer.SerializeToElement(new ResponseObservation("observed:" + next, row.Decision.Group,
+                    row.Decision.Variant.Id, definition.ResponseType), LearningJsonContext.Default.ResponseObservation), ct);
             await Transaction(tx => { var m = Model(tx); m.PendingResponses.Remove(next); PutModel(tx, m); return true; }, ct);
         }
     }
     private ValueTask<T> Transaction<T>(Func<IRelevanceTransaction, T> operation, CancellationToken ct) => store.TransactAsync(tx =>
     { tx.BindSchema(scope, schema); tx.Prune(clock.GetUtcNow()); return operation(tx); }, ct);
-    private LearningState Model(IRelevanceTransaction tx) => tx.Get<LearningState>(scope, "model", "current") ?? new();
-    private void PutModel(IRelevanceTransaction tx, LearningState model) => tx.Put(scope, "model", "current", model, Expiry());
+    private T? Read<T>(IRelevanceTransaction tx, string kind, string id)
+    {
+        var json = tx.Get<JsonElement>(scope, kind, id);
+        return json.ValueKind == JsonValueKind.Undefined ? default
+            : RelevanceJson.Deserialize<T>(json.GetRawText(), LearningJsonContext.Default);
+    }
+    private void Write<T>(IRelevanceTransaction tx, string kind, string id, T value, DateTimeOffset expiry)
+        => tx.Put(scope, kind, id, JsonSerializer.SerializeToElement(value,
+            (System.Text.Json.Serialization.Metadata.JsonTypeInfo<T>)(LearningJsonContext.Default.GetTypeInfo(typeof(T))
+                ?? throw new NotSupportedException("Missing learning record metadata."))), expiry);
+    private LearningState Model(IRelevanceTransaction tx) => Read<LearningState>(tx, "model", "current") ?? new();
+    private void PutModel(IRelevanceTransaction tx, LearningState model) => Write(tx, "model", "current", model, Expiry());
     private static ArmEvidence Arm(LearningState model, string group, string variant)
     { var key = Key(group, variant); if (!model.Arms.TryGetValue(key, out var arm)) model.Arms[key] = arm = new(); return arm; }
     private static string Key(string group, string variant) => Hash(new[] { group, variant });
@@ -281,8 +291,8 @@ public sealed class InterventionLearning : IAsyncDisposable
     private static void Id(string id) { if (string.IsNullOrWhiteSpace(id) || id.Length > 160) throw new ArgumentException("Supply a bounded non-empty ID."); }
     private static void Vector(double[] vector, int dimensions)
     { if (vector.Length != dimensions || vector.Any(v => !double.IsFinite(v) || v is < 0 or > 1)) throw new ArgumentException("Use finite [0,1] coordinates in the declared order."); }
-    private static T Copy<T>(T value) => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value))!;
-    private static string Hash<T>(T value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(value))));
+    private static T Copy<T>(T value) => RelevanceJson.Deserialize<T>(RelevanceJson.Serialize(value, LearningJsonContext.Default), LearningJsonContext.Default)!;
+    private static string Hash<T>(T value) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(RelevanceJson.Serialize(value, LearningJsonContext.Default))));
     private ValueTask<T> Queue<T>(Func<CancellationToken, ValueTask<T>> operation, CancellationToken ct)
     { ObjectDisposedException.ThrowIf(disposed != 0, this); return worker.EnqueueAsync(operation, ct); }
     /// <summary>Drains accepted work, then closes the owned store. Does not dispose the external relevance engine.</summary>

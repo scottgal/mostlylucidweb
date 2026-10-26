@@ -33,7 +33,7 @@ public sealed class RelevanceEngine : IAsyncDisposable
         IDestinationPredictor? predictor = null)
     {
         // Freeze caller-owned configuration so runtime mutation cannot bypass version checks.
-        this.definition = JsonSerializer.Deserialize<RelevanceDefinition>(JsonSerializer.Serialize(definition))!;
+        this.definition = RelevanceJson.Deserialize<RelevanceDefinition>(RelevanceJson.Serialize(definition))!;
         this.definition.Validate();
         this.store = store;
         this.clock = clock ?? TimeProvider.System;
@@ -47,7 +47,7 @@ public sealed class RelevanceEngine : IAsyncDisposable
             if (!registry.TryGetValue(point.Converter, out var converter)) throw new ArgumentException($"Unknown converter '{point.Converter}'.");
             var dimensions = converter.Dimensions(point);
             if (dimensions is < 1 or > 65_536) throw new ArgumentException("Point dimensions must be between 1 and 65536.");
-            points[name] = (converter, RelevanceDefinition.Hash(new { point, converter.Version, dimensions }), dimensions);
+            points[name] = (converter, RelevanceDefinition.Hash(new PointFingerprint(point, converter.Version, dimensions)), dimensions);
         }
         if (this.definition.Destinations?.Trajectory is { } trajectory)
         {
@@ -56,7 +56,7 @@ public sealed class RelevanceEngine : IAsyncDisposable
                 throw new ArgumentException("Trajectories require declared points (at most 64 coordinates) and input-sourced observations.");
         }
         // Include storage semantics as well as vector semantics. Old deduplication layouts need explicit replay.
-        schema = RelevanceDefinition.Hash(new { StorageContract = 2, this.definition, Points = points.Select(p => new { p.Key, p.Value.Signature }).ToArray() });
+        schema = RelevanceDefinition.Hash(new SchemaFingerprint(2, this.definition, points.Select(p => new PointSignature(p.Key, p.Value.Signature)).ToArray()));
         this.worker = worker ?? new RelevanceWorker();
         ownsWorker = worker is null;
         if (ownsWorker) this.worker.StartAsync(CancellationToken.None).GetAwaiter().GetResult();
@@ -79,12 +79,30 @@ public sealed class RelevanceEngine : IAsyncDisposable
     /// <exception cref="ArgumentException">The stream, input, event order or feedback attribution is invalid.</exception>
     /// <exception cref="InvalidOperationException">A configured capacity or stored-schema constraint is violated.</exception>
     /// <exception cref="ObjectDisposedException">The engine has been disposed.</exception>
+    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("Use the JsonElement or JsonTypeInfo overload in trimmed applications.")]
+    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("Use the JsonElement or JsonTypeInfo overload in Native AOT.")]
     public ValueTask<SaveReceipt> SaveAsync<T>(string source, T value, CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(disposed != 0, this);
         var data = JsonSerializer.SerializeToElement(value);
+        return SaveAsync(source, data, cancellationToken);
+    }
+
+    /// <summary>Snapshots a JSON object of at most 1 MiB and commits through the bounded worker; supported in Native AOT.</summary>
+    public ValueTask<SaveReceipt> SaveAsync(string source, JsonElement value, CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(disposed != 0, this);
+        if (value.ValueKind != JsonValueKind.Object) throw new ArgumentException("Input must be a JSON object.");
+        if (System.Text.Encoding.UTF8.GetByteCount(value.GetRawText()) > 1_048_576)
+            throw new ArgumentException("Input exceeds the 1 MiB observation/candidate limit.");
+        var data = value.Clone();
         return worker.EnqueueAsync(ct => SaveCoreAsync(source, data, ct), cancellationToken);
     }
+
+    /// <summary>Snapshots a typed input with caller-generated JSON metadata; supported in Native AOT.</summary>
+    public ValueTask<SaveReceipt> SaveAsync<T>(string source, T value,
+        System.Text.Json.Serialization.Metadata.JsonTypeInfo<T> jsonType, CancellationToken cancellationToken = default)
+        => SaveAsync(source, JsonSerializer.SerializeToElement(value, jsonType), cancellationToken);
 
     private async ValueTask<SaveReceipt> SaveCoreAsync(string source, JsonElement data, CancellationToken cancellationToken)
     {
@@ -113,7 +131,7 @@ public sealed class RelevanceEngine : IAsyncDisposable
             }
             var hash = RelevanceDefinition.Hash(data);
             // Hash the structured identity: source="events:part", id="x" must differ from source="events", id="part:x".
-            var eventKey = "event:" + RelevanceDefinition.Hash(new { source, id });
+            var eventKey = "event:" + RelevanceDefinition.Hash(new EventIdentity(source, id));
             if (!tx.Accept(definition.Id, eventKey, hash, now.AddHours(definition.StateRetentionHours))) return new SaveReceipt(id, true);
             if (tx.Count(definition.Id, "dedup") > definition.MaxDeduplicationRecords) throw new InvalidOperationException("Deduplication capacity reached.");
             if (stream.Kind == "observation") Observe(tx, stream, data, encoded, now);
@@ -164,10 +182,32 @@ public sealed class RelevanceEngine : IAsyncDisposable
             (await RecommendCoreAsync(subject, placement, snapshot, count, ct, retain: false)).Items, cancellationToken);
     }
 
+    /// <summary>Finds candidates near an existing candidate in one named representation.</summary>
+    /// <remarks>Excludes the seed itself. Proximity is representation-specific similarity, not evidence of causation.
+    /// SQLite HNSW can serve unfiltered queries; providers preserve all supplied eligibility constraints.</remarks>
+    public ValueTask<IReadOnlyList<Neighbor>> RelatedAsync(string candidate, string point, Filter? filter = null,
+        int count = 10, CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(disposed != 0, this);
+        if (count < 1 || count > definition.CandidateLimit) throw new ArgumentOutOfRangeException(nameof(count));
+        if (!points.ContainsKey(point)) throw new ArgumentException("Unknown point.");
+        var snapshot = Filter.Snapshot(filter);
+        definition.ValidateFilter(snapshot);
+        return worker.EnqueueAsync(ct => store.TransactAsync<IReadOnlyList<Neighbor>>(tx =>
+        {
+            tx.BindSchema(definition.Id, schema);
+            var seed = tx.Get<Candidate>(definition.Id, "candidate", candidate) ?? throw new ArgumentException("Unknown candidate.");
+            if (!seed.Points.TryGetValue(point, out var encoded)) throw new ArgumentException("Candidate has no such point.");
+            var query = new VectorQuery(point, encoded.Signature, encoded.Metric, encoded.Values);
+            return tx.Nearest(definition.Id, query, snapshot, count + 1)
+                .Where(n => n.Candidate.Id != candidate).Take(count).ToArray();
+        }, ct), cancellationToken);
+    }
+
     private ValueTask<RecommendationResult> RecommendCoreAsync(string subject, string placement,
         Filter? filter, int count, CancellationToken cancellationToken, bool retain = true)
     {
-        if (string.IsNullOrWhiteSpace(subject)) throw new ArgumentException("Subject is required.");
+        if (string.IsNullOrWhiteSpace(subject) || subject.Length > 256) throw new ArgumentException("Subject requires 1 through 256 characters.");
         if (!definition.Placements.TryGetValue(placement, out var area)) throw new ArgumentException($"Unknown placement '{placement}'.");
         if (count < 1 || count > definition.CandidateLimit) throw new ArgumentOutOfRangeException(nameof(count));
         definition.ValidateFilter(filter);
@@ -232,7 +272,7 @@ public sealed class RelevanceEngine : IAsyncDisposable
     public ValueTask<DestinationPrediction> PredictAsync(string subject, CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(disposed != 0, this);
-        if (string.IsNullOrWhiteSpace(subject)) throw new ArgumentException("Subject is required.");
+        if (string.IsNullOrWhiteSpace(subject) || subject.Length > 256) throw new ArgumentException("Subject requires 1 through 256 characters.");
         if (definition.Destinations is null) throw new InvalidOperationException("Configure destinations before requesting probabilities.");
         return worker.EnqueueAsync(async ct =>
         {
@@ -378,7 +418,7 @@ public sealed class RelevanceEngine : IAsyncDisposable
         var decision = tx.Get<RecommendationResult>(definition.Id, "decision", decisionId) ?? throw new ArgumentException("Recommendation is unknown or expired.");
         var item = decision.Items.SingleOrDefault(r => r.Id == candidateId) ?? throw new ArgumentException("Feedback candidate was not returned in this recommendation.");
         // Exactly one attributed outcome per displayed candidate, even with different transport event IDs.
-        var outcomeKey = "outcome:" + RelevanceDefinition.Hash(new { decisionId, candidateId });
+        var outcomeKey = "outcome:" + RelevanceDefinition.Hash(new OutcomeIdentity(decisionId, candidateId));
         if (!tx.Accept(definition.Id, outcomeKey, RelevanceDefinition.Hash(reward), now.AddHours(definition.DecisionRetentionHours))) return;
         var weights = tx.Get<Dictionary<string, HeadEvidence>>(definition.Id, "weights", decision.Placement) ?? [];
         var total = item.Reasons.Sum(r => 1.0 / r.Rank);
@@ -398,7 +438,7 @@ public sealed class RelevanceEngine : IAsyncDisposable
     private static string RequiredString(JsonElement data, string path)
     {
         var result = DataValues.Read(data, path).GetString();
-        return !string.IsNullOrWhiteSpace(result) ? result : throw new ArgumentException($"'{path}' must be a non-empty string.");
+        return !string.IsNullOrWhiteSpace(result) && result.Length <= 256 ? result : throw new ArgumentException($"'{path}' must contain 1 through 256 characters.");
     }
     /// <summary>Stops and drains an owned worker, then disposes the owned store.</summary>
     /// <remarks>

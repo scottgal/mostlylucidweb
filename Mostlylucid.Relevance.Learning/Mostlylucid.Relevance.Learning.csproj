@@ -6,11 +6,13 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
     <IsPackable>true</IsPackable>
+    <IsAotCompatible>true</IsAotCompatible>
     <Version>0.1.0-preview.1</Version>
     <Description>Measured contextual intervention learning over Mostlylucid.Relevance candidates.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup><ProjectReference Include="../Mostlylucid.Relevance/Mostlylucid.Relevance.csproj" /></ItemGroup>
-  <ItemGroup><None Include="README.md" Pack="true" PackagePath="/" /></ItemGroup>
+  <ItemGroup><None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="../Mostlylucid.Relevance/AGENTS.md" Pack="true" PackagePath="/AGENTS.md" /></ItemGroup>
 </Project>

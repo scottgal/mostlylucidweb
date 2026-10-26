@@ -1,4 +1,6 @@
-# Part 5: Richer representations
+Part 5 now packages the framework: [Please Change This](../../Mostlylucid/Markdown/show-me-what-you-got-part5-please-change-this.md). This remains the research plan for a later representations chapter.
+
+# Later part: Richer representations
 
 Planned follow-up to **Understand the data → Understand the behaviour → Change the outcome**. The bells and whistles should demonstrate what new evidence buys us, with the same small save/recommend/predict surface.
 

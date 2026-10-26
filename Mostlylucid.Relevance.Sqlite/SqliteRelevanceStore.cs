@@ -7,17 +7,28 @@ namespace Mostlylucid.Relevance.Sqlite;
 public sealed class SqliteRelevanceStore : IRelevanceStore
 {
     private readonly SqliteConnection connection;
+    private readonly Dictionary<string, FileStream> leases = [];
+    private readonly string? leaseRoot;
     private readonly SemaphoreSlim gate = new(1, 1);
     private readonly bool native;
+    private readonly SqliteVectorOptions? vectorOptions;
+    private readonly System.Text.Json.Serialization.JsonSerializerContext? recordTypes;
     /// <summary>Describes the active exact-distance implementation; neither mode is an approximate index.</summary>
-    public string SearchMode => native ? "sqlite-vec exact SQL" : "managed exact SQL function";
+    public string SearchMode => vectorOptions is not null ? "SQLite HNSW; filtered queries use exact SQL" : native ? "sqlite-vec exact SQL" : "managed exact SQL function";
 
     /// <summary>Opens a SQLite database with WAL/FULL durability, creating the schema if needed.</summary>
     /// <param name="databasePath">Local database path or :memory:; parent directories are not created.</param>
     /// <param name="vectorExtensionPath">Optional sqlite-vec native binary loaded with sqlite3_vec_init; failures propagate.</param>
+    /// <param name="vectorOptions">Optional SQLite-owned HNSW index; cannot be combined with sqlite-vec.</param>
+    /// <param name="recordTypes">Optional generated metadata for application-owned provider records.</param>
     /// <remarks>No extension means managed exact distance functions. Connections are not pooled.</remarks>
-    public SqliteRelevanceStore(string databasePath, string? vectorExtensionPath = null)
+    public SqliteRelevanceStore(string databasePath, string? vectorExtensionPath = null, System.Text.Json.Serialization.JsonSerializerContext? recordTypes = null, SqliteVectorOptions? vectorOptions = null)
     {
+        if (vectorExtensionPath is not null && vectorOptions is not null) throw new ArgumentException("Choose one SQLite vector extension.");
+        vectorOptions?.Validate();
+        this.vectorOptions = vectorOptions;
+        leaseRoot = vectorOptions is null || databasePath == ":memory:" ? null : Path.GetFullPath(databasePath);
+        this.recordTypes = recordTypes;
         connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = databasePath, Pooling = false }.ToString());
         try
         {
@@ -31,6 +42,8 @@ public sealed class SqliteRelevanceStore : IRelevanceStore
                 verify.ExecuteScalar();
                 native = true;
             }
+            if (vectorOptions is not null)
+                connection.LoadExtension(Path.GetFullPath(vectorOptions.ExtensionPath), "sqlite3_sqlitevectorrs_init");
             connection.CreateFunction<byte[], byte[], string, double>("relevance_distance",
                 (a, b, metric) => VectorMath.Distance(VectorMath.Decode(a), VectorMath.Decode(b), metric), isDeterministic: true);
             using var command = connection.CreateCommand();
@@ -68,7 +81,7 @@ public sealed class SqliteRelevanceStore : IRelevanceStore
         {
             // SQLite I/O is synchronous. No fake Task.Run or unbounded background queue.
             using var transaction = connection.BeginTransaction(deferred: false);
-            var result = action(new Transaction(connection, transaction, native));
+            var result = action(new Transaction(connection, transaction, native, recordTypes, vectorOptions, ReserveScope));
             cancellationToken.ThrowIfCancellationRequested();
             transaction.Commit();
             return result;
@@ -79,12 +92,26 @@ public sealed class SqliteRelevanceStore : IRelevanceStore
     public async ValueTask DisposeAsync()
     {
         await gate.WaitAsync();
-        try { connection.Dispose(); }
+        try
+        {
+            connection.Dispose();
+            foreach (var lease in leases.Values) lease.Dispose();
+            leases.Clear();
+        }
         finally { gate.Release(); }
     }
 
-    private sealed class Transaction(SqliteConnection connection, SqliteTransaction transaction, bool native) : IRelevanceTransaction
+    private void ReserveScope(string scope)
     {
+        if (leaseRoot is null || leases.ContainsKey(scope)) return;
+        var id = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(scope)));
+        try { leases[scope] = new FileStream(leaseRoot + "." + id + ".writer.lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None); }
+        catch (IOException error) { throw new InvalidOperationException("Native vector space is already in use, or its ownership lock cannot be opened. Reuse its existing hub.", error); }
+    }
+
+    private sealed class Transaction(SqliteConnection connection, SqliteTransaction transaction, bool native, System.Text.Json.Serialization.JsonSerializerContext? recordTypes, SqliteVectorOptions? vectorOptions, Action<string> reserveScope) : IRelevanceTransaction
+    {
+        private readonly SqliteHnsw? hnsw = vectorOptions is null ? null : new(connection, transaction, vectorOptions);
         private SqliteCommand Command(string sql, params (string, object)[] args)
         {
             var command = connection.CreateCommand();
@@ -95,6 +122,7 @@ public sealed class SqliteRelevanceStore : IRelevanceStore
         }
         public void BindSchema(string scope, string fingerprint)
         {
+            reserveScope(scope);
             using var read = Command("SELECT fingerprint FROM relevance_schema WHERE scope=@scope", ("@scope", scope));
             if (read.ExecuteScalar() is string current)
             {
@@ -117,14 +145,14 @@ public sealed class SqliteRelevanceStore : IRelevanceStore
             using var command = kind == "candidate"
                 ? Command("SELECT record FROM relevance_candidates WHERE scope=@scope AND id=@id", ("@scope", scope), ("@id", id))
                 : Command("SELECT payload FROM relevance_records WHERE scope=@scope AND kind=@kind AND id=@id", ("@scope", scope), ("@kind", kind), ("@id", id));
-            return command.ExecuteScalar() is string json ? JsonSerializer.Deserialize<T>(json) : default;
+            return command.ExecuteScalar() is string json ? RelevanceJson.Deserialize<T>(json, recordTypes) : default;
         }
         public void Put<T>(string scope, string kind, string id, T value, DateTimeOffset expiresAt)
         {
             using var command = Command("""
                 INSERT INTO relevance_records VALUES(@scope,@kind,@id,@payload,@expires)
                 ON CONFLICT(scope,kind,id) DO UPDATE SET payload=excluded.payload,expires=excluded.expires
-                """, ("@scope", scope), ("@kind", kind), ("@id", id), ("@payload", JsonSerializer.Serialize(value)), ("@expires", expiresAt.UtcTicks));
+                """, ("@scope", scope), ("@kind", kind), ("@id", id), ("@payload", RelevanceJson.Serialize(value, recordTypes)), ("@expires", expiresAt.UtcTicks));
             command.ExecuteNonQuery();
         }
         public int Count(string scope, string kind)
@@ -136,10 +164,12 @@ public sealed class SqliteRelevanceStore : IRelevanceStore
         }
         public void Upsert(string scope, Candidate candidate)
         {
+            reserveScope(scope);
+            if (hnsw is not null && Get<Candidate>(scope, "candidate", candidate.Id) is { } old) hnsw.Delete(scope, old);
             using var command = Command("""
                 INSERT INTO relevance_candidates VALUES(@scope,@id,@payload,@record)
                 ON CONFLICT(scope,id) DO UPDATE SET payload=excluded.payload,record=excluded.record
-                """, ("@scope", scope), ("@id", candidate.Id), ("@payload", candidate.Data.GetRawText()), ("@record", JsonSerializer.Serialize(candidate)));
+                """, ("@scope", scope), ("@id", candidate.Id), ("@payload", candidate.Data.GetRawText()), ("@record", RelevanceJson.Serialize(candidate)));
             command.ExecuteNonQuery();
             using var delete = Command("DELETE FROM relevance_vectors WHERE scope=@scope AND candidate_id=@id", ("@scope", scope), ("@id", candidate.Id));
             delete.ExecuteNonQuery();
@@ -150,9 +180,12 @@ public sealed class SqliteRelevanceStore : IRelevanceStore
                     ("@metric", point.Metric), ("@vector", VectorMath.Encode(point.Values)));
                 insert.ExecuteNonQuery();
             }
+            hnsw?.Upsert(scope, candidate);
         }
         public IReadOnlyList<Neighbor> Nearest(string scope, VectorQuery query, Filter? filter, int limit)
         {
+            reserveScope(scope);
+            if (hnsw is not null && (filter is null || filter is Conjunction { Filters.Count: 0 })) return hnsw.Nearest(scope, query, limit);
             var compiled = SqliteFilterCompiler.Compile(filter);
             var distance = native ? query.Metric switch
             {
@@ -172,7 +205,7 @@ public sealed class SqliteRelevanceStore : IRelevanceStore
             Bind(command, compiled);
             using var reader = command.ExecuteReader();
             var results = new List<Neighbor>();
-            while (reader.Read()) results.Add(new Neighbor(JsonSerializer.Deserialize<Candidate>(reader.GetString(0))!, reader.GetDouble(1)));
+            while (reader.Read()) results.Add(new Neighbor(RelevanceJson.Deserialize<Candidate>(reader.GetString(0))!, reader.GetDouble(1)));
             return results;
         }
         public IReadOnlyList<Candidate> Eligible(string scope, Filter? filter, int limit)
@@ -183,7 +216,7 @@ public sealed class SqliteRelevanceStore : IRelevanceStore
             Bind(command, compiled);
             using var reader = command.ExecuteReader();
             var results = new List<Candidate>();
-            while (reader.Read()) results.Add(JsonSerializer.Deserialize<Candidate>(reader.GetString(0))!);
+            while (reader.Read()) results.Add(RelevanceJson.Deserialize<Candidate>(reader.GetString(0))!);
             return results;
         }
         private static void Bind(SqliteCommand command, CompiledFilter filter)

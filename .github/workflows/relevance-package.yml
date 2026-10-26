@@ -1,0 +1,89 @@
+name: Relevance packages and Native AOT
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Mostlylucid.Relevance/**'
+      - 'Mostlylucid.Relevance.Sqlite/**'
+      - 'Mostlylucid.Relevance.Learning/**'
+      - 'Mostlylucid.Relevance.Tests/**'
+      - 'Mostlylucid.Sqlite.Vector/**'
+      - 'samples/RelevancePackage/**'
+      - 'scripts/relevance/**'
+      - '.github/workflows/relevance-package.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            rid: linux-x64
+            library: libsqlite_vector_rs.so
+          - os: macos-14
+            rid: osx-arm64
+            library: libsqlite_vector_rs.dylib
+          - os: windows-2022
+            rid: win-x64
+            library: sqlite_vector_rs.dll
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build pinned SQLite extension
+        shell: bash
+        run: scripts/relevance/build-sqlite-vector.sh '${{ matrix.rid }}'
+      - name: Test managed and SQLite-owned HNSW paths
+        shell: bash
+        run: |
+          export RELEVANCE_SQLITE_HNSW="$PWD/Mostlylucid.Sqlite.Vector/runtimes/${{ matrix.rid }}/native/${{ matrix.library }}"
+          dotnet test Mostlylucid.Relevance.Tests -c Release
+      - name: Pack host assets and framework
+        shell: bash
+        run: |
+          for project in Mostlylucid.Relevance Mostlylucid.Relevance.Sqlite Mostlylucid.Relevance.Learning Mostlylucid.Sqlite.Vector; do
+            dotnet pack "$project" -c Release -o "$RUNNER_TEMP/feed" -p:AllowPartialNativePackage=true
+          done
+      - name: Publish actual NuGet consumer with Native AOT
+        shell: bash
+        run: |
+          dotnet publish samples/RelevancePackage -c Release -r '${{ matrix.rid }}' -o "$RUNNER_TEMP/aot" -p:UsePackedRelevance=true \
+            --source "$RUNNER_TEMP/feed" --source https://api.nuget.org/v3/index.json
+      - name: Run published consumer without copying native libraries
+        shell: bash
+        run: |
+          executable="$RUNNER_TEMP/aot/RelevancePackage"
+          if [[ '${{ runner.os }}' == Windows ]]; then executable="$executable.exe"; fi
+          "$executable" "$RUNNER_TEMP/exact-data"
+          "$executable" "$RUNNER_TEMP/hnsw-data" bundled
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sqlite-vector-${{ matrix.rid }}
+          path: Mostlylucid.Sqlite.Vector/runtimes/
+  assemble:
+    needs: verify
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: sqlite-vector-*
+          path: Mostlylucid.Sqlite.Vector/runtimes
+          merge-multiple: true
+      - name: Pack complete, verified runtime set
+        run: dotnet pack Mostlylucid.Sqlite.Vector -c Release -o artifacts/packages
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sqlite-vector-nuget
+          path: artifacts/packages/*.nupkg

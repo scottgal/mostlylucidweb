@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsAotCompatible>true</IsAotCompatible>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+    <Version>0.3.1-preview.1</Version>
+    <Description>SQLite-owned HNSW vector search: pinned sqlite-vector-rs native runtime assets with Native AOT-compatible path discovery.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="/" />
+    <None Include="THIRD-PARTY-NOTICES.md" Pack="true" PackagePath="/" />
+    <None Include="runtimes/licenses/**/*" Pack="true" PackagePath="licenses/%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="runtimes/**/*" Exclude="runtimes/licenses/**/*" Pack="true" PackagePath="runtimes/%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <RequiredNative Include="runtimes/linux-x64/native/libsqlite_vector_rs.so;runtimes/osx-arm64/native/libsqlite_vector_rs.dylib;runtimes/win-x64/native/sqlite_vector_rs.dll" />
+  </ItemGroup>
+  <Target Name="VerifyNativeAssets" BeforeTargets="GenerateNuspec" Condition="'$(AllowPartialNativePackage)' != 'true'">
+    <Error Condition="!Exists('%(RequiredNative.Identity)')" Text="Missing %(RequiredNative.Identity). Build all supported RIDs before packing. AllowPartialNativePackage=true is for local verification only." />
+  </Target>
+</Project>

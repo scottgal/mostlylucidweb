@@ -171,7 +171,7 @@ dotnet run --project samples/RelevanceShop -- predict --output /tmp/relevance-pr
 
 It starts fresh, learns from observations, predicts new users, reopens SQLite and evaluates against a frozen later population. See [the sample](../samples/RelevancePredict/README.md) for actual output, optional frozen LLM copy and the prefix/label boundary. The sample's small predictor adapters inspect or freeze the existing transition baseline; the core consumer API is unchanged.
 
-[Part 3](../Mostlylucid/Markdown/show-me-what-you-got-part3-predict.md) establishes outcome forecasts. [Part 4](../docs/relevance/part4-intervention-learning.md) uses controlled interventions to learn what changes the result. Richer image/embedding ingestion follows in [Part 5](../docs/relevance/part5-richer-representations.md).
+[Part 3](../Mostlylucid/Markdown/show-me-what-you-got-part3-predict.md) establishes outcome forecasts. [Part 4](../docs/relevance/part4-intervention-learning.md) uses controlled interventions to learn what changes the result. Richer image/embedding ingestion remains planned in [a later part](../docs/relevance/part5-richer-representations.md).
 
 ## Timestamped trajectories and normal references
 
@@ -209,3 +209,15 @@ Run the reproducible two-domain sample:
 ```sh
 dotnet run --project samples/RelevanceShop -- predict-time --output /tmp/relevance-time-814
 ```
+
+## Part 5: a framework to change
+
+[AGENTS.md](AGENTS.md) ships in the core, SQLite and Learning packages. It maps application decisions to extension points, with recipes for products, email interventions, incident diagnosis and provider replacement. This is intended to be adapted; explicitly give the guide to a coding assistant when asking it to customise the framework.
+
+`RelevanceHub` opens independent `RelevanceSpace(tenant, name)` engines through `IRelevanceStoreFactory`. `SqliteRelevanceFactory` defaults to one file and optionally routes whole spaces across named shard files. The application authorises the tenant; the hub isolates state. Shard topology changes require explicit migration. Returned engines are hub-owned.
+
+[The compact package sample](../samples/RelevancePackage/README.md) demonstrates multiple domains, sharding, source-generated inputs, Native AOT and the optional SQLite-owned HNSW index. Use `RelatedAsync` to find neighbours of a candidate in one named representation. A neighbour is a similarity result, not a causal relationship.
+
+For Native AOT, use a typed definition or `RelevanceDefinition.FromJson`, and save `JsonElement` values or pass caller-generated `JsonTypeInfo<T>`. YAML and the generic reflection-based convenience overload are JIT paths. Internal record serialization has no reflection fallback; custom predictor/provider records need generated metadata supplied through the provider's `recordTypes` argument.
+
+Inputs are JSON objects capped at 1 MiB. Envelope IDs and recommendation subjects allow at most 256 characters; tenant/space names allow 128. Filters are capped at 64 nodes and 16 nested levels, and mandatory placement rules always combine using AND. Configuration, converters, database paths and native extensions are trusted host decisions, not request parameters. Store only metadata you intend the recommendation result to return.
