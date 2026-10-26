@@ -13,7 +13,7 @@ registry = Path(os.environ.get('CARGO_HOME', Path.home() / '.cargo')) / 'registr
 tree = subprocess.check_output(['cargo', 'tree', '--manifest-path', str(source / 'Cargo.toml'), '--locked', '--edges', 'normal,build', '--prefix', 'none', '--format', '{p}'], text=True)
 entries = []
 for name, version in sorted(set(re.findall(r'^([\w-]+) v([\w.+-]+)', tree, re.M))):
-    roots = [source] if name == 'sqlite-vector-rs' else list(registry.glob(f'*/{name}-{version}'))
+    roots = [source] if name == 'sqlite-vector-rs' else ([source / 'compat' / name] if (source / 'compat' / name).is_dir() else list(registry.glob(f'*/{name}-{version}')))
     if not roots:
         raise SystemExit(f'Dependency source missing: {name} {version}')
     root = roots[0]

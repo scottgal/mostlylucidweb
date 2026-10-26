@@ -1,6 +1,6 @@
 # Mostlylucid.Sqlite.Vector
 
-A separate, small native-assets package for **SQLite-owned HNSW search**, built from unchanged sqlite-vector-rs 0.3.1 at `7ee2baf7b2783c1798f285cdff3b2285da38de04`. No search server, .NET HNSW index, runtime download or consumer-side Rust build.
+A separate, small native-assets package for **SQLite-owned HNSW search**, built from unchanged sqlite-vector-rs 0.3.1 at `7ee2baf7b2783c1798f285cdff3b2285da38de04`. No search server, .NET HNSW index, runtime download or consumer-side Rust build. The Windows build applies checked-in compatibility fixes to private copies of locked sqlite3_ext/USearch dependencies and disables optional unsupported SIMD kernels; it preserves the extension source and all dependency versions. See the packaged windows-compatibility.json for provenance.
 
 ```csharp
 using Mostlylucid.Sqlite.Vector;

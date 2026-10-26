@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-# Build upstream unchanged from a pinned commit, using its Cargo.lock.
+# Build the pinned extension; Windows compatibility patches affect private dependency copies only.
 repo_root="$(cd "$(dirname "$0")/../.." && pwd)"
 rid="${1:?usage: build-sqlite-vector.sh <osx-arm64|linux-x64|win-x64> [work-directory]}"
 case "$rid" in
@@ -15,10 +15,19 @@ if [[ ! -d "$work/.git" ]]; then
   git clone --no-checkout https://github.com/quinnjr/sqlite-vector-rs.git "$work"
 fi
 git -C "$work" checkout --detach "$source_commit"
+# Reset only the private build manifests before reapplying platform compatibility.
+git -C "$work" restore --source="$source_commit" -- Cargo.toml Cargo.lock
 rustup target add "$target"
+if [[ "$rid" == "win-x64" ]]; then
+  cargo fetch --manifest-path "$work/Cargo.toml" --locked --target "$target"
+  python3 "$repo_root/scripts/relevance/prepare-windows-native.py" "$work"
+fi
 cargo build --manifest-path "$work/Cargo.toml" --release --locked --target "$target"
 destination="$repo_root/Mostlylucid.Sqlite.Vector/runtimes/$rid/native"
 mkdir -p "$destination"
 cp "$work/target/$target/release/$library" "$destination/$library"
 
 python3 "$repo_root/scripts/relevance/collect-native-notices.py" "$work" "$repo_root/Mostlylucid.Sqlite.Vector/runtimes/licenses"
+if [[ "$rid" == "win-x64" ]]; then
+  cp "$work/windows-compatibility.json" "$repo_root/Mostlylucid.Sqlite.Vector/runtimes/licenses/windows-compatibility.json"
+fi
