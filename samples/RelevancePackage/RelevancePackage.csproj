@@ -7,8 +7,10 @@
     <PublishAot>true</PublishAot>
     <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
+  <ItemGroup><PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.12" /></ItemGroup>
   <ItemGroup Condition="'$(UsePackedRelevance)' != 'true'">
     <ProjectReference Include="../../Mostlylucid.Sqlite.Vector/Mostlylucid.Sqlite.Vector.csproj" />
     <ProjectReference Include="../../Mostlylucid.Relevance.Sqlite/Mostlylucid.Relevance.Sqlite.csproj" />

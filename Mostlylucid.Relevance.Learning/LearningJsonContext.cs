@@ -2,7 +2,21 @@ using System.Text.Json.Serialization;
 
 namespace Mostlylucid.Relevance.Learning;
 
+/// <summary>Generated serialization metadata for public intervention requests and evidence.</summary>
+public static class LearningJson
+{
+    /// <summary>Add to a serializer resolver chain or pass to RelevanceJson for learning records.</summary>
+    public static JsonSerializerContext Metadata => LearningJsonContext.Default;
+}
+
+
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
+[JsonSerializable(typeof(LearningSnapshot))]
+[JsonSerializable(typeof(InterventionJourney))]
+[JsonSerializable(typeof(InterventionDecision))]
+[JsonSerializable(typeof(InterventionEvidence))]
+[JsonSerializable(typeof(DetectedGroup))]
+[JsonSerializable(typeof(InterventionScore))]
 [JsonSerializable(typeof(LearningDefinition))]
 [JsonSerializable(typeof(InterventionVariant))]
 [JsonSerializable(typeof(InterventionRequest))]

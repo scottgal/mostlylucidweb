@@ -307,7 +307,7 @@ await engine.SaveAsync("items", item, AppJson.Default.Item);
 
 `AppJson.Default.Item` comes from the application's source-generated JSON context. The engine can snapshot the input without discovering its properties at runtime. An existing `JsonElement` is another supported input route. Internal records use generated metadata too; an unknown custom provider record requires its own supplied metadata.
 
-Use a typed definition or `RelevanceDefinition.FromJson` in this path. The YAML loader and generic reflection-based save convenience remain available to JIT applications, with explicit compatibility annotations. Microsoft's [source-generation guide](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/source-generation) explains the metadata mechanism.
+Typed, JSON and YAML definitions all work in this path. The supplied item, observation and feedback records can be saved directly, without an application JSON context. Custom input types use generated metadata as above; only the generic reflection-based save convenience requires JIT. Microsoft's [source-generation guide](https://learn.microsoft.com/en-us/dotnet/standard/serialization/system-text-json/source-generation) explains the metadata mechanism.
 
 The separate **Mostlylucid.Sqlite.Vector** package supplies native runtime assets and fixed path discovery. Consumers do not need Cargo, a Rust compiler, a download during startup or a manually copied extension. The SQLite provider loads the known extension through its explicit entry point.
 

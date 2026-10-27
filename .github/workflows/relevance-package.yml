@@ -1,6 +1,11 @@
 name: Relevance packages and Native AOT
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the verified package set to NuGet.org
+        type: boolean
+        default: false
   push:
     paths:
       - 'Mostlylucid.Relevance/**'
@@ -10,11 +15,34 @@ on:
       - 'Mostlylucid.Sqlite.Vector/**'
       - 'samples/RelevancePackage/**'
       - 'scripts/relevance/**'
+      - 'docs/relevance/sdk/**'
+      - 'dotnet-tools.json'
       - '.github/workflows/relevance-package.yml'
 permissions:
   contents: read
 jobs:
+  documentation:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate and check complete SDK documentation
+        run: python scripts/relevance/build-sdk-docs.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: relevance-sdk-docs
+          path: docs/relevance/sdk/_site/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: relevance-api-markdown
+          path: docs/relevance/sdk/reference/
   verify:
+    needs: documentation
     strategy:
       fail-fast: false
       matrix:
@@ -48,11 +76,15 @@ jobs:
         run: |
           export RELEVANCE_SQLITE_HNSW="$PWD/Mostlylucid.Sqlite.Vector/runtimes/${{ matrix.rid }}/native/${{ matrix.library }}"
           dotnet test Mostlylucid.Relevance.Tests -c Release
+      - uses: actions/download-artifact@v4
+        with:
+          name: relevance-api-markdown
+          path: docs/relevance/sdk/reference
       - name: Pack host assets and framework
         shell: bash
         run: |
           for project in Mostlylucid.Relevance Mostlylucid.Relevance.Sqlite Mostlylucid.Relevance.Learning Mostlylucid.Sqlite.Vector; do
-            dotnet pack "$project" -c Release -o "$RUNNER_TEMP/feed" -p:AllowPartialNativePackage=true
+            dotnet pack "$project" -c Release -o "$RUNNER_TEMP/feed" -p:AllowPartialNativePackage=true -p:RequireSdkDocumentation=true
           done
       - name: Publish actual NuGet consumer with Native AOT
         shell: bash
@@ -73,7 +105,7 @@ jobs:
           name: sqlite-vector-${{ matrix.rid }}
           path: Mostlylucid.Sqlite.Vector/runtimes/
   assemble:
-    needs: verify
+    needs: [verify, documentation]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -85,11 +117,19 @@ jobs:
           pattern: sqlite-vector-*
           path: Mostlylucid.Sqlite.Vector/runtimes
           merge-multiple: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: relevance-api-markdown
+          path: docs/relevance/sdk/reference
+      - uses: actions/download-artifact@v4
+        with:
+          name: relevance-sdk-docs
+          path: artifacts/packages/docs
       - name: Pack ready-to-use framework feed and verified runtime set
         shell: bash
         run: |
           for project in Mostlylucid.Relevance Mostlylucid.Relevance.Sqlite Mostlylucid.Relevance.Learning Mostlylucid.Sqlite.Vector; do
-            dotnet pack "$project" -c Release -o artifacts/packages
+            dotnet pack "$project" -c Release -o artifacts/packages -p:RequireSdkDocumentation=true
           done
           cat > artifacts/packages/NuGet.Config <<'CONFIG'
           <?xml version="1.0" encoding="utf-8"?>
@@ -113,3 +153,30 @@ jobs:
         with:
           name: relevance-nuget-packages
           path: artifacts/packages/
+  publish:
+    if: github.event_name == 'workflow_dispatch' && inputs.publish
+    needs: assemble
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/download-artifact@v4
+        with:
+          name: relevance-nuget-packages
+          path: packages
+      - uses: NuGet/login@v1
+        id: login
+        with:
+          user: mostlylucid
+      - name: Publish the exact verified packages
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+        shell: bash
+        run: |
+          for package in packages/*.nupkg; do
+            dotnet nuget push "$package" --source https://api.nuget.org/v3/index.json --api-key "$NUGET_API_KEY"
+          done

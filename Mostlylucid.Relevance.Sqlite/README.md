@@ -11,7 +11,7 @@ await using var hub = new RelevanceHub(new SqliteRelevanceFactory("./relevance-d
 var products = await hub.OpenAsync(new RelevanceSpace(authorisedTenant, "products"), definition);
 ```
 
-`definition` supplies the configured points, streams, placements and optional destinations. Use a typed definition or `RelevanceDefinition.FromJson` for Native AOT; the [package sample](../samples/RelevancePackage/Program.cs) includes a complete working example. The application authorises the tenant before opening a space. The hub owns returned engines and drains accepted work on disposal.
+`definition` supplies the configured points, streams, placements and optional destinations. Typed, JSON and YAML definitions support Native AOT; the [package sample](../samples/RelevancePackage/Program.cs) includes a complete working example. The application authorises the tenant before opening a space. The hub owns returned engines and drains accepted work on disposal.
 
 ## Start with exact search
 

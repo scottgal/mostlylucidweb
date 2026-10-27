@@ -1,0 +1,24 @@
+- name: Overview
+  href: index.md
+- name: Getting started
+  href: guides/getting-started.md
+- name: Configuration and representations
+  href: guides/configuration.md
+- name: Observations and recommendations
+  href: guides/recommendations.md
+- name: Outcome prediction
+  href: guides/prediction.md
+- name: Intervention learning
+  href: guides/learning.md
+- name: Storage and sharding
+  href: guides/storage.md
+- name: Native AOT and hosting
+  href: guides/aot.md
+- name: Extending the SDK
+  href: guides/extensions.md
+- name: Operations and limits
+  href: guides/operations.md
+- name: Packaging and releases
+  href: guides/releases.md
+- name: API reference
+  href: api/toc.yml

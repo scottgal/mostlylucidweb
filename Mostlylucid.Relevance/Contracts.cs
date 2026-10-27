@@ -27,6 +27,9 @@ public sealed record RecommendationResult(string Id, string Subject, string Plac
 
 /// <summary>Portable constraints on declared scalar metadata fields, applied before retrieval truncation.</summary>
 /// <remarks>Property paths and strings are case-sensitive. Supported nodes are comparisons and conjunctions.</remarks>
+[System.Text.Json.Serialization.JsonPolymorphic(TypeDiscriminatorPropertyName = "$filter")]
+[System.Text.Json.Serialization.JsonDerivedType(typeof(Comparison), "comparison")]
+[System.Text.Json.Serialization.JsonDerivedType(typeof(Conjunction), "all")]
 public abstract record Filter
 {
     /// <summary>Requires scalar equality without coercing numbers, strings or booleans across types.</summary>

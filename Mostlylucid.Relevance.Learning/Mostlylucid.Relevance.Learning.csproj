@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591;IL2026;IL3050;IL2104</WarningsAsErrors>
     <IsPackable>true</IsPackable>
     <IsAotCompatible>true</IsAotCompatible>
     <Version>0.1.0-preview.1</Version>
@@ -15,4 +15,5 @@
   <ItemGroup><ProjectReference Include="../Mostlylucid.Relevance/Mostlylucid.Relevance.csproj" /></ItemGroup>
   <ItemGroup><None Include="README.md" Pack="true" PackagePath="/" />
     <None Include="../Mostlylucid.Relevance/AGENTS.md" Pack="true" PackagePath="/AGENTS.md" /></ItemGroup>
+  <Import Project="../scripts/relevance/sdk-docs.targets" />
 </Project>

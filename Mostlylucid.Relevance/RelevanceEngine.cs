@@ -88,7 +88,44 @@ public sealed class RelevanceEngine : IAsyncDisposable
         return SaveAsync(source, data, cancellationToken);
     }
 
+    /// <summary>Saves a built-in vector item using shipped AOT metadata; no application JSON context is needed.</summary>
+    /// <param name="source">Configured candidate, observation or feedback stream name.</param>
+    /// <param name="value">Vector item; additional filter fields belong in its metadata object.</param>
+    /// <param name="cancellationToken">Cancels admission or work before commit; cannot undo a committed update.</param>
+    /// <returns>A receipt after atomic commit, including duplicate-event status.</returns>
+    public ValueTask<SaveReceipt> SaveAsync(string source, RelevanceItem value, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return SaveAsync(source, RelevanceJson.Element(value), cancellationToken);
+    }
+
+    /// <summary>Saves a built-in observation using shipped AOT metadata and conventional mapped field names.</summary>
+    /// <param name="source">Configured candidate, observation or feedback stream name.</param>
+    /// <param name="value">Stable event ID, subject and optional candidate, state, event time and vector.</param>
+    /// <param name="cancellationToken">Cancels admission or work before commit; cannot undo a committed update.</param>
+    /// <returns>A receipt after atomic commit, including duplicate-event status.</returns>
+    public ValueTask<SaveReceipt> SaveAsync(string source, RelevanceObservation value, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return SaveAsync(source, RelevanceJson.Element(value), cancellationToken);
+    }
+
+    /// <summary>Saves an observed attributed reward using shipped AOT metadata.</summary>
+    /// <param name="source">Configured candidate, observation or feedback stream name.</param>
+    /// <param name="value">Stable feedback ID, retained recommendation, returned candidate and reward in [0,1].</param>
+    /// <param name="cancellationToken">Cancels admission or work before commit; cannot undo a committed update.</param>
+    /// <returns>A receipt after atomic commit, including duplicate-event status.</returns>
+    public ValueTask<SaveReceipt> SaveAsync(string source, RelevanceFeedback value, CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(value);
+        return SaveAsync(source, RelevanceJson.Element(value), cancellationToken);
+    }
+
     /// <summary>Snapshots a JSON object of at most 1 MiB and commits through the bounded worker; supported in Native AOT.</summary>
+    /// <param name="source">Configured candidate, observation or feedback stream name.</param>
+    /// <param name="value">Input object with field names matching the configured stream mappings.</param>
+    /// <param name="cancellationToken">Cancels admission or work before commit; cannot undo a committed update.</param>
+    /// <returns>A receipt after atomic commit, including duplicate-event status.</returns>
     public ValueTask<SaveReceipt> SaveAsync(string source, JsonElement value, CancellationToken cancellationToken = default)
     {
         ObjectDisposedException.ThrowIf(disposed != 0, this);
@@ -100,6 +137,12 @@ public sealed class RelevanceEngine : IAsyncDisposable
     }
 
     /// <summary>Snapshots a typed input with caller-generated JSON metadata; supported in Native AOT.</summary>
+    /// <typeparam name="T">Application input type described by generated serialization metadata.</typeparam>
+    /// <param name="source">Configured candidate, observation or feedback stream name.</param>
+    /// <param name="value">Input whose serialized field names match the stream mappings.</param>
+    /// <param name="jsonType">Source-generated metadata for the exact input type.</param>
+    /// <param name="cancellationToken">Cancels admission or work before commit; cannot undo a committed update.</param>
+    /// <returns>A receipt after atomic commit, including duplicate-event status.</returns>
     public ValueTask<SaveReceipt> SaveAsync<T>(string source, T value,
         System.Text.Json.Serialization.Metadata.JsonTypeInfo<T> jsonType, CancellationToken cancellationToken = default)
         => SaveAsync(source, JsonSerializer.SerializeToElement(value, jsonType), cancellationToken);

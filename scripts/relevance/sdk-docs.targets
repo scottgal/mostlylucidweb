@@ -1,0 +1,9 @@
+<Project>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)../../docs/relevance/sdk/reference/**/*.md" Pack="true" PackagePath="docs/api/%(RecursiveDir)%(Filename)%(Extension)" />
+    <None Include="$(MSBuildThisFileDirectory)../../docs/relevance/sdk/guides/**/*.md" Pack="true" PackagePath="docs/guides/%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+  <Target Name="VerifySdkDocumentation" BeforeTargets="GenerateNuspec" Condition="'$(RequireSdkDocumentation)' == 'true'">
+    <Error Condition="!Exists('$(MSBuildThisFileDirectory)../../docs/relevance/sdk/reference/index.md')" Text="Generate SDK documentation with python scripts/relevance/build-sdk-docs.py before release packing." />
+  </Target>
+</Project>

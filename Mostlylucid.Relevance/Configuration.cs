@@ -2,8 +2,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace Mostlylucid.Relevance;
 
@@ -77,13 +75,7 @@ public sealed class RelevanceDefinition
     }
 
     /// <summary>Parses strict YAML, rejecting duplicate and unknown keys; call Validate before using the result.</summary>
-    [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("YAML uses reflection. Use FromJson or a typed definition for Native AOT.")]
-    [System.Diagnostics.CodeAnalysis.RequiresDynamicCode("YAML uses runtime type discovery. Use FromJson for Native AOT.")]
-    public static RelevanceDefinition FromYaml(string yaml) => new DeserializerBuilder()
-        .WithNamingConvention(UnderscoredNamingConvention.Instance)
-        .WithDuplicateKeyChecking()
-        .WithAttemptingUnquotedStringTypeDeserialization()
-        .Build().Deserialize<RelevanceDefinition>(yaml) ?? throw new ArgumentException("Empty configuration.");
+    public static RelevanceDefinition FromYaml(string yaml) => YamlConfiguration.Read(yaml);
 
     /// <summary>Loads configuration using generated JSON metadata; supported in Native AOT.</summary>
     public static RelevanceDefinition FromJson(string json)

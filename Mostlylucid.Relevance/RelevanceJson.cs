@@ -7,6 +7,9 @@ namespace Mostlylucid.Relevance;
 /// <summary>Reflection-free record serialization with optional application-generated metadata.</summary>
 public static class RelevanceJson
 {
+    /// <summary>Generated metadata for built-in inputs, public results, filters and persistence models.</summary>
+    /// <remarks>Add to an HTTP serializer's TypeInfoResolverChain; custom application types need their own context.</remarks>
+    public static JsonSerializerContext Metadata => CoreJsonContext.Default;
     /// <summary>Serializes a known record; custom provider records require supplied generated metadata.</summary>
     public static string Serialize<T>(T value, JsonSerializerContext? context = null) => JsonSerializer.Serialize(value, Info<T>(context));
     /// <summary>Deserializes a known record; custom provider records require supplied generated metadata.</summary>
@@ -17,7 +20,8 @@ public static class RelevanceJson
     public static JsonElement Scalar(object value) => value switch
     {
         JsonElement json => json.Clone(), string x => Element(x), bool x => Element(x),
-        int x => Element(x), long x => Element(x), double x => Element(x), float x => Element(x), decimal x => Element(x),
+        byte x => Element((int)x), sbyte x => Element((int)x), short x => Element((int)x), ushort x => Element((int)x),
+        uint x => Element((long)x), ulong x => Element((decimal)x), int x => Element(x), long x => Element(x), double x => Element(x), float x => Element(x), decimal x => Element(x),
         _ => throw new ArgumentException("Use a JSON scalar or string, boolean, int, long, float, double or decimal.")
     };
     private static JsonTypeInfo<T> Info<T>(JsonSerializerContext? context)
@@ -29,6 +33,18 @@ public static class RelevanceJson
 }
 
 [JsonSourceGenerationOptions(GenerationMode = JsonSourceGenerationMode.Metadata)]
+[JsonSerializable(typeof(RelevanceItem))]
+[JsonSerializable(typeof(RelevanceObservation))]
+[JsonSerializable(typeof(RelevanceFeedback))]
+[JsonSerializable(typeof(DestinationPrediction))]
+[JsonSerializable(typeof(PredictionContext))]
+[JsonSerializable(typeof(Filter))]
+[JsonSerializable(typeof(Neighbor))]
+[JsonSerializable(typeof(Neighbor[]))]
+[JsonSerializable(typeof(Recommendation[]))]
+[JsonSerializable(typeof(SaveReceipt))]
+[JsonSerializable(typeof(VectorQuery))]
+[JsonSerializable(typeof(Dictionary<string, bool>))]
 [JsonSerializable(typeof(RelevanceDefinition))]
 [JsonSerializable(typeof(Candidate))]
 [JsonSerializable(typeof(SubjectState))]

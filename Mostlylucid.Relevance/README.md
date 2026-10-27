@@ -27,7 +27,7 @@ var result = await relevance.RecommendAsync("entity-1", "next",
 
 Start with one space and default exact search. Add another `RelevanceSpace` for a different tenant/domain; add `Mostlylucid.Sqlite.Vector` only when SQLite-owned HNSW is useful. The hub owns returned engines and drains them on disposal. The application authorises the tenant before opening a space.
 
-For JIT applications, the existing YAML convenience remains available: `await SqliteRelevance.OpenAsync("relevance.yaml")` opens one owned engine using [the shop definition](../samples/RelevanceShop/relevance.yaml), and the generic `SaveAsync` overload accepts ordinary objects. An existing Generic Host can use `services.AddRelevanceSqlite("relevance.yaml")` and inject that single `RelevanceEngine`. Use the hub when several domains are required; use JSON or generated input metadata for Native AOT.
+YAML and JSON file loading also work under Native AOT: `await SqliteRelevance.OpenAsync("relevance.yaml")` opens one owned engine using [the shop definition](../samples/RelevanceShop/relevance.yaml), and the generic `SaveAsync` overload accepts ordinary objects. An existing Generic Host can use `services.AddRelevanceSqlite("relevance.yaml")` and inject that single `RelevanceEngine`. Use the hub when several domains are required. For Native AOT, use the supplied input records or explicit generated metadata for custom input types.
 
 ## What happens in the background?
 
@@ -217,6 +217,10 @@ dotnet run --project samples/RelevanceShop -- predict-time --output /tmp/relevan
 
 [The compact package sample](../samples/RelevancePackage/README.md) demonstrates multiple domains, sharding, source-generated inputs, Native AOT and the optional SQLite-owned HNSW index. Use `RelatedAsync` to find neighbours of a candidate in one named representation. A neighbour is a similarity result, not a causal relationship.
 
-For Native AOT, use a typed definition or `RelevanceDefinition.FromJson`, and save `JsonElement` values or pass caller-generated `JsonTypeInfo<T>`. YAML and the generic reflection-based convenience overload are JIT paths. Internal record serialization has no reflection fallback; custom predictor/provider records need generated metadata supplied through the provider's `recordTypes` argument.
+For Native AOT, use typed, JSON or YAML definitions. Save the supplied `RelevanceItem`, `RelevanceObservation` and `RelevanceFeedback` records directly, save `JsonElement` values, or pass caller-generated `JsonTypeInfo<T>` for custom types. Only the generic reflection-based save convenience requires JIT. `RelevanceJson.Metadata` and `LearningJson.Metadata` provide generated serialization metadata for public results. Internal record serialization has no reflection fallback; custom predictor/provider records need generated metadata supplied through the provider's `recordTypes` argument.
 
 Inputs are JSON objects capped at 1 MiB. Envelope IDs and recommendation subjects allow at most 256 characters; tenant/space names allow 128. Filters are capped at 64 nodes and 16 nested levels, and mandatory placement rules always combine using AND. Configuration, converters, database paths and native extensions are trusted host decisions, not request parameters. Store only metadata you intend the recommendation result to return.
+
+## SDK documentation
+
+The [SDK documentation](../docs/relevance/sdk/index.md) covers configuration, ingestion, filtering, prediction, learning, storage, sharding, hosting, AOT and extension contracts. Every release package includes the generated public API reference under `docs/api` and usage guides under `docs/guides`. CI also supplies a searchable HTML site.

@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <IsAotCompatible>true</IsAotCompatible>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591;IL2026;IL3050;IL2104</WarningsAsErrors>
     <Version>0.3.1-preview.1</Version>
     <Description>SQLite-owned HNSW vector search: pinned sqlite-vector-rs native runtime assets with Native AOT-compatible path discovery.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -21,4 +21,5 @@
   <Target Name="VerifyNativeAssets" BeforeTargets="GenerateNuspec" Condition="'$(AllowPartialNativePackage)' != 'true'">
     <Error Condition="!Exists('%(RequiredNative.Identity)')" Text="Missing %(RequiredNative.Identity). Build all supported RIDs before packing. AllowPartialNativePackage=true is for local verification only." />
   </Target>
+  <Import Project="../scripts/relevance/sdk-docs.targets" />
 </Project>

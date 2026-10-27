@@ -54,7 +54,7 @@ verification: held-out outcomes, exact-search recall baseline, isolation, persis
 
 ## Native AOT path
 
-Use typed RelevanceDefinition or RelevanceDefinition.FromJson. YAML and the convenient reflection-based generic SaveAsync overload are JIT conveniences. In AOT use JsonElement or SaveAsync with caller-generated JsonTypeInfo<T>. Register converters explicitly; no assembly scanning.
+Typed, JSON and bounded YAML definitions all support AOT. Use supplied RelevanceItem/RelevanceObservation/RelevanceFeedback records, JsonElement, or SaveAsync with caller-generated JsonTypeInfo<T>. Only the generic reflection-based SaveAsync convenience requires JIT. RelevanceJson.Metadata and LearningJson.Metadata supply public result serialization metadata. Register converters explicitly; no assembly scanning. Read docs/relevance/sdk for full contracts and defaults.
 
 InterventionLearning serializes its private records with its own generated metadata. Custom predictor/provider records require generated metadata supplied through the provider's recordTypes argument. Do not suppress a new trimming/AOT warning to hide unsupported reflection.
 
