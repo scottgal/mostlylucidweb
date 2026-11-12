@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Google.OrTools" Version="9.15.6755" />
+    <ProjectReference Include="../Core/ResourcePacking.Core.csproj" />
+  </ItemGroup>
+</Project>

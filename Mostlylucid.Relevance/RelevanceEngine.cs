@@ -260,37 +260,9 @@ public sealed class RelevanceEngine : IAsyncDisposable
         {
             tx.BindSchema(definition.Id, schema);
             tx.Prune(now);
-            var state = tx.Get<SubjectState>(definition.Id, "state", subject);
-            var weights = tx.Get<Dictionary<string, HeadEvidence>>(definition.Id, "weights", placement) ?? [];
-            var merged = new Dictionary<string, (Candidate Candidate, List<Contribution> Reasons)>();
-            if (state is not null)
-                foreach (var (point, baseWeight) in area.Heads)
-                {
-                    if (!state.Points.TryGetValue(point, out var summary)) continue;
-                    var mass = summary.Mass * Decay(now - state.At);
-                    if (mass < definition.MinEvidence) continue;
-                    var vector = summary.Sum.Select(v => (float)(v / summary.Mass)).ToArray();
-                    if (definition.Points[point].Metric == "cosine" && vector.All(v => v == 0)) continue;
-                    var query = new VectorQuery(point, points[point].Signature, definition.Points[point].Metric, vector);
-                    var neighbors = tx.Nearest(definition.Id, query, eligibility, definition.CandidateLimit);
-                    var evidence = weights.GetValueOrDefault(point) ?? new HeadEvidence();
-                    // A bounded, smoothed reliability multiplier. It is not a calibrated probability.
-                    var weight = baseWeight * (0.5 + (1 + evidence.Positive) / (2 + evidence.Positive + evidence.Negative));
-                    for (var rank = 0; rank < neighbors.Count; rank++)
-                    {
-                        var neighbor = neighbors[rank];
-                        if (!merged.TryGetValue(neighbor.Candidate.Id, out var entry)) entry = (neighbor.Candidate, []);
-                        entry.Reasons.Add(new Contribution(point, rank + 1, weight, neighbor.Distance));
-                        merged[neighbor.Candidate.Id] = entry;
-                    }
-                }
-            var items = merged.Values.Select(entry => new Recommendation(entry.Candidate.Id,
-                    entry.Reasons.Sum(r => r.Weight / (definition.RrfConstant + r.Rank)), entry.Candidate.Data, entry.Reasons))
-                .OrderByDescending(r => r.Score).ThenBy(r => r.Id, StringComparer.Ordinal).Take(count).ToArray();
-            // Cold start/expired evidence uses deterministic eligible candidates, explicitly without personal scores.
-            if (items.Length == 0)
-                items = tx.Eligible(definition.Id, eligibility, count)
-                    .Select(c => new Recommendation(c.Id, 0, c.Data, Array.Empty<Contribution>())).ToArray();
+            var items = RankPool(tx, subject, placement, area, eligibility, count, now,
+                (query, constraints, limit) => tx.Nearest(definition.Id, query, constraints, limit),
+                (constraints, limit) => tx.Eligible(definition.Id, constraints, limit));
             var result = new RecommendationResult(Guid.NewGuid().ToString("N"), subject, placement, items);
             if (retain)
             {
@@ -299,6 +271,133 @@ public sealed class RelevanceEngine : IAsyncDisposable
             }
             return result;
         }, cancellationToken);
+    }
+
+    /// <summary>Ranks a bounded transient candidate pool against current user evidence without persisting candidates or a decision.</summary>
+    /// <param name="subject">Authorised subject identity within this engine's space.</param>
+    /// <param name="placement">Configured ranking surface whose mandatory eligibility rules still apply.</param>
+    /// <param name="candidates">JSON candidate objects with id and configured point/filter paths, copied before queuing.</param>
+    /// <param name="filter">Additional metadata eligibility combined with the placement rules.</param>
+    /// <param name="count">Maximum returned candidates, between one and 10,000.</param>
+    /// <param name="cancellationToken">Cancellation during admission, conversion or the read transaction.</param>
+    /// <returns>Exact rank fusion over the supplied eligible pool, with deterministic cold-start ordering.</returns>
+    /// <remarks>
+    /// The pool must contain at most 10,000 objects, each at most 1 MiB, with at most 16 MiB total JSON.
+    /// Every eligible supplied candidate participates in each head, independently of the stored-catalogue CandidateLimit.
+    /// IDs must be unique. Results preserve configured conversions, evidence decay, head weights and AND eligibility.
+    /// This operation creates no recommendation/feedback record and does not establish exposure.
+    /// </remarks>
+    public ValueTask<IReadOnlyList<Recommendation>> RankCandidatesAsync(string subject, string placement,
+        IReadOnlyList<JsonElement> candidates, Filter? filter = null, int count = 10,
+        CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(disposed != 0, this);
+        ArgumentNullException.ThrowIfNull(candidates);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (string.IsNullOrWhiteSpace(subject) || subject.Length > 256) throw new ArgumentException("Invalid subject.");
+        if (!definition.Placements.TryGetValue(placement, out var area)) throw new ArgumentException("Unknown placement.");
+        if (count is < 1 or > 10_000 || candidates.Count > 10_000)
+            throw new ArgumentOutOfRangeException(nameof(count), "The result count and supplied pool must fit 10,000.");
+        var inputs = new List<JsonElement>(candidates.Count);
+        var ids = new HashSet<string>(StringComparer.Ordinal);
+        long bytes = 0;
+        foreach (var candidate in candidates)
+        {
+            if (candidate.ValueKind != JsonValueKind.Object) throw new ArgumentException("Candidates must be JSON objects.");
+            var length = System.Text.Encoding.UTF8.GetByteCount(candidate.GetRawText());
+            bytes += length;
+            if (length > 1_048_576 || bytes > 16 * 1_048_576) throw new ArgumentException("Candidate JSON exceeds the pool bounds.");
+            if (!ids.Add(RequiredString(candidate, "id"))) throw new ArgumentException("Candidate IDs must be unique.");
+            inputs.Add(candidate.Clone());
+        }
+        var constraints = Filter.Snapshot(filter);
+        definition.ValidateFilter(constraints);
+        var eligibility = Filter.All(new[] { area.BuildFilter(), constraints }.OfType<Filter>().ToArray());
+        return worker.EnqueueAsync<IReadOnlyList<Recommendation>>(async ct =>
+        {
+            var encoded = new List<Candidate>(inputs.Count);
+            foreach (var input in inputs)
+            {
+                ct.ThrowIfCancellationRequested();
+                encoded.Add(await EncodeCandidateAsync(RequiredString(input, "id"), input, true, ct));
+            }
+            var now = clock.GetUtcNow();
+            return await store.TransactAsync<IReadOnlyList<Recommendation>>(tx =>
+            {
+                tx.BindSchema(definition.Id, schema);
+                tx.Prune(now);
+                return RankPool(tx, subject, placement, area, eligibility, count, now,
+                    (query, where, limit) => encoded.Where(candidate => DataValues.Matches(candidate.Data, where))
+                        .Select(candidate =>
+                        {
+                            ct.ThrowIfCancellationRequested();
+                            var point = candidate.Points[query.Point];
+                            return new Neighbor(candidate, VectorMath.Distance(point.Values, query.Values, query.Metric));
+                        }).OrderBy(neighbour => neighbour.Distance)
+                        .ThenBy(neighbour => neighbour.Candidate.Id, StringComparer.Ordinal).Take(limit).ToArray(),
+                    (where, limit) => encoded.Where(candidate => DataValues.Matches(candidate.Data, where))
+                        .OrderBy(candidate => candidate.Id, StringComparer.Ordinal).Take(limit).ToArray(), encoded.Count);
+            }, ct);
+        }, cancellationToken);
+    }
+
+    /// <summary>Ranks built-in precomputed-vector items as a transient pool using generated AOT metadata.</summary>
+    /// <param name="subject">Authorised subject identity in this engine's space.</param>
+    /// <param name="placement">Configured recommendation surface.</param>
+    /// <param name="candidates">Items whose vectors match the configured representation.</param>
+    /// <param name="filter">Additional eligibility constraints.</param>
+    /// <param name="count">Maximum returned items, from one through 10,000.</param>
+    /// <param name="cancellationToken">Cancellation during queue admission, conversion or ranking.</param>
+    /// <returns>Ranked eligible items with head contributions; no attribution record is created.</returns>
+    public ValueTask<IReadOnlyList<Recommendation>> RankCandidatesAsync(string subject, string placement,
+        IReadOnlyList<RelevanceItem> candidates, Filter? filter = null, int count = 10,
+        CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(disposed != 0, this);
+        ArgumentNullException.ThrowIfNull(candidates);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (candidates.Count > 10_000)
+            throw new ArgumentOutOfRangeException(nameof(candidates), "The pool must fit 10,000 candidates.");
+        return RankCandidatesAsync(subject, placement, candidates.Select(RelevanceJson.Element).ToArray(), filter, count, cancellationToken);
+    }
+
+    private Recommendation[] RankPool(IRelevanceTransaction tx, string subject, string placement,
+        PlacementDefinition area, Filter eligibility, int count, DateTimeOffset now,
+        Func<VectorQuery, Filter?, int, IReadOnlyList<Neighbor>> nearest,
+        Func<Filter?, int, IReadOnlyList<Candidate>> eligible, int? headLimit = null)
+    {
+        var state = tx.Get<SubjectState>(definition.Id, "state", subject);
+        var weights = tx.Get<Dictionary<string, HeadEvidence>>(definition.Id, "weights", placement) ?? [];
+        var merged = new Dictionary<string, (Candidate Candidate, List<Contribution> Reasons)>();
+        if (state is not null)
+            foreach (var (point, baseWeight) in area.Heads)
+            {
+                if (!state.Points.TryGetValue(point, out var summary)) continue;
+                var mass = summary.Mass * Decay(now - state.At);
+                if (mass < definition.MinEvidence) continue;
+                var vector = summary.Sum.Select(v => (float)(v / summary.Mass)).ToArray();
+                if (definition.Points[point].Metric == "cosine" && vector.All(v => v == 0)) continue;
+                var query = new VectorQuery(point, points[point].Signature, definition.Points[point].Metric, vector);
+                var neighbors = nearest(query, eligibility, headLimit ?? definition.CandidateLimit);
+                var evidence = weights.GetValueOrDefault(point) ?? new HeadEvidence();
+                // A bounded, smoothed reliability multiplier. It is not a calibrated probability.
+                var weight = baseWeight * (0.5 + (1 + evidence.Positive) / (2 + evidence.Positive + evidence.Negative));
+                for (var rank = 0; rank < neighbors.Count; rank++)
+                {
+                    var neighbor = neighbors[rank];
+                    if (!merged.TryGetValue(neighbor.Candidate.Id, out var entry)) entry = (neighbor.Candidate, []);
+                    entry.Reasons.Add(new Contribution(point, rank + 1, weight, neighbor.Distance));
+                    merged[neighbor.Candidate.Id] = entry;
+                }
+            }
+        var items = merged.Values.Select(entry => new Recommendation(entry.Candidate.Id,
+                entry.Reasons.Sum(r => r.Weight / (definition.RrfConstant + r.Rank)), entry.Candidate.Data, entry.Reasons))
+            .OrderByDescending(r => r.Score).ThenBy(r => r.Id, StringComparer.Ordinal).Take(count).ToArray();
+        // Cold start/expired evidence uses deterministic eligible candidates, explicitly without personal scores.
+        if (items.Length == 0)
+            items = eligible(eligibility, count)
+                .Select(c => new Recommendation(c.Id, 0, c.Data, Array.Empty<Contribution>())).ToArray();
+        return items;
     }
 
     /// <summary>Estimates configured destination outcomes from a consistent snapshot of retained evidence.</summary>

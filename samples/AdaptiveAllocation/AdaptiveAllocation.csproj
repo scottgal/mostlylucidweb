@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <PackingSourceRoot Condition="'$(PackingSourceRoot)' == ''">$(MSBuildThisFileDirectory)../../../mostlylucid.packing</PackingSourceRoot>
+    <PackingPackageVersion Condition="'$(PackingPackageVersion)' == ''">0.1.0-preview.2</PackingPackageVersion>
+    <RelevancePackageVersion Condition="'$(RelevancePackageVersion)' == ''">0.1.0-preview.1</RelevancePackageVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Tests/**/*.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UsePackedAllocation)' != 'true'">
+    <ProjectReference Include="$(PackingSourceRoot)/src/Mostlylucid.Packing.OrTools/Mostlylucid.Packing.OrTools.csproj" />
+    <ProjectReference Include="../../Mostlylucid.Relevance/Mostlylucid.Relevance.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(UsePackedAllocation)' == 'true'">
+    <PackageReference Include="mostlylucid.packing.ortools" Version="$(PackingPackageVersion)" />
+    <PackageReference Include="Mostlylucid.Relevance" Version="$(RelevancePackageVersion)" />
+  </ItemGroup>
+</Project>

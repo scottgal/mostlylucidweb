@@ -116,6 +116,22 @@ await relevance.SaveAsync("outcomes", new
 
 Only returned candidates can receive attributed feedback. Only one outcome per result/candidate is accepted, even with different transport IDs. Use a defined attribution horizon before reporting success/failure, rather than sending provisional failure and later success for the same exposure. A bounded, smoothed, placement-specific reliability heuristic allocates credit among supporting heads. It is not an unbiased causal estimate or calibrated probability. Record actual exposure in the calling application; returning a result does not establish that it was displayed.
 
+## Rank a supplied feasible pool
+
+Use `RankCandidatesAsync` when another system has already established current eligibility, such as a packing engine's appointment candidates.
+
+```csharp
+var ranked = await relevance.RankCandidatesAsync(
+    subject: customerId,
+    placement: "next",
+    candidates: feasibleItems,
+    count: 5);
+```
+
+The JSON and built-in `RelevanceItem` overloads snapshot inputs before queueing. Configured converters, mandatory placement filters, caller filters, evidence decay and rank fusion use the same implementation as stored-catalogue ranking. The supplied pool is scored exactly, including candidates beyond the stored catalogue's per-head retrieval window. It accepts up to 10,000 candidates, each at most 1 MiB and at most 16 MiB of JSON in total.
+
+Candidates and recommendation decisions are transient. This call provides ranking contributions and deterministic zero-score cold-start results. It creates no exposure or feedback attribution record. Record actual displayed recommendations and their outcomes through the application's recommendation flow. Use a compatible named representation and scope for the user's evidence.
+
 ## Destination probabilities
 
 ```yaml
