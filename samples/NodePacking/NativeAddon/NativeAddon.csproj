@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RuntimeFrameworkVersion>10.0.14</RuntimeFrameworkVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>NativeInterop</AssemblyName>
+    <PublishAot>true</PublishAot>
+    <PublishNodeModule>true</PublishNodeModule>
+    <PublishDir>$(MSBuildProjectDirectory)/native/$(RuntimeIdentifier)/</PublishDir>
+    <PackNpmPackage>true</PackNpmPackage>
+    <PackageOutputPath>$(MSBuildProjectDirectory)/pkg</PackageOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.JavaScript.NodeApi" Version="0.9.36" />
+    <PackageReference Include="Microsoft.JavaScript.NodeApi.Generator" Version="0.9.36" />
+  </ItemGroup>
+</Project>

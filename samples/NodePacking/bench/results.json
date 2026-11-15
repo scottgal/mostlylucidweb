@@ -1,0 +1,575 @@
+{
+  "measuredAt": "2026-11-13T15:23:32.252Z",
+  "environment": {
+    "node": "v22.15.0",
+    "dotnetSdk": "10.0.201",
+    "os": "darwin",
+    "arch": "arm64",
+    "osRelease": "27.2.0",
+    "cpu": "Apple M5",
+    "logicalCpus": 10,
+    "totalMemoryBytes": 34359738368
+  },
+  "artifactSha256": {
+    "PackingBridge": "dc9a4b99e67c4d7e84eab9c34d18c8d624276c68c62f0668b1af8adf883bd909",
+    "Mostlylucid.Packing": "006b2b154766f54e7d7a41d13b1795ce3617ee03258ab229ca515f7d5e84c867",
+    "Mostlylucid.Packing.Sqlite": "e02b43458896b523f9e3699575a2719d4d5079555884cb4e8e19a839f61fdf2d"
+  },
+  "methodology": {
+    "trials": 3,
+    "concurrency": 1,
+    "transport": "loopback TCP, HTTP/2, plaintext; reused channel",
+    "warmupPerOperation": 200,
+    "garbageCollection": "natural; .NET workstation GC in both modes",
+    "payload": "same C# result model; typed JS property snapshot, JSON string, or JSON in protobuf",
+    "memory": "RSS snapshots; sum client+sidecar for gRPC; shared pages may be counted twice"
+  },
+  "runs": [
+    {
+      "trial": 1,
+      "mode": "baseline",
+      "nodeRssBytes": 42237952
+    },
+    {
+      "trial": 1,
+      "mode": "interop-typed",
+      "iterations": 1500,
+      "readyMs": 111.56854200000001,
+      "responseBytes": 495,
+      "correctness": {
+        "candidateId": "BA27E27ED89BB116E3733A7412E988D98CE75B05E09554703E1877A5293BC227",
+        "appointments": [
+          {
+            "clientId": "alice",
+            "serviceId": "gels",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:45:00.0000000+00:00",
+            "technician": "sarah"
+          },
+          {
+            "clientId": "beth",
+            "serviceId": "pedicure",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:30:00.0000000+00:00",
+            "technician": "anna"
+          }
+        ]
+      },
+      "initialized": {
+        "nodeRssBytes": 112279552,
+        "runtime": {
+          "workingSetBytes": 112787456,
+          "managedHeapBytes": 1745408
+        }
+      },
+      "loaded": {
+        "nodeRssBytes": 135315456,
+        "runtime": {
+          "workingSetBytes": 135315456,
+          "managedHeapBytes": 7480864
+        }
+      },
+      "timerDelayDuring100QueriesMs": 31.241833000000042,
+      "control": {
+        "name": "echo-1KiB",
+        "calls": 1500,
+        "meanUs": 2.3650013333333226,
+        "p50Us": 1.875,
+        "p95Us": 3,
+        "p99Us": 5.416,
+        "sequentialCallsPerSecond": 400953.4137574601
+      },
+      "packing": {
+        "name": "packing",
+        "calls": 1500,
+        "meanUs": 651.0298553333337,
+        "p50Us": 661.375,
+        "p95Us": 851.459,
+        "p99Us": 1098.625,
+        "sequentialCallsPerSecond": 1535.765941603956
+      }
+    },
+    {
+      "trial": 1,
+      "mode": "interop-json",
+      "iterations": 1500,
+      "readyMs": 90.730208,
+      "responseBytes": 495,
+      "correctness": {
+        "candidateId": "BA27E27ED89BB116E3733A7412E988D98CE75B05E09554703E1877A5293BC227",
+        "appointments": [
+          {
+            "clientId": "alice",
+            "serviceId": "gels",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:45:00.0000000+00:00",
+            "technician": "sarah"
+          },
+          {
+            "clientId": "beth",
+            "serviceId": "pedicure",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:30:00.0000000+00:00",
+            "technician": "anna"
+          }
+        ]
+      },
+      "initialized": {
+        "nodeRssBytes": 112394240,
+        "runtime": {
+          "workingSetBytes": 112885760,
+          "managedHeapBytes": 1868768
+        }
+      },
+      "loaded": {
+        "nodeRssBytes": 130842624,
+        "runtime": {
+          "workingSetBytes": 130842624,
+          "managedHeapBytes": 7837688
+        }
+      },
+      "timerDelayDuring100QueriesMs": 32.52004099999999,
+      "control": {
+        "name": "echo-1KiB",
+        "calls": 1500,
+        "meanUs": 1.6675639999999858,
+        "p50Us": 1.209,
+        "p95Us": 2.416,
+        "p99Us": 3.916,
+        "sequentialCallsPerSecond": 560721.4616139433
+      },
+      "packing": {
+        "name": "packing",
+        "calls": 1500,
+        "meanUs": 581.7678006666664,
+        "p50Us": 574.792,
+        "p95Us": 701.083,
+        "p99Us": 860,
+        "sequentialCallsPerSecond": 1718.5509121423784
+      }
+    },
+    {
+      "trial": 1,
+      "mode": "grpc",
+      "iterations": 1500,
+      "readyMs": 149.168708,
+      "responseBytes": 495,
+      "correctness": {
+        "candidateId": "BA27E27ED89BB116E3733A7412E988D98CE75B05E09554703E1877A5293BC227",
+        "appointments": [
+          {
+            "clientId": "alice",
+            "serviceId": "gels",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:45:00.0000000+00:00",
+            "technician": "sarah"
+          },
+          {
+            "clientId": "beth",
+            "serviceId": "pedicure",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:30:00.0000000+00:00",
+            "technician": "anna"
+          }
+        ]
+      },
+      "initialized": {
+        "nodeRssBytes": 67829760,
+        "runtime": {
+          "workingSetBytes": 109576192,
+          "managedHeapBytes": 2684952
+        }
+      },
+      "loaded": {
+        "nodeRssBytes": 123797504,
+        "runtime": {
+          "workingSetBytes": 124387328,
+          "managedHeapBytes": 9152616
+        }
+      },
+      "timerDelayDuring100QueriesMs": 0,
+      "control": {
+        "name": "echo-1KiB",
+        "calls": 1500,
+        "meanUs": 148.78066266666653,
+        "p50Us": 139.042,
+        "p95Us": 181.083,
+        "p99Us": 343.666,
+        "sequentialCallsPerSecond": 6711.175420676162
+      },
+      "packing": {
+        "name": "packing",
+        "calls": 1500,
+        "meanUs": 722.8691759999998,
+        "p50Us": 693.583,
+        "p95Us": 963.334,
+        "p99Us": 1257.958,
+        "sequentialCallsPerSecond": 1383.0173081158566
+      }
+    },
+    {
+      "trial": 2,
+      "mode": "baseline",
+      "nodeRssBytes": 42287104
+    },
+    {
+      "trial": 2,
+      "mode": "interop-json",
+      "iterations": 1500,
+      "readyMs": 98.75375,
+      "responseBytes": 495,
+      "correctness": {
+        "candidateId": "BA27E27ED89BB116E3733A7412E988D98CE75B05E09554703E1877A5293BC227",
+        "appointments": [
+          {
+            "clientId": "alice",
+            "serviceId": "gels",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:45:00.0000000+00:00",
+            "technician": "sarah"
+          },
+          {
+            "clientId": "beth",
+            "serviceId": "pedicure",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:30:00.0000000+00:00",
+            "technician": "anna"
+          }
+        ]
+      },
+      "initialized": {
+        "nodeRssBytes": 112508928,
+        "runtime": {
+          "workingSetBytes": 112984064,
+          "managedHeapBytes": 1900640
+        }
+      },
+      "loaded": {
+        "nodeRssBytes": 131006464,
+        "runtime": {
+          "workingSetBytes": 131006464,
+          "managedHeapBytes": 7854872
+        }
+      },
+      "timerDelayDuring100QueriesMs": 29.569334000000026,
+      "control": {
+        "name": "echo-1KiB",
+        "calls": 1500,
+        "meanUs": 1.634884666666659,
+        "p50Us": 1.209,
+        "p95Us": 2.333,
+        "p99Us": 3.291,
+        "sequentialCallsPerSecond": 583449.4073515403
+      },
+      "packing": {
+        "name": "packing",
+        "calls": 1500,
+        "meanUs": 603.6644806666668,
+        "p50Us": 528.042,
+        "p95Us": 952.542,
+        "p99Us": 2122.666,
+        "sequentialCallsPerSecond": 1644.9959758682776
+      }
+    },
+    {
+      "trial": 2,
+      "mode": "grpc",
+      "iterations": 1500,
+      "readyMs": 124.22758300000001,
+      "responseBytes": 495,
+      "correctness": {
+        "candidateId": "BA27E27ED89BB116E3733A7412E988D98CE75B05E09554703E1877A5293BC227",
+        "appointments": [
+          {
+            "clientId": "alice",
+            "serviceId": "gels",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:45:00.0000000+00:00",
+            "technician": "sarah"
+          },
+          {
+            "clientId": "beth",
+            "serviceId": "pedicure",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:30:00.0000000+00:00",
+            "technician": "anna"
+          }
+        ]
+      },
+      "initialized": {
+        "nodeRssBytes": 67796992,
+        "runtime": {
+          "workingSetBytes": 109707264,
+          "managedHeapBytes": 2702088
+        }
+      },
+      "loaded": {
+        "nodeRssBytes": 125829120,
+        "runtime": {
+          "workingSetBytes": 121913344,
+          "managedHeapBytes": 11506152
+        }
+      },
+      "timerDelayDuring100QueriesMs": 0,
+      "control": {
+        "name": "echo-1KiB",
+        "calls": 1500,
+        "meanUs": 146.1106826666667,
+        "p50Us": 137.75,
+        "p95Us": 178.541,
+        "p99Us": 284.166,
+        "sequentialCallsPerSecond": 6834.368118175738
+      },
+      "packing": {
+        "name": "packing",
+        "calls": 1500,
+        "meanUs": 815.2246546666669,
+        "p50Us": 810.208,
+        "p95Us": 1100.25,
+        "p99Us": 1673.417,
+        "sequentialCallsPerSecond": 1226.361080769848
+      }
+    },
+    {
+      "trial": 2,
+      "mode": "interop-typed",
+      "iterations": 1500,
+      "readyMs": 91.795,
+      "responseBytes": 495,
+      "correctness": {
+        "candidateId": "BA27E27ED89BB116E3733A7412E988D98CE75B05E09554703E1877A5293BC227",
+        "appointments": [
+          {
+            "clientId": "alice",
+            "serviceId": "gels",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:45:00.0000000+00:00",
+            "technician": "sarah"
+          },
+          {
+            "clientId": "beth",
+            "serviceId": "pedicure",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:30:00.0000000+00:00",
+            "technician": "anna"
+          }
+        ]
+      },
+      "initialized": {
+        "nodeRssBytes": 112345088,
+        "runtime": {
+          "workingSetBytes": 112836608,
+          "managedHeapBytes": 1761856
+        }
+      },
+      "loaded": {
+        "nodeRssBytes": 135020544,
+        "runtime": {
+          "workingSetBytes": 135020544,
+          "managedHeapBytes": 7055560
+        }
+      },
+      "timerDelayDuring100QueriesMs": 53.26204199999984,
+      "control": {
+        "name": "echo-1KiB",
+        "calls": 1500,
+        "meanUs": 2.2498619999999874,
+        "p50Us": 1.875,
+        "p95Us": 3.042,
+        "p99Us": 3.959,
+        "sequentialCallsPerSecond": 428928.7875269796
+      },
+      "packing": {
+        "name": "packing",
+        "calls": 1500,
+        "meanUs": 598.0811193333335,
+        "p50Us": 589.042,
+        "p95Us": 693.333,
+        "p99Us": 1006.416,
+        "sequentialCallsPerSecond": 1671.7664068082995
+      }
+    },
+    {
+      "trial": 3,
+      "mode": "baseline",
+      "nodeRssBytes": 42090496
+    },
+    {
+      "trial": 3,
+      "mode": "grpc",
+      "iterations": 1500,
+      "readyMs": 112.377959,
+      "responseBytes": 495,
+      "correctness": {
+        "candidateId": "BA27E27ED89BB116E3733A7412E988D98CE75B05E09554703E1877A5293BC227",
+        "appointments": [
+          {
+            "clientId": "alice",
+            "serviceId": "gels",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:45:00.0000000+00:00",
+            "technician": "sarah"
+          },
+          {
+            "clientId": "beth",
+            "serviceId": "pedicure",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:30:00.0000000+00:00",
+            "technician": "anna"
+          }
+        ]
+      },
+      "initialized": {
+        "nodeRssBytes": 67829760,
+        "runtime": {
+          "workingSetBytes": 109477888,
+          "managedHeapBytes": 2685544
+        }
+      },
+      "loaded": {
+        "nodeRssBytes": 122978304,
+        "runtime": {
+          "workingSetBytes": 123731968,
+          "managedHeapBytes": 3919264
+        }
+      },
+      "timerDelayDuring100QueriesMs": 0.8717910000000302,
+      "control": {
+        "name": "echo-1KiB",
+        "calls": 1500,
+        "meanUs": 146.78882800000005,
+        "p50Us": 138.5,
+        "p95Us": 172.792,
+        "p99Us": 296.375,
+        "sequentialCallsPerSecond": 6803.072040564451
+      },
+      "packing": {
+        "name": "packing",
+        "calls": 1500,
+        "meanUs": 798.2990533333337,
+        "p50Us": 717.666,
+        "p95Us": 1161.958,
+        "p99Us": 2426.5,
+        "sequentialCallsPerSecond": 1252.3057212915157
+      }
+    },
+    {
+      "trial": 3,
+      "mode": "interop-typed",
+      "iterations": 1500,
+      "readyMs": 94.52025,
+      "responseBytes": 495,
+      "correctness": {
+        "candidateId": "BA27E27ED89BB116E3733A7412E988D98CE75B05E09554703E1877A5293BC227",
+        "appointments": [
+          {
+            "clientId": "alice",
+            "serviceId": "gels",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:45:00.0000000+00:00",
+            "technician": "sarah"
+          },
+          {
+            "clientId": "beth",
+            "serviceId": "pedicure",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:30:00.0000000+00:00",
+            "technician": "anna"
+          }
+        ]
+      },
+      "initialized": {
+        "nodeRssBytes": 112148480,
+        "runtime": {
+          "workingSetBytes": 112656384,
+          "managedHeapBytes": 1753632
+        }
+      },
+      "loaded": {
+        "nodeRssBytes": 135020544,
+        "runtime": {
+          "workingSetBytes": 135020544,
+          "managedHeapBytes": 7402032
+        }
+      },
+      "timerDelayDuring100QueriesMs": 44.27445899999998,
+      "control": {
+        "name": "echo-1KiB",
+        "calls": 1500,
+        "meanUs": 2.4116173333333273,
+        "p50Us": 1.917,
+        "p95Us": 3.042,
+        "p99Us": 6.709,
+        "sequentialCallsPerSecond": 400213.447171825
+      },
+      "packing": {
+        "name": "packing",
+        "calls": 1500,
+        "meanUs": 632.935200666667,
+        "p50Us": 621.083,
+        "p95Us": 740.542,
+        "p99Us": 1041.208,
+        "sequentialCallsPerSecond": 1579.6831682125621
+      }
+    },
+    {
+      "trial": 3,
+      "mode": "interop-json",
+      "iterations": 1500,
+      "readyMs": 93.29899999999999,
+      "responseBytes": 495,
+      "correctness": {
+        "candidateId": "BA27E27ED89BB116E3733A7412E988D98CE75B05E09554703E1877A5293BC227",
+        "appointments": [
+          {
+            "clientId": "alice",
+            "serviceId": "gels",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:45:00.0000000+00:00",
+            "technician": "sarah"
+          },
+          {
+            "clientId": "beth",
+            "serviceId": "pedicure",
+            "start": "2030-06-03T10:00:00.0000000+00:00",
+            "end": "2030-06-03T10:30:00.0000000+00:00",
+            "technician": "anna"
+          }
+        ]
+      },
+      "initialized": {
+        "nodeRssBytes": 112541696,
+        "runtime": {
+          "workingSetBytes": 113016832,
+          "managedHeapBytes": 1900640
+        }
+      },
+      "loaded": {
+        "nodeRssBytes": 131170304,
+        "runtime": {
+          "workingSetBytes": 131170304,
+          "managedHeapBytes": 10276520
+        }
+      },
+      "timerDelayDuring100QueriesMs": 31.244707999999946,
+      "control": {
+        "name": "echo-1KiB",
+        "calls": 1500,
+        "meanUs": 1.57909866666666,
+        "p50Us": 1.208,
+        "p95Us": 2.25,
+        "p99Us": 3.25,
+        "sequentialCallsPerSecond": 602550.9597431687
+      },
+      "packing": {
+        "name": "packing",
+        "calls": 1500,
+        "meanUs": 595.6493499999993,
+        "p50Us": 588.375,
+        "p95Us": 779.208,
+        "p99Us": 925.209,
+        "sequentialCallsPerSecond": 1678.46714484823
+      }
+    }
+  ]
+}

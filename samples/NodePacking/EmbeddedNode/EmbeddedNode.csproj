@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../AppScheduler/AppScheduler.csproj" />
+    <PackageReference Include="Microsoft.JavaScript.LibNode" Version="20.1800.203" />
+    <Content Include="../format-booking.cjs" Link="format-booking.cjs" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="../existing-calendar-api.cjs" Link="existing-calendar-api.cjs" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

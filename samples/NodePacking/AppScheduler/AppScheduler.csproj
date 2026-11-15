@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <PackingSourceRoot Condition="'$(PackingSourceRoot)' == ''">$(MSBuildThisFileDirectory)../../../../mostlylucid.packing</PackingSourceRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(PackingSourceRoot)/src/Mostlylucid.Packing/Mostlylucid.Packing.csproj" />
+    <Compile Include="../PackingBridge/SalonDefinition.cs" Link="SalonDefinition.cs" />
+    <PackageReference Include="Microsoft.JavaScript.NodeApi" Version="0.9.36" />
+    <PackageReference Include="Microsoft.JavaScript.NodeApi.Generator" Version="0.9.36" />
+  </ItemGroup>
+</Project>

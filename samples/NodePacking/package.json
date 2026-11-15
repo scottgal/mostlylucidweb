@@ -1,0 +1,28 @@
+{
+  "name": "node-packing-tutorial",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "npm run build:app && npm run build:fixture",
+    "build:app": "dotnet build EmbeddedNode -c Release",
+    "build:fixture": "dotnet build PackingBridge -c Release",
+    "demo": "node demo.mjs",
+    "booking": "node book.mjs",
+    "app": "node existing-app.mjs",
+    "build:bench": "dotnet build Sidecar -c Release",
+    "bench": "node bench/run.mjs",
+    "bench:summary": "node bench/summarize.mjs",
+    "test": "node --test test.mjs existing-app.test.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "reverse": "dotnet run --project EmbeddedNode -c Release --no-build",
+    "test:interop": "dotnet run --project EmbeddedNode -c Release --no-build -- --verify-errors"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "1.14.7",
+    "@grpc/proto-loader": "0.8.1",
+    "node-api-dotnet": "0.9.36"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2"
+  }
+}

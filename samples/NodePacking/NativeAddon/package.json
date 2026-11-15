@@ -1,0 +1,9 @@
+{
+  "name": "@mostlylucid/native-interop-demo",
+  "version": "0.1.0",
+  "private": true,
+  "main": "index.cjs",
+  "types": "index.d.cts",
+  "files": ["index.cjs", "index.d.cts", "native/**/*.node"],
+  "license": "MIT"
+}

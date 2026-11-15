@@ -1,0 +1,16 @@
+syntax = "proto3";
+package packing;
+option csharp_namespace = "PackingTutorial.Grpc";
+
+service PackingBench {
+  rpc FindTogether (SearchRequest) returns (JsonReply);
+  rpc Echo (JsonReply) returns (JsonReply);
+  rpc Memory (Empty) returns (JsonReply);
+}
+
+message SearchRequest {
+  string from = 1;
+  string to = 2;
+}
+message JsonReply { string json = 1; }
+message Empty {}
